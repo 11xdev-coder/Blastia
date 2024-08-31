@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlasterMaster", "BlasterMaster\BlasterMaster.csproj", "{11343F55-DF94-40BE-A62F-42AF2EEF52EF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FNA.NetFramework", "FNA\FNA.NetFramework.csproj", "{A9A72DBB-25CB-44A5-A864-FCBE46D9420A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,9 +12,5 @@ Global
 		{11343F55-DF94-40BE-A62F-42AF2EEF52EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11343F55-DF94-40BE-A62F-42AF2EEF52EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11343F55-DF94-40BE-A62F-42AF2EEF52EF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9A72DBB-25CB-44A5-A864-FCBE46D9420A}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{A9A72DBB-25CB-44A5-A864-FCBE46D9420A}.Debug|Any CPU.Build.0 = Debug|x64
-		{A9A72DBB-25CB-44A5-A864-FCBE46D9420A}.Release|Any CPU.ActiveCfg = Release|x64
-		{A9A72DBB-25CB-44A5-A864-FCBE46D9420A}.Release|Any CPU.Build.0 = Release|x64
 	EndGlobalSection
 EndGlobal

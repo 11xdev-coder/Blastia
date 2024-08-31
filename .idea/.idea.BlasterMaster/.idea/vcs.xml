@@ -3,8 +3,5 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../FNACloned/FNA/lib/FAudio" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../FNACloned/FNA/lib/SDL2-CS" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../FNACloned/FNA/lib/Theorafile" vcs="Git" />
   </component>
 </project>

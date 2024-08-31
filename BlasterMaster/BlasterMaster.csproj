@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FNA\FNA.NetFramework.csproj" />
+      <PackageReference Include="FNA.NET" Version="1.0.15.2403" />
     </ItemGroup>
 
 </Project>
