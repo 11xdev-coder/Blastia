@@ -17,8 +17,8 @@
   "libraries": {
     "FNA/1.0.0": {
       "type": "project",
-      "path": "../../FNACloned/FNA/FNA.NetFramework.csproj",
-      "msbuildProject": "../../FNACloned/FNA/FNA.NetFramework.csproj"
+      "path": "../FNA/FNA.NetFramework.csproj",
+      "msbuildProject": "../FNA/FNA.NetFramework.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -59,8 +59,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "C:\\Users\\matve\\projects\\FNACloned\\FNA\\FNA.NetFramework.csproj": {
-              "projectPath": "C:\\Users\\matve\\projects\\FNACloned\\FNA\\FNA.NetFramework.csproj"
+            "C:\\Users\\matve\\projects\\BlasterMaster\\FNA\\FNA.NetFramework.csproj": {
+              "projectPath": "C:\\Users\\matve\\projects\\BlasterMaster\\FNA\\FNA.NetFramework.csproj"
             }
           }
         }

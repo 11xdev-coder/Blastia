@@ -22,11 +22,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\FNACloned\FNA\FNA.NetFramework.csproj" />
+      <Folder Include="Main\Content\Sounds\Menu\" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Main\Content\Sounds\Menu\" />
+      <ProjectReference Include="..\FNA\FNA.NetFramework.csproj" />
     </ItemGroup>
 
 </Project>
