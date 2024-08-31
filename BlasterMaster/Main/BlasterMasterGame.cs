@@ -32,6 +32,8 @@ public class BlasterMasterGame : Game
     
     public MainMenu MainMenu;
     public SpriteFont MainMenuFont;
+
+    private static event Action? ExitRequestEvent;
     
     public BlasterMasterGame()
     {
@@ -40,6 +42,8 @@ public class BlasterMasterGame : Game
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
         SoundEngine.Initialize(Content);
+        
+        ExitRequestEvent += OnExitRequested;
     }
 
     protected override void Initialize()
@@ -113,5 +117,15 @@ public class BlasterMasterGame : Game
     {
         ScreenWidth = GraphicsDevice.Viewport.Width;
         ScreenHeight = GraphicsDevice.Viewport.Height;
+    }
+
+    private void OnExitRequested()
+    {
+        Exit();
+    }
+
+    public static void RequestExit()
+    {
+        ExitRequestEvent?.Invoke();
     }
 }

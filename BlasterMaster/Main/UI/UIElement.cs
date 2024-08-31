@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BlasterMaster.Main.Utilities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI;
@@ -11,38 +12,23 @@ public abstract class UIElement
     public Vector2 Position;
 
     private float _hAlign;
-    private float _vAlign;
-    
     /// <summary>
     /// Horizontal Alignment
     /// </summary>
     public float HAlign
     {
         get => _hAlign;
-        set
-        {
-            if (value != _hAlign)
-            {
-                _hAlign = value;
-                UpdateBounds();
-            }
-        }
+        set => Properties.OnValueChangedProperty(ref _hAlign, value, UpdateBounds);
     }
     
+    private float _vAlign;
     /// <summary>
     /// Vertical alignment
     /// </summary>
     public float VAlign
     {
         get => _vAlign;
-        set
-        {
-            if (value != _vAlign)
-            {
-                _vAlign = value;
-                UpdateBounds();
-            }
-        }
+        set => Properties.OnValueChangedProperty(ref _vAlign, value, UpdateBounds);
     }
 
     public Rectangle Bounds { get; set; }
@@ -105,13 +91,13 @@ public abstract class UIElement
         int positionX = (int)Position.X;
         int positionY = (int)Position.Y;
 
-        // Apply horizontal alignment
+        // horizontal alignment if has any
         if (HAlign > 0)
         {
             positionX += (int)((BlasterMasterGame.ScreenWidth * HAlign) - (textSize.X * HAlign));
         }
 
-        // Apply vertical alignment
+        // vertical alignment if has any
         if (VAlign > 0)
         {
             positionY += (int)((BlasterMasterGame.ScreenHeight * VAlign) - (textSize.Y * VAlign));
