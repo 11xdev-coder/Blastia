@@ -5,9 +5,45 @@ namespace BlasterMaster.Main.UI;
 
 public abstract class UIElement
 {
+    /// <summary>
+    /// Left corner of Bounds rectangle
+    /// </summary>
     public Vector2 Position;
-    // TODO: Ask how alignment works and implement
-    public Vector2 Alignment;
+
+    private float _hAlign;
+    private float _vAlign;
+    
+    /// <summary>
+    /// Horizontal Alignment
+    /// </summary>
+    public float HAlign
+    {
+        get => _hAlign;
+        set
+        {
+            if (value != _hAlign)
+            {
+                _hAlign = value;
+                UpdateBounds();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Vertical alignment
+    /// </summary>
+    public float VAlign
+    {
+        get => _vAlign;
+        set
+        {
+            if (value != _vAlign)
+            {
+                _vAlign = value;
+                UpdateBounds();
+            }
+        }
+    }
 
     public Rectangle Bounds { get; set; }
     public Action? OnHover { get; set; }
@@ -47,9 +83,9 @@ public abstract class UIElement
     
     public virtual void Update()
     {
-        int cursorX = (int)BlasterMasterGame.Instance.CursorPosition.X;
-        int cursorY = (int)BlasterMasterGame.Instance.CursorPosition.Y;
-        bool hasClicked = BlasterMasterGame.Instance.HasClickedLeft;
+        int cursorX = (int)BlasterMasterGame.CursorPosition.X;
+        int cursorY = (int)BlasterMasterGame.CursorPosition.Y;
+        bool hasClicked = BlasterMasterGame.HasClickedLeft;
         IsHovered = Bounds.Contains(cursorX, cursorY);
         
         if(IsHovered) OnHover?.Invoke(); // if hovering
@@ -58,14 +94,32 @@ public abstract class UIElement
         if(IsHovered && hasClicked) OnClick?.Invoke();
         
         _prevIsHovered = IsHovered;
+        
+        UpdateBounds();
     }
     
     public void UpdateBounds()
     {
         Vector2 textSize = Font.MeasureString(TextToDraw);
+        
+        int positionX = (int)Position.X;
+        int positionY = (int)Position.Y;
+
+        // Apply horizontal alignment
+        if (HAlign > 0)
+        {
+            positionX += (int)((BlasterMasterGame.ScreenWidth * HAlign) - (textSize.X * HAlign));
+        }
+
+        // Apply vertical alignment
+        if (VAlign > 0)
+        {
+            positionY += (int)((BlasterMasterGame.ScreenHeight * VAlign) - (textSize.Y * VAlign));
+        }
+        
         Bounds = new Rectangle(
-            (int)Position.X, 
-            (int)Position.Y, 
+            positionX, 
+            positionY,
             (int)textSize.X + 2, 
             (int)textSize.Y + 2);
     }

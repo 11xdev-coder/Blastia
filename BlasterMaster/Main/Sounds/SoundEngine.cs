@@ -11,25 +11,20 @@ public enum SoundID
 
 public class SoundEngine
 {
-    public static SoundEngine Instance { get; private set; }
-    
-    private Dictionary<SoundID, SoundEffect> _sounds;
-    private ContentManager _contentManager;
+    private static Dictionary<SoundID, SoundEffect>? _sounds = new Dictionary<SoundID, SoundEffect>();
+    private static ContentManager? _contentManager;
 
-    public SoundEngine(ContentManager contentManager)
+    public static void Initialize(ContentManager? contentManager)
     {
-        Instance = this;
-        
-        _sounds = new Dictionary<SoundID, SoundEffect>();
         _contentManager = contentManager;
     }
 
-    public void LoadSounds()
+    public static void LoadSounds()
     {
         LoadSound(SoundID.Tick, Paths.TickSoundPath);
     }
 
-    public void LoadSound(SoundID id, string path)
+    public static void LoadSound(SoundID id, string path)
     {
         try
         {
@@ -41,7 +36,7 @@ public class SoundEngine
         }
     }
 
-    public void PlaySound(SoundID id)
+    public static void PlaySound(SoundID id)
     {
         if (_sounds.TryGetValue(id, out var sound))
         {
@@ -53,7 +48,7 @@ public class SoundEngine
         }
     }
 
-    public void UnloadSounds()
+    public static void UnloadSounds()
     {
         foreach (var sound in _sounds.Values)
         {

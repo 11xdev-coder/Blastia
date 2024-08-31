@@ -17,8 +17,9 @@ public class MainMenu : Menu
             Font);
         Elements.Add(logoText);
         
-        Button singlePlayerButton = new Button(new Vector2(100, 100), "Single Player",
+        Button singlePlayerButton = new Button(new Vector2(0, 100), "Single Player",
             Font, OnClickSinglePlayer);
+        singlePlayerButton.HAlign = 0.5f;
         Elements.Add(singlePlayerButton);
 
         Button multiplayerButton = new Button(new Vector2(100, 150), "Multiplayer",

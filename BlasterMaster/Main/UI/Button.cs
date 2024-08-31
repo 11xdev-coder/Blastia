@@ -29,7 +29,7 @@ public class Button : UIElement
 
     private void PlayTickSound()
     {
-        SoundEngine.Instance.PlaySound(SoundID.Tick);
+        SoundEngine.PlaySound(SoundID.Tick);
     }
 
     private void Select()

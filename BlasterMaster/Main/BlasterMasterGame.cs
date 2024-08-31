@@ -1,4 +1,5 @@
-﻿using BlasterMaster.Main.Sounds;
+﻿using System.Diagnostics;
+using BlasterMaster.Main.Sounds;
 using BlasterMaster.Main.UI;
 using BlasterMaster.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -17,37 +18,41 @@ public class BlasterMasterGame : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
+    public static float ScreenWidth;
+    public static float ScreenHeight;
+
     public MouseState PreviousMouseState;
     public MouseState CurrentMouseState;
-    public bool HasClickedLeft;
+    public static bool HasClickedLeft;
 
     private Texture2D _cursorTexture;
-    public Vector2 CursorPosition;
+    public static Vector2 CursorPosition;
     
     private Texture2D _texture;
     
     public MainMenu MainMenu;
     public SpriteFont MainMenuFont;
     
-    public static BlasterMasterGame Instance { get; private set; }
-    public static SoundEngine SoundEngine { get; private set; }
-    
     public BlasterMasterGame()
     {
-        Instance = this;
-        
         _graphics = new GraphicsDeviceManager(this);
         
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
-        SoundEngine = new SoundEngine(Content);
+        SoundEngine.Initialize(Content);
     }
 
     protected override void Initialize()
     {
         base.Initialize();
+        
+        _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
+        _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+        _graphics.ApplyChanges();
+        
+        UpdateResolution();
     }
-
+    
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -102,5 +107,11 @@ public class BlasterMasterGame : Game
         // draw cursor texture last on top of everything
         _spriteBatch.Draw(_cursorTexture, CursorPosition, Color.White);
         _spriteBatch.End();
+    }
+
+    private void UpdateResolution()
+    {
+        ScreenWidth = GraphicsDevice.Viewport.Width;
+        ScreenHeight = GraphicsDevice.Viewport.Height;
     }
 }
