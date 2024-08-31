@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <CaseSensitiveFilenames>true</CaseSensitiveFilenames>
+        <Nullable>enable</Nullable>
+        <LangVersion>12</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="FNA">
+        <HintPath>FNA.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="Main\Content\**\*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\FNACloned\FNA\FNA.NetFramework.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Main\Content\Sounds\Menu\" />
+    </ItemGroup>
+
+</Project>
