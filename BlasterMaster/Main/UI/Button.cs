@@ -16,7 +16,7 @@ public class Button : UIElement
     {
         OnClick = onClick;
         
-        TextDrawColor = NormalColor;
+        DrawColor = NormalColor;
         
         OnStartHovering = () => { PlayTickSound(); Select(); };
         OnEndHovering = Deselect;
@@ -34,11 +34,11 @@ public class Button : UIElement
 
     private void Select()
     {
-        TextDrawColor = SelectedColor;
+        DrawColor = SelectedColor;
     }
 
     private void Deselect()
     {
-        TextDrawColor = NormalColor;
+        DrawColor = NormalColor;
     }
 }

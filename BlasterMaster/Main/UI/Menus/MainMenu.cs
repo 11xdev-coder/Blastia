@@ -1,25 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BlasterMaster.Main.UI;
+namespace BlasterMaster.Main.UI.Menus;
 
 public class MainMenu : Menu
 {
     public MainMenu(SpriteFont font) : base(font)
     {
+        AddElements();
     }
 
-    protected override void AddElements()
+    private void AddElements()
     {
-        base.AddElements();
-
-        Text logoText = new Text(new Vector2(0, 200), "Blaster Master",
-            Font)
-        {
-            HAlign = 0.5f
-        };
-        Elements.Add(logoText);
-        
         Button singlePlayerButton = new Button(new Vector2(0, 500), "Single Player",
             Font, OnClickSinglePlayer)
         {
@@ -61,7 +53,7 @@ public class MainMenu : Menu
 
     private void OnClickSettings()
     {
-        
+        SwitchToMenu(BlasterMasterGame.SettingsMenu);
     }
 
     private void OnClickExit()

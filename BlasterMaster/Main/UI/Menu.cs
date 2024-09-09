@@ -7,20 +7,13 @@ public class Menu
     public List<UIElement> Elements;
     public SpriteFont Font;
 
-    public Menu(SpriteFont font)
+    public bool Active;
+
+    public Menu(SpriteFont font, bool isActive = true)
     {
         Elements = new List<UIElement>();
         Font = font;
-        
-        AddElements();
-    }
-    
-    /// <summary>
-    /// Override to add custom elements. All elements must be added to Elements list
-    /// </summary>
-    protected virtual void AddElements()
-    {
-        
+        Active = isActive;
     }
     
     /// <summary>
@@ -43,6 +36,19 @@ public class Menu
         foreach (var elem in Elements)
         {
             elem.Draw(spriteBatch);
+        }
+    }
+    
+    /// <summary>
+    /// Sets current menu to inactive and new menu to active
+    /// </summary>
+    /// <param name="menu"></param>
+    public void SwitchToMenu(Menu? menu)
+    {
+        if (menu != null)
+        {
+            Active = false;
+            menu.Active = true;
         }
     }
 }

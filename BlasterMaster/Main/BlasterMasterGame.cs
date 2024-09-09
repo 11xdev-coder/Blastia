@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using BlasterMaster.Main.Sounds;
 using BlasterMaster.Main.UI;
+using BlasterMaster.Main.UI.Menus;
 using BlasterMaster.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,26 +19,35 @@ public class BlasterMasterGame : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
-    public static float ScreenWidth;
-    public static float ScreenHeight;
+    public static float ScreenWidth { get; private set; }
+    public static float ScreenHeight { get; private set; }
+    public static bool HasClickedLeft { get; private set; }
+    public static Vector2 CursorPosition { get; private set; }
 
-    public MouseState PreviousMouseState;
-    public MouseState CurrentMouseState;
-    public static bool HasClickedLeft;
+    private MouseState _previousMouseState;
+    private MouseState _currentMouseState;
 
     private Texture2D _cursorTexture;
-    public static Vector2 CursorPosition;
     
-    private Texture2D _texture;
-    
-    public MainMenu MainMenu;
-    public SpriteFont MainMenuFont;
+    public SpriteFont MainFont { get; private set; }
+    private Texture2D _logoTexture;
 
+    public static LogoMenu? LogoMenu { get; private set; }
+    public static MainMenu? MainMenu { get; private set; }
+    public static SettingsMenu? SettingsMenu { get; private set; }
+    private readonly List<Menu> _menus;
+
+    /// <summary>
+    /// Event triggered when a request to exit the game is made.
+    /// This event allows for a clean shutdown process by ensuring
+    /// all necessary operations are completed prior to exiting.
+    /// </summary>
     private static event Action? ExitRequestEvent;
     
     public BlasterMasterGame()
     {
         _graphics = new GraphicsDeviceManager(this);
+        _menus = new List<Menu>();
         
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
@@ -65,12 +75,19 @@ public class BlasterMasterGame : Game
         
         _cursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
             Content.RootDirectory + Paths.CursorTexturePath);
-        
-        _texture = LoadingUtilities.LoadTexture(GraphicsDevice, 
-            Content.RootDirectory + "/Textures/Toilet.png");
 
-        MainMenuFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
-        MainMenu = new MainMenu(MainMenuFont);
+        MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
+        _logoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.Logo5XTexturePath);
+        
+        LogoMenu = new LogoMenu(MainFont, _logoTexture);
+        AddMenu(LogoMenu);
+        
+        MainMenu = new MainMenu(MainFont);
+        AddMenu(MainMenu);
+        
+        SettingsMenu = new SettingsMenu(MainFont);
+        AddMenu(SettingsMenu);
     }
 
     protected override void UnloadContent()
@@ -83,20 +100,29 @@ public class BlasterMasterGame : Game
     {
         base.Update(gameTime);
         
-        CurrentMouseState = Mouse.GetState();
+        UpdateMouseState();
+
+        foreach (Menu menu in _menus)
+        {
+            if (menu.Active)
+            {
+                menu.Update();
+            }
+        }
+    }
+
+    private void UpdateMouseState()
+    {
+        _currentMouseState = Mouse.GetState();
         
-        HasClickedLeft = CurrentMouseState.LeftButton == ButtonState.Released 
-                         && PreviousMouseState.LeftButton == ButtonState.Pressed;
+        HasClickedLeft = _currentMouseState.LeftButton == ButtonState.Released 
+                         && _previousMouseState.LeftButton == ButtonState.Pressed;
         
         
-        CursorPosition = new Vector2(CurrentMouseState.X, CurrentMouseState.Y);
-        
-        MainMenu.Update();
-        
-        if(Keyboard.GetState().IsKeyDown(Keys.Escape)) SoundEngine.PlaySound(SoundID.Tick);
+        CursorPosition = new Vector2(_currentMouseState.X, _currentMouseState.Y);
         
         // set previous in the end
-        PreviousMouseState = CurrentMouseState;
+        _previousMouseState = _currentMouseState;
     }
 
     protected override void Draw(GameTime gameTime)
@@ -104,9 +130,14 @@ public class BlasterMasterGame : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
         
         _spriteBatch.Begin();
-        _spriteBatch.Draw(_texture, new Vector2(0, 0), Color.White);
         
-        MainMenu.Draw(_spriteBatch);
+        foreach (Menu menu in _menus)
+        {
+            if (menu.Active)
+            {
+                menu.Draw(_spriteBatch);
+            }
+        }
         
         // draw cursor texture last on top of everything
         _spriteBatch.Draw(_cursorTexture, CursorPosition, Color.White);
@@ -117,6 +148,11 @@ public class BlasterMasterGame : Game
     {
         ScreenWidth = GraphicsDevice.Viewport.Width;
         ScreenHeight = GraphicsDevice.Viewport.Height;
+    }
+
+    private void AddMenu(Menu? menu)
+    {
+        if(menu != null) _menus.Add(menu);
     }
 
     private void OnExitRequested()
