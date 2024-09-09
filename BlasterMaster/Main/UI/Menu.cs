@@ -9,11 +9,15 @@ public class Menu
 
     public bool Active;
 
-    public Menu(SpriteFont font, bool isActive = true)
+    private bool _menuSwitched;
+
+    public Menu(SpriteFont font, bool isActive = false)
     {
         Elements = new List<UIElement>();
         Font = font;
         Active = isActive;
+        
+        _menuSwitched = false;
     }
     
     /// <summary>
@@ -49,6 +53,20 @@ public class Menu
         {
             Active = false;
             menu.Active = true;
+            
+            _menuSwitched = true;
         }
+    }
+    
+    /// <summary>
+    /// Runs in Game Update method to prevent other menus from updating when transitioning
+    /// to new menu
+    /// </summary>
+    /// <returns></returns>
+    public bool CheckAndResetMenuSwitchedFlag()
+    {
+        bool wasSwitched = _menuSwitched;
+        _menuSwitched = false;
+        return wasSwitched;
     }
 }

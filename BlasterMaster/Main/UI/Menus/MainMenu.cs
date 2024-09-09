@@ -5,7 +5,7 @@ namespace BlasterMaster.Main.UI.Menus;
 
 public class MainMenu : Menu
 {
-    public MainMenu(SpriteFont font) : base(font)
+    public MainMenu(SpriteFont font, bool isActive = true) : base(font, isActive)
     {
         AddElements();
     }

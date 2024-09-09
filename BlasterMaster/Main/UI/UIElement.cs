@@ -91,14 +91,14 @@ public abstract class UIElement
         int cursorY = (int)BlasterMasterGame.CursorPosition.Y;
         bool hasClicked = BlasterMasterGame.HasClickedLeft;
         IsHovered = Bounds.Contains(cursorX, cursorY);
-        
+    
         if(IsHovered) OnHover?.Invoke(); // if hovering
         if(IsHovered && !_prevIsHovered) OnStartHovering?.Invoke(); // if started hovering
         if(!IsHovered && _prevIsHovered) OnEndHovering?.Invoke(); // end hovering
         if(IsHovered && hasClicked) OnClick?.Invoke();
-        
+    
         _prevIsHovered = IsHovered;
-        
+    
         UpdateBounds();
     }
     

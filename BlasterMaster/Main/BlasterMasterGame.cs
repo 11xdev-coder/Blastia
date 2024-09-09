@@ -35,6 +35,7 @@ public class BlasterMasterGame : Game
     public static LogoMenu? LogoMenu { get; private set; }
     public static MainMenu? MainMenu { get; private set; }
     public static SettingsMenu? SettingsMenu { get; private set; }
+    public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
     private readonly List<Menu> _menus;
 
     /// <summary>
@@ -88,6 +89,9 @@ public class BlasterMasterGame : Game
         
         SettingsMenu = new SettingsMenu(MainFont);
         AddMenu(SettingsMenu);
+        
+        VideoSettingsMenu = new VideoSettingsMenu(MainFont);
+        AddMenu(VideoSettingsMenu);
     }
 
     protected override void UnloadContent()
@@ -107,6 +111,11 @@ public class BlasterMasterGame : Game
             if (menu.Active)
             {
                 menu.Update();
+                // prevent new menu from updating when switched
+                if (menu.CheckAndResetMenuSwitchedFlag())
+                {
+                    break;
+                }
             }
         }
     }
