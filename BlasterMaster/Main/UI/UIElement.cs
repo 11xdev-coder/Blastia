@@ -57,6 +57,10 @@ public abstract class UIElement
     /// </summary>
     public string Text { get; set; }
     /// <summary>
+    /// Additional text variable for custom text logic
+    /// </summary>
+    public string InitialText { get; private set; }
+    /// <summary>
     /// Draw color applied to Texture and Text
     /// </summary>
     public Color DrawColor { get; set; } = Color.White;
@@ -81,6 +85,7 @@ public abstract class UIElement
         Position = position;
         Font = font;
         Text = text;
+        InitialText = text;
         
         UpdateBounds();
     }

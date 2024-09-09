@@ -12,6 +12,15 @@ public class VideoSettingsMenu : Menu
 
     private void AddElements()
     {
+        BoolSwitchButton isFullScreenButton = new BoolSwitchButton(new Vector2(0, 600), "Full Screen", Font, 
+            OnClickFullScreen, 
+            () => BlasterMasterGame.VideoManager.IsFullScreen,
+            (b) => BlasterMasterGame.VideoManager.IsFullScreen = b)
+        {
+            HAlign = 0.5f
+        };
+        Elements.Add(isFullScreenButton);
+        
         Button backButton = new Button(new Vector2(0, 650), "Back", Font, OnClickBack)
         {
             HAlign = 0.5f
@@ -23,5 +32,10 @@ public class VideoSettingsMenu : Menu
     private void OnClickBack()
     {
         SwitchToMenu(BlasterMasterGame.SettingsMenu);
+    }
+
+    private void OnClickFullScreen()
+    {
+        
     }
 }
