@@ -44,15 +44,11 @@ public class BlasterMasterGame : Game
     /// all necessary operations are completed prior to exiting.
     /// </summary>
     private static event Action? ExitRequestEvent;
-
-    public static VideoManager VideoManager { get; private set; }
     
     public BlasterMasterGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         _menus = new List<Menu>();
-        
-        VideoManager = new VideoManager();
         
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
