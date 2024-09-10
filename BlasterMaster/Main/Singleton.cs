@@ -6,7 +6,7 @@ public abstract class Singleton<T> where T : class, new()
     private static T? _instance;
     
     // lock object
-    private static readonly object _lock = new();
+    private static readonly object Lock = new();
 
     public static T Instance
     {
@@ -16,7 +16,7 @@ public abstract class Singleton<T> where T : class, new()
             {
                 // only one thread can create a new instance
                 // if multiple threads try to access instance, multiple instances can be created
-                lock (_lock)
+                lock (Lock)
                 {
                     if (_instance == null) _instance = new T();
                 }

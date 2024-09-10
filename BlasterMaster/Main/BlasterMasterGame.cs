@@ -16,7 +16,7 @@ public class BlasterMasterGame : Game
     /// Manages things such as resolution, VSync, fullscreen or windowed mode, etc.
     /// Used for low-level graphics operations.
     /// </summary>
-    private GraphicsDeviceManager _graphics;
+    private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
     public static float ScreenWidth { get; private set; }
@@ -50,6 +50,9 @@ public class BlasterMasterGame : Game
         _graphics = new GraphicsDeviceManager(this);
         _menus = new List<Menu>();
         
+        // initialize video manager with graphics manager
+        VideoManager.Instance.Initialize(_graphics);
+        
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
         SoundEngine.Initialize(Content);
@@ -61,8 +64,8 @@ public class BlasterMasterGame : Game
     {
         base.Initialize();
         
-        _graphics.PreferredBackBufferWidth = GraphicsDevice.DisplayMode.Width;
-        _graphics.PreferredBackBufferHeight = GraphicsDevice.DisplayMode.Height;
+        _graphics.PreferredBackBufferWidth = 1920;
+        _graphics.PreferredBackBufferHeight = 1080;
         _graphics.ApplyChanges();
         
         UpdateResolution();
