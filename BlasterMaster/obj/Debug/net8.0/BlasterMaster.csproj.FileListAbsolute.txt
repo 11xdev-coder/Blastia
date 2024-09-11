@@ -77,3 +77,4 @@ D:\Projects\BlasterMaster\BlasterMaster\obj\Debug\net8.0\BlasterMaster.genruntim
 D:\Projects\BlasterMaster\BlasterMaster\obj\Debug\net8.0\ref\BlasterMaster.dll
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Menu\Logo.png
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Menu\Logo5X.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Saved\videomanager.bin

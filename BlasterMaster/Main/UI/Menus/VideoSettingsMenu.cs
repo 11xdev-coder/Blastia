@@ -32,6 +32,7 @@ public class VideoSettingsMenu : Menu
     private void OnClickBack()
     {
         SwitchToMenu(BlasterMasterGame.SettingsMenu);
+        VideoManager.Instance.SaveStateToFile();
     }
 
     private void OnClickFullScreen()

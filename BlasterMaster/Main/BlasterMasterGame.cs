@@ -50,12 +50,13 @@ public class BlasterMasterGame : Game
         _graphics = new GraphicsDeviceManager(this);
         _menus = new List<Menu>();
         
-        // initialize video manager with graphics manager
-        VideoManager.Instance.Initialize(_graphics);
-        
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
         SoundEngine.Initialize(Content);
+        
+        // initialize video manager with graphics manager
+        string videoManagerPath = Content.RootDirectory + Paths.VideoManagerSavePath;
+        VideoManager.Instance.Initialize(_graphics, videoManagerPath);
         
         ExitRequestEvent += OnExitRequested;
     }
