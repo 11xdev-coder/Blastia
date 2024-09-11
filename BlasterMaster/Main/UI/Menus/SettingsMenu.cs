@@ -32,6 +32,7 @@ public class SettingsMenu : Menu
 
     private void OnClickVideoSettings()
     {
+        VideoManager.Instance.LoadStateFromFile();
         SwitchToMenu(BlasterMasterGame.VideoSettingsMenu);
     }
 }

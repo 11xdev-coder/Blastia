@@ -57,6 +57,7 @@ public class BlasterMasterGame : Game
         // initialize video manager with graphics manager
         string videoManagerPath = Content.RootDirectory + Paths.VideoManagerSavePath;
         VideoManager.Instance.Initialize(_graphics, videoManagerPath);
+        VideoManager.Instance.LoadStateFromFile();
         
         ExitRequestEvent += OnExitRequested;
     }
