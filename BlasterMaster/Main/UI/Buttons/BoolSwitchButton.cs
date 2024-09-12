@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BlasterMaster.Main.UI.Menus;
+namespace BlasterMaster.Main.UI.Buttons;
 
 public class BoolSwitchButton : Button
 {

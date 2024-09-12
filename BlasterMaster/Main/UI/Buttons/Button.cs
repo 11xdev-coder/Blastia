@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-namespace BlasterMaster.Main.UI;
+namespace BlasterMaster.Main.UI.Buttons;
 
 public class Button : UIElement
 {

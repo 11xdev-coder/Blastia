@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BlasterMaster.Main.UI.Buttons;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI.Menus;
@@ -12,6 +13,13 @@ public class VideoSettingsMenu : Menu
 
     private void AddElements()
     {
+        EnumArrowButton resolutionSwitcher = new EnumArrowButton(new Vector2(0, 550), "Resolution", Font,
+            OnClickResolution, 10)
+        {
+            HAlign = 0.5f
+        };
+        resolutionSwitcher.AddToElements(Elements);
+        
         BoolSwitchButton isFullScreenButton = new BoolSwitchButton(new Vector2(0, 600), "Full Screen", Font, 
             OnClickFullScreen, 
             () => VideoManager.Instance.IsFullScreen,
@@ -36,6 +44,11 @@ public class VideoSettingsMenu : Menu
     }
 
     private void OnClickFullScreen()
+    {
+        
+    }
+
+    private void OnClickResolution()
     {
         
     }
