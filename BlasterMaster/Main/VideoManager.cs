@@ -1,5 +1,5 @@
 ﻿using BlasterMaster.Main.Utilities;
-using BlasterMaster.Main.Utilities.Handlers;
+using BlasterMaster.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,8 +14,8 @@ public class VideoManager : Singleton<VideoManager>
     // property will update on itself
     public bool IsFullScreen => _graphics?.IsFullScreen ?? false;
     
-    private ResolutionHandler? _resolutionHandler;
-    public ResolutionHandler ResolutionHandler
+    private ResolutionListHandler? _resolutionHandler;
+    public ResolutionListHandler ResolutionHandler
     {
         get
         {
@@ -32,7 +32,7 @@ public class VideoManager : Singleton<VideoManager>
         _graphics = graphics;
         _savePath = savePath;
         
-        ResolutionHandler = new ResolutionHandler();
+        ResolutionHandler = new ResolutionListHandler();
     }
     
     public void ToggleFullscreen()

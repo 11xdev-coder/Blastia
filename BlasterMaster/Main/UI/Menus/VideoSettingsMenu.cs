@@ -1,5 +1,5 @@
 ﻿using BlasterMaster.Main.UI.Buttons;
-using BlasterMaster.Main.Utilities.Handlers;
+using BlasterMaster.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -14,7 +14,7 @@ public class VideoSettingsMenu : Menu
 
     private void AddElements()
     {
-        HandlerArrowButton resolutionSwitcher = new HandlerArrowButton(new Vector2(0, 550), "Resolution", Font,
+        HandlerArrowButton<DisplayMode> resolutionSwitcher = new HandlerArrowButton<DisplayMode>(new Vector2(0, 550), "Resolution", Font,
             OnClickResolution, 10, VideoManager.Instance.ResolutionHandler)
         {
             HAlign = 0.5f

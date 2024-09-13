@@ -1,4 +1,4 @@
-﻿using BlasterMaster.Main.Utilities.Handlers;
+﻿using BlasterMaster.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,8 +6,9 @@ namespace BlasterMaster.Main.UI.Buttons;
 
 /// <summary>
 /// Accepts handler, creates 2 arrows that will go to next/previous item.
+/// <para>T -> ListHandler's class</para>
 /// </summary>
-public class HandlerArrowButton : Button
+public class HandlerArrowButton<T> : Button where T : class
 {
     public Button? LeftButton;
     public Button? RightButton;
@@ -15,13 +16,13 @@ public class HandlerArrowButton : Button
     private Vector2 _leftArrowPosition;
     private Vector2 _rightArrowPosition;
     private float _arrowSpacing;
-    private Handler _handler;
+    private ListHandler<T> _handler;
 
     private float _leftArrowSizeY;
     private float _rightArrowSizeX;
     
     public HandlerArrowButton(Vector2 position, string text, SpriteFont font, Action onClick, 
-        float arrowSpacing, Handler handler) : base(position, text, font, onClick)
+        float arrowSpacing, ListHandler<T> handler) : base(position, text, font, onClick)
     {
         _arrowSpacing = arrowSpacing;
         _handler = handler;
