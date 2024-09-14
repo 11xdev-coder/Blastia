@@ -6,10 +6,24 @@
 /// </summary>
 public abstract class ListHandler<T>
 {
-    protected List<T> _list;
-    protected int _currentIndex;
+    private readonly List<T> _list;
+    private int _currentIndex;
     
     public T CurrentItem => _list[_currentIndex];
+
+    public int CurrentIndex
+    {
+        get => _currentIndex;
+        set
+        {
+            if (value < 0 || value >= _list.Count)
+            {
+                throw new IndexOutOfRangeException("ListHandler index out of range.");
+            }
+
+            _currentIndex = value;
+        }
+    }
 
     protected ListHandler(List<T> list)
     {

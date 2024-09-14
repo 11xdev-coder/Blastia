@@ -68,9 +68,11 @@ public class BlasterMasterGame : Game
     protected override void Initialize()
     {
         base.Initialize();
-        
-        _graphics.PreferredBackBufferWidth = 1920;
-        _graphics.PreferredBackBufferHeight = 1080;
+
+        int width = VideoManager.Instance.ResolutionHandler.GetCurrentResolutionWidth();
+        int height = VideoManager.Instance.ResolutionHandler.GetCurrentResolutionHeight();
+        _graphics.PreferredBackBufferWidth = width;
+        _graphics.PreferredBackBufferHeight = height;
         _graphics.ApplyChanges();
         
         UpdateResolution();

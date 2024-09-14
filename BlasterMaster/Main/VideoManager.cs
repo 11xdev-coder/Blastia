@@ -21,7 +21,7 @@ public class VideoManager : Singleton<VideoManager>
         get
         {
             if (_resolutionHandler == null)
-                throw new Exception("Resolution handler is not initialized.");
+                throw new NullReferenceException("Resolution handler is not initialized.");
             
             return _resolutionHandler;
         }
@@ -55,6 +55,14 @@ public class VideoManager : Singleton<VideoManager>
         }
     }
 
+    private void SetResolutionByIndex(int index)
+    {
+        if (_graphics != null)
+        {
+            ResolutionHandler.CurrentIndex = index;
+        }
+    }
+
     public void ApplyHandlerResolution()
     {
         if (_graphics != null)
@@ -83,13 +91,15 @@ public class VideoManager : Singleton<VideoManager>
     {
         return new VideoManagerState
         {
-            IsFullScreen = this.IsFullScreen
+            IsFullScreen = IsFullScreen,
+            ResolutionIndex = ResolutionHandler.CurrentIndex
         };
     }
 
     public void SetState(VideoManagerState state)
     {
         SetFullscreen(state.IsFullScreen);
+        SetResolutionByIndex(state.ResolutionIndex);
     }
 
     public void SaveStateToFile()
@@ -112,10 +122,14 @@ public class VideoManager : Singleton<VideoManager>
 
     public Matrix CalculateResolutionScaleMatrix()
     {
-        BlasterMasterGame.RequestResolutionUpdate();
-        float scaleX = _graphics.PreferredBackBufferWidth / TargetResolution.X;
-        float scaleY = _graphics.PreferredBackBufferHeight / TargetResolution.Y;
-        return Matrix.CreateScale(scaleX, scaleY, 1f);
+        if (_graphics != null)
+        {
+            BlasterMasterGame.RequestResolutionUpdate();
+            float scaleX = _graphics.PreferredBackBufferWidth / TargetResolution.X;
+            float scaleY = _graphics.PreferredBackBufferHeight / TargetResolution.Y;
+            return Matrix.CreateScale(scaleX, scaleY, 1f);
+        }
+        return Matrix.CreateScale(1f, 1f, 1f);
     }
 }
 
@@ -123,4 +137,5 @@ public class VideoManager : Singleton<VideoManager>
 public class VideoManagerState
 {
     public bool IsFullScreen { get; set; }
+    public int ResolutionIndex { get; set; }
 }
