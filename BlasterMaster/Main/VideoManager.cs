@@ -1,4 +1,5 @@
-﻿using BlasterMaster.Main.Utilities;
+﻿using System.IO.Pipes;
+using BlasterMaster.Main.Utilities;
 using BlasterMaster.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,6 +27,8 @@ public class VideoManager : Singleton<VideoManager>
         }
         private set => _resolutionHandler = value;
     }
+    
+    public readonly Vector2 TargetResolution = new (1920, 1080);
 
     public void Initialize(GraphicsDeviceManager graphics, string savePath)
     {
@@ -56,9 +59,13 @@ public class VideoManager : Singleton<VideoManager>
     {
         if (_graphics != null)
         {
-            _graphics.PreferredBackBufferWidth = ResolutionHandler.GetCurrentResolutionWidth();
-            _graphics.PreferredBackBufferHeight = ResolutionHandler.GetCurrentResolutionHeight();
+            var x = ResolutionHandler.GetCurrentResolutionWidth();
+            var y = ResolutionHandler.GetCurrentResolutionHeight();
+            _graphics.PreferredBackBufferWidth = x;
+            _graphics.PreferredBackBufferHeight = y;
             _graphics.ApplyChanges();
+            
+            BlasterMasterGame.RequestResolutionUpdate();
         }
     }
 
@@ -101,6 +108,14 @@ public class VideoManager : Singleton<VideoManager>
             var state = Saving.Load<VideoManagerState>(_savePath);
             SetState(state);
         }
+    }
+
+    public Matrix CalculateResolutionScaleMatrix()
+    {
+        BlasterMasterGame.RequestResolutionUpdate();
+        float scaleX = _graphics.PreferredBackBufferWidth / TargetResolution.X;
+        float scaleY = _graphics.PreferredBackBufferHeight / TargetResolution.Y;
+        return Matrix.CreateScale(scaleX, scaleY, 1f);
     }
 }
 

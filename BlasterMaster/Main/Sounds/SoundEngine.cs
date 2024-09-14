@@ -11,7 +11,7 @@ public enum SoundID
 
 public class SoundEngine
 {
-    private static Dictionary<SoundID, SoundEffect>? _sounds = new Dictionary<SoundID, SoundEffect>();
+    private static Dictionary<SoundID, SoundEffect>? _sounds = new();
     private static ContentManager? _contentManager;
 
     public static void Initialize(ContentManager? contentManager)

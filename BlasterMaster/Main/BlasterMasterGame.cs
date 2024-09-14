@@ -45,6 +45,8 @@ public class BlasterMasterGame : Game
     /// </summary>
     private static event Action? ExitRequestEvent;
     
+    private static event Action? ResolutionRequestEvent;
+    
     public BlasterMasterGame()
     {
         _graphics = new GraphicsDeviceManager(this);
@@ -60,6 +62,7 @@ public class BlasterMasterGame : Game
         VideoManager.Instance.LoadStateFromFile();
         
         ExitRequestEvent += OnExitRequested;
+        ResolutionRequestEvent += UpdateResolution;
     }
 
     protected override void Initialize()
@@ -132,8 +135,9 @@ public class BlasterMasterGame : Game
         HasClickedLeft = _currentMouseState.LeftButton == ButtonState.Released 
                          && _previousMouseState.LeftButton == ButtonState.Pressed;
         
-        
-        CursorPosition = new Vector2(_currentMouseState.X, _currentMouseState.Y);
+        // mouse position that is aligned with OS cursor
+        CursorPosition = Vector2.Transform(new Vector2(_currentMouseState.X, _currentMouseState.Y),
+            Matrix.Invert(VideoManager.Instance.CalculateResolutionScaleMatrix()));
         
         // set previous in the end
         _previousMouseState = _currentMouseState;
@@ -143,7 +147,11 @@ public class BlasterMasterGame : Game
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         
-        _spriteBatch.Begin();
+        var matrix = VideoManager.Instance.CalculateResolutionScaleMatrix();
+        
+        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
+            SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
+            null, matrix);
         
         foreach (Menu menu in _menus)
         {
@@ -156,6 +164,11 @@ public class BlasterMasterGame : Game
         // draw cursor texture last on top of everything
         _spriteBatch.Draw(_cursorTexture, CursorPosition, Color.White);
         _spriteBatch.End();
+    }
+
+    public static void RequestResolutionUpdate()
+    {
+        ResolutionRequestEvent?.Invoke();
     }
 
     private void UpdateResolution()

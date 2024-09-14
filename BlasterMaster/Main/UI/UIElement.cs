@@ -23,7 +23,7 @@ public abstract class UIElement
     
     private float _hAlign;
     /// <summary>
-    /// Horizontal Alignment
+    /// Horizontal Alignment, when changed UpdateBounds() is called
     /// </summary>
     public float HAlign
     {
@@ -33,7 +33,7 @@ public abstract class UIElement
     
     private float _vAlign;
     /// <summary>
-    /// Vertical alignment
+    /// Vertical alignment, when changed UpdateBounds() is called
     /// </summary>
     public float VAlign
     {
@@ -42,9 +42,21 @@ public abstract class UIElement
     }
 
     public Rectangle Bounds { get; set; }
+    /// <summary>
+    /// Called every Update() when mouse is hovered
+    /// </summary>
     public Action? OnHover { get; set; }
+    /// <summary>
+    /// Called once when mouse hovered
+    /// </summary>
     public Action? OnStartHovering { get; set; }
+    /// <summary>
+    /// Called once when mouse un-hovered
+    /// </summary>
     public Action? OnEndHovering { get; set; }
+    /// <summary>
+    /// Called once when LMB is released while hovered
+    /// </summary>
     public Action? OnClick { get; set; }
     public bool IsHovered { get; set; }
     
@@ -67,7 +79,12 @@ public abstract class UIElement
     
     private bool _prevIsHovered;
     
-    // image
+    /// <summary>
+    /// Image constructor
+    /// </summary>
+    /// <param name="position">Left-top bounds corner</param>
+    /// <param name="texture">Texture that will be drawn</param>
+    /// <param name="scale">Texture scale (up-scaling is not recommended)</param>
     protected UIElement(Vector2 position, Texture2D texture, Vector2 scale = default)
     {
         Position = position;
@@ -79,7 +96,12 @@ public abstract class UIElement
         UpdateBounds();
     }
     
-    // text
+    /// <summary>
+    /// Text contructor
+    /// </summary>
+    /// <param name="position">Left-top bounds corner</param>
+    /// <param name="text">Text</param>
+    /// <param name="font">Font (from menu)</param>
     protected UIElement(Vector2 position, string text, SpriteFont font)
     {
         Position = position;
@@ -127,42 +149,42 @@ public abstract class UIElement
 
     protected void UpdateBoundsBase(float width, float height)
     {
+        float targetResX = VideoManager.Instance.TargetResolution.X;
+        float targetResY = VideoManager.Instance.TargetResolution.Y;
+        
         int positionX = (int)Position.X;
         int positionY = (int)Position.Y;
 
-        // horizontal alignment if has any
         if (HAlign > 0)
         {
-            positionX += (int)((BlasterMasterGame.ScreenWidth * HAlign) - (width * HAlign));
+            positionX += (int)((targetResX* HAlign) - (width * HAlign));
         }
 
-        // vertical alignment if has any
         if (VAlign > 0)
         {
-            positionY += (int)((BlasterMasterGame.ScreenHeight * VAlign) - (height * VAlign));
+            positionY += (int)((targetResY * VAlign) - (height * VAlign));
         }
-        
-        Bounds = new Rectangle(
-            positionX, 
-            positionY,
-            (int)width + 2, 
-            (int)height + 2);
+
+        Bounds = new Rectangle(positionX, positionY, (int)width, (int)height);
     }
 
     protected void DrawText(SpriteBatch spriteBatch)
     {
         Vector2 textSize = Font.MeasureString(Text);
+        
         Vector2 origin = textSize / 2f;
-        Vector2 position = new Vector2(Bounds.Center.X, Bounds.Center.Y);
-    
-        spriteBatch.DrawString(Font, Text, position, DrawColor, Rotation, 
-            origin, Vector2.One, SpriteEffects.None, 0f);
+        Vector2 position = new Vector2(Bounds.Center.X, 
+            Bounds.Center.Y);
+        
+        spriteBatch.DrawString(Font, Text, position, DrawColor, 
+            Rotation, origin, Vector2.One, SpriteEffects.None, 0f);
     }
 
     protected void DrawTexture(SpriteBatch spriteBatch)
     {
-        Vector2 origin = new Vector2(Texture.Width / 2, Texture.Height / 2);
-        Vector2 position = new Vector2(Bounds.Center.X, Bounds.Center.Y);
+        Vector2 origin = new Vector2(Texture.Width * 0.5f, Texture.Height * 0.5f);
+        Vector2 position = new Vector2(Bounds.Center.X, 
+            Bounds.Center.Y);
         
         spriteBatch.Draw(Texture, position, null, DrawColor, Rotation, 
             origin, Scale, SpriteEffects.None, 0f);
