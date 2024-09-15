@@ -25,13 +25,27 @@ public class Slider : Button
     private Vector2 _percentTextSize;
     private float _percentTextOffset;
 
-    public float Percent { get; private set; }
+    private bool _updatedPercent = true;
+    private Func<float> _getValue;
+    private Action<float> _setValue;
+    
+    private float _percent;
+    public float Percent
+    {
+        get => _percent;
+        private set
+        {
+            _percent = Math.Clamp(value, 0, 1);
+            _setValue(_percent);
+        }
+    }
 
-    public Slider(Vector2 position, SpriteFont font, bool showPercent = false, 
-        float percentTextOffset = 35) : 
+    public Slider(Vector2 position, SpriteFont font, 
+        Func<float> getValue, Action<float> setValue,
+        bool showPercent = false, float percentTextOffset = 35) : 
         base(position, SliderText, font, null)
     {
-        // initialize BG image, get its Height
+        // initialize BG image, get its Heights
         InitBackgroundImage(position);
         
         // get text size of "O"
@@ -43,6 +57,10 @@ public class Slider : Button
             // get size of 100% and init _percentTextOffset
             InitPercentText(position, percentTextOffset);
         }
+        
+        _getValue = getValue;
+        _setValue = setValue;
+        InitPercent();
     }
 
     /// <summary>
@@ -75,6 +93,17 @@ public class Slider : Button
         _percentText = new Text(percentTextPosition, InitialPercentText, Font);
         _percentTextSize = Font.MeasureString(InitialPercentText);
         _percentTextOffset = offset;
+    }
+
+    /// <summary>
+    /// Initializes the percentage for the slider based on the value from the getValue function.
+    /// </summary>
+    private void InitPercent()
+    {
+        float value = _getValue();
+        _percent = value;
+        _updatedPercent = false; // request slider update
+        Console.WriteLine($"Slider loaded percent: {_percent}");
     }
 
     /// <summary>
@@ -113,7 +142,7 @@ public class Slider : Button
         
         // update percent text
         if(_percentText != null && _showPercentText) 
-            _percentText.Text = Percent.ToString("0.00");
+            _percentText.Text = $"{Percent * 100:0.00}%";
     }
 
     public override void UpdateBounds()
@@ -121,6 +150,7 @@ public class Slider : Button
         base.UpdateBounds();
         UpdateBackgroundImage();
         UpdatePercentText();
+        UpdateSliderPosition();
     }
 
     private void UpdateBackgroundImage()
@@ -173,8 +203,7 @@ public class Slider : Button
         {
             // if _percentText is init, if we need to show it and didnt updated it, and init BG image
             // set position to the right of the slider
-            Vector2 position = CalculatePercentTextPosition();
-            _percentText.Position = position;
+            _percentText.Position = CalculatePercentTextPosition();
             
             _hasUpdatedPercentText = true;
         }
@@ -187,6 +216,18 @@ public class Slider : Button
         elements.Add(this);
     }
 
+    private void UpdateSliderPosition()
+    {
+        if (!_hasUpdatedBgPosition || _updatedPercent) return;
+        
+        float rightBound = _sliderBgRightBound - 1;
+        float newX = _sliderBgLeftBound + _percent * (rightBound - _sliderBgLeftBound);
+        Position = new Vector2(newX, Position.Y);
+        FixHAlignment(); // align properly
+        
+        _updatedPercent = true;
+    }
+    
     protected override void UpdateDragPosition(Vector2 cursorPosition)
     {
         // get drag X position (clamped to the BG)
@@ -197,8 +238,6 @@ public class Slider : Button
         
         // calculate percent
         Percent = CalculatePercent();
-        
-        Console.WriteLine(Percent);
     }
 
     private float CalculatePercent()

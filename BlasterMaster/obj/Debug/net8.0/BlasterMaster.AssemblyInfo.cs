@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlasterMaster")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c2ee5e41d81778070953fbf573ee6807537105c7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f2cafb7b558c053bf365ccf581433b6adbc17435")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlasterMaster")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlasterMaster")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

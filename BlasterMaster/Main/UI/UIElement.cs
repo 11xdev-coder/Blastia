@@ -195,6 +195,20 @@ public abstract class UIElement
         Bounds = new Rectangle(positionX, positionY, (int)width, (int)height);
     }
 
+    
+    protected void FixHAlignment()
+    {
+        float targetResX = VideoManager.Instance.TargetResolution.X;
+        float positionX = Position.X;  // float instead of int for non-integer operations
+
+        if (HAlign > 0)
+        {
+            positionX -= (targetResX * HAlign) - (Bounds.Width * HAlign);
+        }
+    
+        Position.X = positionX;
+    }
+
     /// <summary>
     /// Calculates the new position for an element being dragged based on the cursor position.
     /// </summary>

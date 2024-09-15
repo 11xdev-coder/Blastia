@@ -1,5 +1,6 @@
 ﻿using BlasterMaster.Main.UI.Buttons;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI.Menus;
@@ -19,7 +20,9 @@ public class AudioSettingsMenu : Menu
         };
         Elements.Add(soundVolumeText);
 
-        Slider soundsVolumeSlider = new Slider(new Vector2(0, 600), Font, true)
+        Slider soundsVolumeSlider = new Slider(new Vector2(0, 600), Font,
+            () => AudioManager.Instance.SoundsVolume,
+            f => AudioManager.Instance.SoundsVolume = f, true)
         {
             HAlign = 0.55f
         };
