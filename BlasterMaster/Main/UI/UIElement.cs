@@ -128,6 +128,19 @@ public abstract class UIElement
         if(!IsHovered && _prevIsHovered) OnEndHovering?.Invoke(); // end hovering
         if(IsHovered && hasClicked) OnClick?.Invoke();
 
+        Drag(isHoldingLeft);
+    
+        _prevIsHovered = IsHovered;
+    
+        UpdateBounds();
+    }
+
+    /// <summary>
+    /// Handles the dragging logic for the UIElement based on mouse input.
+    /// </summary>
+    /// <param name="isHoldingLeft">Indicates if the left mouse button is being held down.</param>
+    private void Drag(bool isHoldingLeft)
+    {
         if (Draggable && isHoldingLeft && IsHovered && !_isDragging)
         {
             _isDragging = true;
@@ -137,41 +150,28 @@ public abstract class UIElement
         {
             if (isHoldingLeft)
             {
-                Drag(BlasterMasterGame.CursorPosition);
+                UpdateDragPosition(BlasterMasterGame.CursorPosition);
             }
             else
             {
                 _isDragging = false;
             }
         }
-    
-        _prevIsHovered = IsHovered;
-    
-        UpdateBounds();
     }
 
-    public virtual void Drag(Vector2 cursorPosition)
+    /// <summary>
+    /// Updates the position of the UI element being dragged based on the cursor position.
+    /// </summary>
+    /// <param name="cursorPosition">The current position of the cursor</param>
+    protected virtual void UpdateDragPosition(Vector2 cursorPosition)
     {
         Position = GetDragPosition(cursorPosition);
-        UpdateBounds();
     }
     
     public virtual void UpdateBounds()
     {
         Vector2 textSize = Font.MeasureString(Text);
         UpdateBoundsBase(textSize.X, textSize.Y);
-    }
-
-    public virtual void Draw(SpriteBatch spriteBatch)
-    {
-        if (!UseTexture)
-        {
-            DrawText(spriteBatch);
-        }
-        else
-        {
-            DrawTexture(spriteBatch);
-        }
     }
 
     protected void UpdateBoundsBase(float width, float height)
@@ -222,7 +222,36 @@ public abstract class UIElement
         return new Vector2(positionX, positionY);
     }
 
-    protected void DrawText(SpriteBatch spriteBatch)
+    
+    protected Vector2 GetDragPositionNoYClamped(float x, float minValue, float maxValue)
+    {
+        Vector2 textSize = Font.MeasureString(Text);
+        float targetResX = VideoManager.Instance.TargetResolution.X;
+
+        float positionX = x - textSize.X * 0.5f;
+        positionX = Math.Clamp(positionX, minValue, maxValue);
+
+        if (HAlign > 0)
+        {
+            positionX -= (targetResX * HAlign) - (textSize.X * HAlign);
+        }
+        
+        return new Vector2(positionX, Position.Y);
+    }
+    
+    public virtual void Draw(SpriteBatch spriteBatch)
+    {
+        if (!UseTexture)
+        {
+            DrawText(spriteBatch);
+        }
+        else
+        {
+            DrawTexture(spriteBatch);
+        }
+    }
+
+    private void DrawText(SpriteBatch spriteBatch)
     {
         Vector2 textSize = Font.MeasureString(Text);
         
@@ -234,7 +263,7 @@ public abstract class UIElement
             Rotation, origin, Vector2.One, SpriteEffects.None, 0f);
     }
 
-    protected void DrawTexture(SpriteBatch spriteBatch)
+    private void DrawTexture(SpriteBatch spriteBatch)
     {
         Vector2 origin = new Vector2(Texture.Width * 0.5f, Texture.Height * 0.5f);
         Vector2 position = new Vector2(Bounds.Center.X, 

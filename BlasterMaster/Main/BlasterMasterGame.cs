@@ -32,6 +32,9 @@ public class BlasterMasterGame : Game
     
     public SpriteFont MainFont { get; private set; }
     private Texture2D _logoTexture;
+    
+    // Textures
+    public static Texture2D SliderTexture { get; private set; } = null!;
 
     public static LogoMenu? LogoMenu { get; private set; }
     public static MainMenu? MainMenu { get; private set; }
@@ -88,19 +91,27 @@ public class BlasterMasterGame : Game
         
         UpdateResolution();
     }
+
+    private void LoadTextures()
+    {
+        _cursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
+            Content.RootDirectory + Paths.CursorTexturePath);
+        
+        _logoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.Logo5XTexturePath);
+        
+        SliderTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.SliderBackgroundPath);
+    }
     
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         
         SoundEngine.LoadSounds();
-        
-        _cursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
-            Content.RootDirectory + Paths.CursorTexturePath);
-
+        LoadTextures();
         MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
-        _logoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
-            Content.RootDirectory + Paths.Logo5XTexturePath);
+        
         
         LogoMenu = new LogoMenu(MainFont, _logoTexture);
         AddMenu(LogoMenu);

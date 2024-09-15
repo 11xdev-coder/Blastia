@@ -23,7 +23,7 @@ public class AudioSettingsMenu : Menu
         {
             HAlign = 0.55f
         };
-        Elements.Add(soundsVolumeSlider);
+        soundsVolumeSlider.AddToElements(Elements);
         
         Button backButton = new Button(new Vector2(0, 650), "Back", Font, OnClickBack)
         {
