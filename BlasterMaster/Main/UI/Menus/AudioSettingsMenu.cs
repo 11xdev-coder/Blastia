@@ -14,6 +14,20 @@ public class AudioSettingsMenu : Menu
 
     private void AddElements()
     {
+        Text masterVolumeText = new Text(new Vector2(0, 550), "Master Volume", Font)
+        {
+            HAlign = 0.45f
+        };
+        Elements.Add(masterVolumeText);
+
+        Slider masterVolumeSlider = new Slider(new Vector2(0, 550), Font,
+            () => AudioManager.Instance.MasterVolume,
+            f => AudioManager.Instance.MasterVolume = f, true)
+        {
+            HAlign = 0.55f
+        };
+        masterVolumeSlider.AddToElements(Elements);
+        
         Text soundVolumeText = new Text(new Vector2(0, 600), "Sound Volume", Font)
         {
             HAlign = 0.45f

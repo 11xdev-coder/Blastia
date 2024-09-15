@@ -195,7 +195,9 @@ public abstract class UIElement
         Bounds = new Rectangle(positionX, positionY, (int)width, (int)height);
     }
 
-    
+    /// <summary>
+    /// De-aligns the position
+    /// </summary>
     protected void FixHAlignment()
     {
         float targetResX = VideoManager.Instance.TargetResolution.X;
