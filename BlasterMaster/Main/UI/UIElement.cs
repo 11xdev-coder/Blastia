@@ -222,7 +222,14 @@ public abstract class UIElement
         return new Vector2(positionX, positionY);
     }
 
-    
+
+    /// <summary>
+    /// Calculates the drag position clamped on the X-axis while keeping the current Y position.
+    /// </summary>
+    /// <param name="x">The X-coordinate of the cursor position.</param>
+    /// <param name="minValue">The minimum allowed X position.</param>
+    /// <param name="maxValue">The maximum allowed X position.</param>
+    /// <returns>A Vector2 representing the clamped X position and the current Y position.</returns>
     protected Vector2 GetDragPositionNoYClamped(float x, float minValue, float maxValue)
     {
         Vector2 textSize = Font.MeasureString(Text);
