@@ -23,6 +23,7 @@ public class BlasterMasterGame : Game
     public static float ScreenHeight { get; private set; }
     public static bool HasClickedLeft { get; private set; }
     public static Vector2 CursorPosition { get; private set; }
+    public static bool IsHoldingLeft { get; private set; }
 
     private MouseState _previousMouseState;
     private MouseState _currentMouseState;
@@ -35,6 +36,7 @@ public class BlasterMasterGame : Game
     public static LogoMenu? LogoMenu { get; private set; }
     public static MainMenu? MainMenu { get; private set; }
     public static SettingsMenu? SettingsMenu { get; private set; }
+    public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
     public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
     private readonly List<Menu> _menus;
 
@@ -45,6 +47,11 @@ public class BlasterMasterGame : Game
     /// </summary>
     private static event Action? ExitRequestEvent;
     
+    /// <summary>
+    /// Event triggered when a request to update resolution is made.
+    /// This event allows for ScreenWidth and ScreenHeight values to
+    /// properly update when resolution has changed.
+    /// </summary>
     private static event Action? ResolutionRequestEvent;
     
     public BlasterMasterGame()
@@ -60,6 +67,10 @@ public class BlasterMasterGame : Game
         string videoManagerPath = Content.RootDirectory + Paths.VideoManagerSavePath;
         VideoManager.Instance.Initialize(_graphics, videoManagerPath);
         VideoManager.Instance.LoadStateFromFile();
+        // load audio manager
+        string audioManagerPath = Content.RootDirectory + Paths.AudioManagerSavePath;
+        AudioManager.Instance.Initialize(audioManagerPath);
+        AudioManager.Instance.LoadStateFromFile();
         
         ExitRequestEvent += OnExitRequested;
         ResolutionRequestEvent += UpdateResolution;
@@ -99,6 +110,9 @@ public class BlasterMasterGame : Game
         
         SettingsMenu = new SettingsMenu(MainFont);
         AddMenu(SettingsMenu);
+
+        AudioSettingsMenu = new AudioSettingsMenu(MainFont);
+        AddMenu(AudioSettingsMenu);
         
         VideoSettingsMenu = new VideoSettingsMenu(MainFont);
         AddMenu(VideoSettingsMenu);
@@ -136,6 +150,8 @@ public class BlasterMasterGame : Game
         
         HasClickedLeft = _currentMouseState.LeftButton == ButtonState.Released 
                          && _previousMouseState.LeftButton == ButtonState.Pressed;
+
+        IsHoldingLeft = _currentMouseState.LeftButton == ButtonState.Pressed;
         
         // mouse position that is aligned with OS cursor
         CursorPosition = Vector2.Transform(new Vector2(_currentMouseState.X, _currentMouseState.Y),

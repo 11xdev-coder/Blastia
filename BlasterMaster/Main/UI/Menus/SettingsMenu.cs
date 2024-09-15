@@ -13,6 +13,12 @@ public class SettingsMenu : Menu
 
     private void AddElements()
     {
+        Button audioButton = new Button(new Vector2(0, 550), "Audio Settings", Font, OnClickAudioSettings)
+        {
+            HAlign = 0.5f
+        };
+        Elements.Add(audioButton);
+        
         Button videoButton = new Button(new Vector2(0, 600), "Video Settings", Font, OnClickVideoSettings)
         {
             HAlign = 0.5f
@@ -29,6 +35,12 @@ public class SettingsMenu : Menu
     private void OnClickBack()
     {
         SwitchToMenu(BlasterMasterGame.MainMenu);
+    }
+
+    private void OnClickAudioSettings()
+    {
+        AudioManager.Instance.LoadStateFromFile();
+        SwitchToMenu(BlasterMasterGame.AudioSettingsMenu);
     }
 
     private void OnClickVideoSettings()

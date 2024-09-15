@@ -11,7 +11,7 @@ public class Button : UIElement
     public Color NormalColor = Color.Wheat;
     public Color SelectedColor = Color.Yellow;
 
-    public Button(Vector2 position, string text, SpriteFont font, Action onClick) : 
+    public Button(Vector2 position, string text, SpriteFont font, Action? onClick) : 
         base(position, text, font)
     {
         OnClick = onClick;

@@ -60,6 +60,9 @@ public abstract class UIElement
     public Action? OnClick { get; set; }
     public bool IsHovered { get; set; }
     
+    public virtual bool Draggable { get; set; }
+    private bool _isDragging;
+    
     /// <summary>
     /// TextToDraw will be drawn using this Font
     /// </summary>
@@ -117,15 +120,39 @@ public abstract class UIElement
         int cursorX = (int)BlasterMasterGame.CursorPosition.X;
         int cursorY = (int)BlasterMasterGame.CursorPosition.Y;
         bool hasClicked = BlasterMasterGame.HasClickedLeft;
+        bool isHoldingLeft = BlasterMasterGame.IsHoldingLeft;
         IsHovered = Bounds.Contains(cursorX, cursorY);
     
         if(IsHovered) OnHover?.Invoke(); // if hovering
         if(IsHovered && !_prevIsHovered) OnStartHovering?.Invoke(); // if started hovering
         if(!IsHovered && _prevIsHovered) OnEndHovering?.Invoke(); // end hovering
         if(IsHovered && hasClicked) OnClick?.Invoke();
+
+        if (Draggable && isHoldingLeft && IsHovered && !_isDragging)
+        {
+            _isDragging = true;
+        }
+
+        if (_isDragging)
+        {
+            if (isHoldingLeft)
+            {
+                Drag(BlasterMasterGame.CursorPosition);
+            }
+            else
+            {
+                _isDragging = false;
+            }
+        }
     
         _prevIsHovered = IsHovered;
     
+        UpdateBounds();
+    }
+
+    public virtual void Drag(Vector2 cursorPosition)
+    {
+        Position = GetDragPosition(cursorPosition);
         UpdateBounds();
     }
     
@@ -157,7 +184,7 @@ public abstract class UIElement
 
         if (HAlign > 0)
         {
-            positionX += (int)((targetResX* HAlign) - (width * HAlign));
+            positionX += (int)((targetResX * HAlign) - (width * HAlign));
         }
 
         if (VAlign > 0)
@@ -166,6 +193,33 @@ public abstract class UIElement
         }
 
         Bounds = new Rectangle(positionX, positionY, (int)width, (int)height);
+    }
+
+    /// <summary>
+    /// Calculates the new position for an element being dragged based on the cursor position.
+    /// </summary>
+    /// <param name="cursorPosition">The current position of the cursor</param>
+    /// <returns>The new position for the dragged element</returns>
+    protected Vector2 GetDragPosition(Vector2 cursorPosition)
+    {
+        Vector2 textSize = Font.MeasureString(Text);
+        float targetResX = VideoManager.Instance.TargetResolution.X;
+        float targetResY = VideoManager.Instance.TargetResolution.Y;
+
+        float positionX = cursorPosition.X - textSize.X * 0.5f;
+        float positionY = cursorPosition.Y - textSize.Y * 0.5f;
+
+        if (HAlign > 0)
+        {
+            positionX -= (targetResX * HAlign) - (textSize.X * HAlign);
+        }
+
+        if (VAlign > 0)
+        {
+            positionY -= (targetResY * VAlign) - (textSize.Y * VAlign);
+        }
+        
+        return new Vector2(positionX, positionY);
     }
 
     protected void DrawText(SpriteBatch spriteBatch)

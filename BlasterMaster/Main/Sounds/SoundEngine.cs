@@ -40,7 +40,8 @@ public class SoundEngine
     {
         if (_sounds.TryGetValue(id, out var sound))
         {
-            sound.Play();
+            float volume = AudioManager.Instance.SoundsVolume;
+            sound.Play(volume, 0f, 0f);
         }
         else
         {

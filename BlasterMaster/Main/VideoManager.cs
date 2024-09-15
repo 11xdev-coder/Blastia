@@ -87,7 +87,7 @@ public class VideoManager : Singleton<VideoManager>
         return resolutions;
     }
 
-    public VideoManagerState GetState()
+    private VideoManagerState GetState()
     {
         return new VideoManagerState
         {
@@ -96,7 +96,7 @@ public class VideoManager : Singleton<VideoManager>
         };
     }
 
-    public void SetState(VideoManagerState state)
+    private void SetState(VideoManagerState state)
     {
         SetFullscreen(state.IsFullScreen);
         SetResolutionByIndex(state.ResolutionIndex);
@@ -124,7 +124,6 @@ public class VideoManager : Singleton<VideoManager>
     {
         if (_graphics != null)
         {
-            BlasterMasterGame.RequestResolutionUpdate();
             float scaleX = _graphics.PreferredBackBufferWidth / TargetResolution.X;
             float scaleY = _graphics.PreferredBackBufferHeight / TargetResolution.Y;
             return Matrix.CreateScale(scaleX, scaleY, 1f);

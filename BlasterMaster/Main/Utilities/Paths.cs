@@ -13,4 +13,5 @@ public static class Paths
     public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
 
     public static readonly string VideoManagerSavePath = "/Saved/videomanager.bin";
+    public static readonly string AudioManagerSavePath = "/Saved/audiomanager.bin";
 }
