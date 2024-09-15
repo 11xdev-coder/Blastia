@@ -19,7 +19,7 @@ public class AudioSettingsMenu : Menu
         };
         Elements.Add(soundVolumeText);
 
-        Slider soundsVolumeSlider = new Slider(new Vector2(0, 600), Font)
+        Slider soundsVolumeSlider = new Slider(new Vector2(0, 600), Font, true)
         {
             HAlign = 0.55f
         };
