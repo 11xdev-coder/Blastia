@@ -9,12 +9,12 @@ public enum SoundID
     Tick
 }
 
-public class SoundEngine
+public static class SoundEngine
 {
-    private static Dictionary<SoundID, SoundEffect>? _sounds = new();
+    private static Dictionary<SoundID, SoundEffect> _sounds = new();
     private static ContentManager? _contentManager;
 
-    public static void Initialize(ContentManager? contentManager)
+    public static void Initialize(ContentManager contentManager)
     {
         _contentManager = contentManager;
     }
@@ -26,6 +26,8 @@ public class SoundEngine
 
     public static void LoadSound(SoundID id, string path)
     {
+        if (_contentManager == null) return;
+        
         try
         {
             _sounds[id] = _contentManager.Load<SoundEffect>(path);

@@ -25,7 +25,7 @@ public class Slider : Button
     private Vector2 _percentTextSize;
     private float _percentTextOffset;
 
-    private bool _updatedPercent = true;
+    private bool _hasUpdatedSliderPosition = true;
     private Func<float> _getValue;
     private Action<float> _setValue;
     
@@ -102,7 +102,7 @@ public class Slider : Button
     {
         float value = _getValue();
         _percent = value;
-        _updatedPercent = false; // request slider update
+        _hasUpdatedSliderPosition = false; // request slider update
         Console.WriteLine($"Slider loaded percent: {_percent}");
     }
 
@@ -218,14 +218,14 @@ public class Slider : Button
 
     private void UpdateSliderPosition()
     {
-        if (!_hasUpdatedBgPosition || _updatedPercent) return;
+        if (!_hasUpdatedBgPosition || _hasUpdatedSliderPosition) return;
         
         float rightBound = _sliderBgRightBound - 1;
         float newX = _sliderBgLeftBound + _percent * (rightBound - _sliderBgLeftBound);
         Position = new Vector2(newX, Position.Y);
         FixHAlignment(); // align properly
         
-        _updatedPercent = true;
+        _hasUpdatedSliderPosition = true;
     }
     
     protected override void UpdateDragPosition(Vector2 cursorPosition)
