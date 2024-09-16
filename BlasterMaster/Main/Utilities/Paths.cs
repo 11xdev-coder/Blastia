@@ -12,6 +12,12 @@ public static class Paths
     
     // sounds
     public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
+    
+    // music
+    public static readonly string PeacefulJourney00 = "Sounds/MenuSongs/peaceful journey_00.ogg";
+    public static readonly string PeacefulJourney01 = "Sounds/MenuSongs/peaceful journey_01.ogg";
+    public static readonly string PeacefulJourney02 = "Sounds/MenuSongs/peaceful journey_02.ogg";
+    public static readonly string PeacefulJourney03 = "Sounds/MenuSongs/peaceful journey_03.ogg";
 
     public static readonly string VideoManagerSavePath = "/Saved/videomanager.bin";
     public static readonly string AudioManagerSavePath = "/Saved/audiomanager.bin";

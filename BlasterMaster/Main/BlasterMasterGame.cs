@@ -65,6 +65,7 @@ public class BlasterMasterGame : Game
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
         SoundEngine.Initialize(Content);
+        MusicEngine.Initialize(Content);
         
         // initialize video manager with graphics manager
         string videoManagerPath = Content.RootDirectory + Paths.VideoManagerSavePath;
@@ -109,6 +110,9 @@ public class BlasterMasterGame : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         
         SoundEngine.LoadSounds();
+        MusicEngine.LoadMusic();
+        MusicEngine.PlayMusicTrack(MusicID.PeacefulJourney00);
+        
         LoadTextures();
         MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
         
@@ -132,7 +136,9 @@ public class BlasterMasterGame : Game
     protected override void UnloadContent()
     {
         base.UnloadContent();
+        
         SoundEngine.UnloadSounds();
+        MusicEngine.UnloadMusic();
     }
 
     protected override void Update(GameTime gameTime)

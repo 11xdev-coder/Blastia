@@ -24,7 +24,7 @@ public static class SoundEngine
         LoadSound(SoundID.Tick, Paths.TickSoundPath);
     }
 
-    public static void LoadSound(SoundID id, string path)
+    private static void LoadSound(SoundID id, string path)
     {
         if (_contentManager == null) return;
         
@@ -34,7 +34,7 @@ public static class SoundEngine
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading sound with ID: {id}. Err: {ex.Message}");
+            Console.WriteLine($"Error loading sound. ID: {id}, Exception: {ex.Message}");
         }
     }
 
