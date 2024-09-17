@@ -26,6 +26,9 @@ public static class MusicEngine
     public static void LoadMusic()
     {
         LoadMusicTrack(MusicID.PeacefulJourney00, Paths.PeacefulJourney00);
+        LoadMusicTrack(MusicID.PeacefulJourney01, Paths.PeacefulJourney01);
+        LoadMusicTrack(MusicID.PeacefulJourney02, Paths.PeacefulJourney02);
+        LoadMusicTrack(MusicID.PeacefulJourney03, Paths.PeacefulJourney03);
     }
 
     private static void LoadMusicTrack(MusicID musicId, string path)
@@ -48,12 +51,12 @@ public static class MusicEngine
         if (_musicTracks.TryGetValue(musicId, out var musicTrack))
         {
             MediaPlayer.IsRepeating = loop;
-            MediaPlayer.Volume = AudioManager.Instance.MusicVolume 
-                                 * AudioManager.Instance.MasterVolume;
+            UpdateVolume();
             MediaPlayer.Play(musicTrack);
+            
             _currentlyPlaying = musicId;
             
-            Console.WriteLine(musicTrack.Name);
+            Console.WriteLine($"Music volume: {GetVolume()}");
         }
         else
         {
@@ -68,8 +71,13 @@ public static class MusicEngine
 
     public static void UpdateVolume()
     {
-        MediaPlayer.Volume = AudioManager.Instance.MusicVolume 
-                             * AudioManager.Instance.MasterVolume;
+        MediaPlayer.Volume = GetVolume();
+    }
+
+    private static float GetVolume()
+    {
+        return AudioManager.Instance.MusicVolume 
+               * AudioManager.Instance.MasterVolume;
     }
 
     public static void UnloadMusic()

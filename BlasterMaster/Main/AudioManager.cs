@@ -1,4 +1,5 @@
-﻿using BlasterMaster.Main.Utilities;
+﻿using BlasterMaster.Main.Sounds;
+using BlasterMaster.Main.Utilities;
 
 namespace BlasterMaster.Main;
 
@@ -6,9 +7,21 @@ public class AudioManager : Singleton<AudioManager>
 {
     private string? _savePath;
 
-    public float MasterVolume = 1;
+    private float _masterVolume = 1;
+    public float MasterVolume
+    {
+        get => _masterVolume;
+        set => Properties.OnValueChangedProperty(ref _masterVolume, value, MusicEngine.UpdateVolume);
+    }
+
+    private float _musicVolume = 1;
+    public float MusicVolume
+    {
+        get => _musicVolume;
+        set => Properties.OnValueChangedProperty(ref _musicVolume, value, MusicEngine.UpdateVolume);
+    }
+    
     public float SoundsVolume = 1;
-    public float MusicVolume = 1;
 
     public void Initialize(string savePath)
     {

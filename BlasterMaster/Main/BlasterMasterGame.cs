@@ -56,11 +56,14 @@ public class BlasterMasterGame : Game
     /// properly update when resolution has changed.
     /// </summary>
     private static event Action? ResolutionRequestEvent;
+
+    private readonly Random _rand;
     
     public BlasterMasterGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         _menus = new List<Menu>();
+        _rand = new Random();
         
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
@@ -111,7 +114,7 @@ public class BlasterMasterGame : Game
         
         SoundEngine.LoadSounds();
         MusicEngine.LoadMusic();
-        MusicEngine.PlayMusicTrack(MusicID.PeacefulJourney00);
+        MusicEngine.PlayMusicTrack(ChooseRandomMenuMusic());
         
         LoadTextures();
         MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
@@ -201,6 +204,18 @@ public class BlasterMasterGame : Game
         _spriteBatch.End();
     }
 
+    public MusicID ChooseRandomMenuMusic()
+    {
+        float randomIndex = _rand.Next(0, 3);
+        
+        MusicID musicID = (MusicID)randomIndex;
+
+        return musicID;
+    }
+
+    /// <summary>
+    /// Requests to update the screen resolution by invoking the ResolutionRequestEvent.
+    /// </summary>
     public static void RequestResolutionUpdate()
     {
         ResolutionRequestEvent?.Invoke();
@@ -222,6 +237,9 @@ public class BlasterMasterGame : Game
         Exit();
     }
 
+    /// <summary>
+    /// Requests to exit the game by invoking ExitRequestEvent
+    /// </summary>
     public static void RequestExit()
     {
         ExitRequestEvent?.Invoke();
