@@ -57,13 +57,12 @@ public class BlasterMasterGame : Game
     /// </summary>
     private static event Action? ResolutionRequestEvent;
 
-    private readonly Random _rand;
+    private static readonly Random Rand = new();
     
     public BlasterMasterGame()
     {
         _graphics = new GraphicsDeviceManager(this);
         _menus = new List<Menu>();
-        _rand = new Random();
         
         // root folder of all assets
         Content.RootDirectory = "Main/Content";
@@ -204,13 +203,13 @@ public class BlasterMasterGame : Game
         _spriteBatch.End();
     }
 
-    public MusicID ChooseRandomMenuMusic()
+    public static MusicID ChooseRandomMenuMusic()
     {
-        float randomIndex = _rand.Next(0, 3);
+        float randomIndex = Rand.Next(0, 3);
         
-        MusicID musicID = (MusicID)randomIndex;
+        MusicID musicId = (MusicID)randomIndex;
 
-        return musicID;
+        return musicId;
     }
 
     /// <summary>
