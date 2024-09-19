@@ -14,9 +14,12 @@ public enum MusicID
 
 public static class MusicEngine
 {
-    private static Dictionary<MusicID, Song> _musicTracks = new();
+    private static readonly Dictionary<MusicID, Song> MusicTracks = new();
+    
     private static ContentManager? _contentManager;
     private static MusicID? _currentlyPlaying;
+
+    private static float _fadeDuration = 1f;
 
     public static void Initialize(ContentManager contentManager)
     {
@@ -37,7 +40,7 @@ public static class MusicEngine
 
         try
         {
-            _musicTracks[musicId] = _contentManager.Load<Song>(path);
+            MusicTracks[musicId] = _contentManager.Load<Song>(path);
         }
         catch (Exception ex)
         {
@@ -45,23 +48,64 @@ public static class MusicEngine
         }
     }
 
-    public static void PlayMusicTrack(MusicID musicId, bool loop = true)
+    /// Plays the specified music track, optionally looping it. If another track is currently playing, it will be faded out before the new track starts.
+    /// <param name="musicId">The ID of the music track to play.</param>
+    /// <param name="loop">Determines whether the music track should loop when it reaches the end. Defaults to true.</param>
+    /// <returns>A Task representing the asynchronous music play operation.</returns>
+    public static async void PlayMusicTrack(MusicID musicId, bool loop = true)
     {
+        await FadeOutMusicTrack();
+        
         // get the Song (music track)
-        if (_musicTracks.TryGetValue(musicId, out var musicTrack))
+        if (MusicTracks.TryGetValue(musicId, out var musicTrack))
         {
             MediaPlayer.IsRepeating = loop;
             UpdateVolume();
             MediaPlayer.Play(musicTrack);
             
             _currentlyPlaying = musicId;
+            await FadeInMusicTrack();
             
-            Console.WriteLine($"Music volume: {GetVolume()}");
+            Console.WriteLine($"Music volume: {CalculateVolume()}");
         }
         else
         {
             Console.WriteLine($"Music track {musicId} not found.");
         }
+    }
+
+    /// Fades out the currently playing music track over the specified fade duration.
+    /// The music volume will gradually decrease to zero before stopping the track.
+    /// <returns>A Task representing the asynchronous fade-out operation.</returns>
+    private static async Task FadeOutMusicTrack()
+    {
+        if (MediaPlayer.State == MediaState.Playing)
+        {
+            var initialVolume = MediaPlayer.Volume;
+            for (float t = 0; t < _fadeDuration; t += 0.1f)
+            {
+                MediaPlayer.Volume = initialVolume * (1 - t / _fadeDuration);
+                await Task.Delay(100);
+            }
+
+            MediaPlayer.Volume = 0;
+            MediaPlayer.Stop();
+        }
+    }
+
+    /// Gradually increases the volume of the currently playing music track over a specified fade duration.
+    /// The volume will increase from zero to the calculated music volume.
+    /// <returns>A Task representing the asynchronous fade-in operation.</returns>
+    private static async Task FadeInMusicTrack()
+    {
+        var finalVolume = CalculateVolume();
+        for (float t = 0; t < _fadeDuration; t += 0.1f)
+        {
+            MediaPlayer.Volume = finalVolume * (t / _fadeDuration);
+            await Task.Delay(100);
+        }
+        
+        MediaPlayer.Volume = finalVolume;
     }
 
     public static void StopMusic()
@@ -71,10 +115,10 @@ public static class MusicEngine
 
     public static void UpdateVolume()
     {
-        MediaPlayer.Volume = GetVolume();
+        MediaPlayer.Volume = CalculateVolume();
     }
 
-    private static float GetVolume()
+    private static float CalculateVolume()
     {
         return AudioManager.Instance.MusicVolume 
                * AudioManager.Instance.MasterVolume;
@@ -83,6 +127,6 @@ public static class MusicEngine
     public static void UnloadMusic()
     {
         StopMusic();
-        _musicTracks.Clear();
+        MusicTracks.Clear();
     }
 }
