@@ -19,6 +19,10 @@ public static class Paths
     public static readonly string PeacefulJourney02 = "Sounds/MenuSongs/peaceful journey_02.ogg";
     public static readonly string PeacefulJourney03 = "Sounds/MenuSongs/peaceful journey_03.ogg";
 
+    // settings save
     public static readonly string VideoManagerSavePath = "/Saved/videomanager.bin";
     public static readonly string AudioManagerSavePath = "/Saved/audiomanager.bin";
+    
+    // players save
+    public static readonly string PlayerSavePath = "/Saved/Players/";
 }

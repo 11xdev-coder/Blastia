@@ -21,9 +21,15 @@ public class BlasterMasterGame : Game
 
     public static float ScreenWidth { get; private set; }
     public static float ScreenHeight { get; private set; }
+    
+    // MOUSE
     public static bool HasClickedLeft { get; private set; }
     public static Vector2 CursorPosition { get; private set; }
     public static bool IsHoldingLeft { get; private set; }
+    
+    // KEYBOARD
+    public static KeyboardState KeyboardState { get; private set; }
+    public static KeyboardState PreviousKeyboardState { get; private set; }
 
     private MouseState _previousMouseState;
     private MouseState _currentMouseState;
@@ -38,6 +44,7 @@ public class BlasterMasterGame : Game
 
     public static LogoMenu? LogoMenu { get; private set; }
     public static MainMenu? MainMenu { get; private set; }
+    public static SinglePlayerMenu? SinglePlayerMenu { get; private set; }
     public static SettingsMenu? SettingsMenu { get; private set; }
     public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
     public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
@@ -70,13 +77,16 @@ public class BlasterMasterGame : Game
         MusicEngine.Initialize(Content);
         
         // initialize video manager with graphics manager
-        string videoManagerPath = Content.RootDirectory + Paths.VideoManagerSavePath;
-        VideoManager.Instance.Initialize(_graphics, videoManagerPath);
+        string videoManagerSavePath = Content.RootDirectory + Paths.VideoManagerSavePath;
+        VideoManager.Instance.Initialize(_graphics, videoManagerSavePath);
         VideoManager.Instance.LoadStateFromFile();
         // load audio manager
-        string audioManagerPath = Content.RootDirectory + Paths.AudioManagerSavePath;
-        AudioManager.Instance.Initialize(audioManagerPath);
+        string audioManagerSavePath = Content.RootDirectory + Paths.AudioManagerSavePath;
+        AudioManager.Instance.Initialize(audioManagerSavePath);
         AudioManager.Instance.LoadStateFromFile();
+        // load player manager
+        string playerManagerSavePath = Content.RootDirectory + Paths.PlayerSavePath;
+        PlayerManager.Instance.Initialize(playerManagerSavePath);
         
         ExitRequestEvent += OnExitRequested;
         ResolutionRequestEvent += UpdateResolution;
@@ -125,6 +135,9 @@ public class BlasterMasterGame : Game
         MainMenu = new MainMenu(MainFont);
         AddMenu(MainMenu);
         
+        SinglePlayerMenu = new SinglePlayerMenu(MainFont);
+        AddMenu(SinglePlayerMenu);
+        
         SettingsMenu = new SettingsMenu(MainFont);
         AddMenu(SettingsMenu);
 
@@ -148,6 +161,7 @@ public class BlasterMasterGame : Game
         base.Update(gameTime);
         
         UpdateMouseState();
+        UpdateKeyboardState();
 
         foreach (Menu menu in _menus)
         {
@@ -161,6 +175,9 @@ public class BlasterMasterGame : Game
                 }
             }
         }
+        
+        // update previous states in the end
+        UpdatePreviousStates();
     }
 
     private void UpdateMouseState()
@@ -175,10 +192,19 @@ public class BlasterMasterGame : Game
         // mouse position that is aligned with OS cursor
         CursorPosition = Vector2.Transform(new Vector2(_currentMouseState.X, _currentMouseState.Y),
             Matrix.Invert(VideoManager.Instance.CalculateResolutionScaleMatrix()));
-        
-        // set previous in the end
-        _previousMouseState = _currentMouseState;
     }
+
+    private void UpdateKeyboardState()
+    {
+        KeyboardState = Keyboard.GetState();
+    }
+
+    private void UpdatePreviousStates()
+    {
+        _previousMouseState = _currentMouseState;
+        PreviousKeyboardState = KeyboardState;
+    }
+    
 
     protected override void Draw(GameTime gameTime)
     {
