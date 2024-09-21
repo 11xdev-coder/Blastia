@@ -114,6 +114,15 @@ public abstract class UIElement
         
         UpdateBounds();
     }
+
+    /// <summary>
+    /// Invoked on menu update when the menu is inactive.
+    /// It can be used to manage UI element behaviors or states while the menu is not active.
+    /// </summary>
+    public virtual void OnMenuInactive()
+    {
+        
+    }
     
     public virtual void Update()
     {
@@ -167,13 +176,21 @@ public abstract class UIElement
     {
         Position = GetDragPosition(cursorPosition);
     }
-    
+
+    /// <summary>
+    /// Updates the bounding rectangle of the UI element based on its current properties such as position, text size, or texture size.
+    /// </summary>
     public virtual void UpdateBounds()
     {
         Vector2 textSize = Font.MeasureString(Text);
         UpdateBoundsBase(textSize.X, textSize.Y);
     }
 
+    /// <summary>
+    /// Updates the bounding rectangle of the UI element based on specified width and height.
+    /// </summary>
+    /// <param name="width">The width for the bounding rectangle.</param>
+    /// <param name="height">The height for the bounding rectangle.</param>
     protected void UpdateBoundsBase(float width, float height)
     {
         float targetResX = VideoManager.Instance.TargetResolution.X;

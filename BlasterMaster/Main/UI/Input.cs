@@ -22,4 +22,9 @@ public class Input : UIElement
         
         Text = _stringBuilder.ToString();
     }
+
+    public override void OnMenuInactive()
+    {
+        _stringBuilder.Clear();
+    }
 }

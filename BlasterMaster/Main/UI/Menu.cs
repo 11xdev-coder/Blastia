@@ -55,7 +55,22 @@ public class Menu
             menu.Active = true;
             
             _menuSwitched = true;
+            
+            OnMenuInactive();
         }
+    }
+
+    /// <summary>
+    /// Invokes the OnMenuInactive method on all UI elements to handle their state when the menu becomes inactive.
+    /// Outputs a debug message to indicate the method has been called.
+    /// </summary>
+    private void OnMenuInactive()
+    {
+        foreach (var elem in Elements)
+        {
+            elem.OnMenuInactive();
+        }
+        Console.WriteLine("Called OnMenuInactive on all UIElements.");
     }
     
     /// <summary>
