@@ -123,7 +123,7 @@ public static class KeyboardHelper
         {
             char character = keyString[0];
 
-            if (isShiftDown || IsCapsLockOn())
+            if ((isShiftDown || IsCapsLockOn()) && !(isShiftDown && IsCapsLockOn()))
             {
                 stringBuilder.Append(char.ToUpper(character));
             }

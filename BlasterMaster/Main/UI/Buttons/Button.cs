@@ -11,7 +11,7 @@ public class Button : UIElement
     public Color NormalColor = Color.Wheat;
     public Color SelectedColor = Color.Yellow;
 
-    public Button(Vector2 position, string text, SpriteFont font, Action? onClick) : 
+    public Button(Vector2 position, string text, SpriteFont font, Action? onClick, bool a = false) : 
         base(position, text, font)
     {
         OnClick = onClick;
@@ -20,6 +20,11 @@ public class Button : UIElement
         
         OnStartHovering = () => { PlayTickSound(); Select(); };
         OnEndHovering = Deselect;
+    }
+
+    public override void Update()
+    {
+        base.Update();
     }
 
     public override void Draw(SpriteBatch spriteBatch)

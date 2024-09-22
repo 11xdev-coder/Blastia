@@ -8,24 +8,40 @@ public class Slider : Button
 {
     public override bool Draggable => true;
 
-    private Image? _backgroundImage;
-    private float _bgTextureHeight;
-    // flag to update background position only once
-    private bool _hasUpdatedBgPosition;
+    public override float HAlign
+    {
+        get => base.HAlign;
+        set
+        {
+            base.HAlign = value;
 
-    private const string SliderText = "O";
-    private float _sliderTextSizeX;
-    private float _sliderBgLeftBound;
-    private float _sliderBgRightBound;
+            UpdateSliderVisuals();
+        }
+    }
+    public override float VAlign
+    {
+        get => base.VAlign;
+        set
+        {
+            base.VAlign = value;
+
+            UpdateSliderVisuals();
+        }
+    }
 
     private const string InitialPercentText = "100%";
+    private const string SliderText = "O";
+    
+    private Image? _backgroundImage;
+    private float _sliderTextSizeX;
+    
+    private float _sliderBgLeftBound;
+    private float _sliderBgRightBound;
+    
     private Text? _percentText;
-    private bool _hasUpdatedPercentText;
-    private bool _showPercentText;
     private Vector2 _percentTextSize;
     private float _percentTextOffset;
 
-    private bool _hasUpdatedSliderPosition = true;
     private Func<float> _getValue;
     private Action<float> _setValue;
     
@@ -37,6 +53,8 @@ public class Slider : Button
         {
             _percent = Math.Clamp(value, 0, 1);
             _setValue(_percent);
+            
+            UpdatePercentTextAndPosition();
         }
     }
 
@@ -45,190 +63,85 @@ public class Slider : Button
         bool showPercent = false, float percentTextOffset = 35) : 
         base(position, SliderText, font, null)
     {
-        // initialize BG image, get its Heights
-        InitBackgroundImage(position);
+        _backgroundImage = new Image(Position, BlasterMasterGame.SliderTexture);
         
-        // get text size of "O"
-        InitSliderTextSize();
-
-        if (showPercent)
-        {
-            // if showPercent = true, initialize _percentText with custom pos,
-            // get size of 100% and init _percentTextOffset
-            InitPercentText(position, percentTextOffset);
-        }
+        _sliderTextSizeX = font.MeasureString(SliderText).X;
         
         _getValue = getValue;
         _setValue = setValue;
-        InitPercent();
-    }
-
-    /// <summary>
-    /// Initializes the background image for the slider.
-    /// </summary>
-    /// <param name="pos">The position where the background image will be placed.</param>
-    private void InitBackgroundImage(Vector2 pos)
-    {
-        _backgroundImage = new Image(pos, BlasterMasterGame.SliderTexture);
         
-        _bgTextureHeight = _backgroundImage.Texture.Height;
-    }
+        _percentTextOffset = percentTextOffset;
+        _percentText = showPercent ? new Text(Vector2.Zero, InitialPercentText, font) : null;
+        _percentTextSize = font.MeasureString(InitialPercentText);
 
-    /// <summary>
-    /// Initializes the text size for the slider.
-    /// </summary>
-    private void InitSliderTextSize()
-    {
-        _sliderTextSizeX = Font.MeasureString(SliderText).X;
+        InitializeSlider();
     }
-
-    /// <summary>
-    /// Initializes the percent text display for the slider.
-    /// </summary>
-    /// <param name="pos">The position of the slider.</param>
-    /// <param name="offset">The offset distance for the percent text from the slider.</param>
-    private void InitPercentText(Vector2 pos, float offset)
-    {
-        _showPercentText = true;
-        Vector2 percentTextPosition = CalculatePercentTextPosition(pos);
-        
-        _percentText = new Text(percentTextPosition, InitialPercentText, Font);
-        
-        _percentTextSize = Font.MeasureString(InitialPercentText);
-        _percentTextOffset = offset;
-    }
-
+    
     /// <summary>
     /// Initializes the percentage for the slider based on the value from the getValue function.
     /// </summary>
-    private void InitPercent()
+    private void InitializeSlider()
     {
-        float value = _getValue();
-        _percent = value;
-        _hasUpdatedSliderPosition = false; // request slider update
-        Console.WriteLine($"Slider loaded percent: {_percent}");
-    }
-
-    /// <summary>
-    /// Gets the position for the percent text relative to the slider's background image.
-    /// </summary>
-    /// <param name="initialPos">The initial slider position.</param>
-    /// <return>The calculated position of the percent text.</return>
-    private Vector2 CalculatePercentTextPosition(Vector2 initialPos = default)
-    {
-        if (_backgroundImage != null)
-        {
-            if (_hasUpdatedBgPosition)
-            {
-                return CalculatePercentTextPositionForUpdatedBg();
-            }
-            
-            return new Vector2(_backgroundImage.Bounds.Right, initialPos.Y);
-        }
-        
-        return new Vector2(initialPos.X, initialPos.Y);
-    }
-
-    /// <summary>
-    /// Calculates the position of the percent text when the background has been updated.
-    /// </summary>
-    /// <returns>The position vector for the percent text.</returns>
-    private Vector2 CalculatePercentTextPositionForUpdatedBg()
-    {
-        return new Vector2(_sliderBgRightBound + _percentTextOffset,
-            Bounds.Center.Y - _percentTextSize.Y * 0.5f);
-    }
-
-    public override void Update()
-    {
-        base.Update();
-        
-        // update percent text
-        if(_percentText != null && _showPercentText) 
-            _percentText.Text = $"{Percent * 100:0.00}%";
-    }
-
-    public override void UpdateBounds()
-    {
-        base.UpdateBounds();
-        UpdateBackgroundImage();
-        UpdatePercentText();
+        Percent = _getValue();
         UpdateSliderPosition();
+        
+        Console.WriteLine($"Slider loaded percent: {Percent}");
     }
 
-    private void UpdateBackgroundImage()
+    private void UpdateBackgroundImagePositionAndBounds()
     {
-        if (_backgroundImage == null || _hasUpdatedBgPosition) return;
+        if (_backgroundImage == null) return;
         
-        // if BG image is init, and we didnt update
-        // set pos to half of the "O"
-        Vector2 bgPosition = CalculateBgImagePosition();
+        _backgroundImage.Position = CalculateBackgroundImagePosition();
+        _backgroundImage.Update();
         
-        // set custom bounds calculated with size of "O"
-        UpdateBgAndSetBounds(bgPosition);
-        
-        _hasUpdatedBgPosition = true;
+        _sliderBgLeftBound = _backgroundImage.Bounds.Left - _sliderTextSizeX * 0.5f;
+        _sliderBgRightBound = _backgroundImage.Bounds.Right - _sliderTextSizeX * 0.5f;
     }
-
-    /// <summary>
-    /// Calculates the position of the background image relative to the slider.
-    /// </summary>
-    /// <returns>
-    /// A <see cref="Vector2"/> representing the calculated position of the background image.
-    /// </returns>
-    private Vector2 CalculateBgImagePosition()
+    
+    private Vector2 CalculateBackgroundImagePosition()
     {
+        if (_backgroundImage == null) return Position;
+        
         float x = Bounds.Left + _sliderTextSizeX * 0.5f;
-        float y = Bounds.Center.Y - _bgTextureHeight * 0.65f;
+        float y = Bounds.Center.Y - _backgroundImage.Texture.Height * 0.65f;
         return new Vector2(x, y);
     }
 
     /// <summary>
-    /// Updates the background image position and sets the bounds for the slider.
+    /// Updates background image position and bounds. Updates percent text and position.
+    /// Updates slider position.
     /// </summary>
-    /// <param name="position">The position to set the background image to.</param>
-    private void UpdateBgAndSetBounds(Vector2 position)
+    private void UpdateSliderVisuals()
     {
-        if(_backgroundImage == null || _hasUpdatedBgPosition) return;
+        UpdateBackgroundImagePositionAndBounds();
+        UpdatePercentTextAndPosition();
+        UpdateSliderPosition();
+    }
+
+    /// <summary>
+    /// Updates percent text, and position using offset.
+    /// </summary>
+    private void UpdatePercentTextAndPosition()
+    {
+        if (_percentText == null) return;
         
-        _backgroundImage.Position = position;
-        _backgroundImage.UpdateBounds();
-        
-        // set bounds
-        _sliderBgLeftBound = _backgroundImage.Bounds.Left - _sliderTextSizeX * 0.5f;
-        _sliderBgRightBound = _backgroundImage.Bounds.Right - _sliderTextSizeX * 0.5f;
+        _percentText.Text = $"{Percent * 100:0.00}%";
+        _percentText.Position = new Vector2(_sliderBgRightBound + _percentTextOffset,
+            Bounds.Center.Y - _percentTextSize.Y * 0.5f);
+        _percentText.Update();
     }
 
-    private void UpdatePercentText()
-    {
-        if (_percentText != null && _showPercentText &&
-            !_hasUpdatedPercentText && _hasUpdatedBgPosition && _backgroundImage != null)
-        {
-            // if _percentText is init, if we need to show it and didnt updated it, and init BG image
-            // set position to the right of the slider
-            _percentText.Position = CalculatePercentTextPosition();
-            
-            _hasUpdatedPercentText = true;
-        }
-    }
-
-    public void AddToElements(List<UIElement> elements)
-    {
-        if (_backgroundImage != null) elements.Add(_backgroundImage);
-        if (_percentText != null) elements.Add(_percentText);
-        elements.Add(this);
-    }
-
+    /// <summary>
+    /// Updates slider position using Percent considering the HAlign
+    /// </summary>
     private void UpdateSliderPosition()
     {
-        if (!_hasUpdatedBgPosition || _hasUpdatedSliderPosition) return;
-        
         float rightBound = _sliderBgRightBound - 1;
-        float newX = _sliderBgLeftBound + _percent * (rightBound - _sliderBgLeftBound);
-        Position = new Vector2(newX, Position.Y);
-        FixHAlignment(); // align properly
+        float newX = _sliderBgLeftBound + Percent * (rightBound - _sliderBgLeftBound);
+        float alignedX = GetAlignedPositionX(newX);
         
-        _hasUpdatedSliderPosition = true;
+        Position = new Vector2(alignedX, Position.Y);
     }
     
     protected override void UpdateDragPosition(Vector2 cursorPosition)
@@ -248,5 +161,27 @@ public class Slider : Button
         float rightBound = _sliderBgRightBound - 1;
         return (Bounds.Left - _sliderBgLeftBound) / 
                (rightBound - _sliderBgLeftBound);
+    }
+    
+    public override void Update()
+    {
+        base.Update();
+        
+        _backgroundImage?.Update();
+        _percentText?.Update();
+    }
+
+    public override void UpdateBounds()
+    {
+        base.UpdateBounds();
+        _backgroundImage?.UpdateBounds();
+        _percentText?.UpdateBounds();
+    }
+    
+    public void AddToElements(List<UIElement> elements)
+    {
+        if (_backgroundImage != null) elements.Add(_backgroundImage);
+        if (_percentText != null) elements.Add(_percentText);
+        elements.Add(this);
     }
 }

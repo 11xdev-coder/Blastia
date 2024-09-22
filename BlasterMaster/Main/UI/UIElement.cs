@@ -25,7 +25,7 @@ public abstract class UIElement
     /// <summary>
     /// Horizontal Alignment, when changed UpdateBounds() is called
     /// </summary>
-    public float HAlign
+    public virtual float HAlign
     {
         get => _hAlign;
         set => Properties.OnValueChangedProperty(ref _hAlign, value, UpdateBounds);
@@ -35,7 +35,7 @@ public abstract class UIElement
     /// <summary>
     /// Vertical alignment, when changed UpdateBounds() is called
     /// </summary>
-    public float VAlign
+    public virtual float VAlign
     {
         get => _vAlign;
         set => Properties.OnValueChangedProperty(ref _vAlign, value, UpdateBounds);
@@ -98,7 +98,7 @@ public abstract class UIElement
         
         UpdateBounds();
     }
-    
+
     /// <summary>
     /// Text contructor
     /// </summary>
@@ -213,19 +213,21 @@ public abstract class UIElement
     }
 
     /// <summary>
-    /// De-aligns the position
+    /// Subtracts alignment calculations from the X 
     /// </summary>
-    protected void FixHAlignment()
+    /// <param name="calculatedX">X position to align</param>
+    /// <returns></returns>
+    protected float GetAlignedPositionX(float calculatedX)
     {
         float targetResX = VideoManager.Instance.TargetResolution.X;
-        float positionX = Position.X;  // float instead of int for non-integer operations
+        float newX = calculatedX;
 
         if (HAlign > 0)
         {
-            positionX -= (targetResX * HAlign) - (Bounds.Width * HAlign);
+            newX -= (targetResX * HAlign) - (Bounds.Width * HAlign);
         }
-    
-        Position.X = positionX;
+
+        return newX;
     }
 
     /// <summary>
