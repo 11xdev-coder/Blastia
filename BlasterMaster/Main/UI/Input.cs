@@ -26,5 +26,6 @@ public class Input : UIElement
     public override void OnMenuInactive()
     {
         _stringBuilder.Clear();
+        Update(); // no text in next draw
     }
 }

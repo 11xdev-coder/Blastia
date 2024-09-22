@@ -70,6 +70,7 @@ public class Slider : Button
     private void InitBackgroundImage(Vector2 pos)
     {
         _backgroundImage = new Image(pos, BlasterMasterGame.SliderTexture);
+        
         _bgTextureHeight = _backgroundImage.Texture.Height;
     }
 
@@ -90,7 +91,9 @@ public class Slider : Button
     {
         _showPercentText = true;
         Vector2 percentTextPosition = CalculatePercentTextPosition(pos);
+        
         _percentText = new Text(percentTextPosition, InitialPercentText, Font);
+        
         _percentTextSize = Font.MeasureString(InitialPercentText);
         _percentTextOffset = offset;
     }

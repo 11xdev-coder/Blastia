@@ -1,10 +1,34 @@
-﻿using System.Text;
+﻿using System.Runtime.InteropServices;
+using System.Text;
+using Microsoft.VisualBasic;
 using Microsoft.Xna.Framework.Input;
 
 namespace BlasterMaster.Main.Utilities;
 
 public static class KeyboardHelper
 {
+    /// <summary>
+    /// Represents the virtual key code for the Caps Lock key.
+    /// </summary>
+    public const int VkCapsLock = 0x14;
+
+    /// <summary>
+    /// Retrieves the status of the specified virtual key.
+    /// </summary>
+    /// <param name="keyCode">The virtual key code for which to retrieve the status.</param>
+    /// <returns>The status of the specified virtual key. If the high-order bit is 1, the key is down; if it is 0, the key is up. The low-order bit indicates whether the key was pressed after the previous call to GetKeyState.</returns>
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern short GetKeyState(int keyCode);
+
+    /// <summary>
+    /// Determines whether the Caps Lock key is currently on.
+    /// </summary>
+    /// <returns>true if the Caps Lock key is on; otherwise, false.</returns>
+    public static bool IsCapsLockOn()
+    {
+        return Convert.ToBoolean(GetKeyState(VkCapsLock) & 0x0001);
+    }
+    
     /// <summary>
     /// Processes the input from the current keyboard state and updates the provided StringBuilder
     /// based on the keys that were pressed.
@@ -15,11 +39,14 @@ public static class KeyboardHelper
     public static void ProcessInput(KeyboardState currentKeyState,
         KeyboardState prevKeyState, StringBuilder stringBuilder)
     {
+        bool isShiftDown = currentKeyState.IsKeyDown(Keys.LeftShift) ||
+                           currentKeyState.IsKeyDown(Keys.RightShift);
+        
         foreach (Keys key in Enum.GetValues(typeof(Keys)))
         {
             if (IsKeyJustPressed(currentKeyState, prevKeyState, key))
             {
-                HandleKeyPress(key, stringBuilder);
+                HandleKeyPress(key, stringBuilder, isShiftDown);
             }
         }
     }
@@ -43,7 +70,9 @@ public static class KeyboardHelper
     /// </summary>
     /// <param name="key">The key that was pressed.</param>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key press.</param>
-    private static void HandleKeyPress(Keys key, StringBuilder stringBuilder)
+    /// /// <param name="isShiftDown">Indicates whether the shift key is currently held down.</param>
+    private static void HandleKeyPress(Keys key, StringBuilder stringBuilder,
+        bool isShiftDown = false)
     {
         if (key == Keys.Back && stringBuilder.Length > 0)
         {
@@ -51,11 +80,11 @@ public static class KeyboardHelper
         }
         else if (key == Keys.Space)
         {
-           HandleSpace(stringBuilder);
+            HandleSpace(stringBuilder);
         }
         else
         {
-           HandleCharacter(key, stringBuilder);
+            HandleCharacter(key, stringBuilder, isShiftDown);
         }
     }
 
@@ -78,18 +107,30 @@ public static class KeyboardHelper
     }
 
     /// <summary>
-    /// Handles a character key press by appending the character to the provided StringBuilder.
-    /// Only appends characters that are letters or digits.
+    /// Handles the character key press by appending the appropriate character
+    /// to the provided StringBuilder, taking into account shift and caps lock states.
+    /// Only handles letters or digits.
     /// </summary>
-    /// <param name="key">The key representing the character that was pressed.</param>
-    /// <param name="stringBuilder">The StringBuilder to be updated with the character.</param>
-    private static void HandleCharacter(Keys key, StringBuilder stringBuilder)
+    /// <param name="key">The character key that was pressed.</param>
+    /// <param name="stringBuilder">The StringBuilder to be updated with the character key press.</param>
+    /// <param name="isShiftDown">Indicates whether the shift key is currently held down.</param>
+    private static void HandleCharacter(Keys key, StringBuilder stringBuilder,
+        bool isShiftDown = false)
     {
         string keyString = key.ToString();
 
         if (keyString.Length == 1 && char.IsLetterOrDigit(keyString[0]))
         {
-            stringBuilder.Append(keyString);
+            char character = keyString[0];
+
+            if (isShiftDown || IsCapsLockOn())
+            {
+                stringBuilder.Append(char.ToUpper(character));
+            }
+            else
+            {
+                stringBuilder.Append(char.ToLower(character));
+            }
         }
     }
 }

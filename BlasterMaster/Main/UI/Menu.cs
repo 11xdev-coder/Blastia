@@ -30,6 +30,14 @@ public class Menu
             elem.Update();
         }
     }
+
+    public void UpdateElementsBounds()
+    {
+        foreach (var elem in Elements)
+        {
+            elem.UpdateBounds();
+        }
+    }
     
     /// <summary>
     /// Draw each element
@@ -49,14 +57,14 @@ public class Menu
     /// <param name="menu"></param>
     public void SwitchToMenu(Menu? menu)
     {
-        if (menu != null)
+        if (menu != null && menu != this && !menu.Active)
         {
+            OnMenuInactive();
+            
             Active = false;
             menu.Active = true;
             
             _menuSwitched = true;
-            
-            OnMenuInactive();
         }
     }
 
