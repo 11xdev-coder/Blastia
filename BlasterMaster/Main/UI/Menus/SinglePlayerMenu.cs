@@ -14,7 +14,7 @@ public class SinglePlayerMenu : Menu
 
     private void AddElements()
     {
-        Input input = new Input(Vector2.Zero, Font)
+        Input input = new Input(Vector2.Zero, Font, true)
         {
             HAlign = 0.5f,
             VAlign = 0.7f

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using BlasterMaster.Main.Sounds;
+﻿using BlasterMaster.Main.Sounds;
 using BlasterMaster.Main.UI;
 using BlasterMaster.Main.UI.Menus;
 using BlasterMaster.Main.Utilities;
@@ -35,6 +34,10 @@ public class BlasterMasterGame : Game
     // KEYBOARD
     public static KeyboardState KeyboardState { get; private set; }
     public static KeyboardState PreviousKeyboardState { get; private set; }
+    
+    // GLOBAL TEXTURES
+    public static Texture2D SliderTexture { get; private set; } = null!;
+    public static Texture2D WhitePixel { get; private set; } = null!;
 
     private MouseState _previousMouseState;
     private MouseState _currentMouseState;
@@ -44,8 +47,7 @@ public class BlasterMasterGame : Game
     public SpriteFont MainFont { get; private set; }
     private Texture2D _logoTexture;
     
-    // Textures
-    public static Texture2D SliderTexture { get; private set; } = null!;
+    
 
     public static LogoMenu? LogoMenu { get; private set; }
     public static MainMenu? MainMenu { get; private set; }
@@ -120,6 +122,9 @@ public class BlasterMasterGame : Game
         
         SliderTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
             Content.RootDirectory + Paths.SliderBackgroundPath);
+        
+        WhitePixel = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.WhitePixelPath);
     }
     
     protected override void LoadContent()

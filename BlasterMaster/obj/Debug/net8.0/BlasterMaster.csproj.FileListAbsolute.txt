@@ -84,3 +84,4 @@ D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Sounds\Men
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_01.ogg
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_02.ogg
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_03.ogg
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\WhitePixel.png
