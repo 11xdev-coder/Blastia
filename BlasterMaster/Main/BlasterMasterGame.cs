@@ -18,7 +18,12 @@ public class BlasterMasterGame : Game
     /// </summary>
     private readonly GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
-
+    
+    // TICK
+    public static GameTime GameTime { get; private set; } = new();
+    public static double GameTimeElapsedSeconds { get; private set; }
+    
+    // SCREEN
     public static float ScreenWidth { get; private set; }
     public static float ScreenHeight { get; private set; }
     
@@ -159,6 +164,7 @@ public class BlasterMasterGame : Game
     protected override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
+        UpdateGameTime(gameTime);
         
         UpdateMouseState();
         UpdateKeyboardState();
@@ -178,6 +184,12 @@ public class BlasterMasterGame : Game
         
         // update previous states in the end
         UpdatePreviousStates();
+    }
+
+    private void UpdateGameTime(GameTime newGameTime)
+    {
+        GameTime = newGameTime;
+        GameTimeElapsedSeconds = newGameTime.ElapsedGameTime.TotalSeconds;
     }
 
     private void UpdateMouseState()
