@@ -7,6 +7,11 @@ namespace BlasterMaster.Main.Utilities;
 
 public static class KeyboardHelper
 {
+    // dictionary to store each key
+    private static readonly Dictionary<Keys, double> KeyHoldTimes = new();
+    private const double CharacterInitialHoldDelay = 0.5f;
+    private const double CharacterHoldRepeatInterval = 0.1f;
+    
     /// <summary>
     /// Represents the virtual key code for the Caps Lock key.
     /// </summary>
@@ -33,12 +38,12 @@ public static class KeyboardHelper
     /// Processes the input from the current keyboard state and updates the provided StringBuilder
     /// based on the keys that were pressed.
     /// </summary>
-    /// <param name="currentKeyState">The current state of the keyboard.</param>
-    /// <param name="prevKeyState">The previous state of the keyboard.</param>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key inputs.</param>
-    public static void ProcessInput(KeyboardState currentKeyState,
-        KeyboardState prevKeyState, StringBuilder stringBuilder)
+    public static void ProcessInput(StringBuilder stringBuilder)
     {
+        KeyboardState currentKeyState = BlasterMasterGame.KeyboardState;
+        KeyboardState prevKeyState = BlasterMasterGame.PreviousKeyboardState;
+        
         bool isShiftDown = currentKeyState.IsKeyDown(Keys.LeftShift) ||
                            currentKeyState.IsKeyDown(Keys.RightShift);
         
@@ -46,11 +51,29 @@ public static class KeyboardHelper
         {
             if (IsKeyJustPressed(currentKeyState, prevKeyState, key))
             {
-                HandleKeyPress(key, stringBuilder, isShiftDown);
+                HandleSingleKeyPress(key, stringBuilder, isShiftDown);
+            }
+
+            if (currentKeyState.IsKeyDown(key))
+            {
+                if (!KeyHoldTimes.ContainsKey(key))
+                {
+                    KeyHoldTimes[key] = 0;
+                }
+
+                // Update the dictionary value directly
+                ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
+                    (timerRef) => KeyHoldTimes[key] = timerRef, 
+                    () => HandleCharacter(key, stringBuilder, isShiftDown));
+            }
+            else
+            {
+                KeyHoldTimes.Remove(key);
             }
         }
     }
-
+    
+    #region Helpers for ProcessInput
     /// <summary>
     /// Determines if a specific key has just been pressed based on the current and previous keyboard states.
     /// </summary>
@@ -71,7 +94,7 @@ public static class KeyboardHelper
     /// <param name="key">The key that was pressed.</param>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key press.</param>
     /// /// <param name="isShiftDown">Indicates whether the shift key is currently held down.</param>
-    private static void HandleKeyPress(Keys key, StringBuilder stringBuilder,
+    private static void HandleSingleKeyPress(Keys key, StringBuilder stringBuilder,
         bool isShiftDown = false)
     {
         if (key == Keys.Back && stringBuilder.Length > 0)
@@ -81,10 +104,6 @@ public static class KeyboardHelper
         else if (key == Keys.Space)
         {
             HandleSpace(stringBuilder);
-        }
-        else
-        {
-            HandleCharacter(key, stringBuilder, isShiftDown);
         }
     }
 
@@ -131,6 +150,80 @@ public static class KeyboardHelper
             {
                 stringBuilder.Append(char.ToLower(character));
             }
+        }
+    }
+    #endregion
+
+    /// <summary>
+    /// Handles the action for a key being held down with a delay and interval and executes click action
+    /// </summary>
+    /// <param name="keyHeld">The held key</param>
+    /// <param name="holdDelay">The delay before the action is starts repeating</param>
+    /// <param name="holdInterval">The interval at which action is repeated after holdDelay</param>
+    /// <param name="heldKeyTimerRef">Reference to the timer for the held key</param>
+    /// <param name="oppositeKeyTimerRef">Reference to the timer for the opposite key's hold action, which will be reset if the current key is pressed</param>
+    /// <param name="onPressAction">The action executed when key is single-tapped or held</param>
+    public static void ProcessKeyHold(Keys keyHeld, double holdDelay, double holdInterval,
+        ref double heldKeyTimerRef,
+        ref double oppositeKeyTimerRef, Action onPressAction)
+    {
+        if (BlasterMasterGame.KeyboardState.IsKeyDown(keyHeld))
+        {
+            oppositeKeyTimerRef = 0;
+            
+            // single press
+            if (BlasterMasterGame.PreviousKeyboardState.IsKeyUp(keyHeld))
+            {
+                heldKeyTimerRef = 0;
+                onPressAction();
+            }
+            else
+            {
+                // still holding
+                heldKeyTimerRef += BlasterMasterGame.GameTimeElapsedSeconds;
+                if (heldKeyTimerRef >= holdDelay)
+                {
+                    heldKeyTimerRef -= holdInterval;
+                    onPressAction();
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Handles the action for a key being held down with a delay and interval and executes click action
+    /// </summary>
+    /// <param name="keyHeld">The held key</param>
+    /// <param name="holdDelay">The delay before the action is starts repeating</param>
+    /// <param name="holdInterval">The interval at which action is repeated after holdDelay</param>
+    /// <param name="updateHeldKeyTimerRef">Action to update key hold timer to new value</param>
+    /// <param name="onPressAction">The action executed when key is single-tapped or held</param>
+    public static void ProcessKeyHold(Keys keyHeld, double holdDelay, double holdInterval, 
+        Action<double> updateHeldKeyTimerRef,
+        Action onPressAction)
+    {
+        double heldKeyTimerRef = KeyHoldTimes[keyHeld];
+        
+        if (BlasterMasterGame.KeyboardState.IsKeyDown(keyHeld))
+        {
+            // single press
+            if (BlasterMasterGame.PreviousKeyboardState.IsKeyUp(keyHeld))
+            {
+                heldKeyTimerRef = 0;
+                onPressAction();
+            }
+            else
+            {
+                // still holding
+                heldKeyTimerRef += BlasterMasterGame.GameTimeElapsedSeconds;
+                if (heldKeyTimerRef >= holdDelay)
+                {
+                    heldKeyTimerRef -= holdInterval;
+                    onPressAction();
+                }
+            }
+
+            updateHeldKeyTimerRef(heldKeyTimerRef);
         }
     }
 }

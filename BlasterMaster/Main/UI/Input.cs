@@ -45,9 +45,8 @@ public class Input : UIElement
         
         HandleArrows();
         
-        // TODO: delete + hold
-        KeyboardHelper.ProcessInput(BlasterMasterGame.KeyboardState, BlasterMasterGame.PreviousKeyboardState,
-            _stringBuilder);
+        // TODO: delete
+        KeyboardHelper.ProcessInput(_stringBuilder);
         
         Text = _stringBuilder.ToString();
 
@@ -57,48 +56,12 @@ public class Input : UIElement
     private void HandleArrows()
     {
         // left arrow
-        HandleArrow(Keys.Left, ref _leftArrowHoldTime, ref _rightArrowHoldTime, LeftArrowPress);
+        KeyboardHelper.ProcessKeyHold(Keys.Left, InitialHoldDelay, HoldRepeatInterval,
+            ref _leftArrowHoldTime, ref _rightArrowHoldTime, LeftArrowPress);
         
         // right arrow
-        HandleArrow(Keys.Right, ref _rightArrowHoldTime, ref _leftArrowHoldTime, RightArrowPress);
-    }
-
-    /// <summary>
-    /// Handles the logic for an arrow key press, including handling hold and repeat actions.
-    /// </summary>
-    /// <param name="arrowKey">The arrow key being pressed (left or right).</param>
-    /// <param name="arrowKeyHoldTime">The reference to the time the arrow key has been held down.</param>
-    /// <param name="oppositeArrowKeyHoldTime">The reference to the hold time of the opposite arrow key, which is reset if the current arrow key is pressed.</param>
-    /// <param name="pressAction">The action to execute when the arrow key is pressed.</param>
-    private void HandleArrow(Keys arrowKey, ref double arrowKeyHoldTime, 
-        ref double oppositeArrowKeyHoldTime, Action pressAction)
-    {
-        if (BlasterMasterGame.KeyboardState.IsKeyDown(arrowKey))
-        {
-            oppositeArrowKeyHoldTime = 0;
-            
-            // single press
-            if (BlasterMasterGame.PreviousKeyboardState.IsKeyUp(arrowKey))
-            {
-                pressAction();
-                arrowKeyHoldTime = 0;
-            }
-            else
-            {
-                // still holding
-                arrowKeyHoldTime += BlasterMasterGame.GameTimeElapsedSeconds;
-                if (arrowKeyHoldTime >= InitialHoldDelay)
-                {
-                    arrowKeyHoldTime -= HoldRepeatInterval;
-                    pressAction();
-                }
-            }
-        }
-        else
-        {
-            // reset if not pressed
-            arrowKeyHoldTime = 0;
-        }
+        KeyboardHelper.ProcessKeyHold(Keys.Right, InitialHoldDelay, HoldRepeatInterval,
+            ref _rightArrowHoldTime, ref _leftArrowHoldTime, RightArrowPress);
     }
 
     private void LeftArrowPress()

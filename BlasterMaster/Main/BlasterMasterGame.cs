@@ -16,7 +16,7 @@ public class BlasterMasterGame : Game
     /// Used for low-level graphics operations.
     /// </summary>
     private readonly GraphicsDeviceManager _graphics;
-    private SpriteBatch _spriteBatch;
+    public static SpriteBatch SpriteBatch { get; private set; } = null!;
     
     // TICK
     public static GameTime GameTime { get; private set; } = new();
@@ -129,7 +129,7 @@ public class BlasterMasterGame : Game
     
     protected override void LoadContent()
     {
-        _spriteBatch = new SpriteBatch(GraphicsDevice);
+        SpriteBatch = new SpriteBatch(GraphicsDevice);
         
         SoundEngine.LoadSounds();
         MusicEngine.LoadMusic();
@@ -229,7 +229,7 @@ public class BlasterMasterGame : Game
         
         var matrix = VideoManager.Instance.CalculateResolutionScaleMatrix();
         
-        _spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
+        SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
             SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
             null, matrix);
         
@@ -237,13 +237,13 @@ public class BlasterMasterGame : Game
         {
             if (menu.Active)
             {
-                menu.Draw(_spriteBatch);
+                menu.Draw(SpriteBatch);
             }
         }
         
         // draw cursor texture last on top of everything
-        _spriteBatch.Draw(_cursorTexture, CursorPosition, Color.White);
-        _spriteBatch.End();
+        SpriteBatch.Draw(_cursorTexture, CursorPosition, Color.White);
+        SpriteBatch.End();
     }
 
     public static MusicID ChooseRandomMenuMusic()
