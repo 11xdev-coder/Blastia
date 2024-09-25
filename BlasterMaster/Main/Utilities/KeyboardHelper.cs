@@ -39,8 +39,10 @@ public static class KeyboardHelper
     /// based on the keys that were pressed.
     /// </summary>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key inputs.</param>
-    public static void ProcessInput(StringBuilder stringBuilder)
+    public static bool ProcessInput(StringBuilder stringBuilder)
     {
+        bool hasChanged = false;
+        
         KeyboardState currentKeyState = BlasterMasterGame.KeyboardState;
         KeyboardState prevKeyState = BlasterMasterGame.PreviousKeyboardState;
         
@@ -49,28 +51,35 @@ public static class KeyboardHelper
         
         foreach (Keys key in Enum.GetValues(typeof(Keys)))
         {
+            if (key == Keys.Left || key == Keys.Right) continue; // ignore arrows
+            
             if (IsKeyJustPressed(currentKeyState, prevKeyState, key))
             {
-                HandleSingleKeyPress(key, stringBuilder, isShiftDown);
+                hasChanged = HandleDeleteAndSpace(key, stringBuilder);
             }
 
             if (currentKeyState.IsKeyDown(key))
             {
-                if (!KeyHoldTimes.ContainsKey(key))
-                {
-                    KeyHoldTimes[key] = 0;
-                }
+                // set pressed key holding time to 0
+                KeyHoldTimes.TryAdd(key, 0);
 
                 // Update the dictionary value directly
                 ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
-                    (timerRef) => KeyHoldTimes[key] = timerRef, 
-                    () => HandleCharacter(key, stringBuilder, isShiftDown));
+                    timerRef => KeyHoldTimes[key] = timerRef,
+                    () =>
+                    {
+                        HandleCharacter(key, stringBuilder, isShiftDown);
+                        hasChanged = true;
+                    });
             }
             else
             {
+                // if not holding remove the key
                 KeyHoldTimes.Remove(key);
             }
         }
+        
+        return hasChanged;
     }
     
     #region Helpers for ProcessInput
@@ -93,18 +102,22 @@ public static class KeyboardHelper
     /// </summary>
     /// <param name="key">The key that was pressed.</param>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key press.</param>
-    /// /// <param name="isShiftDown">Indicates whether the shift key is currently held down.</param>
-    private static void HandleSingleKeyPress(Keys key, StringBuilder stringBuilder,
-        bool isShiftDown = false)
+    /// <returns>Returns true if stringBuilder has been changed</returns>
+    private static bool HandleDeleteAndSpace(Keys key, StringBuilder stringBuilder)
     {
         if (key == Keys.Back && stringBuilder.Length > 0)
         {
             HandleBackSpace(stringBuilder);
+            return true;
         }
-        else if (key == Keys.Space)
+        
+        if (key == Keys.Space)
         {
             HandleSpace(stringBuilder);
+            return true;
         }
+
+        return false;
     }
 
     /// <summary>
