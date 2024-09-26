@@ -38,8 +38,9 @@ public static class KeyboardHelper
     /// Processes the input from the current keyboard state and updates the provided StringBuilder
     /// based on the keys that were pressed.
     /// </summary>
+    /// <param name="index">Where to change the character</param>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key inputs.</param>
-    public static bool ProcessInput(StringBuilder stringBuilder)
+    public static bool ProcessInput(int index, StringBuilder stringBuilder)
     {
         bool hasChanged = false;
         
@@ -55,7 +56,7 @@ public static class KeyboardHelper
             
             if (IsKeyJustPressed(currentKeyState, prevKeyState, key))
             {
-                hasChanged = HandleDeleteAndSpace(key, stringBuilder);
+                hasChanged = HandleDeleteAndSpace(index, key, stringBuilder);
             }
 
             if (currentKeyState.IsKeyDown(key))
@@ -68,7 +69,7 @@ public static class KeyboardHelper
                     timerRef => KeyHoldTimes[key] = timerRef,
                     () =>
                     {
-                        HandleCharacter(key, stringBuilder, isShiftDown);
+                        HandleCharacter(index, key, stringBuilder, isShiftDown);
                         hasChanged = true;
                     });
             }
@@ -100,20 +101,22 @@ public static class KeyboardHelper
     /// Handles the key press by updating the provided StringBuilder based on the key that was pressed.
     /// Supports handling backspace, space, and character keys.
     /// </summary>
+    /// <param name="index">Where to change the character at</param>
     /// <param name="key">The key that was pressed.</param>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key press.</param>
     /// <returns>Returns true if stringBuilder has been changed</returns>
-    private static bool HandleDeleteAndSpace(Keys key, StringBuilder stringBuilder)
+    private static bool HandleDeleteAndSpace(int index, Keys key, StringBuilder stringBuilder)
     {
-        if (key == Keys.Back && stringBuilder.Length > 0)
+        if (key == Keys.Back && stringBuilder.Length > 0 && index != 0)
         {
-            HandleBackSpace(stringBuilder);
+            int positiveIndex = Math.Max(0, index - 1);
+            stringBuilder.Remove(positiveIndex, 1);
             return true;
         }
         
         if (key == Keys.Space)
         {
-            HandleSpace(stringBuilder);
+            stringBuilder.Insert(index, ' ');
             return true;
         }
 
@@ -121,32 +124,15 @@ public static class KeyboardHelper
     }
 
     /// <summary>
-    /// Handles the backspace key press by removing the last character from the provided StringBuilder.
-    /// </summary>
-    /// <param name="stringBuilder">The StringBuilder from which the last character will be removed.</param>
-    private static void HandleBackSpace(StringBuilder stringBuilder)
-    {
-        stringBuilder.Length -= 1;
-    }
-
-    /// <summary>
-    /// Handles the space key press by appending a space character to the provided StringBuilder.
-    /// </summary>
-    /// <param name="stringBuilder">The StringBuilder to which a space character will be appended.</param>
-    private static void HandleSpace(StringBuilder stringBuilder)
-    {
-        stringBuilder.Append(' ');
-    }
-
-    /// <summary>
     /// Handles the character key press by appending the appropriate character
     /// to the provided StringBuilder, taking into account shift and caps lock states.
     /// Only handles letters or digits.
     /// </summary>
+    /// <param name="index">Where to insert the char at</param>
     /// <param name="key">The character key that was pressed.</param>
     /// <param name="stringBuilder">The StringBuilder to be updated with the character key press.</param>
     /// <param name="isShiftDown">Indicates whether the shift key is currently held down.</param>
-    private static void HandleCharacter(Keys key, StringBuilder stringBuilder,
+    private static void HandleCharacter(int index, Keys key, StringBuilder stringBuilder,
         bool isShiftDown = false)
     {
         string keyString = key.ToString();
@@ -157,11 +143,11 @@ public static class KeyboardHelper
 
             if ((isShiftDown || IsCapsLockOn()) && !(isShiftDown && IsCapsLockOn()))
             {
-                stringBuilder.Append(char.ToUpper(character));
+                stringBuilder.Insert(index, char.ToUpper(character));
             }
             else
             {
-                stringBuilder.Append(char.ToLower(character));
+                stringBuilder.Insert(index, char.ToLower(character));
             }
         }
     }

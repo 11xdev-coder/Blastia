@@ -49,11 +49,12 @@ public class Input : UIElement
         
         int originalLength = _stringBuilder.Length;
         
-        if (KeyboardHelper.ProcessInput(_stringBuilder))
+        if (KeyboardHelper.ProcessInput(_cursorIndex, _stringBuilder))
         {
             int newCharacters = _stringBuilder.Length - originalLength;
             
-            _cursorIndex = Math.Min(_cursorIndex + newCharacters, _stringBuilder.Length);
+            // dont go below 0
+            _cursorIndex = Math.Min(Math.Max(0, _cursorIndex + newCharacters), _stringBuilder.Length);
         }
         
         Text = _stringBuilder.ToString();
