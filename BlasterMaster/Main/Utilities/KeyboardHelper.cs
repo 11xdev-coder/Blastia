@@ -45,33 +45,51 @@ public static class KeyboardHelper
         bool hasChanged = false;
         
         KeyboardState currentKeyState = BlasterMasterGame.KeyboardState;
-        KeyboardState prevKeyState = BlasterMasterGame.PreviousKeyboardState;
         
         bool isShiftDown = currentKeyState.IsKeyDown(Keys.LeftShift) ||
                            currentKeyState.IsKeyDown(Keys.RightShift);
+
+        // temp index to change later
+        int tempIndex = index;
         
         foreach (Keys key in Enum.GetValues(typeof(Keys)))
         {
             if (key == Keys.Left || key == Keys.Right) continue; // ignore arrows
             
-            if (IsKeyJustPressed(currentKeyState, prevKeyState, key))
-            {
-                hasChanged = HandleDeleteAndSpace(index, key, stringBuilder);
-            }
-
             if (currentKeyState.IsKeyDown(key))
             {
                 // set pressed key holding time to 0
                 KeyHoldTimes.TryAdd(key, 0);
-
-                // Update the dictionary value directly
-                ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
-                    timerRef => KeyHoldTimes[key] = timerRef,
-                    () =>
-                    {
-                        HandleCharacter(index, key, stringBuilder, isShiftDown);
-                        hasChanged = true;
-                    });
+                
+                Action<double> updateTimerRef = timerRef => KeyHoldTimes[key] = timerRef;
+                
+                switch (key)
+                {
+                    case Keys.Back:
+                        ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
+                            updateTimerRef,
+                            () =>
+                            {
+                                hasChanged = HandleBackSpace(ref tempIndex, key, stringBuilder);
+                            });
+                        break;
+                    case Keys.Space:
+                        ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
+                            updateTimerRef,
+                            () =>
+                            {
+                                hasChanged = HandleSpace(ref tempIndex, key, stringBuilder);
+                            });
+                        break;
+                    default:
+                        ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
+                            updateTimerRef,
+                            () =>
+                            {
+                                hasChanged = HandleCharacter(ref tempIndex, key, stringBuilder, isShiftDown);
+                            });
+                        break;
+                }
             }
             else
             {
@@ -97,45 +115,39 @@ public static class KeyboardHelper
         return currentKeyState.IsKeyDown(key) && prevKeyState.IsKeyUp(key);
     }
 
-    /// <summary>
-    /// Handles the key press by updating the provided StringBuilder based on the key that was pressed.
-    /// Supports handling backspace, space, and character keys.
-    /// </summary>
-    /// <param name="index">Where to change the character at</param>
-    /// <param name="key">The key that was pressed.</param>
-    /// <param name="stringBuilder">The StringBuilder to be updated based on the key press.</param>
-    /// <returns>Returns true if stringBuilder has been changed</returns>
-    private static bool HandleDeleteAndSpace(int index, Keys key, StringBuilder stringBuilder)
+    #region Short key handlings
+    private static bool HandleSpace(ref int index, Keys key, StringBuilder stringBuilder)
     {
-        if (key == Keys.Back && stringBuilder.Length > 0 && index != 0)
-        {
-            int positiveIndex = Math.Max(0, index - 1);
-            stringBuilder.Remove(positiveIndex, 1);
-            return true;
-        }
-        
         if (key == Keys.Space)
         {
             stringBuilder.Insert(index, ' ');
+            index++;
             return true;
         }
 
         return false;
     }
 
-    /// <summary>
-    /// Handles the character key press by appending the appropriate character
-    /// to the provided StringBuilder, taking into account shift and caps lock states.
-    /// Only handles letters or digits.
-    /// </summary>
-    /// <param name="index">Where to insert the char at</param>
-    /// <param name="key">The character key that was pressed.</param>
-    /// <param name="stringBuilder">The StringBuilder to be updated with the character key press.</param>
-    /// <param name="isShiftDown">Indicates whether the shift key is currently held down.</param>
-    private static void HandleCharacter(int index, Keys key, StringBuilder stringBuilder,
+    private static bool HandleBackSpace(ref int index, Keys key, StringBuilder stringBuilder)
+    {
+        if (key == Keys.Back && stringBuilder.Length > 0 && index != 0)
+        {
+            int positiveIndex = Math.Max(0, index - 1);
+            stringBuilder.Remove(positiveIndex, 1);
+            index = positiveIndex;
+            
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool HandleCharacter(ref int index, Keys key, StringBuilder stringBuilder,
         bool isShiftDown = false)
     {
         string keyString = key.ToString();
+        
+        Console.WriteLine($"{index}, length: {stringBuilder.Length}");
 
         if (keyString.Length == 1 && char.IsLetterOrDigit(keyString[0]))
         {
@@ -144,13 +156,19 @@ public static class KeyboardHelper
             if ((isShiftDown || IsCapsLockOn()) && !(isShiftDown && IsCapsLockOn()))
             {
                 stringBuilder.Insert(index, char.ToUpper(character));
+                index++;
+                return true;
             }
-            else
-            {
-                stringBuilder.Insert(index, char.ToLower(character));
-            }
+
+            // if no shift/caps -> lower
+            stringBuilder.Insert(index, char.ToLower(character));
+            index++;
+            return true;
         }
+
+        return false;
     }
+    #endregion
     #endregion
 
     /// <summary>
