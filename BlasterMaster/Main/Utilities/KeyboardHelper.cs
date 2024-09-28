@@ -40,7 +40,7 @@ public static class KeyboardHelper
     /// </summary>
     /// <param name="index">Where to change the character</param>
     /// <param name="stringBuilder">The StringBuilder to be updated based on the key inputs.</param>
-    public static bool ProcessInput(int index, StringBuilder stringBuilder)
+    public static bool ProcessInput(ref int index, StringBuilder stringBuilder)
     {
         bool hasChanged = false;
         
@@ -48,9 +48,7 @@ public static class KeyboardHelper
         
         bool isShiftDown = currentKeyState.IsKeyDown(Keys.LeftShift) ||
                            currentKeyState.IsKeyDown(Keys.RightShift);
-
-        // temp index to change later
-        int tempIndex = index;
+        
         
         foreach (Keys key in Enum.GetValues(typeof(Keys)))
         {
@@ -61,35 +59,23 @@ public static class KeyboardHelper
                 // set pressed key holding time to 0
                 KeyHoldTimes.TryAdd(key, 0);
                 
-                Action<double> updateTimerRef = timerRef => KeyHoldTimes[key] = timerRef;
+                // temp index to change later
+                var tempIndex = index;
                 
-                switch (key)
+                Action<double> updateTimerRef = timerRef => KeyHoldTimes[key] = timerRef;
+
+                Action handleAction = key switch
                 {
-                    case Keys.Back:
-                        ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
-                            updateTimerRef,
-                            () =>
-                            {
-                                hasChanged = HandleBackSpace(ref tempIndex, key, stringBuilder);
-                            });
-                        break;
-                    case Keys.Space:
-                        ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
-                            updateTimerRef,
-                            () =>
-                            {
-                                hasChanged = HandleSpace(ref tempIndex, key, stringBuilder);
-                            });
-                        break;
-                    default:
-                        ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
-                            updateTimerRef,
-                            () =>
-                            {
-                                hasChanged = HandleCharacter(ref tempIndex, key, stringBuilder, isShiftDown);
-                            });
-                        break;
-                }
+                    Keys.Back => () => hasChanged = HandleBackSpace(ref tempIndex, key, stringBuilder),
+                    Keys.Space => () => hasChanged = HandleSpace(ref tempIndex, key, stringBuilder),
+                    _ => () => hasChanged = HandleCharacter(ref tempIndex, key, stringBuilder, isShiftDown)
+                };
+                
+                ProcessKeyHold(key, CharacterInitialHoldDelay, CharacterHoldRepeatInterval,
+                    updateTimerRef, handleAction);
+                
+                // update index
+                index = tempIndex;
             }
             else
             {
@@ -102,18 +88,6 @@ public static class KeyboardHelper
     }
     
     #region Helpers for ProcessInput
-    /// <summary>
-    /// Determines if a specific key has just been pressed based on the current and previous keyboard states.
-    /// </summary>
-    /// <param name="currentKeyState">The current state of the keyboard.</param>
-    /// <param name="prevKeyState">The previous state of the keyboard.</param>
-    /// <param name="key">The key to check.</param>
-    /// <returns>True if the key has just been pressed; otherwise, false.</returns>
-    private static bool IsKeyJustPressed(KeyboardState currentKeyState, 
-        KeyboardState prevKeyState, Keys key)
-    {
-        return currentKeyState.IsKeyDown(key) && prevKeyState.IsKeyUp(key);
-    }
 
     #region Short key handlings
     private static bool HandleSpace(ref int index, Keys key, StringBuilder stringBuilder)
@@ -130,7 +104,7 @@ public static class KeyboardHelper
 
     private static bool HandleBackSpace(ref int index, Keys key, StringBuilder stringBuilder)
     {
-        if (key == Keys.Back && stringBuilder.Length > 0 && index != 0)
+        if (key == Keys.Back && stringBuilder.Length > 0 && index > 0)
         {
             int positiveIndex = Math.Max(0, index - 1);
             stringBuilder.Remove(positiveIndex, 1);
@@ -147,7 +121,6 @@ public static class KeyboardHelper
     {
         string keyString = key.ToString();
         
-        Console.WriteLine($"{index}, length: {stringBuilder.Length}");
 
         if (keyString.Length == 1 && char.IsLetterOrDigit(keyString[0]))
         {

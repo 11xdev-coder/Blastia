@@ -45,17 +45,7 @@ public class Input : UIElement
         
         HandleArrows();
         
-        // TODO: delete
-        
-        int originalLength = _stringBuilder.Length;
-        
-        if (KeyboardHelper.ProcessInput(_cursorIndex, _stringBuilder))
-        {
-            int newCharacters = _stringBuilder.Length - originalLength;
-            
-            // dont go below 0
-            _cursorIndex = Math.Min(Math.Max(0, _cursorIndex + newCharacters), _stringBuilder.Length);
-        }
+        KeyboardHelper.ProcessInput(ref _cursorIndex, _stringBuilder);
         
         Text = _stringBuilder.ToString();
 
