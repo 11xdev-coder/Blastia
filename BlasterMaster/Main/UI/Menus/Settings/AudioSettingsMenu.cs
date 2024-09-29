@@ -3,7 +3,7 @@ using BlasterMaster.Main.UI.Buttons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BlasterMaster.Main.UI.Menus;
+namespace BlasterMaster.Main.UI.Menus.Settings;
 
 public class AudioSettingsMenu : Menu
 {

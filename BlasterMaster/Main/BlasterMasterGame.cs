@@ -1,6 +1,8 @@
 ﻿using BlasterMaster.Main.Sounds;
 using BlasterMaster.Main.UI;
 using BlasterMaster.Main.UI.Menus;
+using BlasterMaster.Main.UI.Menus.Settings;
+using BlasterMaster.Main.UI.Menus.SinglePlayer;
 using BlasterMaster.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -38,6 +40,17 @@ public class BlasterMasterGame : Game
     // GLOBAL TEXTURES
     public static Texture2D SliderTexture { get; private set; } = null!;
     public static Texture2D WhitePixel { get; private set; } = null!;
+    
+    #region Player Textures
+
+    public static Texture2D PlayerHead { get; private set; } = null!;
+    public static Texture2D PlayerBody { get; private set; } = null!;
+    public static Texture2D PlayerLeftArm { get; private set; } = null!;
+    public static Texture2D PlayerRightArm { get; private set; } = null!;
+    public static Texture2D PlayerLeftLeg { get; private set; } = null!;
+    public static Texture2D PlayerRightLeg { get; private set; } = null!;
+    
+    #endregion
 
     private MouseState _previousMouseState;
     private MouseState _currentMouseState;
@@ -47,15 +60,18 @@ public class BlasterMasterGame : Game
     public SpriteFont MainFont { get; private set; }
     private Texture2D _logoTexture;
     
+    #region Menus
     
-
     public static LogoMenu? LogoMenu { get; private set; }
     public static MainMenu? MainMenu { get; private set; }
     public static SinglePlayerMenu? SinglePlayerMenu { get; private set; }
+    public static PlayerCreationMenu? PlayerCreationMenu { get; private set; }
     public static SettingsMenu? SettingsMenu { get; private set; }
     public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
     public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
     private readonly List<Menu> _menus;
+    
+    #endregion
 
     /// <summary>
     /// Event triggered when a request to exit the game is made.
@@ -125,6 +141,28 @@ public class BlasterMasterGame : Game
         
         WhitePixel = LoadingUtilities.LoadTexture(GraphicsDevice,
             Content.RootDirectory + Paths.WhitePixelPath);
+        
+        #region Player Textures
+        
+        PlayerHead = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerHeadTexturePath);
+        
+        PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerBodyTexturePath);
+        
+        PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerLeftArmTexturePath);
+        
+        PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerRightArmTexturePath);
+        
+        PlayerLeftLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerLeftLegTexturePath);
+        
+        PlayerRightLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerRightLegTexturePath);
+        
+        #endregion
     }
     
     protected override void LoadContent()
@@ -147,6 +185,9 @@ public class BlasterMasterGame : Game
         
         SinglePlayerMenu = new SinglePlayerMenu(MainFont);
         AddMenu(SinglePlayerMenu);
+        
+        PlayerCreationMenu = new PlayerCreationMenu(MainFont);
+        AddMenu(PlayerCreationMenu);
         
         SettingsMenu = new SettingsMenu(MainFont);
         AddMenu(SettingsMenu);

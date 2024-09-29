@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BlasterMaster.Main.UI.Menus;
+namespace BlasterMaster.Main.UI.Menus.SinglePlayer;
 
 public class SinglePlayerMenu : Menu
 {
@@ -13,13 +13,6 @@ public class SinglePlayerMenu : Menu
 
     private void AddElements()
     {
-        Input input = new Input(Vector2.Zero, Font, true)
-        {
-            HAlign = 0.5f,
-            VAlign = 0.7f
-        };
-        Elements.Add(input);
-        
         Button newPlayerButton = new Button(Vector2.Zero, "New player", Font, NewPlayer)
         {
             HAlign = 0.5f,
@@ -37,7 +30,7 @@ public class SinglePlayerMenu : Menu
 
     private void NewPlayer()
     {
-        PlayerManager.Instance.NewPlayer();
+        SwitchToMenu(BlasterMasterGame.PlayerCreationMenu);
     }
 
     private void Back()
