@@ -1,7 +1,6 @@
 ﻿using BlasterMaster.Main.Sounds;
 using BlasterMaster.Main.UI.Buttons;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI.Menus;

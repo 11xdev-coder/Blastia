@@ -1,5 +1,4 @@
 ﻿using BlasterMaster.Main.UI.Buttons;
-using BlasterMaster.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

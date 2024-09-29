@@ -16,6 +16,8 @@ public class Input : UIElement
 
     private int _cursorIndex;
 
+    private bool _isFocused;
+    
     private double BlinkTimer { get; set; }
     private Color CursorColor { get; set; }
     private int CursorWidth { get; set; }
@@ -25,9 +27,12 @@ public class Input : UIElement
     private double _rightArrowHoldTime;
     private const double InitialHoldDelay = 0.5f;
     private const double HoldRepeatInterval = 0.1f;
+
+    private Color _defaultTextColor = Color.Wheat;
+    private Color _normalTextColor = Color.White;
     
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
-        double blinkInterval = 0.15f, Color? cursorColor = default, 
+        double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
         int cursorWidth = 2, int cursorHeight = 30) : base(position, "", font)
     {
         _cursorVisible = cursorVisible;
@@ -37,19 +42,42 @@ public class Input : UIElement
         CursorColor = cursorColor ?? Color.White;
         CursorWidth = cursorWidth;
         CursorHeight = cursorHeight;
+        
+        _isFocused = focusedByDefault;
+        OnClick += Focus;
     }
 
     public override void Update()
     {
         base.Update();
         
-        HandleArrows();
+        // if clicked not on this element -> unfocus
+        if (BlasterMasterGame.HasClickedLeft && !IsHovered)
+        {
+            Unfocus();
+        }
         
-        KeyboardHelper.ProcessInput(ref _cursorIndex, _stringBuilder);
+        // handle input if focused
+        if (_isFocused)
+        {
+            HandleArrows();
+            KeyboardHelper.ProcessInput(ref _cursorIndex, _stringBuilder);
+        }
         
-        Text = _stringBuilder.ToString();
-
-        if (_cursorVisible) Blink();
+        // if no text + unfocused -> default text; otherwise -> StringBuilder text
+        if (!_isFocused && _stringBuilder.Length <= 0)
+        {
+            Text = "Text here...";
+            DrawColor = _defaultTextColor;
+        }
+        else
+        {
+            Text = _stringBuilder.ToString();
+            DrawColor = _normalTextColor;
+        }
+        
+        // blink if cursor is visible + focused
+        if (_cursorVisible && _isFocused) Blink();
     }
 
     private void HandleArrows()
@@ -83,11 +111,22 @@ public class Input : UIElement
         }
     }
 
+    private void Focus()
+    {
+        _isFocused = true;
+    }
+
+    private void Unfocus()
+    {
+        _isFocused = false;
+    }
+
     public override void OnMenuInactive()
     {
         _cursorIndex = 0;
         _stringBuilder.Clear();
         _shouldDrawCursor = false; // no blink in next draw
+        _isFocused = false; // unfocus
         Update(); // no text in next draw
     }
 
@@ -95,7 +134,10 @@ public class Input : UIElement
     {
         base.Draw(spriteBatch);
 
-        if (_shouldDrawCursor)
+        if (Font == null || Text == null) return;
+        
+        // draw cursor only if we should + focused
+        if (_shouldDrawCursor && _isFocused)
         {
             // little offset if no text
             float yOffset = 0;

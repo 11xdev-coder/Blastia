@@ -101,7 +101,7 @@ public class Slider : Button
     
     private Vector2 CalculateBackgroundImagePosition()
     {
-        if (_backgroundImage == null) return Position;
+        if (_backgroundImage?.Texture == null) return Position;
         
         float x = Bounds.Left + _sliderTextSizeX * 0.5f;
         float y = Bounds.Center.Y - _backgroundImage.Texture.Height * 0.65f;

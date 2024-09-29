@@ -11,7 +11,9 @@ public class Image : UIElement
     }
 
     public override void UpdateBounds()
-    {  
+    {
+        if (Texture == null) return;
+        
         UpdateBoundsBase(Texture.Width, Texture.Height);
     }
 }

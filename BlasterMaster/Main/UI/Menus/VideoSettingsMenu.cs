@@ -1,5 +1,4 @@
 ﻿using BlasterMaster.Main.UI.Buttons;
-using BlasterMaster.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -24,7 +23,7 @@ public class VideoSettingsMenu : Menu
         BoolSwitchButton isFullScreenButton = new BoolSwitchButton(new Vector2(0, 600), "Full Screen", Font, 
             OnClickFullScreen, 
             () => VideoManager.Instance.IsFullScreen,
-            newBool => VideoManager.Instance.ToggleFullscreen())
+            _ => VideoManager.Instance.ToggleFullscreen())
         {
             HAlign = 0.5f
         };

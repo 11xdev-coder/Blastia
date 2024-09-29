@@ -5,7 +5,6 @@ namespace BlasterMaster.Main.UI.Buttons;
 
 public class BoolSwitchButton : Button
 {
-    private readonly Action _onClick;
     private Func<bool> _getValue;
     private Action<bool> _setValue;
     
@@ -21,19 +20,15 @@ public class BoolSwitchButton : Button
     public BoolSwitchButton(Vector2 position, string text, SpriteFont font, Action onClick,
         Func<bool> getValue, Action<bool> setValue) : base(position, text, font, onClick)
     {
-        _onClick = onClick;
         _getValue = getValue;
         _setValue = setValue;
 
-        OnClick = OnClickChangeValue;
+        OnClick += OnClickChangeValue;
         Text = InitialText + $": {getValue()}";
     }
 
     private void OnClickChangeValue()
     {
-        // invoke original onclick
-        _onClick.Invoke();
-        
         bool current = !_getValue();
         // add bool value to the end of initial text
         Text = InitialText + $": {current}";

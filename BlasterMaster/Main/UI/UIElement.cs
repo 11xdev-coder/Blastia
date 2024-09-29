@@ -11,15 +11,10 @@ public abstract class UIElement
     /// Left corner of Bounds rectangle
     /// </summary>
     public Vector2 Position;
-
     public float Rotation;
     public Vector2 Scale;
 
-    public Texture2D Texture;
-    /// <summary>
-    /// If true, UIElement wont draw and text, but will draw Texture
-    /// </summary>
-    public bool UseTexture;
+    #region Alignment
     
     private float _hAlign;
     /// <summary>
@@ -40,8 +35,15 @@ public abstract class UIElement
         get => _vAlign;
         set => Properties.OnValueChangedProperty(ref _vAlign, value, UpdateBounds);
     }
+    
+    #endregion
 
     public Rectangle Bounds { get; set; }
+    
+    #region Hovering events
+    
+    public bool IsHovered { get; set; }
+    private bool _prevIsHovered;
     /// <summary>
     /// Called every Update() when mouse is hovered
     /// </summary>
@@ -54,33 +56,57 @@ public abstract class UIElement
     /// Called once when mouse un-hovered
     /// </summary>
     public Action? OnEndHovering { get; set; }
+    
+    #endregion
+    
     /// <summary>
     /// Called once when LMB is released while hovered
     /// </summary>
     public Action? OnClick { get; set; }
-    public bool IsHovered { get; set; }
+    
+    /// <summary>
+    /// If clicked on this element -> focused; otherwise if clicked somewhere else -> unfocused
+    /// </summary>
+    public bool IsFocused { get; set; }
+    
+    #region Dragging
     
     public virtual bool Draggable { get; set; }
     private bool _isDragging;
     
+    #endregion
+    
+    #region Texture
+    
+    public Texture2D? Texture;
+    /// <summary>
+    /// If true, UIElement won't Text, but will draw Texture
+    /// </summary>
+    public bool UseTexture;
+    
+    #endregion
+    
+    #region Text
+    
     /// <summary>
     /// TextToDraw will be drawn using this Font
     /// </summary>
-    public SpriteFont Font { get; set; }
+    public SpriteFont? Font { get; set; }
     /// <summary>
     /// Text to draw in Draw method
     /// </summary>
-    public string Text { get; set; }
+    public string? Text { get; set; }
     /// <summary>
     /// Additional text variable for custom text logic
     /// </summary>
-    public string InitialText { get; private set; }
+    public string? InitialText { get; private set; }
+    
+    #endregion
+    
     /// <summary>
     /// Draw color applied to Texture and Text
     /// </summary>
     public Color DrawColor { get; set; } = Color.White;
-    
-    private bool _prevIsHovered;
     
     /// <summary>
     /// Image constructor
@@ -96,11 +122,11 @@ public abstract class UIElement
         // if scale is not set -> Vector one; otherwise -> scale
         Scale = scale == default ? Vector2.One : scale;
         
-        UpdateBounds();
+        Initialize();
     }
 
     /// <summary>
-    /// Text contructor
+    /// Text constructor
     /// </summary>
     /// <param name="position">Left-top bounds corner</param>
     /// <param name="text">Text</param>
@@ -112,6 +138,11 @@ public abstract class UIElement
         Text = text;
         InitialText = text;
         
+        Initialize();
+    }
+
+    private void Initialize()
+    {
         UpdateBounds();
     }
 

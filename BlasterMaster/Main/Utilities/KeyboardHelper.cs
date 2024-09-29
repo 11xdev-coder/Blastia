@@ -33,22 +33,22 @@ public static class KeyboardHelper
     {
         return Convert.ToBoolean(GetKeyState(VkCapsLock) & 0x0001);
     }
-    
+
     /// <summary>
     /// Processes the input from the current keyboard state and updates the provided StringBuilder
-    /// based on the keys that were pressed.
+    /// based on the keys that were pressed
     /// </summary>
-    /// <param name="index">Where to change the character</param>
-    /// <param name="stringBuilder">The StringBuilder to be updated based on the key inputs.</param>
+    /// <param name="index">Index where to write at + will be changed to new index</param>
+    /// <param name="stringBuilder">StringBuilder to be updated</param>
+    /// <returns>If StringBuilder was updated -> true; otherwise -> false</returns>
     public static bool ProcessInput(ref int index, StringBuilder stringBuilder)
     {
         bool hasChanged = false;
-        
+
         KeyboardState currentKeyState = BlasterMasterGame.KeyboardState;
-        
+
         bool isShiftDown = currentKeyState.IsKeyDown(Keys.LeftShift) ||
                            currentKeyState.IsKeyDown(Keys.RightShift);
-        
         
         foreach (Keys key in Enum.GetValues(typeof(Keys)))
         {
@@ -87,8 +87,6 @@ public static class KeyboardHelper
         return hasChanged;
     }
     
-    #region Helpers for ProcessInput
-
     #region Short key handlings
     private static bool HandleSpace(ref int index, Keys key, StringBuilder stringBuilder)
     {
@@ -141,7 +139,6 @@ public static class KeyboardHelper
 
         return false;
     }
-    #endregion
     #endregion
 
     /// <summary>
