@@ -15,8 +15,6 @@ public class Input : UIElement
     private bool _shouldDrawCursor;
 
     private int _cursorIndex;
-
-    private bool _isFocused;
     
     private double BlinkTimer { get; set; }
     private Color CursorColor { get; set; }
@@ -43,29 +41,22 @@ public class Input : UIElement
         CursorWidth = cursorWidth;
         CursorHeight = cursorHeight;
         
-        _isFocused = focusedByDefault;
-        OnClick += Focus;
+        IsFocused = focusedByDefault;
     }
 
     public override void Update()
     {
         base.Update();
         
-        // if clicked not on this element -> unfocus
-        if (BlasterMasterGame.HasClickedLeft && !IsHovered)
-        {
-            Unfocus();
-        }
-        
         // handle input if focused
-        if (_isFocused)
+        if (IsFocused)
         {
             HandleArrows();
             KeyboardHelper.ProcessInput(ref _cursorIndex, _stringBuilder);
         }
         
         // if no text + unfocused -> default text; otherwise -> StringBuilder text
-        if (!_isFocused && _stringBuilder.Length <= 0)
+        if (!IsFocused && _stringBuilder.Length <= 0)
         {
             Text = "Text here...";
             DrawColor = _defaultTextColor;
@@ -77,7 +68,7 @@ public class Input : UIElement
         }
         
         // blink if cursor is visible + focused
-        if (_cursorVisible && _isFocused) Blink();
+        if (_cursorVisible && IsFocused) Blink();
     }
 
     private void HandleArrows()
@@ -111,22 +102,12 @@ public class Input : UIElement
         }
     }
 
-    private void Focus()
-    {
-        _isFocused = true;
-    }
-
-    private void Unfocus()
-    {
-        _isFocused = false;
-    }
-
     public override void OnMenuInactive()
     {
         _cursorIndex = 0;
         _stringBuilder.Clear();
         _shouldDrawCursor = false; // no blink in next draw
-        _isFocused = false; // unfocus
+        IsFocused = false; // unfocus
         Update(); // no text in next draw
     }
 
@@ -137,7 +118,7 @@ public class Input : UIElement
         if (Font == null || Text == null) return;
         
         // draw cursor only if we should + focused
-        if (_shouldDrawCursor && _isFocused)
+        if (_shouldDrawCursor && IsFocused)
         {
             // little offset if no text
             float yOffset = 0;

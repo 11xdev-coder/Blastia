@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI;
 
+// ReSharper disable once InconsistentNaming
 public abstract class UIElement
 {
     /// <summary>
@@ -155,6 +156,22 @@ public abstract class UIElement
         
     }
     
+    /// <summary>
+    /// Called when clicked on this UIElement
+    /// </summary>
+    public virtual void OnFocus()
+    {
+        IsFocused = true;
+    }
+    
+    /// <summary>
+    /// Called when clicked NOT on this UIElement (ClickedLeft + !IsHovered)
+    /// </summary>
+    public virtual void OnUnfocus()
+    {
+        IsFocused = false;
+    }
+    
     public virtual void Update()
     {
         int cursorX = (int)BlasterMasterGame.CursorPosition.X;
@@ -166,8 +183,13 @@ public abstract class UIElement
         if(IsHovered) OnHover?.Invoke(); // if hovering
         if(IsHovered && !_prevIsHovered) OnStartHovering?.Invoke(); // if started hovering
         if(!IsHovered && _prevIsHovered) OnEndHovering?.Invoke(); // end hovering
-        if(IsHovered && hasClicked) OnClick?.Invoke();
-
+        if (IsHovered && hasClicked) // focus + click
+        {
+            OnFocus();
+            OnClick?.Invoke();
+        }
+        if (hasClicked && !IsHovered && IsFocused) OnUnfocus(); // if clicked, not hovered and was focused -> unfocus
+        
         Drag(isHoldingLeft);
     
         _prevIsHovered = IsHovered;
@@ -213,6 +235,8 @@ public abstract class UIElement
     /// </summary>
     public virtual void UpdateBounds()
     {
+        if (Font == null) return;
+        
         Vector2 textSize = Font.MeasureString(Text);
         UpdateBoundsBase(textSize.X, textSize.Y);
     }
@@ -268,6 +292,8 @@ public abstract class UIElement
     /// <returns>The new position for the dragged element</returns>
     protected Vector2 GetDragPosition(Vector2 cursorPosition)
     {
+        if (Font == null) return Position;
+        
         Vector2 textSize = Font.MeasureString(Text);
         float targetResX = VideoManager.Instance.TargetResolution.X;
         float targetResY = VideoManager.Instance.TargetResolution.Y;
@@ -298,6 +324,8 @@ public abstract class UIElement
     /// <returns>A Vector2 representing the clamped X position and the current Y position.</returns>
     protected Vector2 GetDragPositionNoYClamped(float x, float minValue, float maxValue)
     {
+        if (Font == null) return Position;
+        
         Vector2 textSize = Font.MeasureString(Text);
         float targetResX = VideoManager.Instance.TargetResolution.X;
 
@@ -326,6 +354,8 @@ public abstract class UIElement
 
     private void DrawText(SpriteBatch spriteBatch)
     {
+        if (Font == null) return;
+        
         Vector2 textSize = Font.MeasureString(Text);
         
         Vector2 origin = textSize / 2f;
@@ -338,6 +368,8 @@ public abstract class UIElement
 
     private void DrawTexture(SpriteBatch spriteBatch)
     {
+        if (Texture == null) return;
+        
         Vector2 origin = new Vector2(Texture.Width * 0.5f, Texture.Height * 0.5f);
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
