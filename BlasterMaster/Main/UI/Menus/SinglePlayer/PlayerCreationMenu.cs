@@ -13,6 +13,13 @@ public class PlayerCreationMenu : Menu
 
     private void AddElements()
     {
+        PlayerPreview player = new PlayerPreview(Vector2.Zero)
+        {
+            HAlign = 0.65f,
+            VAlign = 0.45f
+        };
+        Elements.Add(player);
+        
         Text playerNameText = new Text(Vector2.Zero, "Player Name", Font)
         {
             HAlign = 0.5f,

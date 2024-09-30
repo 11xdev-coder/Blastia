@@ -147,20 +147,20 @@ public class BlasterMasterGame : Game
         PlayerHead = LoadingUtilities.LoadTexture(GraphicsDevice,
             Content.RootDirectory + Paths.PlayerHeadTexturePath);
         
-        PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
-            Content.RootDirectory + Paths.PlayerBodyTexturePath);
-        
-        PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-            Content.RootDirectory + Paths.PlayerLeftArmTexturePath);
-        
-        PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-            Content.RootDirectory + Paths.PlayerRightArmTexturePath);
-        
-        PlayerLeftLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
-            Content.RootDirectory + Paths.PlayerLeftLegTexturePath);
-        
-        PlayerRightLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
-            Content.RootDirectory + Paths.PlayerRightLegTexturePath);
+        // PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
+        //     Content.RootDirectory + Paths.PlayerBodyTexturePath);
+        //
+        // PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+        //     Content.RootDirectory + Paths.PlayerLeftArmTexturePath);
+        //
+        // PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+        //     Content.RootDirectory + Paths.PlayerRightArmTexturePath);
+        //
+        // PlayerLeftLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
+        //     Content.RootDirectory + Paths.PlayerLeftLegTexturePath);
+        //
+        // PlayerRightLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
+        //     Content.RootDirectory + Paths.PlayerRightLegTexturePath);
         
         #endregion
     }
