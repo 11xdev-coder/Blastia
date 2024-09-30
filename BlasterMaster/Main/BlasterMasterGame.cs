@@ -47,8 +47,7 @@ public class BlasterMasterGame : Game
     public static Texture2D PlayerBody { get; private set; } = null!;
     public static Texture2D PlayerLeftArm { get; private set; } = null!;
     public static Texture2D PlayerRightArm { get; private set; } = null!;
-    public static Texture2D PlayerLeftLeg { get; private set; } = null!;
-    public static Texture2D PlayerRightLeg { get; private set; } = null!;
+    public static Texture2D PlayerLeg { get; private set; } = null!;
     
     #endregion
 
@@ -147,20 +146,17 @@ public class BlasterMasterGame : Game
         PlayerHead = LoadingUtilities.LoadTexture(GraphicsDevice,
             Content.RootDirectory + Paths.PlayerHeadTexturePath);
         
-        // PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
-        //     Content.RootDirectory + Paths.PlayerBodyTexturePath);
-        //
-        // PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-        //     Content.RootDirectory + Paths.PlayerLeftArmTexturePath);
-        //
-        // PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-        //     Content.RootDirectory + Paths.PlayerRightArmTexturePath);
-        //
-        // PlayerLeftLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
-        //     Content.RootDirectory + Paths.PlayerLeftLegTexturePath);
-        //
-        // PlayerRightLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
-        //     Content.RootDirectory + Paths.PlayerRightLegTexturePath);
+        PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerBodyTexturePath);
+        
+        PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerLeftArmTexturePath);
+        
+        PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerRightArmTexturePath);
+        
+        PlayerLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.PlayerLegTexturePath);
         
         #endregion
     }

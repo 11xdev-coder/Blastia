@@ -17,8 +17,7 @@ public static class Paths
     public static readonly string PlayerBodyTexturePath = "/Textures/Player/Body.png";
     public static readonly string PlayerLeftArmTexturePath = "/Textures/Player/LeftArm.png";
     public static readonly string PlayerRightArmTexturePath = "/Textures/Player/RightArm.png";
-    public static readonly string PlayerLeftLegTexturePath = "/Textures/Player/LeftLeg.png";
-    public static readonly string PlayerRightLegTexturePath = "/Textures/Player/RightLeg.png";
+    public static readonly string PlayerLegTexturePath = "/Textures/Player/Leg.png";
     
     #endregion
     

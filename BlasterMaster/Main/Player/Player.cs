@@ -27,8 +27,8 @@ public class Player
         Body = new BodyPart(BlasterMasterGame.PlayerBody, Vector2.Zero);
         LeftArm = new BodyPart(BlasterMasterGame.PlayerLeftArm, Vector2.Zero);
         RightArm = new BodyPart(BlasterMasterGame.PlayerRightArm, Vector2.Zero);
-        LeftLeg = new BodyPart(BlasterMasterGame.PlayerLeftLeg, Vector2.Zero);
-        RightLeg = new BodyPart(BlasterMasterGame.PlayerRightLeg, Vector2.Zero);
+        LeftLeg = new BodyPart(BlasterMasterGame.PlayerLeg, Vector2.Zero);
+        RightLeg = new BodyPart(BlasterMasterGame.PlayerLeg, Vector2.Zero);
     }
 
     public void Draw(SpriteBatch spriteBatch)

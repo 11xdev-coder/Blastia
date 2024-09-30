@@ -86,3 +86,8 @@ D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Sounds\Men
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_03.ogg
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\WhitePixel.png
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\Head.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\AssembledPlayer.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\Body.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\LeftArm.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\Leg.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\RightArm.png
