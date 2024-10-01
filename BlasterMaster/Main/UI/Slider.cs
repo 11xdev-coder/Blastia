@@ -8,27 +8,6 @@ public class Slider : Button
 {
     public override bool Draggable => true;
 
-    public override float HAlign
-    {
-        get => base.HAlign;
-        set
-        {
-            base.HAlign = value;
-
-            UpdateSliderVisuals();
-        }
-    }
-    public override float VAlign
-    {
-        get => base.VAlign;
-        set
-        {
-            base.VAlign = value;
-
-            UpdateSliderVisuals();
-        }
-    }
-
     private const string InitialPercentText = "100%";
     private const string SliderText = "O";
     
@@ -106,6 +85,13 @@ public class Slider : Button
         float x = Bounds.Left + _sliderTextSizeX * 0.5f;
         float y = Bounds.Center.Y - _backgroundImage.Texture.Height * 0.65f;
         return new Vector2(x, y);
+    }
+
+    public override void OnAlignmentChanged()
+    {
+        base.OnAlignmentChanged();
+        
+        UpdateSliderVisuals();
     }
 
     /// <summary>

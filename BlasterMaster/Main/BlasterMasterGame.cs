@@ -40,6 +40,7 @@ public class BlasterMasterGame : Game
     // GLOBAL TEXTURES
     public static Texture2D SliderTexture { get; private set; } = null!;
     public static Texture2D WhitePixel { get; private set; } = null!;
+    public static Texture2D InvisibleTexture { get; private set; } = null!;
     
     #region Player Textures
 
@@ -140,6 +141,9 @@ public class BlasterMasterGame : Game
         
         WhitePixel = LoadingUtilities.LoadTexture(GraphicsDevice,
             Content.RootDirectory + Paths.WhitePixelPath);
+        
+        InvisibleTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+            Content.RootDirectory + Paths.InvisibleTexturePath);
         
         #region Player Textures
         

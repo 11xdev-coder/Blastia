@@ -24,7 +24,7 @@ public abstract class UIElement
     public virtual float HAlign
     {
         get => _hAlign;
-        set => Properties.OnValueChangedProperty(ref _hAlign, value, UpdateBounds);
+        set => Properties.OnValueChangedProperty(ref _hAlign, value, OnAlignmentChanged);
     }
     
     private float _vAlign;
@@ -34,7 +34,7 @@ public abstract class UIElement
     public virtual float VAlign
     {
         get => _vAlign;
-        set => Properties.OnValueChangedProperty(ref _vAlign, value, UpdateBounds);
+        set => Properties.OnValueChangedProperty(ref _vAlign, value, OnAlignmentChanged);
     }
     
     #endregion
@@ -265,6 +265,15 @@ public abstract class UIElement
         }
 
         Bounds = new Rectangle(positionX, positionY, (int)width, (int)height);
+    }
+    
+    /// <summary>
+    /// Method called whenever HAlign or VAlign is changed.
+    /// </summary>
+    public virtual void OnAlignmentChanged()
+    {
+        // update bounds by default
+        UpdateBounds();
     }
 
     /// <summary>

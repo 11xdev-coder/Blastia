@@ -10,6 +10,7 @@ public static class Paths
     public static readonly string Logo5XTexturePath = "/Textures/Menu/Logo5X.png";
     public static readonly string SliderBackgroundPath = "/Textures/UI/SliderBG.png";
     public static readonly string WhitePixelPath = "/Textures/WhitePixel.png";
+    public static readonly string InvisibleTexturePath = "/Textures/Invisible.png";
     
     #region Player Textures
     
