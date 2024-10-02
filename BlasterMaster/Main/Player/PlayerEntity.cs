@@ -27,12 +27,37 @@ public class PlayerEntity
     {
         Position = position;
         
-        Head = new BodyPart(BlasterMasterGame.PlayerHead, new Vector2(0, 10));
-        Body = new BodyPart(BlasterMasterGame.PlayerBody, new Vector2(0, 5));
-        LeftArm = new BodyPart(BlasterMasterGame.PlayerLeftArm, Vector2.Zero);
-        RightArm = new BodyPart(BlasterMasterGame.PlayerRightArm, Vector2.Zero);
-        LeftLeg = new BodyPart(BlasterMasterGame.PlayerLeg, Vector2.Zero);
-        RightLeg = new BodyPart(BlasterMasterGame.PlayerLeg, Vector2.Zero);
+        // origin at the bottom
+        Head = new BodyPart(BlasterMasterGame.PlayerHead, new Vector2(0, -25), origin: 
+            new Vector2(BlasterMasterGame.PlayerHead.Width * 0.5f, BlasterMasterGame.PlayerHead.Height));
+        // centered origin
+        Body = new BodyPart(BlasterMasterGame.PlayerBody, Vector2.Zero);
+        // right-top corner origin
+        LeftArm = new BodyPart(BlasterMasterGame.PlayerLeftArm, new Vector2(-14, -22), origin:
+            new Vector2(BlasterMasterGame.PlayerLeftArm.Width, 0f));
+        // left-top corner origin
+        RightArm = new BodyPart(BlasterMasterGame.PlayerRightArm, new Vector2(13, -22), origin:
+            new Vector2(0f, 0f));
+        // top origin
+        Vector2 topOrigin = new Vector2(BlasterMasterGame.PlayerLeg.Width * 0.5f, 0);
+        LeftLeg = new BodyPart(BlasterMasterGame.PlayerLeg, new Vector2(-7, 21), origin: topOrigin);
+        RightLeg = new BodyPart(BlasterMasterGame.PlayerLeg, new Vector2(11, 21), origin: topOrigin);
+    }
+
+    /// <summary>
+    /// Update called when IsPreview = true
+    /// </summary>
+    public void PreviewUpdate()
+    {
+        WalkingAnimation();
+    }
+
+    /// <summary>
+    /// Rotates body parts creating walking animation
+    /// </summary>
+    public void WalkingAnimation()
+    {
+        //LeftArm.Rotation += 1;
     }
 
     public void Draw(SpriteBatch spriteBatch)

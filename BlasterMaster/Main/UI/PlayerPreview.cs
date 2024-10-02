@@ -11,7 +11,10 @@ public class PlayerPreview : UIElement
     public PlayerPreview(Vector2 position, Vector2 scale = default) : 
         base(position, BlasterMasterGame.InvisibleTexture, scale)
     {
-        PlayerInstance = new PlayerEntity(position);
+        PlayerInstance = new PlayerEntity(position)
+        {
+            IsPreview = true
+        };
     }
     
     public override void UpdateBounds()
@@ -37,6 +40,14 @@ public class PlayerPreview : UIElement
         
         if(PlayerInstance == null) return;
         PlayerInstance.Position = new Vector2(Bounds.X, Bounds.Y);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        
+        if(PlayerInstance == null) return;
+        PlayerInstance.PreviewUpdate();
     }
 
     public override void Draw(SpriteBatch spriteBatch)

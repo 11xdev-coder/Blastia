@@ -27,6 +27,7 @@ public class BodyPart
     public void Draw(SpriteBatch spriteBatch, Vector2 entityPosition)
     {
         Vector2 absolutePosition = entityPosition + RelativePosition;
-        spriteBatch.Draw(Image, absolutePosition, Color.White);
+        spriteBatch.Draw(Image, absolutePosition, null, Color.White, 
+            Rotation, Origin, 1f, SpriteEffects.None, 0f);
     }
 }
