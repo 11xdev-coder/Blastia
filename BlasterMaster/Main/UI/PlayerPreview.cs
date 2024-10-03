@@ -47,7 +47,7 @@ public class PlayerPreview : UIElement
         base.Update();
         
         if(PlayerInstance == null) return;
-        PlayerInstance.PreviewUpdate();
+        PlayerInstance.Update();
     }
 
     public override void Draw(SpriteBatch spriteBatch)

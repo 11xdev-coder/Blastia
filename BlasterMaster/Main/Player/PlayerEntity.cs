@@ -9,6 +9,10 @@ public class PlayerEntity
     /// If True, player will play walking animation and disable all other logic
     /// </summary>
     public bool IsPreview { get; set; }
+    private double _animationTimeElapsed;
+
+    public float ArmMaxAngle = 20;
+    public float WalkingAnimationSpeed = 0.09f;
     
     public Vector2 Position { get; set; }
     
@@ -44,10 +48,24 @@ public class PlayerEntity
         RightLeg = new BodyPart(BlasterMasterGame.PlayerLeg, new Vector2(11, 21), origin: topOrigin);
     }
 
+    public void Update()
+    {
+        if(IsPreview) PreviewUpdate();
+        else RegularUpdate();
+    }
+
+    /// <summary>
+    /// Update when IsPreview = false
+    /// </summary>
+    private void RegularUpdate()
+    {
+        
+    }
+
     /// <summary>
     /// Update called when IsPreview = true
     /// </summary>
-    public void PreviewUpdate()
+    private void PreviewUpdate()
     {
         WalkingAnimation();
     }
@@ -55,9 +73,11 @@ public class PlayerEntity
     /// <summary>
     /// Rotates body parts creating walking animation
     /// </summary>
-    public void WalkingAnimation()
-    {
-        //LeftArm.Rotation += 1;
+    private void WalkingAnimation()
+    { 
+        _animationTimeElapsed += BlasterMasterGame.GameTimeElapsedSeconds * WalkingAnimationSpeed;
+        double leftArmOscillation = Math.Sin(_animationTimeElapsed);
+        LeftArm.Rotation = (float)(leftArmOscillation * ArmMaxAngle);
     }
 
     public void Draw(SpriteBatch spriteBatch)
