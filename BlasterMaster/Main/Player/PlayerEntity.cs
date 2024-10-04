@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BlasterMaster.Main.Utilities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.Player;
@@ -12,7 +13,7 @@ public class PlayerEntity
     private double _animationTimeElapsed;
 
     public float ArmMaxAngle = 20;
-    public float WalkingAnimationSpeed = 0.09f;
+    public float WalkingAnimationDuration = 0.666f;
     
     public Vector2 Position { get; set; }
     
@@ -74,10 +75,13 @@ public class PlayerEntity
     /// Rotates body parts creating walking animation
     /// </summary>
     private void WalkingAnimation()
-    { 
-        _animationTimeElapsed += BlasterMasterGame.GameTimeElapsedSeconds * WalkingAnimationSpeed;
-        double leftArmOscillation = Math.Sin(_animationTimeElapsed);
-        LeftArm.Rotation = (float)(leftArmOscillation * ArmMaxAngle);
+    {
+        _animationTimeElapsed += BlasterMasterGame.GameTimeElapsedSeconds;
+        
+        // convert ping pong to degrees
+        LeftArm.Rotation = MathHelper.ToRadians(MathUtilities.PingPongLerp(-ArmMaxAngle, ArmMaxAngle, 
+            (float) _animationTimeElapsed, WalkingAnimationDuration));
+        Console.WriteLine(LeftArm.Rotation);
     }
 
     public void Draw(SpriteBatch spriteBatch)
