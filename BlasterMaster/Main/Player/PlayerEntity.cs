@@ -13,7 +13,8 @@ public class PlayerEntity
     private double _animationTimeElapsed;
 
     public float ArmMaxAngle = 20;
-    public float WalkingAnimationDuration = 0.666f;
+    public float LegMaxAngle = 25;
+    public float WalkingAnimationDuration = 0.4f;
     
     public Vector2 Position { get; set; }
     
@@ -78,18 +79,31 @@ public class PlayerEntity
     {
         _animationTimeElapsed += BlasterMasterGame.GameTimeElapsedSeconds;
         
-        // convert ping pong to degrees
-        LeftArm.Rotation = MathHelper.ToRadians(MathUtilities.PingPongLerp(-ArmMaxAngle, ArmMaxAngle, 
-            (float) _animationTimeElapsed, WalkingAnimationDuration));
-        Console.WriteLine(LeftArm.Rotation);
+        // left arm
+        LeftArm.Rotation = MathUtilities.PingPongLerpRadians(-ArmMaxAngle, ArmMaxAngle, 
+            (float) _animationTimeElapsed, WalkingAnimationDuration);
+        
+        // right arm
+        RightArm.Rotation = MathUtilities.PingPongLerpRadians(ArmMaxAngle, -ArmMaxAngle, 
+            (float) _animationTimeElapsed, WalkingAnimationDuration);
+        
+        // left leg
+        LeftLeg.Rotation = MathUtilities.PingPongLerpRadians(-LegMaxAngle, LegMaxAngle, 
+            (float) _animationTimeElapsed, WalkingAnimationDuration);
+        
+        // right leg
+        RightLeg.Rotation = MathUtilities.PingPongLerpRadians(LegMaxAngle, -LegMaxAngle, 
+            (float) _animationTimeElapsed, WalkingAnimationDuration);
     }
 
     public void Draw(SpriteBatch spriteBatch)
     {
         Head.Draw(spriteBatch, Position);
+        
+        RightArm.Draw(spriteBatch, Position); // right arm behind Body
         Body.Draw(spriteBatch, Position);
+        
         LeftArm.Draw(spriteBatch, Position);
-        RightArm.Draw(spriteBatch, Position);
         LeftLeg.Draw(spriteBatch, Position);
         RightLeg.Draw(spriteBatch, Position);
     }

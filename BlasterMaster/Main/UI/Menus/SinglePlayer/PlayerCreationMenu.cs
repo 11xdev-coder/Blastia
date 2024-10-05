@@ -6,6 +6,9 @@ namespace BlasterMaster.Main.UI.Menus.SinglePlayer;
 
 public class PlayerCreationMenu : Menu
 {
+    private PlayerPreview? _playerPreview;
+    private Input? _nameInput;
+    
     public PlayerCreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
     {
         AddElements();
@@ -13,12 +16,12 @@ public class PlayerCreationMenu : Menu
 
     private void AddElements()
     {
-        PlayerPreview player = new PlayerPreview(Vector2.Zero)
+        _playerPreview = new PlayerPreview(Vector2.Zero, Font)
         {
-            HAlign = 0.65f,
-            VAlign = 0.45f
+            HAlign = 0.8f,
+            VAlign = 0.55f
         };
-        Elements.Add(player);
+        _playerPreview.AddToElements(Elements);
         
         Text playerNameText = new Text(Vector2.Zero, "Player Name", Font)
         {
@@ -27,12 +30,12 @@ public class PlayerCreationMenu : Menu
         };
         Elements.Add(playerNameText);
         
-        Input playerNameInput = new Input(Vector2.Zero, Font, true)
+        _nameInput = new Input(Vector2.Zero, Font, true)
         {
             HAlign = 0.5f,
             VAlign = 0.45f
         };
-        Elements.Add(playerNameInput);
+        Elements.Add(_nameInput);
 
         Button backButton = new Button(Vector2.Zero, "Back", Font, Back)
         {
@@ -40,6 +43,14 @@ public class PlayerCreationMenu : Menu
             VAlign = 0.65f
         };
         Elements.Add(backButton);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (_playerPreview == null || _nameInput?.Text == null) return;
+        _playerPreview.Name = _nameInput.StringBuilder.ToString();
     }
 
     private void Back()

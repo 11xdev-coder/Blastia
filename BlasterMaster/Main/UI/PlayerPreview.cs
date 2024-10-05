@@ -7,14 +7,20 @@ namespace BlasterMaster.Main.UI;
 public class PlayerPreview : UIElement
 {
     public readonly PlayerEntity? PlayerInstance;
+    public string Name = "";
+
+    private Text? _nameText;
     
-    public PlayerPreview(Vector2 position, Vector2 scale = default) : 
-        base(position, BlasterMasterGame.InvisibleTexture, scale)
+    public PlayerPreview(Vector2 position, SpriteFont font, Vector2 scale = default) : 
+        base(position, "", font)
     {
         PlayerInstance = new PlayerEntity(position)
         {
             IsPreview = true
         };
+
+        if (Font == null) return;
+        _nameText = new Text(position, "", Font);
     }
     
     public override void UpdateBounds()
@@ -32,6 +38,12 @@ public class PlayerPreview : UIElement
                        PlayerInstance.Head.Image.Height;
         
         UpdateBoundsBase(width, height);
+
+        if (_nameText == null || Font == null) return;
+        Vector2 nameTextSize = Font.MeasureString(_nameText.Text);
+        
+        _nameText.Position = new Vector2(Bounds.Center.X - nameTextSize.X * 0.5f - width * 0.5f, 
+            Bounds.Center.Y - nameTextSize.Y - height);
     }
 
     public override void OnAlignmentChanged()
@@ -48,6 +60,9 @@ public class PlayerPreview : UIElement
         
         if(PlayerInstance == null) return;
         PlayerInstance.Update();
+
+        if (_nameText == null) return;
+        _nameText.Text = Name;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -56,5 +71,11 @@ public class PlayerPreview : UIElement
 
         if (PlayerInstance == null) return;
         PlayerInstance.Draw(spriteBatch);
+    }
+
+    public void AddToElements(List<UIElement> elements)
+    {
+        elements.Add(this);
+        if(_nameText != null) elements.Add(_nameText);
     }
 }

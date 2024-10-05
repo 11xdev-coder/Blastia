@@ -4,7 +4,15 @@ namespace BlasterMaster.Main.Utilities;
 
 public static class MathUtilities
 {
-    public static float PingPongLerp(float minValue, float maxValue, float time, float duration)
+    /// <summary>
+    /// PingPong lerps from minValue to maxValue, depending on time and duration. Converts result to radians
+    /// </summary>
+    /// <param name="minValue"></param>
+    /// <param name="maxValue"></param>
+    /// <param name="time"></param>
+    /// <param name="duration"></param>
+    /// <returns></returns>
+    public static float PingPongLerpRadians(float minValue, float maxValue, float time, float duration)
     {
         // Normalize the time value for the ping-pong effect.
         float normalizedTime = (time % (2 * duration)) / duration;
@@ -16,6 +24,6 @@ public static class MathUtilities
         normalizedTime = isReturning ? 2.0f - normalizedTime : normalizedTime;
 
         // Lerp between minValue and maxValue using the adjusted time.
-        return MathHelper.Lerp(minValue, maxValue, normalizedTime);
+        return MathHelper.ToRadians(MathHelper.Lerp(minValue, maxValue, normalizedTime));
     }
 }

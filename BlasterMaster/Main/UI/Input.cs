@@ -8,7 +8,7 @@ namespace BlasterMaster.Main.UI;
 
 public class Input : UIElement
 {
-    private StringBuilder _stringBuilder = new();
+    public StringBuilder StringBuilder = new();
 
     private readonly double _blinkInterval;
     private readonly bool _cursorVisible;
@@ -52,18 +52,18 @@ public class Input : UIElement
         if (IsFocused)
         {
             HandleArrows();
-            KeyboardHelper.ProcessInput(ref _cursorIndex, _stringBuilder);
+            KeyboardHelper.ProcessInput(ref _cursorIndex, StringBuilder);
         }
         
         // if no text + unfocused -> default text; otherwise -> StringBuilder text
-        if (!IsFocused && _stringBuilder.Length <= 0)
+        if (!IsFocused && StringBuilder.Length <= 0)
         {
             Text = "Text here...";
             DrawColor = _defaultTextColor;
         }
         else
         {
-            Text = _stringBuilder.ToString();
+            Text = StringBuilder.ToString();
             DrawColor = _normalTextColor;
         }
         
@@ -89,7 +89,7 @@ public class Input : UIElement
     
     private void RightArrowPress()
     {
-        if (_cursorIndex < _stringBuilder.Length) _cursorIndex += 1;
+        if (_cursorIndex < StringBuilder.Length) _cursorIndex += 1;
     }
 
     private void Blink()
@@ -105,7 +105,7 @@ public class Input : UIElement
     public override void OnMenuInactive()
     {
         _cursorIndex = 0;
-        _stringBuilder.Clear();
+        StringBuilder.Clear();
         _shouldDrawCursor = false; // no blink in next draw
         IsFocused = false; // unfocus
         Update(); // no text in next draw
