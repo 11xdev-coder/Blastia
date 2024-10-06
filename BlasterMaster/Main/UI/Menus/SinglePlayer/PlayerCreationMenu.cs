@@ -8,6 +8,7 @@ public class PlayerCreationMenu : Menu
 {
     private PlayerPreview? _playerPreview;
     private Input? _nameInput;
+    private Text? _playerExistsText;
     
     public PlayerCreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
     {
@@ -18,7 +19,7 @@ public class PlayerCreationMenu : Menu
     {
         _playerPreview = new PlayerPreview(Vector2.Zero, Font)
         {
-            HAlign = 0.8f,
+            HAlign = 0.7f,
             VAlign = 0.55f
         };
         _playerPreview.AddToElements(Elements);
@@ -37,6 +38,21 @@ public class PlayerCreationMenu : Menu
         };
         Elements.Add(_nameInput);
 
+        _playerExistsText = new Text(Vector2.Zero, "Player already exists!", Font)
+        {
+            HAlign = 0.5f,
+            VAlign = 0.5f,
+            Alpha = 0f
+        };
+        Elements.Add(_playerExistsText);
+        
+        Button createButton = new Button(Vector2.Zero, "Create", Font, CreatePlayer)
+        {
+            HAlign = 0.5f,
+            VAlign = 0.6f
+        };
+        Elements.Add(createButton);
+        
         Button backButton = new Button(Vector2.Zero, "Back", Font, Back)
         {
             HAlign = 0.5f,
@@ -51,6 +67,28 @@ public class PlayerCreationMenu : Menu
 
         if (_playerPreview == null || _nameInput?.Text == null) return;
         _playerPreview.Name = _nameInput.StringBuilder.ToString();
+    }
+
+    private void CreatePlayer()
+    {
+        if (_nameInput?.Text == null) return;
+        string playerName = _nameInput.StringBuilder.ToString();
+
+        if (!PlayerManager.Instance.AlreadyExists(playerName))
+        {
+            // create player if doesnt exist
+            PlayerManager.Instance.NewPlayer(_nameInput.StringBuilder.ToString());
+            
+            Back(); // go back
+        }
+        else
+        {
+            // show text if exists
+            if (_playerExistsText == null) return;
+
+            _playerExistsText.Alpha = 1f;
+            _playerExistsText.LerpAlphaToZero = true;
+        }
     }
 
     private void Back()

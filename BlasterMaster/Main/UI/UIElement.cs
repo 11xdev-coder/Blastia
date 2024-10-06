@@ -108,6 +108,9 @@ public abstract class UIElement
     /// Draw color applied to Texture and Text
     /// </summary>
     public Color DrawColor { get; set; } = Color.White;
+
+    public float Alpha { get; set; } = 1f;
+    public bool LerpAlphaToZero { get; set; }
     
     /// <summary>
     /// Image constructor
@@ -153,7 +156,8 @@ public abstract class UIElement
     /// </summary>
     public virtual void OnMenuInactive()
     {
-        
+        // reset alpha if we should lerp it
+        if (LerpAlphaToZero) Alpha = 0f;
     }
     
     /// <summary>
@@ -191,12 +195,14 @@ public abstract class UIElement
         if (hasClicked && !IsHovered && IsFocused) OnUnfocus(); // if clicked, not hovered and was focused -> unfocus
         
         Drag(isHoldingLeft);
+        ProcessAlpha();
     
         _prevIsHovered = IsHovered;
     
         UpdateBounds();
     }
 
+    #region Dragging
     /// <summary>
     /// Handles the dragging logic for the UIElement based on mouse input.
     /// </summary>
@@ -228,6 +234,21 @@ public abstract class UIElement
     protected virtual void UpdateDragPosition(Vector2 cursorPosition)
     {
         Position = GetDragPosition(cursorPosition);
+    }
+    #endregion
+    
+    private void ProcessAlpha()
+    {
+        // lerp alpha until 0 and reset the flag
+        if (LerpAlphaToZero)
+        {
+            Alpha -= 0.01f;
+            if (Alpha <= 0)
+            {
+                Alpha = 0;
+                LerpAlphaToZero = false;
+            }
+        }
     }
 
     /// <summary>
@@ -371,7 +392,7 @@ public abstract class UIElement
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
         
-        spriteBatch.DrawString(Font, Text, position, DrawColor, 
+        spriteBatch.DrawString(Font, Text, position, DrawColor * Alpha, 
             Rotation, origin, Vector2.One, SpriteEffects.None, 0f);
     }
 
@@ -383,7 +404,7 @@ public abstract class UIElement
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
         
-        spriteBatch.Draw(Texture, position, null, DrawColor, Rotation, 
-            origin, Scale, SpriteEffects.None, 0f);
+        spriteBatch.Draw(Texture, position, null, DrawColor * Alpha, 
+            Rotation, origin, Scale, SpriteEffects.None, 0f);
     }
 }
