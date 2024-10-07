@@ -88,6 +88,9 @@ public class BlasterMasterGame : Game
     private static event Action? ResolutionRequestEvent;
 
     private static readonly Random Rand = new();
+
+    private double _colorTimer;
+    public static Color ErrorColor { get; private set; }
     
     public BlasterMasterGame()
     {
@@ -212,6 +215,8 @@ public class BlasterMasterGame : Game
         base.Update(gameTime);
         UpdateGameTime(gameTime);
         
+        UpdateColors();
+        
         UpdateMouseState();
         UpdateKeyboardState();
 
@@ -230,6 +235,14 @@ public class BlasterMasterGame : Game
         
         // update previous states in the end
         UpdatePreviousStates();
+    }
+
+    private void UpdateColors()
+    {
+        _colorTimer += GameTimeElapsedSeconds;
+        
+        ErrorColor = MathUtilities.PingPongLerpColor(Color.Red, Color.DarkRed, 
+            (float) _colorTimer, 0.4f);
     }
 
     private void UpdateGameTime(GameTime newGameTime)

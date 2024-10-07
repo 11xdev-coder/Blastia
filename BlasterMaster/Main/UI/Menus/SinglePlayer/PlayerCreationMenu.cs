@@ -42,7 +42,8 @@ public class PlayerCreationMenu : Menu
         {
             HAlign = 0.5f,
             VAlign = 0.5f,
-            Alpha = 0f
+            Alpha = 0f,
+            DrawColor = BlasterMasterGame.ErrorColor
         };
         Elements.Add(_playerExistsText);
         
@@ -67,6 +68,10 @@ public class PlayerCreationMenu : Menu
 
         if (_playerPreview == null || _nameInput?.Text == null) return;
         _playerPreview.Name = _nameInput.StringBuilder.ToString();
+
+        // update color
+        if (_playerExistsText == null) return;
+        _playerExistsText.DrawColor = BlasterMasterGame.ErrorColor;
     }
 
     private void CreatePlayer()

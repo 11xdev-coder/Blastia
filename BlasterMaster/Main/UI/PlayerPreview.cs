@@ -54,6 +54,15 @@ public class PlayerPreview : UIElement
         PlayerInstance.Position = new Vector2(Bounds.X, Bounds.Y);
     }
 
+    public override void OnMenuInactive()
+    {
+        base.OnMenuInactive();
+
+        if (_nameText == null) return;
+        _nameText.Text = "";
+        _nameText.Update();
+    }
+
     public override void Update()
     {
         base.Update();
