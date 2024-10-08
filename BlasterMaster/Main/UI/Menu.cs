@@ -30,14 +30,6 @@ public class Menu
             elem.Update();
         }
     }
-
-    public void UpdateElementsBounds()
-    {
-        foreach (var elem in Elements)
-        {
-            elem.UpdateBounds();
-        }
-    }
     
     /// <summary>
     /// Draw each element
@@ -50,6 +42,8 @@ public class Menu
             elem.Draw(spriteBatch);
         }
     }
+
+    
     
     /// <summary>
     /// Sets current menu to inactive and new menu to active
@@ -63,11 +57,20 @@ public class Menu
             
             Active = false;
             menu.Active = true;
+            menu.OnMenuActive();
             
             _menuSwitched = true;
         }
     }
-
+    
+    /// <summary>
+    /// Called when SwitchToMenu is called on the new menu
+    /// </summary>
+    public virtual void OnMenuActive()
+    {
+        
+    }
+    
     /// <summary>
     /// Invokes the OnMenuInactive method on all UI elements to handle their state when the menu becomes inactive.
     /// Outputs a debug message to indicate the method has been called.

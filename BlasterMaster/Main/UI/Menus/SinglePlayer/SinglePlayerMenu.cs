@@ -28,6 +28,13 @@ public class SinglePlayerMenu : Menu
         Elements.Add(backButton);
     }
 
+    public override void OnMenuActive()
+    {
+        base.OnMenuActive();
+        
+        Console.WriteLine("Singleplayer on menu active");
+    }
+
     private void NewPlayer()
     {
         SwitchToMenu(BlasterMasterGame.PlayerCreationMenu);
