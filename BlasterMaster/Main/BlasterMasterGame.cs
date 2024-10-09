@@ -32,6 +32,7 @@ public class BlasterMasterGame : Game
     public static bool HasClickedLeft { get; private set; }
     public static Vector2 CursorPosition { get; private set; }
     public static bool IsHoldingLeft { get; private set; }
+    public static float ScrollWheelDelta { get; private set; }
     
     // KEYBOARD
     public static KeyboardState KeyboardState { get; private set; }
@@ -210,6 +211,7 @@ public class BlasterMasterGame : Game
         MusicEngine.UnloadMusic();
     }
 
+    #region Update
     protected override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
@@ -260,6 +262,9 @@ public class BlasterMasterGame : Game
 
         IsHoldingLeft = _currentMouseState.LeftButton == ButtonState.Pressed;
         
+        // subtract previous from current
+        ScrollWheelDelta = _currentMouseState.ScrollWheelValue - _previousMouseState.ScrollWheelValue;
+        
         // mouse position that is aligned with OS cursor
         CursorPosition = Vector2.Transform(new Vector2(_currentMouseState.X, _currentMouseState.Y),
             Matrix.Invert(VideoManager.Instance.CalculateResolutionScaleMatrix()));
@@ -276,6 +281,7 @@ public class BlasterMasterGame : Game
         PreviousKeyboardState = KeyboardState;
     }
     
+    #endregion
 
     protected override void Draw(GameTime gameTime)
     {

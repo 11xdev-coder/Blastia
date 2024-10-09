@@ -42,9 +42,44 @@ public class PlayerManager : Singleton<PlayerManager>
         return false;
     }
 
+    public List<PlayerState> LoadAllPlayerStates()
+    {
+        if (!string.IsNullOrEmpty(_playersSaveFolder))
+        {
+            List<PlayerState> playerStates = new List<PlayerState>();
+            
+            // loop through each file in folder
+            foreach (string file in Directory.GetFiles(_playersSaveFolder))
+            {
+                if (file.EndsWith(".bmplr"))
+                {
+                    // get player name without ".bmplr"
+                    string playerName = Path.GetFileNameWithoutExtension(file);
+                    
+                    // create new player state with custom name
+                    PlayerState playerState = new PlayerState
+                    {
+                        Name = playerName
+                    };
+                    playerStates.Add(playerState);
+                }
+            }
+
+            return playerStates;
+        }
+
+        return []; // return nothing if no save folder
+    }
+
     private string GetPlayerPath(string playerName)
     {
         // path/name.bmplr
         return _playersSaveFolder + playerName + ".bmplr";
     }
+}
+
+[Serializable]
+public class PlayerState
+{
+    public string Name { get; set; } = "";
 }

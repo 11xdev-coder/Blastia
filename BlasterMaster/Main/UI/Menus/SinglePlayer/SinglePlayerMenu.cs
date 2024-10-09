@@ -10,7 +10,7 @@ public class SinglePlayerMenu : Menu
     {
         AddElements();
     }
-
+    
     private void AddElements()
     {
         Button newPlayerButton = new Button(Vector2.Zero, "New player", Font, NewPlayer)
@@ -31,8 +31,12 @@ public class SinglePlayerMenu : Menu
     public override void OnMenuActive()
     {
         base.OnMenuActive();
-        
-        Console.WriteLine("Singleplayer on menu active");
+
+        List<PlayerState> playerStates = PlayerManager.Instance.LoadAllPlayerStates();
+        foreach (var state in playerStates)
+        {
+            Console.WriteLine(state.Name);
+        }
     }
 
     private void NewPlayer()
