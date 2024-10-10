@@ -119,7 +119,17 @@ public static class KeyboardHelper
     {
         string keyString = key.ToString();
         
+        // handle digits (1 = 'D1', 2 = 'D2' etc.)
+        if (keyString.Length == 2 && keyString[0] == 'D' && char.IsDigit(keyString[1]))
+        {
+            char digit = keyString[1];
+            
+            stringBuilder.Insert(index, digit);
+            index++;
+            return true;
+        }
 
+        // handle normal letters (like 'A', 'B', 'C')
         if (keyString.Length == 1 && char.IsLetterOrDigit(keyString[0]))
         {
             char character = keyString[0];
