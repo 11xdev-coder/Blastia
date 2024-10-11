@@ -130,7 +130,7 @@ public static class KeyboardHelper
         }
 
         // handle normal letters (like 'A', 'B', 'C')
-        if (keyString.Length == 1 && char.IsLetterOrDigit(keyString[0]))
+        if (keyString.Length == 1 && char.IsLetter(keyString[0]))
         {
             char character = keyString[0];
 

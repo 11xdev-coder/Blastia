@@ -13,6 +13,21 @@ public class SinglePlayerMenu : Menu
     
     private void AddElements()
     {
+        Viewport playerListViewPort = new Viewport(2000, 500);
+        ScrollableArea playerList = new ScrollableArea(Vector2.Zero, playerListViewPort)
+        {
+            HAlign = 0.5f,
+            VAlign = 0.4f
+        };
+        Elements.Add(playerList);
+        
+        Button test = new Button(Vector2.Zero, "TEST", Font, NewPlayer)
+        {
+            HAlign = 0.5f,
+            VAlign = 0.4f
+        };
+        playerList.AddChild(test);
+        
         Button newPlayerButton = new Button(Vector2.Zero, "New player", Font, NewPlayer)
         {
             HAlign = 0.5f,
