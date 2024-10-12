@@ -9,6 +9,7 @@ public class ScrollableArea : UIElement
     private List<UIElement> _children;
     // position offset
     private float _scrolledOffset;
+    private float _currentSpacing;
 
     public int ViewportWidth;
     public int ViewportHeight;
@@ -18,12 +19,15 @@ public class ScrollableArea : UIElement
     /// </summary>
     public float ScrollSpeed { get; set; } = 0.05f;
     
-    public ScrollableArea(Vector2 position, Viewport viewport, 
+    public float Spacing { get; set; }
+    
+    public ScrollableArea(Vector2 position, Viewport viewport, float spacing = 10f,
         float scrolledOffset = 0f) : 
         base(position, BlasterMasterGame.InvisibleTexture)
     {
         ViewportWidth = viewport.Width;
         ViewportHeight = viewport.Height;
+        Spacing = spacing;
         
         _children = new List<UIElement>();
         _scrolledOffset = scrolledOffset;
@@ -43,16 +47,36 @@ public class ScrollableArea : UIElement
     {
         base.Update();
 
-        _scrolledOffset -= BlasterMasterGame.ScrollWheelDelta * ScrollSpeed;
-        Console.WriteLine(_scrolledOffset);
+        _currentSpacing = 0; // reset spacing
+        float delta = BlasterMasterGame.ScrollWheelDelta * ScrollSpeed;
+        
+        Console.WriteLine($"{GetTop()}, {Bounds.Top}");
+        // cant scroll past top/bottom
+        if ((delta > 0 && GetTop() >= Bounds.Top) || (delta < 0 && GetBottom() <= Bounds.Bottom))
+        {
+            _scrolledOffset -= delta;
+        }
         
         // update every child
         foreach (var child in _children)
         {
-            child.Position.Y = _scrolledOffset;
+            // for each new element add spacing
+            child.Position.Y = _scrolledOffset + _currentSpacing;
+            _currentSpacing += Spacing;
             
             child.Update();
         }
+    }
+
+    private float GetTop()
+    {
+        return _children[0].Bounds.Top;
+    }
+
+    private float GetBottom()
+    {
+        // last child bottom
+        return _children[^1].Bounds.Bottom;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
