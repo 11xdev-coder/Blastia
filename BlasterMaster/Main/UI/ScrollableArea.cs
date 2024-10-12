@@ -7,8 +7,12 @@ namespace BlasterMaster.Main.UI;
 public class ScrollableArea : UIElement
 {
     private List<UIElement> _children;
+    
     // position offset
     private float _scrolledOffset;
+    private float _startingScrolledOffset;
+    
+    // spacing
     private float _currentSpacing;
 
     public int ViewportWidth;
@@ -21,7 +25,7 @@ public class ScrollableArea : UIElement
     
     public float Spacing { get; set; }
     
-    public ScrollableArea(Vector2 position, Viewport viewport, float spacing = 10f,
+    public ScrollableArea(Vector2 position, Viewport viewport, float spacing = 0f,
         float scrolledOffset = 0f) : 
         base(position, BlasterMasterGame.InvisibleTexture)
     {
@@ -30,12 +34,28 @@ public class ScrollableArea : UIElement
         Spacing = spacing;
         
         _children = new List<UIElement>();
-        _scrolledOffset = scrolledOffset;
+        
+        // offset
+        _startingScrolledOffset = scrolledOffset;
+        _scrolledOffset = CalculateStartingOffset() + _startingScrolledOffset;
     }
 
+    private float CalculateStartingOffset()
+    {
+        return BlasterMasterGame.ScreenHeight -
+               (BlasterMasterGame.ScreenHeight - Bounds.Top);
+    }
+    
     public override void UpdateBounds()
     {
         UpdateBoundsBase(ViewportWidth, ViewportHeight);
+    }
+
+    public override void OnAlignmentChanged()
+    {
+        base.OnAlignmentChanged();
+        
+        _scrolledOffset = CalculateStartingOffset() + _startingScrolledOffset;
     }
 
     public void AddChild(UIElement child)
@@ -46,13 +66,13 @@ public class ScrollableArea : UIElement
     public override void Update()
     {
         base.Update();
-
+        
         _currentSpacing = 0; // reset spacing
         float delta = BlasterMasterGame.ScrollWheelDelta * ScrollSpeed;
         
-        Console.WriteLine($"{GetTop()}, {Bounds.Top}");
         // cant scroll past top/bottom
-        if ((delta > 0 && GetTop() >= Bounds.Top) || (delta < 0 && GetBottom() <= Bounds.Bottom))
+        if ((delta > 0 && GetTop() >= Bounds.Top) || 
+            (delta < 0 && GetBottom() <= Bounds.Bottom))
         {
             _scrolledOffset -= delta;
         }
@@ -60,9 +80,12 @@ public class ScrollableArea : UIElement
         // update every child
         foreach (var child in _children)
         {
-            // for each new element add spacing
+            // center X
+            child.Position.X = Bounds.Center.X - child.Bounds.Width * 0.5f;
+            
+            // for each new element add spacing + height
             child.Position.Y = _scrolledOffset + _currentSpacing;
-            _currentSpacing += Spacing;
+            _currentSpacing += Spacing + child.Bounds.Height;
             
             child.Update();
         }
