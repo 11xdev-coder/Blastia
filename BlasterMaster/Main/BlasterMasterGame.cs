@@ -39,6 +39,7 @@ public class BlasterMasterGame : Game
     public static KeyboardState PreviousKeyboardState { get; private set; }
     
     // GLOBAL TEXTURES
+    public static Texture2D CursorTexture { get; private set; } = null!;
     public static Texture2D SliderTexture { get; private set; } = null!;
     public static Texture2D WhitePixel { get; private set; } = null!;
     public static Texture2D InvisibleTexture { get; private set; } = null!;
@@ -55,8 +56,6 @@ public class BlasterMasterGame : Game
 
     private MouseState _previousMouseState;
     private MouseState _currentMouseState;
-
-    private Texture2D _cursorTexture;
     
     public SpriteFont MainFont { get; private set; }
     private Texture2D _logoTexture;
@@ -134,7 +133,7 @@ public class BlasterMasterGame : Game
 
     private void LoadTextures()
     {
-        _cursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
+        CursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
             Content.RootDirectory + Paths.CursorTexturePath);
         
         _logoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
@@ -302,7 +301,7 @@ public class BlasterMasterGame : Game
         }
         
         // draw cursor texture last on top of everything
-        SpriteBatch.Draw(_cursorTexture, CursorPosition, Color.White);
+        SpriteBatch.Draw(CursorTexture, CursorPosition, Color.White);
         SpriteBatch.End();
     }
 
