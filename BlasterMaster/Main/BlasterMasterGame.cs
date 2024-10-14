@@ -66,6 +66,7 @@ public class BlasterMasterGame : Game
     public static LogoMenu? LogoMenu { get; private set; }
     public static MainMenu? MainMenu { get; private set; }
     public static SinglePlayerMenu? SinglePlayerMenu { get; private set; }
+    public static WorldsMenu? WorldsMenu { get; private set; }
     public static PlayerCreationMenu? PlayerCreationMenu { get; private set; }
     public static SettingsMenu? SettingsMenu { get; private set; }
     public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
@@ -112,8 +113,9 @@ public class BlasterMasterGame : Game
         AudioManager.Instance.Initialize(audioManagerSavePath);
         AudioManager.Instance.LoadStateFromFile();
         // load player manager
-        string playerManagerSavePath = Content.RootDirectory + Paths.PlayerSavePath;
-        PlayerManager.Instance.Initialize(playerManagerSavePath);
+        string playersSavePath = Content.RootDirectory + Paths.PlayerSavePath;
+        string worldsSavePath = Content.RootDirectory + Paths.WorldsSavePath;
+        PlayerManager.Instance.Initialize(playersSavePath, worldsSavePath);
         
         ExitRequestEvent += OnExitRequested;
         ResolutionRequestEvent += UpdateResolution;
@@ -189,6 +191,9 @@ public class BlasterMasterGame : Game
         
         SinglePlayerMenu = new SinglePlayerMenu(MainFont);
         AddMenu(SinglePlayerMenu);
+        
+        WorldsMenu = new WorldsMenu(MainFont);
+        AddMenu(WorldsMenu);
         
         PlayerCreationMenu = new PlayerCreationMenu(MainFont);
         AddMenu(PlayerCreationMenu);

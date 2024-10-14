@@ -37,4 +37,6 @@ public static class Paths
     
     // players save
     public static readonly string PlayerSavePath = "/Saved/Players/";
+    // worlds save
+    public static readonly string WorldsSavePath = "/Saved/Worlds/";
 }

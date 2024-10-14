@@ -79,7 +79,7 @@ public class PlayerCreationMenu : Menu
         if (_nameInput?.Text == null) return;
         string playerName = _nameInput.StringBuilder.ToString();
 
-        if (!PlayerManager.Instance.AlreadyExists(playerName))
+        if (!PlayerManager.Instance.PlayerExists(playerName))
         {
             // create player if doesnt exist
             PlayerManager.Instance.NewPlayer(_nameInput.StringBuilder.ToString());

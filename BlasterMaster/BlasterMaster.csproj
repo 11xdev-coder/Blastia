@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <Folder Include="Main\Content\Saved\Players\" />
+      <Folder Include="Main\Content\Saved\Worlds\" />
       <Folder Include="Main\Content\Sounds\Menu\" />
       <Folder Include="Main\Content\Textures\Player\" />
     </ItemGroup>

@@ -15,11 +15,11 @@ public class SinglePlayerMenu : Menu
     
     private void AddElements()
     {
-        Viewport playerListViewPort = new Viewport(2000, 500);
+        Viewport playerListViewPort = new Viewport(2000, 450);
         _playerList = new ScrollableArea(Vector2.Zero, playerListViewPort)
         {
             HAlign = 0.5f,
-            VAlign = 0.4f
+            VAlign = 0.55f
         };
         Elements.Add(_playerList);
         
@@ -45,18 +45,19 @@ public class SinglePlayerMenu : Menu
         if (_playerList == null) return;
         _playerList.ClearChildren();
         
-        List<PlayerState> playerStates = PlayerManager.Instance.LoadAllPlayerStates();
+        List<PlayerState> playerStates = PlayerManager.Instance.LoadAllPlayers();
         foreach (var state in playerStates)
         {
             // for each loaded player create a new button
-            Button playerButton = new Button(Vector2.Zero, state.Name, Font, PlayPlayer);
+            Button playerButton = new Button(Vector2.Zero, state.Name, Font, () => PlayPlayer(state));
             _playerList.AddChild(playerButton);
         }
     }
 
-    private void PlayPlayer()
+    private void PlayPlayer(PlayerState playerState)
     {
-        
+        PlayerManager.Instance.SelectPlayer(playerState);
+        SwitchToMenu(BlasterMasterGame.WorldsMenu);
     }
 
     private void NewPlayer()
