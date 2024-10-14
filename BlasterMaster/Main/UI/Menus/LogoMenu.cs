@@ -1,37 +1,33 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BlasterMaster.Main.Utilities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI.Menus;
 
 public class LogoMenu : Menu
 {
-    private Texture2D _texture;
     private Image? _rotatingImageTest;
     
-    public LogoMenu(SpriteFont font, Texture2D texture, bool isActive = true) : base(font, isActive)
+    public LogoMenu(SpriteFont font, bool isActive = true) : base(font, isActive)
     {
-        _texture = texture;
         AddElements();
     }
 
     private void AddElements()
     {
         LogoImageElement logoText = new LogoImageElement(new Vector2(0, 100),
-            _texture)
+            BlasterMasterGame.LogoTexture)
         {
             HAlign = 0.5f
         };
         Elements.Add(logoText);
-        
-        _rotatingImageTest = new Image(new Vector2(200, 100), BlasterMasterGame.CursorTexture);
-        Elements.Add(_rotatingImageTest);
     }
 
     public override void Update()
     {
         base.Update();
         
-        UpdateRotationDotProduct();
+        UpdateRotationTangent();
     }
 
     private void UpdateRotationTangent()
@@ -60,7 +56,7 @@ public class LogoMenu : Menu
         Vector2 direction = end - start;
 
         double dotProduct = direction.X; // dir.X * 1 + dir.Y * 0
-        double directionMagnitude = Math.Sqrt(direction.X * direction.X + direction.Y * direction.Y);
+        double directionMagnitude = direction.Magnitude();
 
         float theta = (float) Math.Acos(dotProduct / directionMagnitude); // right vec magnitude = 1
         if (direction.Y < 0) // flip

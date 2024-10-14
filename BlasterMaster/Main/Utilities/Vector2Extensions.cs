@@ -4,6 +4,12 @@ namespace BlasterMaster.Main.Utilities;
 
 public static class Vector2Extensions
 {
+    public static double Magnitude(this Vector2 vector)
+    {
+        // √x^2 + y^2
+        return Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y);
+    }
+    
     public static bool CompareToFloat(this Vector2 vector, float a)
     {
         if (vector.X == a && vector.Y == a)

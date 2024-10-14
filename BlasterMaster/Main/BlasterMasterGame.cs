@@ -39,6 +39,7 @@ public class BlasterMasterGame : Game
     public static KeyboardState PreviousKeyboardState { get; private set; }
     
     // GLOBAL TEXTURES
+    public static Texture2D LogoTexture { get; private set; } = null!;
     public static Texture2D CursorTexture { get; private set; } = null!;
     public static Texture2D SliderTexture { get; private set; } = null!;
     public static Texture2D WhitePixel { get; private set; } = null!;
@@ -58,7 +59,7 @@ public class BlasterMasterGame : Game
     private MouseState _currentMouseState;
     
     public SpriteFont MainFont { get; private set; }
-    private Texture2D _logoTexture;
+    
     
     #region Menus
     
@@ -136,7 +137,7 @@ public class BlasterMasterGame : Game
         CursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
             Content.RootDirectory + Paths.CursorTexturePath);
         
-        _logoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+        LogoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
             Content.RootDirectory + Paths.Logo5XTexturePath);
         
         SliderTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
@@ -179,8 +180,8 @@ public class BlasterMasterGame : Game
         LoadTextures();
         MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
         
-        
-        LogoMenu = new LogoMenu(MainFont, _logoTexture);
+        // menus
+        LogoMenu = new LogoMenu(MainFont);
         AddMenu(LogoMenu);
         
         MainMenu = new MainMenu(MainFont);

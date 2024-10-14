@@ -58,6 +58,11 @@ public class ScrollableArea : UIElement
         _scrolledOffset = CalculateStartingOffset() + _startingScrolledOffset;
     }
 
+    public void ClearChildren()
+    {
+        _children.Clear();
+    }
+
     public void AddChild(UIElement child)
     {
         _children.Add(child);
