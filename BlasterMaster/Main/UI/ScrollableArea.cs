@@ -98,13 +98,22 @@ public class ScrollableArea : UIElement
 
     private float GetTop()
     {
-        return _children[0].Bounds.Top;
+        var firstChild = _children.FirstOrDefault();
+
+        if (firstChild != null) 
+            return firstChild.Bounds.Top;
+
+        return 0;
     }
 
     private float GetBottom()
     {
-        // last child bottom
-        return _children[^1].Bounds.Bottom;
+        var lastChild = _children.LastOrDefault();
+
+        if (lastChild != null) 
+            return lastChild.Bounds.Bottom;
+
+        return 0;
     }
 
     public override void Draw(SpriteBatch spriteBatch)
