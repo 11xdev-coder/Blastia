@@ -23,12 +23,24 @@ public class WorldsMenu : Menu
         };
         Elements.Add(_worldsList);
 
+        Button newWorldButton = new Button(Vector2.Zero, "New world", Font, NewWorld)
+        {
+            HAlign = 0.5f,
+            VAlign = 0.85f
+        };
+        Elements.Add(newWorldButton);
+
         Button backButton = new Button(Vector2.Zero, "Back", Font, Back)
         {
             HAlign = 0.5f,
             VAlign = 0.9f
         };
         Elements.Add(backButton);
+    }
+
+    private void NewWorld() 
+    {
+    	SwitchToMenu(BlasterMasterGame.WorldCreationMenu);
     }
 
     public override void OnMenuActive()
@@ -54,6 +66,6 @@ public class WorldsMenu : Menu
 
     private void Back()
     {
-        SwitchToMenu(BlasterMasterGame.SinglePlayerMenu);
+        SwitchToMenu(BlasterMasterGame.PlayersMenu);
     }
 }

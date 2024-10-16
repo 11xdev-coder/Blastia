@@ -4,11 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI.Menus.SinglePlayer;
 
-public class SinglePlayerMenu : Menu
+public class PlayersMenu : Menu
 {
     private ScrollableArea? _playerList;
     
-    public SinglePlayerMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
+    public PlayersMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
     {
         AddElements();
     }

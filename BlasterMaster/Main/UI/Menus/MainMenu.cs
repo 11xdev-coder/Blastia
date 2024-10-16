@@ -44,7 +44,7 @@ public class MainMenu : Menu
 
     private void OnClickSinglePlayer()
     {
-        SwitchToMenu(BlasterMasterGame.SinglePlayerMenu);
+        SwitchToMenu(BlasterMasterGame.PlayersMenu);
     }
 
     private void OnClickMultiplayer()

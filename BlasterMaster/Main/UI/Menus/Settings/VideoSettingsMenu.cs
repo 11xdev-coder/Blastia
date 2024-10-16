@@ -50,6 +50,6 @@ public class VideoSettingsMenu : Menu
 
     private void OnClickResolution()
     {
-        
+        VideoManager.Instance.ApplyHandlerResolution();
     }
 }

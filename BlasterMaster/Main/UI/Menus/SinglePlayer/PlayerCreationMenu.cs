@@ -98,6 +98,6 @@ public class PlayerCreationMenu : Menu
 
     private void Back()
     {
-        SwitchToMenu(BlasterMasterGame.SinglePlayerMenu);
+        SwitchToMenu(BlasterMasterGame.PlayersMenu);
     }
 }
