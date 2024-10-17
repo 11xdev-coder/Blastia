@@ -9,11 +9,12 @@ public class WorldCreationMenu : Menu
 {
 	private Input? _worldInput;
 	private Text? _worldExistsText;
-	private HandlerArrowButton<EnumListHandler<WorldDifficulty>>? _difficultyButton;
-	private ListHandler<EnumListHandler<WorldDifficulty>>? _difficultyListHandler;
+	private HandlerArrowButton<WorldDifficulty>? _difficultyButton;
+	private WorldDifficultyHandler _difficultyListHandler;
 	
 	public WorldCreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
 	{
+		_difficultyListHandler = new WorldDifficultyHandler();
 		AddElements();
 	}
 
@@ -42,7 +43,7 @@ public class WorldCreationMenu : Menu
 		};
 		Elements.Add(_worldExistsText);
 		
-		_difficultyButton = new HandlerArrowButton<EnumListHandler<WorldDifficulty>>(Vector2.Zero,
+		_difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
 		"Difficulty", Font, OnClickDifficulty, 10, _difficultyListHandler)
 		{
 			HAlign = 0.5f,

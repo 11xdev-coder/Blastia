@@ -8,7 +8,7 @@ namespace BlasterMaster.Main.UI.Buttons;
 /// Accepts handler, creates 2 arrows that will go to next/previous item.
 /// <para>T -> ListHandler's class</para>
 /// </summary>
-public class HandlerArrowButton<T> : Button where T : class
+public class HandlerArrowButton<T> : Button
 {
 	public Button? LeftButton;
 	public Button? RightButton;
