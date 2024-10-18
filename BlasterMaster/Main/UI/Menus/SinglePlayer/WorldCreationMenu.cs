@@ -82,13 +82,16 @@ public class WorldCreationMenu : Menu
 
 	private void CreateWorld()
 	{
+		Console.WriteLine(_difficultyListHandler.CurrentItem);
+		
 		if (_worldInput?.Text == null) return;
 		string playerName = _worldInput.StringBuilder.ToString();
 
 		if (!PlayerManager.Instance.WorldExists(playerName))
 		{
-			// create player if doesnt exist
-			PlayerManager.Instance.NewWorld(_worldInput.StringBuilder.ToString());
+			// create world with custom difficulty if doesnt exist
+			PlayerManager.Instance.NewWorld(_worldInput.StringBuilder.ToString(), 
+				_difficultyListHandler.CurrentItem);			
 			
 			Back(); // go back
 		}

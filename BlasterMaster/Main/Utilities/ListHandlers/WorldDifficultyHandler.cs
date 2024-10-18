@@ -2,9 +2,9 @@ using BlasterMaster.Main.Utilities.ListHandlers;
 
 public enum WorldDifficulty 
 {
-	IAmTooYoungToDie,
-	HurtMePlenty,
-	Nightmare
+	Easy,
+	Medium,
+	Hard
 }
 
 public class WorldDifficultyHandler: EnumListHandler<WorldDifficulty> 
@@ -14,14 +14,16 @@ public class WorldDifficultyHandler: EnumListHandler<WorldDifficulty>
 		
 	}
 	
-	public string GetDifficultyDescription()
-    {
-        return CurrentItem switch
-        {
-            WorldDifficulty.IAmTooYoungToDie => "For babies",
-            WorldDifficulty.HurtMePlenty => "The intended challenge",
-            WorldDifficulty.Nightmare => "gdggdgdgd",
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
+	public string GetDifficultyName()
+	{
+		return CurrentItem switch
+		{
+			WorldDifficulty.Easy => "I am too young to die",
+			WorldDifficulty.Medium => "Hurt me plenty",
+			WorldDifficulty.Hard => "Nightmare",
+			_ => throw new ArgumentOutOfRangeException()
+		};
+	}
+		
+	public override string GetString() => GetDifficultyName();
 }
