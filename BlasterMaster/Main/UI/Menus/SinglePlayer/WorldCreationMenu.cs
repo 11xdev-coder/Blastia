@@ -91,7 +91,7 @@ public class WorldCreationMenu : Menu
 		{
 			// create world with custom difficulty if doesnt exist
 			PlayerManager.Instance.NewWorld(_worldInput.StringBuilder.ToString(), 
-				_difficultyListHandler.CurrentItem);			
+				_difficultyListHandler.CurrentItem, 100, 100);			
 			
 			Back(); // go back
 		}

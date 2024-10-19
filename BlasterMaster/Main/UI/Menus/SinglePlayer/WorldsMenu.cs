@@ -61,7 +61,7 @@ public class WorldsMenu : Menu
 
     private void PlayWorld(WorldState worldState) 
     {
-
+        PlayerManager.Instance.SelectWorld(worldState);
     }
 
     private void Back()

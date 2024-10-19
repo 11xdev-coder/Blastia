@@ -9,6 +9,7 @@ public class PlayerManager : Singleton<PlayerManager>
 	private string? _worldsSaveFolder;
 	
 	public PlayerState? SelectedPlayer { get; private set; }
+	public WorldState? SelectedWorld { get; private set; }
 
 	public void Initialize(string playersSaveFolder, string worldsSaveFolder)
 	{
@@ -95,15 +96,44 @@ public class PlayerManager : Singleton<PlayerManager>
 	}
 	
 	// world methods
-	public void NewWorld(string worldName, WorldDifficulty difficulty = WorldDifficulty.Easy) 
+	public void NewWorld(string worldName, WorldDifficulty difficulty = WorldDifficulty.Easy, 
+			int worldWidth = 0, int worldHeight = 0) 
 	{
-		WorldState world = new WorldState { Name = worldName, Difficulty = difficulty };
+		WorldState world = new WorldState 
+		{ 
+			Name = worldName, 
+			Difficulty = difficulty,
+			WorldWidth = worldWidth,
+			WorldHeight = worldHeight,
+			Tiles = new ushort[worldWidth * worldHeight]
+		};
+		GenerateWorldTiles(world);
+		
 		New(_worldsSaveFolder, worldName, ".bmwld", world);
 	}
 	
 	public bool WorldExists(string worldName) => Exists(_worldsSaveFolder, worldName, ".bmwld");
 	public List<WorldState> LoadAllWorlds() => 
 		LoadAll(_worldsSaveFolder, ".bmwld", name => new WorldState { Name = name });
+		
+	public void SelectWorld(WorldState worldState)
+	{
+		SelectedWorld = worldState;
+	}
+	
+	private void GenerateWorldTiles(WorldState worldState) 
+	{
+		int width = worldState.WorldWidth;
+		int height = worldState.WorldHeight;
+		
+		for (int x = 0; x < width; x++) 
+		{
+			for (int y = 0; y < height; y++) 
+			{
+				worldState.SetTile(x, y, BlockID.Stone);
+			}
+		}
+	}
 }
 
 [Serializable]
@@ -117,4 +147,19 @@ public class WorldState
 {
 	public string Name { get; set; } = "";
 	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
+	
+	// 1D to support serialization
+	public ushort[] Tiles { get; set; } = Array.Empty<ushort>();
+	public int WorldWidth { get; set; }
+	public int WorldHeight { get; set; }
+	
+	public ushort GetTile(int x, int y) 
+	{
+		return Tiles[y * WorldWidth + x];
+	}
+	
+	 public void SetTile(int x, int y, ushort value)
+	{
+		Tiles[y * WorldWidth + x] = value;
+	}
 }
