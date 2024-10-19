@@ -10,11 +10,14 @@ public class WorldCreationMenu : Menu
 	private Input? _worldInput;
 	private Text? _worldExistsText;
 	private HandlerArrowButton<WorldDifficulty>? _difficultyButton;
-	private WorldDifficultyHandler _difficultyListHandler;
+	private WorldDifficultyHandler _difficultyHandler;
+	private HandlerArrowButton<WorldSize>? _sizeButton;
+	private WorldSizeHandler _sizeHandler;
 	
 	public WorldCreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
 	{
-		_difficultyListHandler = new WorldDifficultyHandler();
+		_difficultyHandler = new WorldDifficultyHandler();
+		_sizeHandler = new WorldSizeHandler();
 		AddElements();
 	}
 
@@ -44,24 +47,32 @@ public class WorldCreationMenu : Menu
 		Elements.Add(_worldExistsText);
 		
 		_difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
-		"Difficulty", Font, OnClickDifficulty, 10, _difficultyListHandler)
+		"Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
 		{
 			HAlign = 0.5f,
 			VAlign = 0.55f
 		};
 		_difficultyButton.AddToElements(Elements);
 		
-		Button createButton = new Button(Vector2.Zero, "Create", Font, CreateWorld)
+		_sizeButton = new HandlerArrowButton<WorldSize>(Vector2.Zero,
+		"World size", Font, OnClickDifficulty, 10, _sizeHandler)
 		{
 			HAlign = 0.5f,
 			VAlign = 0.6f
+		};
+		_sizeButton.AddToElements(Elements);
+		
+		Button createButton = new Button(Vector2.Zero, "Create", Font, CreateWorld)
+		{
+			HAlign = 0.5f,
+			VAlign = 0.65f
 		};
 		Elements.Add(createButton);
 		
 		Button backButton = new Button(Vector2.Zero, "Back", Font, Back)
 		{
 			HAlign = 0.5f,
-			VAlign = 0.65f
+			VAlign = 0.7f
 		};
 		Elements.Add(backButton);
 	}
@@ -82,16 +93,18 @@ public class WorldCreationMenu : Menu
 
 	private void CreateWorld()
 	{
-		Console.WriteLine(_difficultyListHandler.CurrentItem);
+		int width = _sizeHandler.GetWidth();
+		int height = _sizeHandler.GetHeight();
+		Console.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
 		
 		if (_worldInput?.Text == null) return;
 		string playerName = _worldInput.StringBuilder.ToString();
 
 		if (!PlayerManager.Instance.WorldExists(playerName))
-		{
+		{	
 			// create world with custom difficulty if doesnt exist
 			PlayerManager.Instance.NewWorld(_worldInput.StringBuilder.ToString(), 
-				_difficultyListHandler.CurrentItem, 100, 100);			
+				_difficultyHandler.CurrentItem, width, height);			
 			
 			Back(); // go back
 		}
