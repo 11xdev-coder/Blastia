@@ -5,10 +5,8 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace BlasterMaster.Main.UI.Menus.SinglePlayer;
 
-public class WorldCreationMenu : Menu
+public class WorldCreationMenu : CreationMenu
 {
-	private Input? _worldInput;
-	private Text? _worldExistsText;
 	private HandlerArrowButton<WorldDifficulty>? _difficultyButton;
 	private WorldDifficultyHandler _difficultyHandler;
 	private HandlerArrowButton<WorldSize>? _sizeButton;
@@ -21,31 +19,12 @@ public class WorldCreationMenu : Menu
 		AddElements();
 	}
 
-	private void AddElements()
-	{        
-		Text worldNameText = new Text(Vector2.Zero, "World Name", Font)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.4f
-		};
-		Elements.Add(worldNameText);
-		
-		_worldInput = new Input(Vector2.Zero, Font, true)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.45f
-		};
-		Elements.Add(_worldInput);
+	protected override string GetNameLabel() => "World name";
+	protected override string GetExistsText() => "World already exists!";
+	protected override float CreateButtonVAlign => 0.65f;
 
-		_worldExistsText = new Text(Vector2.Zero, "World already exists!", Font)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.5f,
-			Alpha = 0f,
-			DrawColor = BlasterMasterGame.ErrorColor
-		};
-		Elements.Add(_worldExistsText);
-		
+	private void AddElements()
+	{		
 		_difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
 		"Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
 		{
@@ -61,20 +40,6 @@ public class WorldCreationMenu : Menu
 			VAlign = 0.6f
 		};
 		_sizeButton.AddToElements(Elements);
-		
-		Button createButton = new Button(Vector2.Zero, "Create", Font, CreateWorld)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.65f
-		};
-		Elements.Add(createButton);
-		
-		Button backButton = new Button(Vector2.Zero, "Back", Font, Back)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.7f
-		};
-		Elements.Add(backButton);
 	}
 	
 	private void OnClickDifficulty() 
@@ -82,44 +47,33 @@ public class WorldCreationMenu : Menu
 		
 	}
 
-	public override void Update()
+	protected override void UpdateSpecific()
 	{
-		base.Update();
-
-		// update color
-		if (_worldExistsText == null) return;
-		_worldExistsText.DrawColor = BlasterMasterGame.ErrorColor;
+		
 	}
 
-	private void CreateWorld()
+	protected override void Create()
 	{
 		int width = _sizeHandler.GetWidth();
 		int height = _sizeHandler.GetHeight();
 		Console.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
 		
-		if (_worldInput?.Text == null) return;
-		string playerName = _worldInput.StringBuilder.ToString();
+		if (NameInput?.Text == null) return;
+		string playerName = NameInput.StringBuilder.ToString();
 
 		if (!PlayerManager.Instance.WorldExists(playerName))
 		{	
 			// create world with custom difficulty if doesnt exist
-			PlayerManager.Instance.NewWorld(_worldInput.StringBuilder.ToString(), 
+			PlayerManager.Instance.NewWorld(NameInput.StringBuilder.ToString(), 
 				_difficultyHandler.CurrentItem, width, height);			
 			
 			Back(); // go back
 		}
 		else
 		{
-			// show text if exists
-			if (_worldExistsText == null) return;
-
-			_worldExistsText.Alpha = 1f;
-			_worldExistsText.LerpAlphaToZero = true;
+			ShowExistsError();
 		}
 	}
 
-	private void Back()
-	{
-		SwitchToMenu(BlasterMasterGame.WorldsMenu);
-	}
+	protected override void Back() => SwitchToMenu(BlasterMasterGame.WorldsMenu);
 }

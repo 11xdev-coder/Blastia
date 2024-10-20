@@ -1,4 +1,4 @@
-using BlasterMaster.Main.Utilities.ListHandlers;
+namespace BlasterMaster.Main.Utilities.ListHandlers;
 
 public enum WorldSize 
 {

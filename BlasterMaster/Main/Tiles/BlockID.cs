@@ -1,3 +1,4 @@
+namespace BlasterMaster.Main.Tiles;
 
 [Serializable]
 public class Block 
