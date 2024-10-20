@@ -142,13 +142,15 @@ public class PlayerManager : Singleton<PlayerManager>
 public class PlayerState
 {
 	public string Name { get; set; } = "";
+	public override string ToString() => Name;
 }
 
 [Serializable]
 public class WorldState
 {
 	public string Name { get; set; } = "";
-	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
+    public override string ToString() => Name;
+    public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
 	
 	// 1D to support serialization
 	public ushort[] Tiles { get; set; } = Array.Empty<ushort>();
