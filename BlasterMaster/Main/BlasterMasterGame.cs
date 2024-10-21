@@ -41,7 +41,8 @@ public class BlasterMasterGame : Game
 	// GLOBAL TEXTURES
 	public static Texture2D LogoTexture { get; private set; } = null!;
 	public static Texture2D CursorTexture { get; private set; } = null!;
-	public static Texture2D SliderTexture { get; private set; } = null!;
+	public static Texture2D SliderTexture { get; private set; } = null!;	
+	public static Texture2D ProgressBarBackground { get; private set; } = null!;
 	public static Texture2D WhitePixel { get; private set; } = null!;
 	public static Texture2D InvisibleTexture { get; private set; } = null!;
 	
@@ -145,6 +146,9 @@ public class BlasterMasterGame : Game
 		
 		SliderTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Content.RootDirectory + Paths.SliderBackgroundPath);
+			
+		ProgressBarBackground = LoadingUtilities.LoadTexture(GraphicsDevice,
+			Content.RootDirectory + Paths.ProgrssbarBackgroundPath);
 		
 		WhitePixel = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Content.RootDirectory + Paths.WhitePixelPath);

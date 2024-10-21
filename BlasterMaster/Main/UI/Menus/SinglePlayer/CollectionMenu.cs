@@ -59,7 +59,7 @@ public abstract class CollectionMenu : Menu
 			// PlayerState and WorldState ToString() returns their Name
 			// if item.ToString() is null, assign it to ""
 			string? itemString = item.ToString();
-			if (itemString == null) itemString = "";
+			if (itemString == null) itemString = "name error";
 			
 			Button itemButton = new Button(Vector2.Zero, itemString, Font, () => SelectItem(item));
 			Collection.AddChild(itemButton);

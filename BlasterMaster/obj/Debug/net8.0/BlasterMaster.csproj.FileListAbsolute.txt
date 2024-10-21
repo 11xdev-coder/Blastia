@@ -92,3 +92,4 @@ D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\P
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\Leg.png
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Player\RightArm.png
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Invisible.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\UI\ProgressBarBG.png
