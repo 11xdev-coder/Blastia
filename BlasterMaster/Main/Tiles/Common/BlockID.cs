@@ -1,10 +1,4 @@
-namespace BlasterMaster.Main.Tiles;
-
-[Serializable]
-public class Block 
-{
-	public ushort ID { get; set; }
-}
+namespace BlasterMaster.Main.Tiles.Common;
 
 public static class BlockID 
 {

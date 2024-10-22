@@ -103,20 +103,21 @@ public class BlasterMasterGame : Game
 		
 		// root folder of all assets
 		Content.RootDirectory = "Main/Content";
+		Paths.ContentRoot = Content.RootDirectory;
 		SoundEngine.Initialize(Content);
 		MusicEngine.Initialize(Content);
 		
 		// initialize video manager with graphics manager
-		string videoManagerSavePath = Content.RootDirectory + Paths.VideoManagerSavePath;
+		string videoManagerSavePath = Paths.VideoManagerSavePath;
 		VideoManager.Instance.Initialize(_graphics, videoManagerSavePath);
 		VideoManager.Instance.LoadStateFromFile();
 		// load audio manager
-		string audioManagerSavePath = Content.RootDirectory + Paths.AudioManagerSavePath;
+		string audioManagerSavePath = Paths.AudioManagerSavePath;
 		AudioManager.Instance.Initialize(audioManagerSavePath);
 		AudioManager.Instance.LoadStateFromFile();
 		// load player manager
-		string playersSavePath = Content.RootDirectory + Paths.PlayerSavePath;
-		string worldsSavePath = Content.RootDirectory + Paths.WorldsSavePath;
+		string playersSavePath = Paths.PlayerSavePath;
+		string worldsSavePath = Paths.WorldsSavePath;
 		PlayerManager.Instance.Initialize(playersSavePath, worldsSavePath);
 		
 		ExitRequestEvent += OnExitRequested;
@@ -137,41 +138,41 @@ public class BlasterMasterGame : Game
 	}
 
 	private void LoadTextures()
-	{
+	{		
 		CursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
-			Content.RootDirectory + Paths.CursorTexturePath);
+			Paths.CursorTexturePath);
 		
 		LogoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.Logo5XTexturePath);
+			Paths.Logo5XTexturePath);
 		
 		SliderTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.SliderBackgroundPath);
+			Paths.SliderBackgroundPath);
 			
 		ProgressBarBackground = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.ProgrssbarBackgroundPath);
+			Paths.ProgrssbarBackgroundPath);
 		
 		WhitePixel = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.WhitePixelPath);
+			Paths.WhitePixelPath);
 		
 		InvisibleTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.InvisibleTexturePath);
+			Paths.InvisibleTexturePath);
 		
 		#region Player Textures
 		
 		PlayerHead = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.PlayerHeadTexturePath);
+			Paths.PlayerHeadTexturePath);
 		
 		PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.PlayerBodyTexturePath);
+			Paths.PlayerBodyTexturePath);
 		
 		PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.PlayerLeftArmTexturePath);
+			Paths.PlayerLeftArmTexturePath);
 		
 		PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.PlayerRightArmTexturePath);
+			Paths.PlayerRightArmTexturePath);
 		
 		PlayerLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Content.RootDirectory + Paths.PlayerLegTexturePath);
+			Paths.PlayerLegTexturePath);
 		
 		#endregion
 	}
