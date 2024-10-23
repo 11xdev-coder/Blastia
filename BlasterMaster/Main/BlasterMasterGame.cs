@@ -1,4 +1,5 @@
 ﻿using BlasterMaster.Main.Sounds;
+using BlasterMaster.Main.Tiles.Common;
 using BlasterMaster.Main.UI;
 using BlasterMaster.Main.UI.Menus;
 using BlasterMaster.Main.UI.Menus.Settings;
@@ -184,6 +185,7 @@ public class BlasterMasterGame : Game
 		SoundEngine.LoadSounds();
 		MusicEngine.LoadMusic();
 		MusicEngine.PlayMusicTrack(ChooseRandomMenuMusic());
+		BlockLoader.LoadBlocks(GraphicsDevice);
 		
 		LoadTextures();
 		MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");

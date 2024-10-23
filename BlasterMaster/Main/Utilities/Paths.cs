@@ -66,6 +66,9 @@ public static class Paths
 	public static string PlayerSavePath { get; private set; } = "";
 	public static string WorldsSavePath { get; private set; } = "";
 	
+	// loading
+	public static string BlockTextures { get; private set; } = "";
+	
 	// update all paths when ContentRoot changes
 	private static void UpdatePaths()
 	{
@@ -88,5 +91,8 @@ public static class Paths
 		AudioManagerSavePath = ContentRoot + "/Saved/audiomanager.bin";
 		PlayerSavePath = ContentRoot + "/Saved/Players/";
 		WorldsSavePath = ContentRoot + "/Saved/Worlds/";
+		
+		// loading
+		BlockTextures = ContentRoot + "/Textures/Tiles";
 	}
 }
