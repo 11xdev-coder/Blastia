@@ -1,6 +1,6 @@
-using BlasterMaster.Main.Tiles.Common;
+using BlasterMaster.Main.Blocks.Common;
 
-namespace BlasterMaster.Main.Tiles;
+namespace BlasterMaster.Main.Blocks;
 
 public class Stone : Block 
 {

@@ -93,6 +93,6 @@ public static class Paths
 		WorldsSavePath = ContentRoot + "/Saved/Worlds/";
 		
 		// loading
-		BlockTextures = ContentRoot + "/Textures/Tiles";
+		BlockTextures = ContentRoot + "/Textures/Blocks";
 	}
 }

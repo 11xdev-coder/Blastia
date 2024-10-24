@@ -1,7 +1,7 @@
 using System.Data;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BlasterMaster.Main.Tiles.Common;
+namespace BlasterMaster.Main.Blocks.Common;
 
 public static class BlockRegistry 
 {

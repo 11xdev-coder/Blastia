@@ -2,17 +2,17 @@ using System.Reflection;
 using BlasterMaster.Main.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace BlasterMaster.Main.Tiles.Common;
+namespace BlasterMaster.Main.Blocks.Common;
 
 public static class BlockLoader 
 {
-	private const string TilesNamespace = "BlasterMaster.Main.Tiles";
+	private const string BlocksNamespace = "BlasterMaster.Main.Blocks";
 	
 	public static void LoadBlocks(GraphicsDevice graphicsDevice) 
 	{
 		// get all Block classes in namespace 
 		var blockTypes = Assembly.GetExecutingAssembly().GetTypes()
-		.Where(t => t.Namespace == TilesNamespace && !t.IsAbstract && t.IsClass && typeof(Block).IsAssignableFrom(t));
+		.Where(t => t.Namespace == BlocksNamespace && !t.IsAbstract && t.IsClass && typeof(Block).IsAssignableFrom(t));
 		
 		foreach (var blockType in blockTypes) 
 		{

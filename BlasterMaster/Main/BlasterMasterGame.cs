@@ -1,5 +1,5 @@
 ﻿using BlasterMaster.Main.Sounds;
-using BlasterMaster.Main.Tiles.Common;
+using BlasterMaster.Main.Blocks.Common;
 using BlasterMaster.Main.UI;
 using BlasterMaster.Main.UI.Menus;
 using BlasterMaster.Main.UI.Menus.Settings;

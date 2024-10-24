@@ -1,4 +1,4 @@
-namespace BlasterMaster.Main.Tiles.Common;
+namespace BlasterMaster.Main.Blocks.Common;
 
 [Serializable]
 public abstract class Block 
