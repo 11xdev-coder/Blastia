@@ -15,7 +15,7 @@ public static class BlockRegistry
 		// if ID is already present in Blocks
 		if (Blocks.ContainsKey(block.ID)) 
 		{
-			throw new Exception($"Tried registering duplicate block with ID: {block.ID}, name: {block.GetType().Name}. \n" +
+			throw new DuplicateNameException($"Tried registering duplicate block with ID: {block.ID}, name: {block.GetType().Name}. \n" +
 			$"ID already occupied by {Blocks[block.ID].GetType().Name}");
 		}
 		

@@ -34,20 +34,20 @@ public class PlayerEntity
         Position = position;
         
         // origin at the bottom
-        Head = new BodyPart(BlasterMasterGame.PlayerHead, new Vector2(0, -25), origin: 
-            new Vector2(BlasterMasterGame.PlayerHead.Width * 0.5f, BlasterMasterGame.PlayerHead.Height));
+        Head = new BodyPart(BlasterMasterGame.PlayerTextures.PlayerHead, new Vector2(0, -25), origin: 
+            new Vector2(BlasterMasterGame.PlayerTextures.PlayerHead.Width * 0.5f, BlasterMasterGame.PlayerTextures.PlayerHead.Height));
         // centered origin
-        Body = new BodyPart(BlasterMasterGame.PlayerBody, Vector2.Zero);
+        Body = new BodyPart(BlasterMasterGame.PlayerTextures.PlayerBody, Vector2.Zero);
         // right-top corner origin
-        LeftArm = new BodyPart(BlasterMasterGame.PlayerLeftArm, new Vector2(-14, -22), origin:
-            new Vector2(BlasterMasterGame.PlayerLeftArm.Width, 0f));
+        LeftArm = new BodyPart(BlasterMasterGame.PlayerTextures.PlayerLeftArm, new Vector2(-14, -22), origin:
+            new Vector2(BlasterMasterGame.PlayerTextures.PlayerLeftArm.Width, 0f));
         // left-top corner origin
-        RightArm = new BodyPart(BlasterMasterGame.PlayerRightArm, new Vector2(13, -22), origin:
+        RightArm = new BodyPart(BlasterMasterGame.PlayerTextures.PlayerRightArm, new Vector2(13, -22), origin:
             new Vector2(0f, 0f));
         // top origin
-        Vector2 topOrigin = new Vector2(BlasterMasterGame.PlayerLeg.Width * 0.5f, 0);
-        LeftLeg = new BodyPart(BlasterMasterGame.PlayerLeg, new Vector2(-7, 21), origin: topOrigin);
-        RightLeg = new BodyPart(BlasterMasterGame.PlayerLeg, new Vector2(11, 21), origin: topOrigin);
+        Vector2 topOrigin = new Vector2(BlasterMasterGame.PlayerTextures.PlayerLeg.Width * 0.5f, 0);
+        LeftLeg = new BodyPart(BlasterMasterGame.PlayerTextures.PlayerLeg, new Vector2(-7, 21), origin: topOrigin);
+        RightLeg = new BodyPart(BlasterMasterGame.PlayerTextures.PlayerLeg, new Vector2(11, 21), origin: topOrigin);
     }
 
     public void Update()

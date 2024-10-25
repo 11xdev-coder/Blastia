@@ -47,15 +47,14 @@ public class BlasterMasterGame : Game
 	public static Texture2D WhitePixel { get; private set; } = null!;
 	public static Texture2D InvisibleTexture { get; private set; } = null!;
 	
-	#region Player Textures
-
-	public static Texture2D PlayerHead { get; private set; } = null!;
-	public static Texture2D PlayerBody { get; private set; } = null!;
-	public static Texture2D PlayerLeftArm { get; private set; } = null!;
-	public static Texture2D PlayerRightArm { get; private set; } = null!;
-	public static Texture2D PlayerLeg { get; private set; } = null!;
-	
-	#endregion
+	public class PlayerTextures 
+	{
+		public static Texture2D PlayerHead { get; set; } = null!;
+		public static Texture2D PlayerBody { get; set; } = null!;
+		public static Texture2D PlayerLeftArm { get; set; } = null!;
+		public static Texture2D PlayerRightArm { get; set; } = null!;
+		public static Texture2D PlayerLeg { get; set; } = null!;
+	}
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -157,25 +156,21 @@ public class BlasterMasterGame : Game
 		
 		InvisibleTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.InvisibleTexturePath);
-		
-		#region Player Textures
-		
-		PlayerHead = LoadingUtilities.LoadTexture(GraphicsDevice,
+			
+		PlayerTextures.PlayerHead = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.PlayerHeadTexturePath);
 		
-		PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
+		PlayerTextures.PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.PlayerBodyTexturePath);
 		
-		PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+		PlayerTextures.PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.PlayerLeftArmTexturePath);
 		
-		PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
+		PlayerTextures.PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.PlayerRightArmTexturePath);
 		
-		PlayerLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
+		PlayerTextures.PlayerLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.PlayerLegTexturePath);
-		
-		#endregion
 	}
 	
 	protected override void LoadContent()
