@@ -8,6 +8,7 @@ using BlasterMaster.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using BlasterMaster.Main.GameState;
 
 namespace BlasterMaster.Main;
 
@@ -62,8 +63,7 @@ public class BlasterMasterGame : Game
 	public SpriteFont MainFont { get; private set; }
 	
 	
-	#region Menus
-	
+	// MENUS
 	public static LogoMenu? LogoMenu { get; private set; }
 	public static MainMenu? MainMenu { get; private set; }
 	public static PlayersMenu? PlayersMenu { get; private set; }
@@ -74,8 +74,6 @@ public class BlasterMasterGame : Game
 	public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
 	private readonly List<Menu> _menus;
-	
-	#endregion
 
 	/// <summary>
 	/// Event triggered when a request to exit the game is made.
@@ -90,11 +88,21 @@ public class BlasterMasterGame : Game
 	/// properly update when resolution has changed.
 	/// </summary>
 	private static event Action? ResolutionRequestEvent;
+	
+	/// <summary>
+	/// Event to request world initialization 
+	/// </summary>
+	private static event Action? RequestWorldInitializationEvent;
 
 	private static readonly Random Rand = new();
 
+	// COLORS
 	private double _colorTimer;
 	public static Color ErrorColor { get; private set; }
+	
+	// GAMESTATE
+	private World _currentWorld;
+	private Camera _gameCamera;
 	
 	public BlasterMasterGame()
 	{
@@ -122,6 +130,7 @@ public class BlasterMasterGame : Game
 		
 		ExitRequestEvent += OnExitRequested;
 		ResolutionRequestEvent += UpdateResolution;
+		RequestWorldInitializationEvent += InitializeWorld;
 	}
 
 	protected override void Initialize()
@@ -303,6 +312,11 @@ public class BlasterMasterGame : Game
 		SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
 			SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
 			null, matrix);
+			
+		if (_currentWorld != null) 
+		{
+			_currentWorld.Draw(SpriteBatch);
+		}
 		
 		foreach (Menu menu in _menus)
 		{
@@ -339,10 +353,24 @@ public class BlasterMasterGame : Game
 		ScreenWidth = GraphicsDevice.Viewport.Width;
 		ScreenHeight = GraphicsDevice.Viewport.Height;
 	}
-
-	private void AddMenu(Menu? menu)
+	
+	public static void RequestWorldInitialization() 
 	{
-		if(menu != null) _menus.Add(menu);
+		RequestWorldInitializationEvent?.Invoke();
+	}	
+	
+	private void InitializeWorld() 
+	{
+		// load the world if it is selected
+		if (PlayerManager.Instance.SelectedWorld == null) return;
+		
+		_gameCamera = new Camera(Vector2.Zero) 
+		{
+			DrawWidth = 100,
+			DrawHeight = 100
+		};
+		
+		_currentWorld = new World(PlayerManager.Instance.SelectedWorld, _gameCamera);
 	}
 
 	private void OnExitRequested()
@@ -356,5 +384,10 @@ public class BlasterMasterGame : Game
 	public static void RequestExit()
 	{
 		ExitRequestEvent?.Invoke();
+	}
+	
+	private void AddMenu(Menu? menu)
+	{
+		if (menu != null) _menus.Add(menu);
 	}
 }

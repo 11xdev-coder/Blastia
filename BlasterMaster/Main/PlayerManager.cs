@@ -54,7 +54,7 @@ public class PlayerManager : Singleton<PlayerManager>
 		throw new Exception("Save path not initialized.");
 	}
 
-	private List<T> LoadAll<T>(string? folder, string extension, Func<string, T> newInstanceCreator)
+	private List<T> LoadAll<T>(string? folder, string extension, Func<string, T> nameInstanceCreator)
 		where T : class
 	{
 		if (!string.IsNullOrEmpty(folder))
@@ -67,10 +67,19 @@ public class PlayerManager : Singleton<PlayerManager>
 				// if correct extension
 				if (file.EndsWith(extension))
 				{
-					// create new instance with file name
-					string name = Path.GetFileNameWithoutExtension(file);
-					T item = newInstanceCreator(name);
-					items.Add(item);
+					if (typeof(T) == typeof(WorldState)) 
+					{
+						// load additional data for WorldState
+						var loadedState = Saving.Load<WorldState>(file);
+						items.Add(loadedState as T);
+					}
+					else 
+					{
+						// create new instance with file name
+						string name = Path.GetFileNameWithoutExtension(file);
+						T item = nameInstanceCreator(name);
+						items.Add(item);
+					}					
 				}
 			}
 
@@ -121,7 +130,9 @@ public class PlayerManager : Singleton<PlayerManager>
 		
 	public void SelectWorld(WorldState worldState)
 	{
+		Console.WriteLine(worldState.WorldWidth);
 		SelectedWorld = worldState;
+		BlasterMasterGame.RequestWorldInitialization();
 	}
 	
 	private void GenerateWorldTiles(WorldState worldState) 
@@ -150,8 +161,8 @@ public class PlayerState
 public class WorldState
 {
 	public string Name { get; set; } = "";
-    public override string ToString() => Name;
-    public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
+	public override string ToString() => Name;
+	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
 	
 	// 1D to support serialization
 	public ushort[] Tiles { get; set; } = Array.Empty<ushort>();
