@@ -8,7 +8,7 @@ public class World
 {
 	private WorldState _state;
 	private Camera _camera;
-	private const int TILE_SIZE = 16;
+	private const int TILE_SIZE = 8;
 	
 	public World(WorldState state, Camera renderCamera) 
 	{
@@ -23,22 +23,16 @@ public class World
 		int endX = Math.Min(_state.WorldWidth, startX + (_camera.DrawWidth / TILE_SIZE) + 2);
 		int endY = Math.Min(_state.WorldHeight, startY + (_camera.DrawHeight / TILE_SIZE) + 2);
 		
-		Console.WriteLine($"startX calculation: {_camera.Position.X} / {TILE_SIZE} = {_camera.Position.X / TILE_SIZE}");
-	Console.WriteLine($"endX calculation: {startX} + ({_camera.DrawWidth} / {TILE_SIZE}) + 2 = {startX + (_camera.DrawWidth / TILE_SIZE) + 2}");
-	Console.WriteLine($"World Width: {_state.WorldWidth}");
 		for (int x = startX; x < endX; x++) 
 		{
 			for (int y = startY; y < endY; y++) 
 			{
 				ushort tileId = _state.GetTile(x, y);
-				Console.WriteLine(tileId);
 				if (tileId == 0) continue; // skip empty
 				
-				Console.WriteLine("ID is not 0");
 				Texture2D? tileTexture = BlockRegistry.GetTexture(tileId);
 				if (tileTexture == null) continue;
 				
-				Console.WriteLine("TExture is not null");
 				Vector2 tilePosition = new Vector2(x * TILE_SIZE - _camera.Position.X,
 						y * TILE_SIZE - _camera.Position.Y);
 						
