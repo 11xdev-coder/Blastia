@@ -15,7 +15,13 @@ public class Camera : Object
 		set => Properties.OnValueChangedProperty<Rectangle>(ref _renderRectangle, value, UpdateRenderRectangle);
 	}
 	
+	/// <summary>
+	/// in blocks *8 (tile_size = 8)
+	/// </summary>
 	public int DrawWidth;
+	/// <summary>
+	/// in blocks *8 (tile_size = 8)
+	/// </summary>
 	public int DrawHeight;
 	
 	public Camera(Vector2 position) 

@@ -8,7 +8,6 @@ public class World
 {
 	private WorldState _state;
 	private Camera _camera;
-	private const int TILE_SIZE = 8;
 	
 	public World(WorldState state, Camera renderCamera) 
 	{
@@ -18,10 +17,10 @@ public class World
 	
 	private void RenderTiles(SpriteBatch spriteBatch) 
 	{
-		int startX = Math.Max(0, (int) (_camera.Position.X / TILE_SIZE));
-		int startY = Math.Max(0, (int) (_camera.Position.Y / TILE_SIZE));
-		int endX = Math.Min(_state.WorldWidth, startX + (_camera.DrawWidth / TILE_SIZE) + 2);
-		int endY = Math.Min(_state.WorldHeight, startY + (_camera.DrawHeight / TILE_SIZE) + 2);
+		int startX = Math.Max(0, (int) (_camera.Position.X / Block.Size));
+		int startY = Math.Max(0, (int) (_camera.Position.Y / Block.Size));
+		int endX = Math.Min(_state.WorldWidth, startX + (_camera.DrawWidth / Block.Size));
+		int endY = Math.Min(_state.WorldHeight, startY + (_camera.DrawHeight / Block.Size));
 		
 		for (int x = startX; x < endX; x++) 
 		{
@@ -33,10 +32,12 @@ public class World
 				Texture2D? tileTexture = BlockRegistry.GetTexture(tileId);
 				if (tileTexture == null) continue;
 				
-				Vector2 tilePosition = new Vector2(x * TILE_SIZE - _camera.Position.X,
-						y * TILE_SIZE - _camera.Position.Y);
+				Vector2 tilePosition = new Vector2(x * Block.Size - _camera.Position.X,
+						y * Block.Size - _camera.Position.Y);
 						
-				spriteBatch.Draw(tileTexture, tilePosition, null, Color.White);				
+				Rectangle sourceRect = BlockRectangles.Middle;
+				
+				spriteBatch.Draw(tileTexture, tilePosition, sourceRect, Color.White);				
 			}
 		}
 	}

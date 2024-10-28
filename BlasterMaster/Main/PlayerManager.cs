@@ -89,11 +89,11 @@ public class PlayerManager : Singleton<PlayerManager>
 	// PLAYER
 	public void NewPlayer(string playerName) 
 	{
-		PlayerState stateData = new() 
+		PlayerState playerData = new() 
 		{
 			Name = playerName
 		};
-		New(_playersSaveFolder, playerName, ".bmplr", stateData);
+		New(_playersSaveFolder, playerName, ".bmplr", playerData);
 	}
 	public bool PlayerExists(string playerName) => Exists(_playersSaveFolder, playerName, ".bmplr");
 	public List<PlayerState> LoadAllPlayers() => LoadAll<PlayerState>(_playersSaveFolder, ".bmplr");

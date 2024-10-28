@@ -340,6 +340,7 @@ public class BlasterMasterGame : Game
 		return musicId;
 	}
 
+	// UPDATE RESOLUTION
 	/// <summary>
 	/// Requests to update the screen resolution by invoking the ResolutionRequestEvent.
 	/// </summary>
@@ -354,6 +355,7 @@ public class BlasterMasterGame : Game
 		ScreenHeight = GraphicsDevice.Viewport.Height;
 	}
 	
+	// WORLD INITIALIZATION
 	public static void RequestWorldInitialization() 
 	{
 		RequestWorldInitializationEvent?.Invoke();
@@ -366,18 +368,14 @@ public class BlasterMasterGame : Game
 		
 		_gameCamera = new Camera(Vector2.Zero) 
 		{
-			DrawWidth = 100,
-			DrawHeight = 100
+			DrawWidth = 8,
+			DrawHeight = 8
 		};
 		
 		_currentWorld = new World(PlayerManager.Instance.SelectedWorld, _gameCamera);
 	}
-
-	private void OnExitRequested()
-	{
-		Exit();
-	}
-
+	
+	// EXIT
 	/// <summary>
 	/// Requests to exit the game by invoking ExitRequestEvent
 	/// </summary>
@@ -385,7 +383,12 @@ public class BlasterMasterGame : Game
 	{
 		ExitRequestEvent?.Invoke();
 	}
-	
+
+	private void OnExitRequested()
+	{
+		Exit();
+	}
+		
 	private void AddMenu(Menu? menu)
 	{
 		if (menu != null) _menus.Add(menu);
