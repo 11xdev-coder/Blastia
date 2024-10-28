@@ -94,3 +94,4 @@ D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\P
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Invisible.png
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\UI\ProgressBarBG.png
 D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Blocks\Stone.png
+D:\Projects\BlasterMaster\BlasterMaster\bin\Debug\net8.0\Main\Content\Textures\Blocks\Dirt.png

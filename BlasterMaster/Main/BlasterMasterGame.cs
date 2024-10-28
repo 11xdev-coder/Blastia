@@ -21,6 +21,7 @@ public class BlasterMasterGame : Game
 	/// </summary>
 	private readonly GraphicsDeviceManager _graphics;
 	public static SpriteBatch SpriteBatch { get; private set; } = null!;
+	private SamplerState _pixelatedSamplerState;
 	
 	// TICK
 	public static GameTime GameTime { get; private set; } = new();
@@ -101,7 +102,6 @@ public class BlasterMasterGame : Game
 	public static Color ErrorColor { get; private set; }
 	
 	// GAMESTATE
-	private World _currentWorld;
 	private Camera _gameCamera;
 	
 	public BlasterMasterGame()
@@ -131,6 +131,13 @@ public class BlasterMasterGame : Game
 		ExitRequestEvent += OnExitRequested;
 		ResolutionRequestEvent += UpdateResolution;
 		RequestWorldInitializationEvent += InitializeWorld;
+		
+		_pixelatedSamplerState = new SamplerState() 
+		{
+			Filter = TextureFilter.Point,
+			AddressU = TextureAddressMode.Clamp,
+			AddressV = TextureAddressMode.Clamp
+		};
 	}
 
 	protected override void Initialize()
@@ -310,12 +317,12 @@ public class BlasterMasterGame : Game
 		var matrix = VideoManager.Instance.CalculateResolutionScaleMatrix();
 		
 		SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
-			SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
+			_pixelatedSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
 			null, matrix);
 			
-		if (_currentWorld != null) 
+		if (_gameCamera != null && PlayerManager.Instance.SelectedWorld != null) 
 		{
-			_currentWorld.Draw(SpriteBatch);
+			_gameCamera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
 		}
 		
 		foreach (Menu menu in _menus)
@@ -362,17 +369,12 @@ public class BlasterMasterGame : Game
 	}	
 	
 	private void InitializeWorld() 
-	{
-		// load the world if it is selected
-		if (PlayerManager.Instance.SelectedWorld == null) return;
-		
+	{		
 		_gameCamera = new Camera(Vector2.Zero) 
 		{
-			DrawWidth = 8,
-			DrawHeight = 8
+			DrawWidth = 32,
+			DrawHeight = 32
 		};
-		
-		_currentWorld = new World(PlayerManager.Instance.SelectedWorld, _gameCamera);
 	}
 	
 	// EXIT
