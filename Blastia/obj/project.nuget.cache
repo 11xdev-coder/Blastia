@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "emGNUj27KIA=",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\Blastia\\Blastia\\Blastia.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\matvei\\.nuget\\packages\\fna.net\\1.0.15.2403\\fna.net.1.0.15.2403.nupkg.sha512",
+    "C:\\Users\\matvei\\.nuget\\packages\\fna.net.nativeassets\\1.0.6.2403\\fna.net.nativeassets.1.0.6.2403.nupkg.sha512",
+    "C:\\Users\\matvei\\.nuget\\packages\\nvorbis\\0.10.5\\nvorbis.0.10.5.nupkg.sha512",
+    "C:\\Users\\matvei\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
+    "C:\\Users\\matvei\\.nuget\\packages\\system.valuetuple\\4.5.0\\system.valuetuple.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}

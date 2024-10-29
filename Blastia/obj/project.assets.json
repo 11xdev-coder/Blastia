@@ -1,0 +1,372 @@
+{
+  "version": 3,
+  "targets": {
+    "net8.0": {
+      "FNA.NET/1.0.15.2403": {
+        "type": "package",
+        "dependencies": {
+          "FNA.NET.NativeAssets": "1.0.6.2403",
+          "NVorbis": "0.10.5"
+        },
+        "compile": {
+          "lib/net8.0/FNA.NET.dll": {
+            "related": ".pdb"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/FNA.NET.dll": {
+            "related": ".pdb"
+          }
+        },
+        "build": {
+          "buildTransitive/FNA.NET.targets": {}
+        }
+      },
+      "FNA.NET.NativeAssets/1.0.6.2403": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/FNA.NET.NativeAssets.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/FNA.NET.NativeAssets.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libFAudio.so.0": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/linux-x64/native/libFNA3D.so.0": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/linux-x64/native/libSDL2-2.0.so.0": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/linux-x64/native/libtheorafile.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/osx/native/libFAudio.0.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/osx/native/libFNA3D.0.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/osx/native/libSDL2-2.0.0.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/osx/native/libtheorafile.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/win-x64/native/FAudio.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x64/native/FNA3D.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x64/native/SDL2.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x64/native/libtheorafile.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          }
+        }
+      },
+      "NVorbis/0.10.5": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.3",
+          "System.ValueTuple": "4.5.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/NVorbis.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/NVorbis.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "System.Memory/4.5.3": {
+        "type": "package",
+        "compile": {
+          "ref/netcoreapp2.1/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.1/_._": {}
+        }
+      },
+      "System.ValueTuple/4.5.0": {
+        "type": "package",
+        "compile": {
+          "ref/netcoreapp2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/_._": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "FNA.NET/1.0.15.2403": {
+      "sha512": "cB0C9hsZQxH27BztcciGK2y5zVwj2Bmu7EJ95dQzrV/d6bdqnz+PqdVAjhuYngkKt6JVP7I1utV7JiNusfa38w==",
+      "type": "package",
+      "path": "fna.net/1.0.15.2403",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "README.md",
+        "build/FNA.NET.targets",
+        "buildTransitive/FNA.NET.targets",
+        "contentFiles/FNA.NET.dll.config",
+        "fna.net.1.0.15.2403.nupkg.sha512",
+        "fna.net.nuspec",
+        "lib/net8.0-android34.0/FNA.NET.dll",
+        "lib/net8.0-android34.0/FNA.NET.pdb",
+        "lib/net8.0-android34.0/FNA.NET.xml",
+        "lib/net8.0-ios17.2/FNA.NET.dll",
+        "lib/net8.0-ios17.2/FNA.NET.pdb",
+        "lib/net8.0-tvos17.2/FNA.NET.dll",
+        "lib/net8.0-tvos17.2/FNA.NET.pdb",
+        "lib/net8.0-windows7.0/FNA.NET.dll",
+        "lib/net8.0-windows7.0/FNA.NET.pdb",
+        "lib/net8.0/FNA.NET.dll",
+        "lib/net8.0/FNA.NET.pdb",
+        "lib/netstandard2.0/FNA.NET.dll",
+        "lib/netstandard2.0/FNA.NET.pdb"
+      ]
+    },
+    "FNA.NET.NativeAssets/1.0.6.2403": {
+      "sha512": "V0I9rmIJOJHh0CmVkdsMbp05A4eR3Zv6va1yqpmfAMiylk5Yp+wzEEw/yuwyuMrfE9056uTA4SqPhMWC/mKdKQ==",
+      "type": "package",
+      "path": "fna.net.nativeassets/1.0.6.2403",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "fna.net.nativeassets.1.0.6.2403.nupkg.sha512",
+        "fna.net.nativeassets.nuspec",
+        "lib/net8.0-android34.0/FNA.NET.NativeAssets.aar",
+        "lib/net8.0-android34.0/FNA.NET.NativeAssets.dll",
+        "lib/net8.0-android34.0/FNA.NET.NativeAssets.xml",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.dll",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/FAudio.xcframework/Info.plist",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/FAudio.xcframework/ios-arm64/libFAudio.a",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/FAudio.xcframework/ios-arm64_x86_64-simulator/libFAudio.a",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/FNA3D.xcframework/Info.plist",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/FNA3D.xcframework/ios-arm64/libFNA3D.a",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/FNA3D.xcframework/ios-arm64_x86_64-simulator/libFNA3D.a",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/SDL2.xcframework/Info.plist",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/SDL2.xcframework/ios-arm64/libSDL2.a",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/SDL2.xcframework/ios-arm64_x86_64-simulator/libSDL2.a",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/manifest",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/theorafile.xcframework/Info.plist",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/theorafile.xcframework/ios-arm64/libtheorafile.a",
+        "lib/net8.0-ios17.2/FNA.NET.NativeAssets.resources/theorafile.xcframework/ios-arm64_x86_64-simulator/libtheorafile.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.dll",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/FAudio.xcframework/Info.plist",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/FAudio.xcframework/tvos-arm64/libFAudio.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/FAudio.xcframework/tvos-arm64_x86_64-simulator/libFAudio.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/FNA3D.xcframework/Info.plist",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/FNA3D.xcframework/tvos-arm64/libFNA3D.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/FNA3D.xcframework/tvos-arm64_x86_64-simulator/libFNA3D.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/SDL2.xcframework/Info.plist",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/SDL2.xcframework/tvos-arm64/libSDL2.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/SDL2.xcframework/tvos-arm64_x86_64-simulator/libSDL2.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/manifest",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/theorafile.xcframework/Info.plist",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/theorafile.xcframework/tvos-arm64/libtheorafile.a",
+        "lib/net8.0-tvos17.2/FNA.NET.NativeAssets.resources/theorafile.xcframework/tvos-arm64_x86_64-simulator/libtheorafile.a",
+        "lib/net8.0-windows7.0/FNA.NET.NativeAssets.dll",
+        "lib/net8.0/FNA.NET.NativeAssets.dll",
+        "lib/netstandard2.0/FNA.NET.NativeAssets.dll",
+        "runtimes/linux-x64/native/libFAudio.so.0",
+        "runtimes/linux-x64/native/libFNA3D.so.0",
+        "runtimes/linux-x64/native/libSDL2-2.0.so.0",
+        "runtimes/linux-x64/native/libtheorafile.so",
+        "runtimes/osx/native/libFAudio.0.dylib",
+        "runtimes/osx/native/libFNA3D.0.dylib",
+        "runtimes/osx/native/libSDL2-2.0.0.dylib",
+        "runtimes/osx/native/libtheorafile.dylib",
+        "runtimes/win-x64/native/FAudio.dll",
+        "runtimes/win-x64/native/FNA3D.dll",
+        "runtimes/win-x64/native/SDL2.dll",
+        "runtimes/win-x64/native/libtheorafile.dll"
+      ]
+    },
+    "NVorbis/0.10.5": {
+      "sha512": "o+IptCG4Avze39HrGeztC+xIp6fOOwGVAwkoa1J++4Ji1WmZ+KIKlFl5wsgxsXqBkmdpfs/vFSUproiLKYa2bw==",
+      "type": "package",
+      "path": "nvorbis/0.10.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "lib/net45/NVorbis.dll",
+        "lib/net45/NVorbis.xml",
+        "lib/netstandard2.0/NVorbis.dll",
+        "lib/netstandard2.0/NVorbis.xml",
+        "nvorbis.0.10.5.nupkg.sha512",
+        "nvorbis.nuspec"
+      ]
+    },
+    "System.Memory/4.5.3": {
+      "sha512": "3oDzvc/zzetpTKWMShs1AADwZjQ/36HnsufHRPcOjyRAAMLDlu2iD33MBI2opxnezcVUtXyqDXXjoFMOU9c7SA==",
+      "type": "package",
+      "path": "system.memory/4.5.3",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/netcoreapp2.1/_._",
+        "lib/netstandard1.1/System.Memory.dll",
+        "lib/netstandard1.1/System.Memory.xml",
+        "lib/netstandard2.0/System.Memory.dll",
+        "lib/netstandard2.0/System.Memory.xml",
+        "ref/netcoreapp2.1/_._",
+        "system.memory.4.5.3.nupkg.sha512",
+        "system.memory.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "System.ValueTuple/4.5.0": {
+      "sha512": "okurQJO6NRE/apDIP23ajJ0hpiNmJ+f0BwOlB/cSqTLQlw5upkf+5+96+iG2Jw40G1fCVCyPz/FhIABUjMR+RQ==",
+      "type": "package",
+      "path": "system.valuetuple/4.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net461/System.ValueTuple.dll",
+        "lib/net461/System.ValueTuple.xml",
+        "lib/net47/System.ValueTuple.dll",
+        "lib/net47/System.ValueTuple.xml",
+        "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.0/System.ValueTuple.dll",
+        "lib/netstandard1.0/System.ValueTuple.xml",
+        "lib/netstandard2.0/_._",
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.xml",
+        "lib/uap10.0.16299/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net461/System.ValueTuple.dll",
+        "ref/net47/System.ValueTuple.dll",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard2.0/_._",
+        "ref/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "ref/uap10.0.16299/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "system.valuetuple.4.5.0.nupkg.sha512",
+        "system.valuetuple.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net8.0": [
+      "FNA.NET >= 1.0.15.2403"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\matvei\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "D:\\Projects\\Blastia\\Blastia\\Blastia.csproj",
+      "projectName": "Blastia",
+      "projectPath": "D:\\Projects\\Blastia\\Blastia\\Blastia.csproj",
+      "packagesPath": "C:\\Users\\matvei\\.nuget\\packages\\",
+      "outputPath": "D:\\Projects\\Blastia\\Blastia\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\matvei\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net8.0"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
+        "C:\\Users\\matvei\\AppData\\Roaming\\Cosmos User Kit\\packages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      }
+    },
+    "frameworks": {
+      "net8.0": {
+        "targetAlias": "net8.0",
+        "dependencies": {
+          "FNA.NET": {
+            "target": "Package",
+            "version": "[1.0.15.2403, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48",
+          "net481"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.206/PortableRuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
