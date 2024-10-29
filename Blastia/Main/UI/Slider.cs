@@ -63,8 +63,6 @@ public class Slider : Button
     {
         Percent = _getValue();
         UpdateSliderPosition();
-        
-        Console.WriteLine($"Slider loaded percent: {Percent}");
     }
 
     private void UpdateBackgroundImagePositionAndBounds()

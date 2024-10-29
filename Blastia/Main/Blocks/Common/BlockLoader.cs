@@ -32,8 +32,6 @@ public static class BlockLoader
 					// register
 					var texture = LoadingUtilities.LoadTexture(graphicsDevice, texturePath);					
 					BlockRegistry.RegisterBlock(block, texture);
-					
-					Console.WriteLine($"Registered block with ID: {block.ID}");
 				}
 			}
 			catch (Exception e)

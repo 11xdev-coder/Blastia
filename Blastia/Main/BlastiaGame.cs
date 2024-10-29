@@ -103,6 +103,7 @@ public class BlastiaGame : Game
 	
 	// GAMESTATE
 	private Camera _gameCamera;
+	public bool IsWorldInitialized { get; private set; }
 	
 	public BlastiaGame()
 	{
@@ -123,7 +124,7 @@ public class BlastiaGame : Game
 		AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
 		// load player manager
 		PlayerManager.Instance.Initialize();
-		Console.WriteLine(Paths.GetSaveGameDirectory());
+		Console.WriteLine($"Save game directory: {Paths.GetSaveGameDirectory()}");
 		
 		ExitRequestEvent += OnExitRequested;
 		ResolutionRequestEvent += UpdateResolution;
@@ -246,6 +247,11 @@ public class BlastiaGame : Game
 		UpdateMouseState();
 		UpdateKeyboardState();
 
+		if (IsWorldInitialized)
+		{
+			_gameCamera.Update();
+		}
+
 		foreach (Menu menu in _menus)
 		{
 			if (menu.Active)
@@ -316,8 +322,8 @@ public class BlastiaGame : Game
 		SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
 			_pixelatedSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
 			null, matrix);
-			
-		if (_gameCamera != null && PlayerManager.Instance.SelectedWorld != null) 
+		
+		if (IsWorldInitialized && PlayerManager.Instance.SelectedWorld != null)
 		{
 			_gameCamera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
 		}
@@ -372,6 +378,8 @@ public class BlastiaGame : Game
 			DrawWidth = 32,
 			DrawHeight = 32
 		};
+
+		IsWorldInitialized = true;
 	}
 	
 	// EXIT

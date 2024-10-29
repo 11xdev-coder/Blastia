@@ -40,4 +40,14 @@ public static class MathUtilities
 
         return Color.Lerp(startColor, endColor, normalizedTime);
     }
+
+    /// <summary>
+    /// Same as (int) Math.Round(value) -> Rounds the float and casts to int
+    /// </summary>
+    /// <param name="value">Value to round</param>
+    /// <returns>Smoothly rounded value</returns>
+    public static int SmoothRound(float value)
+    {
+        return (int) Math.Round(value);
+    }
 }

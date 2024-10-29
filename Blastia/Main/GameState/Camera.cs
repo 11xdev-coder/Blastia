@@ -1,6 +1,8 @@
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Blastia.Main.GameState;
 
@@ -27,11 +29,29 @@ public class Camera : Object
 	
 	private void UpdateRenderRectangle() 
 	{
-		RenderRectangle = new Rectangle((int) Position.X, (int) Position.Y, DrawWidth, DrawHeight);
+		RenderRectangle = new Rectangle(MathUtilities.SmoothRound(Position.X), MathUtilities.SmoothRound(Position.Y), 
+			DrawWidth, DrawHeight);
 	}
 
-	protected override void Update()
+	public override void Update()
 	{
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.A))
+		{
+			Position.X -= 0.25f;
+		}
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.S))
+		{
+			Position.Y += 0.25f;
+		}
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.D))
+		{
+			Position.X += 0.25f;
+		}
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.W))
+		{
+			Position.Y -= 0.25f;
+		}
+		
 		UpdateRenderRectangle();
 	}
 
@@ -64,8 +84,9 @@ public class Camera : Object
 				// subtract camera position -> scrolling (camera moves right -> move tile to the left)
 				float worldPositionX = x * Block.Size - Position.X;
 				float worldPositionY = y * Block.Size - Position.Y;
-				Rectangle destRect = new Rectangle((int) worldPositionX * CameraScale, (int) worldPositionY * CameraScale, 
-								scaledBlockSize, scaledBlockSize);
+				Rectangle destRect = new Rectangle(MathUtilities.SmoothRound(worldPositionX * CameraScale), 
+					MathUtilities.SmoothRound(worldPositionY * CameraScale), 
+					scaledBlockSize, scaledBlockSize);
 						
 				Rectangle sourceRect = BlockRectangles.All;
 				

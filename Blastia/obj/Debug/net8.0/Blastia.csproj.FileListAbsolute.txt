@@ -8,8 +8,6 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_26_Regular.x
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_8_Regular.xnb
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_9_Regular.xnb
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Arial.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Saved\audiomanager.bin
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Saved\videomanager.bin
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_00.ogg
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_01.ogg
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_02.ogg
