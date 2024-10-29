@@ -40,7 +40,7 @@ public class VideoSettingsMenu : Menu
     private void OnClickBack()
     {
         SwitchToMenu(BlastiaGame.SettingsMenu);
-        VideoManager.Instance.SaveStateToFile();
+        VideoManager.Instance.SaveStateToFile<VideoManagerState>();
     }
 
     private void OnClickFullScreen()

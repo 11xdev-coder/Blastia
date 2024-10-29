@@ -79,6 +79,6 @@ public class AudioSettingsMenu : Menu
     private void OnClickBack()
     {
         SwitchToMenu(BlastiaGame.SettingsMenu);
-        AudioManager.Instance.SaveStateToFile();
+        AudioManager.Instance.SaveStateToFile<AudioManagerState>();
     }
 }

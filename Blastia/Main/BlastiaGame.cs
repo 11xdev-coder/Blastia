@@ -116,13 +116,11 @@ public class BlastiaGame : Game
 		MusicEngine.Initialize(Content);
 		
 		// initialize video manager with graphics manager
-		string videoManagerSavePath = Paths.VideoManagerSavePath;
-		VideoManager.Instance.Initialize(_graphics, videoManagerSavePath);
-		VideoManager.Instance.LoadStateFromFile();
+		VideoManager.Instance.Initialize(_graphics);
+		VideoManager.Instance.LoadStateFromFile<VideoManagerState>();
 		// load audio manager
-		string audioManagerSavePath = Paths.AudioManagerSavePath;
-		AudioManager.Instance.Initialize(audioManagerSavePath);
-		AudioManager.Instance.LoadStateFromFile();
+		AudioManager.Instance.Initialize();
+		AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
 		// load player manager
 		string playersSavePath = Paths.PlayerSavePath;
 		string worldsSavePath = Paths.WorldsSavePath;
@@ -133,7 +131,7 @@ public class BlastiaGame : Game
 		ResolutionRequestEvent += UpdateResolution;
 		RequestWorldInitializationEvent += InitializeWorld;
 		
-		_pixelatedSamplerState = new SamplerState() 
+		_pixelatedSamplerState = new SamplerState
 		{
 			Filter = TextureFilter.Point,
 			AddressU = TextureAddressMode.Clamp,

@@ -3,10 +3,10 @@ using Blastia.Main.Utilities;
 
 namespace Blastia.Main;
 
-public class AudioManager : Singleton<AudioManager>
+public class AudioManager : ManagerWithStateSaving<AudioManager>
 {
-    private string? _savePath;
-
+    protected override string SaveFileName => "audiomanager.bin";
+    
     private float _masterVolume = 1;
     public float MasterVolume
     {
@@ -23,44 +23,27 @@ public class AudioManager : Singleton<AudioManager>
     
     public float SoundsVolume = 1;
 
-    public void Initialize(string savePath)
+    protected override TState GetState<TState>()
     {
-        _savePath = savePath;
-    }
-
-    private AudioManagerState GetState()
-    {
-        return new AudioManagerState
+        var state =  new AudioManagerState
         {
             MasterVolume = MasterVolume,
             SoundsVolume = SoundsVolume,
             MusicVolume = MusicVolume
         };
+        
+        return (TState)(object) state;
     }
 
-    private void SetState(AudioManagerState state)
+    protected override void SetState<TState>(TState state)
     {
-        MasterVolume = state.MasterVolume;
-        SoundsVolume = state.SoundsVolume;
-        MusicVolume = state.MusicVolume;
-    }
-
-    public void SaveStateToFile()
-    {
-        if (_savePath != null)
+        if (state is AudioManagerState audioState)
         {
-            var state = GetState();
-            Saving.Save(_savePath, state);
+            MasterVolume = audioState.MasterVolume;
+            SoundsVolume = audioState.SoundsVolume;
+            MusicVolume = audioState.MusicVolume;
         }
-    }
-
-    public void LoadStateFromFile()
-    {
-        if (_savePath != null)
-        {
-            var state = Saving.Load<AudioManagerState>(_savePath);
-            SetState(state);
-        }
+        else throw new ArgumentException("Invalid state type. Expected AudioManagerState.");
     }
 }
 

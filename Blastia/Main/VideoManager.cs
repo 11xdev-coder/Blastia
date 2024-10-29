@@ -5,10 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main;
 
-public class VideoManager : Singleton<VideoManager>
+public class VideoManager : ManagerWithStateSaving<VideoManager>
 {
     private GraphicsDeviceManager? _graphics;
-    private string? _savePath;
+    protected override string SaveFileName => "videomanager.bin";
     
     // if graphics are null -> false
     // property will update on itself
@@ -29,10 +29,11 @@ public class VideoManager : Singleton<VideoManager>
     
     public readonly Vector2 TargetResolution = new (1920, 1080);
 
-    public void Initialize(GraphicsDeviceManager graphics, string savePath)
+    public void Initialize(GraphicsDeviceManager graphics)
     {
+        base.Initialize();
+        
         _graphics = graphics;
-        _savePath = savePath;
         
         ResolutionHandler = new ResolutionListHandler();
     }
@@ -86,39 +87,27 @@ public class VideoManager : Singleton<VideoManager>
         return resolutions;
     }
 
-    private VideoManagerState GetState()
+    protected override TState GetState<TState>()
     {
-        return new VideoManagerState
+        var state =  new VideoManagerState
         {
             IsFullScreen = IsFullScreen,
             ResolutionIndex = ResolutionHandler.CurrentIndex
         };
+        
+        return (TState)(object) state;
     }
 
-    private void SetState(VideoManagerState state)
+    protected override void SetState<TState>(TState state)
     {
-        SetFullscreen(state.IsFullScreen);
-        SetResolutionByIndex(state.ResolutionIndex);
-    }
-
-    public void SaveStateToFile()
-    {
-        if (_savePath != null)
+        if (state is VideoManagerState videoState)
         {
-            var state = GetState();
-            Saving.Save(_savePath, state);
+            SetFullscreen(videoState.IsFullScreen);
+            SetResolutionByIndex(videoState.ResolutionIndex);
         }
+        else throw new ArgumentException("Invalid state type. Expected VideoManagerState.");
     }
-
-    public void LoadStateFromFile()
-    {
-        if (_savePath != null)
-        {
-            var state = Saving.Load<VideoManagerState>(_savePath);
-            SetState(state);
-        }
-    }
-
+    
     public Matrix CalculateResolutionScaleMatrix()
     {
         if (_graphics != null)

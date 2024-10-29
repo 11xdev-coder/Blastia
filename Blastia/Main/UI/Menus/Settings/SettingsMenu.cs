@@ -39,13 +39,13 @@ public class SettingsMenu : Menu
 
     private void OnClickAudioSettings()
     {
-        AudioManager.Instance.LoadStateFromFile();
+        AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
         SwitchToMenu(BlastiaGame.AudioSettingsMenu);
     }
 
     private void OnClickVideoSettings()
     {
-        VideoManager.Instance.LoadStateFromFile();
+        VideoManager.Instance.LoadStateFromFile<VideoManagerState>();
         SwitchToMenu(BlastiaGame.VideoSettingsMenu);
     }
 }
