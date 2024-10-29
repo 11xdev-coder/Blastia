@@ -6,6 +6,9 @@ using BlasterMaster.Main.Utilities.ListHandlers;
 
 namespace BlasterMaster.Main;
 
+public enum SaveFolder { Player, World }
+public enum Extension { Player, World }
+
 public class PlayerManager : Singleton<PlayerManager>
 {
 	private string? _playersSaveFolder;
@@ -20,8 +23,12 @@ public class PlayerManager : Singleton<PlayerManager>
 		_worldsSaveFolder = worldsSaveFolder;
 	}
 
-	private void New(string? folder, string name, string extension, object? data = null)
+	
+	private void New(SaveFolder folderType, string name, Extension extensionType, object? data = null)
 	{
+		string? folder = GetFolder(folderType);
+		string extension = GetExtension(extensionType);
+		
 		if (!string.IsNullOrEmpty(folder))
 		{
 			string fileName = GetPath(folder, name, extension);
@@ -39,11 +46,14 @@ public class PlayerManager : Singleton<PlayerManager>
 				}				
 			}
 		}
-		else throw new Exception("Save path not initialized.");
+		else throw new Exception("Provided folder path is null.");
 	}
 
-	private bool Exists(string? folder, string name, string extension)
+	private bool Exists(SaveFolder folderType, string name, Extension extensionType)
 	{
+		string? folder = GetFolder(folderType);
+		string extension = GetExtension(extensionType);
+		
 		if (!string.IsNullOrEmpty(folder))
 		{
 			// search at folder/name.extension
@@ -51,12 +61,15 @@ public class PlayerManager : Singleton<PlayerManager>
 			return File.Exists(fileName);
 		}
 		
-		throw new Exception("Save path not initialized.");
+		throw new Exception("Provided folder path is null.");
 	}
 
-	private List<T> LoadAll<T>(string? folder, string extension)
+	private List<T> LoadAll<T>(SaveFolder folderType, Extension extensionType)
 		where T : new()
 	{
+		string? folder = GetFolder(folderType);
+		string extension = GetExtension(extensionType);
+		
 		if (!string.IsNullOrEmpty(folder))
 		{
 			List<T> items = new List<T>();
@@ -86,6 +99,30 @@ public class PlayerManager : Singleton<PlayerManager>
 		return Path.Combine(folder, name + extension);
 	}
 	
+	private string? GetFolder(SaveFolder folderType) 
+	{
+		string? folder = folderType switch 
+		{
+			SaveFolder.Player => _playersSaveFolder,
+			SaveFolder.World => _worldsSaveFolder,
+			_ => ""
+		};
+		
+		return folder;
+	}
+	
+	private string GetExtension(Extension extensionType) 
+	{
+		string extension = extensionType switch
+		{
+			Extension.Player => ".bmplr",
+			Extension.World => ".bmwld",
+			_ => ""
+		};
+		
+		return extension;
+	}
+	
 	// PLAYER
 	public void NewPlayer(string playerName) 
 	{
@@ -93,10 +130,10 @@ public class PlayerManager : Singleton<PlayerManager>
 		{
 			Name = playerName
 		};
-		New(_playersSaveFolder, playerName, ".bmplr", playerData);
+		New(SaveFolder.Player, playerName, Extension.Player, playerData);
 	}
-	public bool PlayerExists(string playerName) => Exists(_playersSaveFolder, playerName, ".bmplr");
-	public List<PlayerState> LoadAllPlayers() => LoadAll<PlayerState>(_playersSaveFolder, ".bmplr");
+	public bool PlayerExists(string playerName) => Exists(SaveFolder.Player, playerName, Extension.Player);
+	public List<PlayerState> LoadAllPlayers() => LoadAll<PlayerState>(SaveFolder.Player, Extension.Player);
 
 	public void SelectPlayer(PlayerState playerState)
 	{
@@ -117,11 +154,11 @@ public class PlayerManager : Singleton<PlayerManager>
 		};
 		GenerateWorldTiles(worldData);
 		
-		New(_worldsSaveFolder, worldName, ".bmwld", worldData);
+		New(SaveFolder.World, worldName, Extension.World, worldData);
 	}
 	
-	public bool WorldExists(string worldName) => Exists(_worldsSaveFolder, worldName, ".bmwld");
-	public List<WorldState> LoadAllWorlds() => LoadAll<WorldState>(_worldsSaveFolder, ".bmwld");
+	public bool WorldExists(string worldName) => Exists(SaveFolder.World, worldName, Extension.World);
+	public List<WorldState> LoadAllWorlds() => LoadAll<WorldState>(SaveFolder.World, Extension.World);
 		
 	public void SelectWorld(WorldState worldState)
 	{

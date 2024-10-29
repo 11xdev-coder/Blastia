@@ -7,15 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace BlasterMaster.Main.GameState;
 
 public class Camera : Object
-{
-	public Vector2 Position;
-	
-	private Rectangle _renderRectangle;
-	public Rectangle RenderRectangle 
-	{
-		get => _renderRectangle;
-		set => Properties.OnValueChangedProperty<Rectangle>(ref _renderRectangle, value, UpdateRenderRectangle);
-	}
+{	
+	public Rectangle RenderRectangle;
 	
 	/// <summary>
 	/// in blocks *8 (tile_size = 8)
@@ -26,7 +19,7 @@ public class Camera : Object
 	/// </summary>
 	public int DrawHeight;
 	
-	public int WorldScale = 5;
+	public int CameraScale = 5;
 	
 	public Camera(Vector2 position) 
 	{
@@ -41,7 +34,7 @@ public class Camera : Object
 
 	protected override void Update()
 	{
-		
+		UpdateRenderRectangle();
 	}
 
 	protected override void Draw()
@@ -51,13 +44,15 @@ public class Camera : Object
 	
 	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState) 
 	{
+		// get corners in tiles
 		int startX = Math.Max(0, (int) (Position.X / Block.Size));
 		int startY = Math.Max(0, (int) (Position.Y / Block.Size));
 		int endX = Math.Min(worldState.WorldWidth, startX + (DrawWidth / Block.Size));
 		int endY = Math.Min(worldState.WorldHeight, startY + (DrawHeight / Block.Size));
 		
-		int scaledBlockSize = Block.Size * WorldScale;
+		int scaledBlockSize = Block.Size * CameraScale;
 		
+		// go through each tile
 		for (int x = startX; x < endX; x++) 
 		{
 			for (int y = startY; y < endY; y++) 
@@ -68,9 +63,10 @@ public class Camera : Object
 				Texture2D? tileTexture = BlockRegistry.GetTexture(tileId);
 				if (tileTexture == null) continue;
 				
-				float tilePositionX = (x * Block.Size - Position.X) * WorldScale;
-				float tilePositionY = (y * Block.Size - Position.Y) * WorldScale;
-				Rectangle destRect = new Rectangle((int) tilePositionX, (int) tilePositionY, 
+				// subtract camera position -> scrolling (camera moves right -> move tile to the left)
+				float worldPositionX = x * Block.Size - Position.X;
+				float worldPositionY = y * Block.Size - Position.Y;
+				Rectangle destRect = new Rectangle((int) worldPositionX * CameraScale, (int) worldPositionY * CameraScale, 
 								scaledBlockSize, scaledBlockSize);
 						
 				Rectangle sourceRect = BlockRectangles.All;
