@@ -122,9 +122,7 @@ public class BlastiaGame : Game
 		AudioManager.Instance.Initialize();
 		AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
 		// load player manager
-		string playersSavePath = Paths.PlayerSavePath;
-		string worldsSavePath = Paths.WorldsSavePath;
-		PlayerManager.Instance.Initialize(playersSavePath, worldsSavePath);
+		PlayerManager.Instance.Initialize();
 		Console.WriteLine(Paths.GetSaveGameDirectory());
 		
 		ExitRequestEvent += OnExitRequested;

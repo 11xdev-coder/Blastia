@@ -15,13 +15,16 @@ public class PlayerManager : Singleton<PlayerManager>
 	public PlayerState? SelectedPlayer { get; private set; }
 	public WorldState? SelectedWorld { get; private set; }
 
-	public void Initialize(string playersSaveFolder, string worldsSaveFolder)
+	public void Initialize()
 	{
-		_playersSaveFolder = playersSaveFolder;
-		_worldsSaveFolder = worldsSaveFolder;
+		_playersSaveFolder = Path.Combine(Paths.GetSaveGameDirectory(), "Players");
+		_worldsSaveFolder = Path.Combine(Paths.GetSaveGameDirectory(), "Worlds");
+		
+		// create folders if dont exist
+		if (!Directory.Exists(_playersSaveFolder)) Directory.CreateDirectory(_playersSaveFolder);
+		if (!Directory.Exists(_worldsSaveFolder)) Directory.CreateDirectory(_worldsSaveFolder);
 	}
 
-	// TODO: saving in documents ?
 	// TODO: event notifications
 	// TODO: flatbuffers (remake serialization)
 	// TODO: IDisposable
