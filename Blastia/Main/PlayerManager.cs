@@ -9,8 +9,8 @@ public enum Extension { Player, World }
 
 public class PlayerManager : Singleton<PlayerManager>
 {
-	private string? _playersSaveFolder;
-	private string? _worldsSaveFolder;
+	private string _playersSaveFolder = "";
+	private string _worldsSaveFolder = "";
 	
 	public PlayerState? SelectedPlayer { get; private set; }
 	public WorldState? SelectedWorld { get; private set; }
@@ -25,12 +25,11 @@ public class PlayerManager : Singleton<PlayerManager>
 		if (!Directory.Exists(_worldsSaveFolder)) Directory.CreateDirectory(_worldsSaveFolder);
 	}
 
-	// TODO: event notifications
 	// TODO: flatbuffers (remake serialization)
 	// TODO: IDisposable
 	private void New(SaveFolder folderType, string name, Extension extensionType, object? data = null)
 	{
-		string? folder = GetFolder(folderType);
+		string folder = GetFolder(folderType);
 		string extension = GetExtension(extensionType);
 		
 		if (!string.IsNullOrEmpty(folder))
@@ -55,7 +54,7 @@ public class PlayerManager : Singleton<PlayerManager>
 
 	private bool Exists(SaveFolder folderType, string name, Extension extensionType)
 	{
-		string? folder = GetFolder(folderType);
+		string folder = GetFolder(folderType);
 		string extension = GetExtension(extensionType);
 		
 		if (!string.IsNullOrEmpty(folder))
@@ -71,7 +70,7 @@ public class PlayerManager : Singleton<PlayerManager>
 	private List<T> LoadAll<T>(SaveFolder folderType, Extension extensionType)
 		where T : new()
 	{
-		string? folder = GetFolder(folderType);
+		string folder = GetFolder(folderType);
 		string extension = GetExtension(extensionType);
 		
 		if (!string.IsNullOrEmpty(folder))
@@ -103,9 +102,9 @@ public class PlayerManager : Singleton<PlayerManager>
 		return Path.Combine(folder, name + extension);
 	}
 	
-	private string? GetFolder(SaveFolder folderType) 
+	private string GetFolder(SaveFolder folderType) 
 	{
-		string? folder = folderType switch 
+		string folder = folderType switch 
 		{
 			SaveFolder.Player => _playersSaveFolder,
 			SaveFolder.World => _worldsSaveFolder,
@@ -200,7 +199,7 @@ public class WorldState
 	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
 	
 	// 1D to support serialization
-	public ushort[] Tiles { get; set; } = Array.Empty<ushort>();
+	public ushort[] Tiles { get; set; } = [];
 	public int WorldWidth { get; set; }
 	public int WorldHeight { get; set; }
 	
@@ -209,7 +208,7 @@ public class WorldState
 		return Tiles[y * WorldWidth + x];
 	}
 	
-	 public void SetTile(int x, int y, ushort value)
+	public void SetTile(int x, int y, ushort value)
 	{
 		Tiles[y * WorldWidth + x] = value;
 	}
