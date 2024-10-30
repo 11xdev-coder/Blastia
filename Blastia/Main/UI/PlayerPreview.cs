@@ -1,4 +1,4 @@
-﻿using Blastia.Main.Player;
+﻿using Blastia.Main.Entities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,7 +6,7 @@ namespace Blastia.Main.UI;
 
 public class PlayerPreview : UIElement
 {
-    public readonly PlayerEntity? PlayerInstance;
+    public readonly Player? PlayerInstance;
     public string Name = "";
 
     private Text? _nameText;
@@ -14,7 +14,7 @@ public class PlayerPreview : UIElement
     public PlayerPreview(Vector2 position, SpriteFont font, Vector2 scale = default) : 
         base(position, "", font)
     {
-        PlayerInstance = new PlayerEntity(position)
+        PlayerInstance = new Player(position)
         {
             IsPreview = true
         };

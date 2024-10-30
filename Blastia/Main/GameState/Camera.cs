@@ -1,4 +1,5 @@
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,7 +20,7 @@ public class Camera : Object
 	/// </summary>
 	public int DrawHeight;
 
-	private float _cameraScale;
+	private float _cameraScale = 1;
 	public float CameraScale
 	{
 		get => _cameraScale;
@@ -40,24 +41,6 @@ public class Camera : Object
 
 	public override void Update()
 	{
-		// movement
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.A))
-		{
-			Position.X -= 0.25f;
-		}
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.S))
-		{
-			Position.Y += 0.25f;
-		}
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.D))
-		{
-			Position.X += 0.25f;
-		}
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.W))
-		{
-			Position.Y -= 0.25f;
-		}
-		
 		// zoom
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.OemPlus))
 		{
@@ -71,7 +54,7 @@ public class Camera : Object
 		UpdateRenderRectangle();
 	}
 
-	protected override void Draw()
+	public override void Draw(SpriteBatch spriteBatch)
 	{
 		
 	}
@@ -109,5 +92,18 @@ public class Camera : Object
 				spriteBatch.Draw(tileTexture, destRect, sourceRect, Color.White);				
 			}
 		}
+	}
+
+	public void RenderPlayer(SpriteBatch spriteBatch, Player player)
+	{
+		// scrolling offset
+		float playerX = player.Position.X - Position.X;
+		float playerY = player.Position.Y - Position.Y;
+
+		float scaledPositionX = playerX * CameraScale;
+		float scaledPositionY = playerY * CameraScale;
+		
+		Vector2 scaledPosition = new Vector2(scaledPositionX, scaledPositionY);
+		player.Draw(spriteBatch, scaledPosition, CameraScale);
 	}
 }

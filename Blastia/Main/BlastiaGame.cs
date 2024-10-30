@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities;
 using Blastia.Main.GameState;
 using Blastia.Main.Sounds;
 using Blastia.Main.UI;
@@ -102,7 +103,7 @@ public class BlastiaGame : Game
 	public static Color ErrorColor { get; private set; }
 	
 	// GAMESTATE
-	private Camera _gameCamera;
+	private Player _player;
 	public bool IsWorldInitialized { get; private set; }
 	
 	public BlastiaGame()
@@ -249,7 +250,7 @@ public class BlastiaGame : Game
 
 		if (IsWorldInitialized)
 		{
-			_gameCamera.Update();
+			_player.Update();
 		}
 
 		foreach (Menu menu in _menus)
@@ -325,7 +326,8 @@ public class BlastiaGame : Game
 		
 		if (IsWorldInitialized && PlayerManager.Instance.SelectedWorld != null)
 		{
-			_gameCamera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
+			_player.Camera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
+			_player.Camera.RenderPlayer(SpriteBatch, _player); // TODO: list of players for multiplayer
 		}
 		
 		foreach (Menu menu in _menus)
@@ -371,13 +373,9 @@ public class BlastiaGame : Game
 		RequestWorldInitializationEvent?.Invoke();
 	}	
 	
-	private void InitializeWorld() 
-	{		
-		_gameCamera = new Camera(Vector2.Zero) 
-		{
-			DrawWidth = (int) ScreenWidth,
-			DrawHeight = (int) ScreenHeight
-		};
+	private void InitializeWorld()
+	{
+		_player = new Player(Vector2.Zero);
 
 		IsWorldInitialized = true;
 	}

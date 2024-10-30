@@ -1,10 +1,12 @@
-﻿using Blastia.Main.Utilities;
+﻿using Blastia.Main.GameState;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
-namespace Blastia.Main.Player;
+namespace Blastia.Main.Entities;
 
-public class PlayerEntity
+public class Player : Entity
 {
 	/// <summary>
 	/// If True, player will play walking animation and disable all other logic
@@ -16,10 +18,7 @@ public class PlayerEntity
 	public float LegMaxAngle = 25;
 	public float WalkingAnimationDuration = 0.4f;
 	
-	public Vector2 Position { get; set; }
-	
-	#region Bodyparts
-	
+	// BODYPARTS
 	public BodyPart Head { get; set; }
 	public BodyPart Body { get; set; }
 	public BodyPart LeftArm { get; set; }
@@ -27,11 +26,16 @@ public class PlayerEntity
 	public BodyPart LeftLeg { get; set; }
 	public BodyPart RightLeg { get; set; }
 	
-	#endregion
+	public Camera Camera { get; set; }
 
-	public PlayerEntity(Vector2 position)
+	public Player(Vector2 position)
 	{
 		Position = position;
+		Camera = new Camera(position)
+		{
+			DrawWidth = (int) BlastiaGame.ScreenWidth,
+			DrawHeight = (int) BlastiaGame.ScreenHeight
+		};
 		
 		// player textures shortcuts
 		var playerHead = BlastiaGame.PlayerTextures.PlayerHead;
@@ -57,9 +61,9 @@ public class PlayerEntity
 		RightLeg = new BodyPart(playerLeg, new Vector2(11, 21), origin: topOrigin);
 	}
 
-	public void Update()
+	public override void Update()
 	{
-		if(IsPreview) PreviewUpdate();
+		if (IsPreview) PreviewUpdate();
 		else RegularUpdate();
 	}
 
@@ -68,7 +72,25 @@ public class PlayerEntity
 	/// </summary>
 	private void RegularUpdate()
 	{
+		// movement
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.A))
+		{
+			Position.X -= 0.25f;
+		}
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.S))
+		{
+			Position.Y += 0.25f;
+		}
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.D))
+		{
+			Position.X += 0.25f;
+		}
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.W))
+		{
+			Position.Y -= 0.25f;
+		}
 		
+		Camera.Update();
 	}
 
 	/// <summary>
@@ -103,7 +125,11 @@ public class PlayerEntity
 			(float) _animationTimeElapsed, WalkingAnimationDuration);
 	}
 
-	public void Draw(SpriteBatch spriteBatch)
+	/// <summary>
+	/// Draws BodyParts at player position
+	/// </summary>
+	/// <param name="spriteBatch"></param>
+	public override void Draw(SpriteBatch spriteBatch)
 	{
 		Head.Draw(spriteBatch, Position);
 		
@@ -113,5 +139,23 @@ public class PlayerEntity
 		LeftArm.Draw(spriteBatch, Position);
 		LeftLeg.Draw(spriteBatch, Position);
 		RightLeg.Draw(spriteBatch, Position);
+	}
+	
+	/// <summary>
+	/// Draws player BodyParts with a specified position and scale
+	/// </summary>
+	/// <param name="spriteBatch"></param>
+	/// <param name="position">Where to draw the BodyParts</param>
+	/// <param name="scale">BodyParts scale</param>
+	public void Draw(SpriteBatch spriteBatch, Vector2 position, float scale = 1f)
+	{
+		Head.Draw(spriteBatch, position, scale);
+		
+		RightArm.Draw(spriteBatch, position, scale); // right arm behind Body
+		Body.Draw(spriteBatch, position, scale);
+		
+		LeftArm.Draw(spriteBatch, position, scale);
+		LeftLeg.Draw(spriteBatch, position, scale);
+		RightLeg.Draw(spriteBatch, position, scale);
 	}
 }

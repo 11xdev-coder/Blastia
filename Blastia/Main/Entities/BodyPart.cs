@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Blastia.Main.Player;
+namespace Blastia.Main.Entities;
 
 public class BodyPart
 {
@@ -24,10 +24,12 @@ public class BodyPart
         Origin = origin ?? new Vector2(Image.Width * 0.5f, Image.Height * 0.5f);
     }
 
-    public void Draw(SpriteBatch spriteBatch, Vector2 entityPosition)
+    public void Draw(SpriteBatch spriteBatch, Vector2 entityPosition, float scale = 1f)
     {
-        Vector2 absolutePosition = entityPosition + RelativePosition;
+        Vector2 scaledOffset = RelativePosition * scale;
+        
+        Vector2 absolutePosition = entityPosition + scaledOffset;
         spriteBatch.Draw(Image, absolutePosition, null, Color.White, 
-            Rotation, Origin, 1f, SpriteEffects.None, 0f);
+            Rotation, Origin, scale, SpriteEffects.None, 0f);
     }
 }
