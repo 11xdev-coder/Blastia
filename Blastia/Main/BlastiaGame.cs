@@ -375,8 +375,8 @@ public class BlastiaGame : Game
 	{		
 		_gameCamera = new Camera(Vector2.Zero) 
 		{
-			DrawWidth = 32,
-			DrawHeight = 32
+			DrawWidth = (int) ScreenWidth,
+			DrawHeight = (int) ScreenHeight
 		};
 
 		IsWorldInitialized = true;

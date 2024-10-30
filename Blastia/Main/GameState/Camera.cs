@@ -18,8 +18,13 @@ public class Camera : Object
 	/// in blocks *8 (tile_size = 8)
 	/// </summary>
 	public int DrawHeight;
-	
-	public int CameraScale = 5;
+
+	private float _cameraScale;
+	public float CameraScale
+	{
+		get => _cameraScale;
+		set => _cameraScale = Math.Clamp(value, 1, 9999);
+	}
 	
 	public Camera(Vector2 position) 
 	{
@@ -35,6 +40,7 @@ public class Camera : Object
 
 	public override void Update()
 	{
+		// movement
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.A))
 		{
 			Position.X -= 0.25f;
@@ -50,6 +56,16 @@ public class Camera : Object
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.W))
 		{
 			Position.Y -= 0.25f;
+		}
+		
+		// zoom
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.OemPlus))
+		{
+			CameraScale += 0.25f;
+		}
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.OemMinus))
+		{
+			CameraScale -= 0.25f;
 		}
 		
 		UpdateRenderRectangle();
@@ -68,7 +84,7 @@ public class Camera : Object
 		int endX = Math.Min(worldState.WorldWidth, startX + (DrawWidth / Block.Size));
 		int endY = Math.Min(worldState.WorldHeight, startY + (DrawHeight / Block.Size));
 		
-		int scaledBlockSize = Block.Size * CameraScale;
+		int scaledBlockSize = MathUtilities.SmoothRound(Block.Size * CameraScale);
 		
 		// go through each tile
 		for (int x = startX; x < endX; x++) 

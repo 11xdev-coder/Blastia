@@ -25,8 +25,6 @@ public class PlayerManager : Singleton<PlayerManager>
 		if (!Directory.Exists(_worldsSaveFolder)) Directory.CreateDirectory(_worldsSaveFolder);
 	}
 
-	// TODO: flatbuffers (remake serialization)
-	// TODO: IDisposable
 	private void New(SaveFolder folderType, string name, Extension extensionType, object? data = null)
 	{
 		string folder = GetFolder(folderType);

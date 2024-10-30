@@ -82,8 +82,11 @@ public static class Saving
             PropertyInfo[] properties = typeof(T).GetProperties();
             foreach (PropertyInfo property in properties)
             {
+                // get property type
                 Type propertyType = property.PropertyType;
+                // read property value
                 object value = ReadValue(reader, propertyType);
+                // set state's property to value
                 property.SetValue(state, value);
             }
         }
@@ -95,12 +98,15 @@ public static class Saving
     {
         if (type.IsArray)
         {
+            var elementType = type.GetElementType() ?? 
+                              throw new NullReferenceException("Array element type cannot be null");
+            
             int length = reader.ReadInt32();
-            Array array = Array.CreateInstance(type.GetElementType(), length);
+            Array array = Array.CreateInstance(elementType, length);
                         
             for (int i = 0; i < length; i++)
             {
-                array.SetValue(ReadValue(reader, type.GetElementType()), i);
+                array.SetValue(ReadValue(reader, elementType), i);
             }
 
             return array;
@@ -111,14 +117,17 @@ public static class Saving
             int enumValue = reader.ReadInt32();
             return Enum.ToObject(type, enumValue);
         }
-        
-        if (type == typeof(byte)) return reader.ReadByte();
-        if (type == typeof(ushort)) return reader.ReadUInt16();
-        if (type == typeof(int)) return reader.ReadInt32();
-        if (type == typeof(float)) return reader.ReadSingle();
-        if (type == typeof(double)) return reader.ReadDouble();
-        if (type == typeof(bool)) return reader.ReadBoolean();
-        if (type == typeof(string)) return reader.ReadString();
+
+        switch (Type.GetTypeCode(type))
+        {
+            case TypeCode.Byte: return reader.ReadByte();
+            case TypeCode.UInt16: return reader.ReadUInt16();
+            case TypeCode.Int32: return reader.ReadInt32();
+            case TypeCode.Single: return reader.ReadSingle();
+            case TypeCode.Double: return reader.ReadDouble();
+            case TypeCode.Boolean: return reader.ReadBoolean();
+            case TypeCode.String: return reader.ReadString();
+        }
         
         throw new ArgumentException("Unsupported type");
     }
