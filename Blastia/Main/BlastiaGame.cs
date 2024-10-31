@@ -375,7 +375,7 @@ public class BlastiaGame : Game
 	
 	private void InitializeWorld()
 	{
-		_player = new Player(Vector2.Zero);
+		_player = new Player(Vector2.Zero, 0.2f);
 
 		IsWorldInitialized = true;
 	}

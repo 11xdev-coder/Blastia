@@ -27,15 +27,18 @@ public class Player : Entity
 	public BodyPart RightLeg { get; set; }
 	
 	public Camera Camera { get; set; }
+	public float InitialScaleFactor { get; set; }
 
-	public Player(Vector2 position)
+	public Player(Vector2 position, float initialScaleFactor = 1f)
 	{
+		// TODO: HumanLikeEntity
 		Position = position;
 		Camera = new Camera(position)
 		{
 			DrawWidth = (int) BlastiaGame.ScreenWidth,
 			DrawHeight = (int) BlastiaGame.ScreenHeight
 		};
+		InitialScaleFactor = initialScaleFactor;
 		
 		// player textures shortcuts
 		var playerHead = BlastiaGame.PlayerTextures.PlayerHead;
@@ -72,6 +75,7 @@ public class Player : Entity
 	/// </summary>
 	private void RegularUpdate()
 	{
+		// TODO: refactor movement
 		// movement
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.A))
 		{
@@ -131,14 +135,15 @@ public class Player : Entity
 	/// <param name="spriteBatch"></param>
 	public override void Draw(SpriteBatch spriteBatch)
 	{
-		Head.Draw(spriteBatch, Position);
+		// TODO: entity loader 
+		Head.Draw(spriteBatch, Position, InitialScaleFactor);
 		
-		RightArm.Draw(spriteBatch, Position); // right arm behind Body
-		Body.Draw(spriteBatch, Position);
+		RightArm.Draw(spriteBatch, Position, InitialScaleFactor); // right arm behind Body
+		Body.Draw(spriteBatch, Position, InitialScaleFactor);
 		
-		LeftArm.Draw(spriteBatch, Position);
-		LeftLeg.Draw(spriteBatch, Position);
-		RightLeg.Draw(spriteBatch, Position);
+		LeftArm.Draw(spriteBatch, Position, InitialScaleFactor);
+		LeftLeg.Draw(spriteBatch, Position, InitialScaleFactor);
+		RightLeg.Draw(spriteBatch, Position, InitialScaleFactor);
 	}
 	
 	/// <summary>
@@ -149,13 +154,13 @@ public class Player : Entity
 	/// <param name="scale">BodyParts scale</param>
 	public void Draw(SpriteBatch spriteBatch, Vector2 position, float scale = 1f)
 	{
-		Head.Draw(spriteBatch, position, scale);
+		Head.Draw(spriteBatch, position, scale * InitialScaleFactor);
 		
-		RightArm.Draw(spriteBatch, position, scale); // right arm behind Body
-		Body.Draw(spriteBatch, position, scale);
+		RightArm.Draw(spriteBatch, position, scale * InitialScaleFactor); // right arm behind Body
+		Body.Draw(spriteBatch, position, scale * InitialScaleFactor);
 		
-		LeftArm.Draw(spriteBatch, position, scale);
-		LeftLeg.Draw(spriteBatch, position, scale);
-		RightLeg.Draw(spriteBatch, position, scale);
+		LeftArm.Draw(spriteBatch, position, scale * InitialScaleFactor);
+		LeftLeg.Draw(spriteBatch, position, scale * InitialScaleFactor);
+		RightLeg.Draw(spriteBatch, position, scale * InitialScaleFactor);
 	}
 }
