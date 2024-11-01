@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Entities;
+using Blastia.Main.Entities.HumanLikeEntities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

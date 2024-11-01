@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Blastia.Main.Entities;
+namespace Blastia.Main.Entities.Common;
 
 public class BodyPart
 {

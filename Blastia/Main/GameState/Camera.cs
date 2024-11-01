@@ -1,5 +1,5 @@
 using Blastia.Main.Blocks.Common;
-using Blastia.Main.Entities;
+using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -77,8 +77,8 @@ public class Camera : Object
 				ushort tileId = worldState.GetTile(x, y);
 				if (tileId == 0) continue; // skip empty
 				
-				Texture2D? tileTexture = BlockRegistry.GetTexture(tileId);
-				if (tileTexture == null) continue;
+				Block? block = StuffRegistry.GetBlock(tileId);
+				if (block == null) continue;
 				
 				// subtract camera position -> scrolling (camera moves right -> move tile to the left)
 				float worldPositionX = x * Block.Size - Position.X;
@@ -89,7 +89,7 @@ public class Camera : Object
 						
 				Rectangle sourceRect = BlockRectangles.All;
 				
-				spriteBatch.Draw(tileTexture, destRect, sourceRect, Color.White);				
+				block.Draw(spriteBatch, destRect, sourceRect);				
 			}
 		}
 	}

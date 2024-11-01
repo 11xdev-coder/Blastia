@@ -19,12 +19,6 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Cursor.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Invisible.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Menu\Logo.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Menu\Logo5X.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Player\AssembledPlayer.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Player\Body.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Player\Head.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Player\LeftArm.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Player\Leg.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Player\RightArm.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Toilet.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\ProgressBarBG.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SliderBG.png
@@ -61,3 +55,9 @@ D:\Projects\Blastia\Blastia\obj\Debug\net8.0\refint\Blastia.dll
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\Blastia.pdb
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\Blastia.genruntimeconfig.cache
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\ref\Blastia.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\AssembledPlayer.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\Body.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\Head.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\LeftArm.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\Leg.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\RightArm.png

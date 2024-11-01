@@ -21,13 +21,6 @@ public static class Paths
 	public static string ProgrssbarBackgroundPath { get; private set; } = "";
 	public static string WhitePixelPath { get; private set; } = "";
 	public static string InvisibleTexturePath { get; private set; } = "";
-
-	// player textures
-	public static string PlayerHeadTexturePath { get; private set; } = "";
-	public static string PlayerBodyTexturePath { get; private set; } = "";
-	public static string PlayerLeftArmTexturePath { get; private set; } = "";
-	public static string PlayerRightArmTexturePath { get; private set; } = "";
-	public static string PlayerLegTexturePath { get; private set; } = "";
 	
 	// sounds
 	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
@@ -46,6 +39,7 @@ public static class Paths
 	
 	// loading
 	public static string BlockTextures { get; private set; } = "";
+	public static string HumanTextures { get; private set; } = "";
 	
 	// update all paths when ContentRoot changes
 	private static void UpdatePaths()
@@ -57,13 +51,6 @@ public static class Paths
 		WhitePixelPath = Path.Combine(ContentRoot, "Textures/WhitePixel.png");
 		InvisibleTexturePath = Path.Combine(ContentRoot, "Textures/Invisible.png");
 
-		// Player textures
-		PlayerHeadTexturePath = Path.Combine(ContentRoot, "Textures/Player/Head.png");
-		PlayerBodyTexturePath = Path.Combine(ContentRoot, "Textures/Player/Body.png");
-		PlayerLeftArmTexturePath = Path.Combine(ContentRoot, "Textures/Player/LeftArm.png");
-		PlayerRightArmTexturePath = Path.Combine(ContentRoot, "Textures/Player/RightArm.png");
-		PlayerLegTexturePath = Path.Combine(ContentRoot, "Textures/Player/Leg.png");
-
 		// Save paths
 		VideoManagerSavePath = ContentRoot + "/Saved/videomanager.bin";
 		AudioManagerSavePath = ContentRoot + "/Saved/audiomanager.bin";
@@ -72,6 +59,7 @@ public static class Paths
 		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";
+		HumanTextures = ContentRoot + "/Textures/Entities/Humans";
 	}
 	
 	// Windows -> Documents/My Games/Blastia

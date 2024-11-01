@@ -2,12 +2,12 @@
 using Microsoft.Xna.Framework.Input;
 using Object = Blastia.Main.GameState.Object;
 
-namespace Blastia.Main.Entities;
+namespace Blastia.Main.Entities.Common;
 
 public abstract class Entity : Object
 {
     // map for movement keys and their vectors
-    protected Dictionary<Keys, Vector2> MovementMap = new()
+    protected readonly Dictionary<Keys, Vector2> MovementMap = new()
     {
         {Keys.A, new Vector2(-1, 0)},
         {Keys.D, new Vector2(1, 0)},
@@ -17,4 +17,21 @@ public abstract class Entity : Object
     
     protected Vector2 MovementVector;
     protected float MovementSpeed;
+
+    public virtual ushort ID { get; set; }
+
+    protected Entity()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
+        SetDefaults();
+    }
+
+    protected virtual void SetDefaults()
+    {
+        
+    }
 }

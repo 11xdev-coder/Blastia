@@ -9,6 +9,12 @@ public static class Vector2Extensions
         // √x^2 + y^2
         return Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y);
     }
+
+    public static Vector2 Normalize(this Vector2 vector)
+    {
+        float length = (float)vector.Magnitude();
+        return new Vector2(vector.X / length, vector.Y / length);
+    }
     
     public static bool CompareToFloat(this Vector2 vector, float a)
     {

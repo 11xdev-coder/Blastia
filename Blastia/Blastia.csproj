@@ -23,7 +23,6 @@
 
     <ItemGroup>
       <Folder Include="Main\Content\Sounds\Menu\" />
-      <Folder Include="Main\Content\Textures\Player\" />
     </ItemGroup>
 
     <ItemGroup>

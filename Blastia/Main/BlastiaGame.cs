@@ -1,5 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
-using Blastia.Main.Entities;
+using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Sounds;
 using Blastia.Main.UI;
@@ -49,15 +49,6 @@ public class BlastiaGame : Game
 	public static Texture2D ProgressBarBackground { get; private set; } = null!;
 	public static Texture2D WhitePixel { get; private set; } = null!;
 	public static Texture2D InvisibleTexture { get; private set; } = null!;
-	
-	public class PlayerTextures 
-	{
-		public static Texture2D PlayerHead { get; set; } = null!;
-		public static Texture2D PlayerBody { get; set; } = null!;
-		public static Texture2D PlayerLeftArm { get; set; } = null!;
-		public static Texture2D PlayerRightArm { get; set; } = null!;
-		public static Texture2D PlayerLeg { get; set; } = null!;
-	}
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -171,21 +162,6 @@ public class BlastiaGame : Game
 		
 		InvisibleTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.InvisibleTexturePath);
-			
-		PlayerTextures.PlayerHead = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Paths.PlayerHeadTexturePath);
-		
-		PlayerTextures.PlayerBody = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Paths.PlayerBodyTexturePath);
-		
-		PlayerTextures.PlayerLeftArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Paths.PlayerLeftArmTexturePath);
-		
-		PlayerTextures.PlayerRightArm = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Paths.PlayerRightArmTexturePath);
-		
-		PlayerTextures.PlayerLeg = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Paths.PlayerLegTexturePath);
 	}
 	
 	protected override void LoadContent()
@@ -195,7 +171,8 @@ public class BlastiaGame : Game
 		SoundEngine.LoadSounds();
 		MusicEngine.LoadMusic();
 		MusicEngine.PlayMusicTrack(ChooseRandomMenuMusic());
-		BlockLoader.LoadBlocks(GraphicsDevice);
+		StuffLoader.LoadBlocks(GraphicsDevice);
+		StuffLoader.LoadHumans(GraphicsDevice);
 		
 		LoadTextures();
 		MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
