@@ -22,16 +22,13 @@ public abstract class Entity : Object
 
     protected Entity()
     {
-        Init();
-    }
-
-    private void Init()
-    {
-        SetDefaults();
-    }
-
-    protected virtual void SetDefaults()
-    {
         
     }
+
+    protected void SetId(ushort id)
+    {
+        ID = id;
+    }
+
+    protected ushort GetId() => ID;
 }

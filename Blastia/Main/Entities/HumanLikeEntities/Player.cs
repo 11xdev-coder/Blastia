@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Blastia.Main.Entities.HumanLikeEntities;
 
+[Entity(Id = EntityID.Player)]
 public class Player : HumanLikeEntity
 {
 	/// <summary>
@@ -21,9 +22,11 @@ public class Player : HumanLikeEntity
 	
 	public Camera Camera { get; set; }
 
-	public Player(Vector2 position, float initialScaleFactor = 1f)
+	public Player(Vector2 position, float initialScaleFactor = 1f) : base(new Vector2(0, -24), Vector2.Zero,
+		new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), new Vector2(10, 21))
 	{
-		// TODO: HumanLikeEntity
+		SetId(EntityID.Player);
+		
 		Position = position;
 		Camera = new Camera(position)
 		{
@@ -32,13 +35,6 @@ public class Player : HumanLikeEntity
 		};
 		Scale = initialScaleFactor;
 		MovementSpeed = 0.25f;
-	}
-
-	protected override void SetDefaults()
-	{
-		ID = EntityID.Player;
-		
-		base.SetDefaults();
 	}
 
 	public override void Update()

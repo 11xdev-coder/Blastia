@@ -32,34 +32,38 @@ public static class StuffRegistry
 	public static Block? GetBlock(ushort id) 
 	{
 		// if found value -> return block
-		return Blocks.TryGetValue(id, out var block) ? block : null;
+		return Blocks.GetValueOrDefault(id);
 	}
 	
 	public static Texture2D? GetTexture(ushort id) 
 	{
 		// if found texture -> return
-		return BlockTextures.TryGetValue(id, out var texture) ? texture : null;
+		return BlockTextures.GetValueOrDefault(id);
 	}
 
-	public static void RegisterHuman(HumanLikeEntity human, HumanTextures textures)
+	public static void RegisterHumanTextures(ushort id, HumanTextures textures)
 	{
-		if (Humans.ContainsKey(human.ID))
+		if (!HumanTextures.TryAdd(id, textures))
 		{
-			throw new DuplicateNameException($"Tried registering duplicate human with ID: {human.ID}, name: {human.GetType().Name}. " +
-			                                 $"ID already occupied by {Humans[human.ID].GetType().Name}");
+			throw new DuplicateNameException($"Duplicate textures for human with ID: {id}");
 		}
-
-		Humans[human.ID] = human;
-		HumanTextures[human.ID] = textures;
+	}
+	
+	public static void RegisterHuman(ushort id, HumanLikeEntity human)
+	{
+		if (!Humans.TryAdd(id, human))
+		{
+			throw new DuplicateNameException($"Duplicate human with ID: {id}");
+		}
 	}
 	
 	public static HumanLikeEntity? GetHuman(ushort id) 
 	{
-		return Humans.TryGetValue(id, out var human) ? human : null;
+		return Humans.GetValueOrDefault(id);
 	}
 	
-	public static HumanTextures? GetHumanTextures(ushort id) 
+	public static HumanTextures? GetHumanTextures(ushort id)
 	{
-		return HumanTextures.TryGetValue(id, out var textures) ? textures : null;
+		return HumanTextures.GetValueOrDefault(id);
 	}
 }

@@ -2,5 +2,5 @@
 
 public static class EntityID
 {
-    public static readonly ushort Player = 0;
+    public const ushort Player = 0;
 }

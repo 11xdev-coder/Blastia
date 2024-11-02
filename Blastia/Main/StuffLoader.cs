@@ -1,5 +1,6 @@
 using System.Reflection;
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -53,24 +54,26 @@ public static class StuffLoader
 
 		foreach (var humanType in humanTypes)
 		{
+			var idAttribute = humanType.GetCustomAttribute<EntityAttribute>();
+			if (idAttribute == null) throw new Exception($"Entity must have an EntityAttribute! {humanType.Name}");
+			
+			var id = idAttribute.Id;
+				
+			string texturesFolder = $"{Paths.HumanTextures}/{humanType.Name}";
+			
+			var headTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Head.png"));
+			var bodyTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Body.png"));
+			var leftArmTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "LeftArm.png"));
+			var rightArmTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "RightArm.png"));
+			var legTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Leg.png"));
+
+			var textures = new HumanTextures(headTexture, bodyTexture, leftArmTexture,
+				rightArmTexture, legTexture);
+			StuffRegistry.RegisterHumanTextures(id, textures); // register textures first
+
 			if (Activator.CreateInstance(humanType, Vector2.Zero, 1f) is HumanLikeEntity human)
 			{
-				string texturesFolder = $"{Paths.HumanTextures}/{humanType.Name}";
-				
-				string head = Path.Combine(texturesFolder, "Head.png");
-				string body = Path.Combine(texturesFolder, "Body.png");
-				string leftArm = Path.Combine(texturesFolder, "LeftArm.png");
-				string rightArm = Path.Combine(texturesFolder, "RightArm.png");
-				string leg = Path.Combine(texturesFolder, "Leg.png");
-				
-				var headTexture = LoadingUtilities.LoadTexture(graphicsDevice, head);
-				var bodyTexture = LoadingUtilities.LoadTexture(graphicsDevice, body);
-				var leftArmTexture = LoadingUtilities.LoadTexture(graphicsDevice, leftArm);
-				var rightArmTexture = LoadingUtilities.LoadTexture(graphicsDevice, rightArm);
-				var legTexture = LoadingUtilities.LoadTexture(graphicsDevice, leg);
-				
-				StuffRegistry.RegisterHuman(human, new HumanTextures(headTexture, bodyTexture, leftArmTexture,
-					rightArmTexture, legTexture));
+				StuffRegistry.RegisterHuman(id, human);
 			}
 		}
 	}

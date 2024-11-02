@@ -13,12 +13,11 @@ public abstract class HumanLikeEntity : Entity
 	public BodyPart LeftLeg { get; set; }
 	public BodyPart RightLeg { get; set; }
 
-	protected override void SetDefaults()
+	protected HumanLikeEntity(Vector2 headOffset, Vector2 bodyOffset, Vector2 leftArmOffset, Vector2 rightArmOffset, 
+		Vector2 leftLegOffset, Vector2 rightLegOffset)
 	{
-		base.SetDefaults();
-
-		var textures = StuffRegistry.GetHumanTextures(ID);
-		if (textures == null) return;
+		var textures = StuffRegistry.GetHumanTextures(GetId());
+		if (textures == null) throw new NullReferenceException($"No textures found for entity with ID: {GetId()}");
 		
 		var head = textures.Value.Head;
 		var body = textures.Value.Body;
@@ -27,20 +26,20 @@ public abstract class HumanLikeEntity : Entity
 		var leg = textures.Value.Leg;
 		
 		// bottom origin
-		Head = new BodyPart(head, new Vector2(0, -24), origin: 
+		Head = new BodyPart(head, headOffset, 0f, 
 			new Vector2(head.Width * 0.5f, head.Height));
 		// centered origin
-		Body = new BodyPart(body, Vector2.Zero);
+		Body = new BodyPart(body, bodyOffset);
 		// right-top corner origin
-		LeftArm = new BodyPart(leftArm, new Vector2(-13, -21), origin:
+		LeftArm = new BodyPart(leftArm, leftArmOffset, 0f,
 			new Vector2(leftArm.Width, 0f));
 		// left-top corner origin
-		RightArm = new BodyPart(rightArm, new Vector2(13, -21), origin:
+		RightArm = new BodyPart(rightArm, rightArmOffset, 0f,
 			new Vector2(0f, 0f));
 		// top origin
 		Vector2 topOrigin = new Vector2(leg.Width * 0.5f, 0);
-		LeftLeg = new BodyPart(leg, new Vector2(-6, 21), origin: topOrigin);
-		RightLeg = new BodyPart(leg, new Vector2(10, 21), origin: topOrigin);
+		LeftLeg = new BodyPart(leg, leftLegOffset, 0f, topOrigin);
+		RightLeg = new BodyPart(leg, rightLegOffset, 0f, topOrigin);
 	}
 
 	public override void Update()
