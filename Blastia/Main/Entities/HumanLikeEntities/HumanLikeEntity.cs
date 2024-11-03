@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Entities.Common;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -12,6 +13,8 @@ public abstract class HumanLikeEntity : Entity
 	public BodyPart RightArm { get; set; }
 	public BodyPart LeftLeg { get; set; }
 	public BodyPart RightLeg { get; set; }
+
+	private double _animationTimeElapsed;
 
 	protected HumanLikeEntity(Vector2 headOffset, Vector2 bodyOffset, Vector2 leftArmOffset, Vector2 rightArmOffset, 
 		Vector2 leftLegOffset, Vector2 rightLegOffset)
@@ -46,6 +49,33 @@ public abstract class HumanLikeEntity : Entity
     {
         
     }
+	
+	/// <summary>
+	/// Rotates arms and legs overtime with specified duration
+	/// </summary>
+	/// <param name="armMaxAngle">Max rotating angle of arms</param>
+	/// <param name="legMaxAngle">Max rotating angle of legs</param>
+	/// <param name="duration">Shorter duration -> faster animation</param>
+	protected void WalkingAnimation(float armMaxAngle, float legMaxAngle, float duration)
+	{
+		_animationTimeElapsed += BlastiaGame.GameTimeElapsedSeconds;
+		
+		// left arm
+		LeftArm.Rotation = MathUtilities.PingPongLerpRadians(-armMaxAngle, armMaxAngle, 
+			(float) _animationTimeElapsed, duration);
+		
+		// right arm
+		RightArm.Rotation = MathUtilities.PingPongLerpRadians(armMaxAngle, -armMaxAngle, 
+			(float) _animationTimeElapsed, duration);
+		
+		// left leg
+		LeftLeg.Rotation = MathUtilities.PingPongLerpRadians(-legMaxAngle, legMaxAngle, 
+			(float) _animationTimeElapsed, duration);
+		
+		// right leg
+		RightLeg.Rotation = MathUtilities.PingPongLerpRadians(legMaxAngle, -legMaxAngle, 
+			(float) _animationTimeElapsed, duration);
+	}
 
     /// <summary>
     /// Draws BodyParts at player position

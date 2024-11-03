@@ -18,14 +18,12 @@ public static class StuffRegistry
 	public static void RegisterBlock(Block block, Texture2D texture)  
 	{
 		// if ID is already present in Blocks
-		if (Blocks.ContainsKey(block.ID)) 
+		if (!Blocks.TryAdd(block.ID, block)) 
 		{
-			throw new DuplicateNameException($"Tried registering duplicate block with ID: {block.ID}, name: {block.GetType().Name}. " +
-			                                 $"ID already occupied by {Blocks[block.ID].GetType().Name}");
+			throw new DuplicateNameException($"Duplicate block with ID: {block.ID}");
 		}
 		
 		// doesnt exist -> register
-		Blocks[block.ID] = block;
 		BlockTextures[block.ID] = texture;
 	}
 	
@@ -41,6 +39,7 @@ public static class StuffRegistry
 		return BlockTextures.GetValueOrDefault(id);
 	}
 
+	// HUMANS
 	public static void RegisterHumanTextures(ushort id, HumanTextures textures)
 	{
 		if (!HumanTextures.TryAdd(id, textures))

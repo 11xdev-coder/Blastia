@@ -14,12 +14,11 @@ public class Player : HumanLikeEntity
 	/// If True, player will play walking animation and disable all other logic
 	/// </summary>
 	public bool IsPreview { get; set; }
-	private double _animationTimeElapsed;
 
-	public float ArmMaxAngle = 20;
-	public float LegMaxAngle = 25;
-	public float WalkingAnimationDuration = 0.4f;
-	
+	private const float ArmMaxAngle = 20;
+	private const float LegMaxAngle = 25;
+	private const float WalkingAnimationDuration = 0.4f;
+
 	public Camera Camera { get; set; }
 
 	public Player(Vector2 position, float initialScaleFactor = 1f) : base(new Vector2(0, -24), Vector2.Zero,
@@ -69,7 +68,7 @@ public class Player : HumanLikeEntity
 			directionVector = Vector2Extensions.Normalize(directionVector);
 		
 		MovementVector = directionVector * MovementSpeed;
-		Position += MovementVector;
+		UpdatePosition();
 	}
 
 	/// <summary>
@@ -77,30 +76,6 @@ public class Player : HumanLikeEntity
 	/// </summary>
 	private void PreviewUpdate()
 	{
-		WalkingAnimation();
-	}
-
-	/// <summary>
-	/// Rotates body parts creating walking animation
-	/// </summary>
-	private void WalkingAnimation()
-	{
-		_animationTimeElapsed += BlastiaGame.GameTimeElapsedSeconds;
-		
-		// left arm
-		LeftArm.Rotation = MathUtilities.PingPongLerpRadians(-ArmMaxAngle, ArmMaxAngle, 
-			(float) _animationTimeElapsed, WalkingAnimationDuration);
-		
-		// right arm
-		RightArm.Rotation = MathUtilities.PingPongLerpRadians(ArmMaxAngle, -ArmMaxAngle, 
-			(float) _animationTimeElapsed, WalkingAnimationDuration);
-		
-		// left leg
-		LeftLeg.Rotation = MathUtilities.PingPongLerpRadians(-LegMaxAngle, LegMaxAngle, 
-			(float) _animationTimeElapsed, WalkingAnimationDuration);
-		
-		// right leg
-		RightLeg.Rotation = MathUtilities.PingPongLerpRadians(LegMaxAngle, -LegMaxAngle, 
-			(float) _animationTimeElapsed, WalkingAnimationDuration);
+		WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
 	}
 }

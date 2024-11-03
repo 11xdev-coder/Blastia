@@ -18,17 +18,29 @@ public abstract class Entity : Object
     protected Vector2 MovementVector;
     protected float MovementSpeed;
 
-    public virtual ushort ID { get; set; }
+    protected virtual ushort ID { get; set; }
 
     protected Entity()
     {
         
     }
 
+    /// <summary>
+    /// Call in constructor to set the ID
+    /// </summary>
+    /// <param name="id">EntityID</param>
     protected void SetId(ushort id)
     {
         ID = id;
     }
 
     protected ushort GetId() => ID;
+
+    /// <summary>
+    /// Adds MovementVector to Position. Call this when Entity should move and MovementVector has been set
+    /// </summary>
+    protected void UpdatePosition()
+    {
+        Position += MovementVector;
+    }
 }
