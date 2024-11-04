@@ -20,9 +20,10 @@ public abstract class Entity : Object
 
     protected virtual ushort ID { get; set; }
 
-    protected Entity()
+    protected Entity(Vector2 position, float initialScaleFactor)
     {
-        
+        Position = position;
+        Scale = initialScaleFactor;
     }
 
     /// <summary>

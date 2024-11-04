@@ -61,3 +61,8 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Huma
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\LeftArm.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\Leg.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\RightArm.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\Body.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\Head.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\LeftArm.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\Leg.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\RightArm.png

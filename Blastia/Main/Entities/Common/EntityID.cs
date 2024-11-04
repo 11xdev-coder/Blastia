@@ -3,4 +3,5 @@
 public static class EntityID
 {
     public const ushort Player = 0;
+    public const ushort MutantScavenger = 1;
 }

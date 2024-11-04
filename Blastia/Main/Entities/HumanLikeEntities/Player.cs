@@ -21,18 +21,15 @@ public class Player : HumanLikeEntity
 
 	public Camera Camera { get; set; }
 
-	public Player(Vector2 position, float initialScaleFactor = 1f) : base(new Vector2(0, -24), Vector2.Zero,
-		new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), new Vector2(10, 21))
+	public Player(Vector2 position, float initialScaleFactor = 1f) : base(position, initialScaleFactor, EntityID.Player,
+		new Vector2(0, -24), Vector2.Zero, new Vector2(-13, -21), 
+		new Vector2(13, -21), new Vector2(-6, 21), new Vector2(10, 21))
 	{
-		SetId(EntityID.Player);
-		
-		Position = position;
 		Camera = new Camera(position)
 		{
 			DrawWidth = (int) BlastiaGame.ScreenWidth,
 			DrawHeight = (int) BlastiaGame.ScreenHeight
 		};
-		Scale = initialScaleFactor;
 		MovementSpeed = 0.25f;
 	}
 

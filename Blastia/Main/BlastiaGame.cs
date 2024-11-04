@@ -95,6 +95,7 @@ public class BlastiaGame : Game
 	
 	// GAMESTATE
 	private Player _player;
+	private MutantScavenger _mutant;
 	public bool IsWorldInitialized { get; private set; }
 	
 	public BlastiaGame()
@@ -305,6 +306,8 @@ public class BlastiaGame : Game
 		{
 			_player.Camera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
 			_player.Camera.RenderPlayer(SpriteBatch, _player); // TODO: list of players for multiplayer
+			
+			_mutant.Draw(SpriteBatch);
 		}
 		
 		foreach (Menu menu in _menus)
@@ -353,6 +356,7 @@ public class BlastiaGame : Game
 	private void InitializeWorld()
 	{
 		_player = new Player(Vector2.Zero, 0.2f);
+		_mutant = new MutantScavenger(new Vector2(100, 300), 1f);
 
 		IsWorldInitialized = true;
 	}

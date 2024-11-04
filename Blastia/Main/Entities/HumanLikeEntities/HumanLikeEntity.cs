@@ -16,9 +16,12 @@ public abstract class HumanLikeEntity : Entity
 
 	private double _animationTimeElapsed;
 
-	protected HumanLikeEntity(Vector2 headOffset, Vector2 bodyOffset, Vector2 leftArmOffset, Vector2 rightArmOffset, 
-		Vector2 leftLegOffset, Vector2 rightLegOffset)
+	protected HumanLikeEntity(Vector2 position, float initialScaleFactor, ushort id,
+		Vector2 headOffset, Vector2 bodyOffset, Vector2 leftArmOffset, Vector2 rightArmOffset, 
+		Vector2 leftLegOffset, Vector2 rightLegOffset) : base(position, initialScaleFactor)
 	{
+		SetId(id);
+		
 		var textures = StuffRegistry.GetHumanTextures(GetId());
 		if (textures == null) throw new NullReferenceException($"No textures found for entity with ID: {GetId()}");
 		
