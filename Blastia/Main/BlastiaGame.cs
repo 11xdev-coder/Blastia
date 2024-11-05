@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Sounds;
@@ -94,14 +95,20 @@ public class BlastiaGame : Game
 	public static Color ErrorColor { get; private set; }
 	
 	// GAMESTATE
-	private Player _player;
-	private MutantScavenger _mutant;
+	public List<Entity> Entities;
+	public ushort EntityLimit = 256;
+
+	public Player? MyPlayer;
+	public List<Player> Players;
+	public ushort PlayerLimit = 128;
 	public bool IsWorldInitialized { get; private set; }
 	
 	public BlastiaGame()
 	{
 		_graphics = new GraphicsDeviceManager(this);
 		_menus = new List<Menu>();
+		Entities = new List<Entity>();
+		Players = new List<Player>();
 		
 		// root folder of all assets
 		Content.RootDirectory = "Main/Content";
@@ -228,7 +235,16 @@ public class BlastiaGame : Game
 
 		if (IsWorldInitialized)
 		{
-			_player.Update();
+			MyPlayer?.Update();
+			foreach (var player in Players)
+			{
+				player.Update();
+			}
+
+			foreach (var entity in Entities)
+			{
+				entity.Update();
+			}
 		}
 
 		foreach (Menu menu in _menus)
@@ -304,10 +320,13 @@ public class BlastiaGame : Game
 		
 		if (IsWorldInitialized && PlayerManager.Instance.SelectedWorld != null)
 		{
-			_player.Camera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
-			_player.Camera.RenderPlayer(SpriteBatch, _player); // TODO: list of players for multiplayer
-			
-			_mutant.Draw(SpriteBatch);
+			MyPlayer?.Camera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
+			MyPlayer?.Camera.RenderEntity(SpriteBatch, MyPlayer);
+
+			foreach (var entity in Entities)
+			{
+				MyPlayer?.Camera.RenderEntity(SpriteBatch, entity);
+			}
 		}
 		
 		foreach (Menu menu in _menus)
@@ -355,8 +374,8 @@ public class BlastiaGame : Game
 	
 	private void InitializeWorld()
 	{
-		_player = new Player(Vector2.Zero, 0.2f);
-		_mutant = new MutantScavenger(new Vector2(100, 300), 1f);
+		MyPlayer = new Player(Vector2.Zero, 0.2f);
+		Entities.Add(new MutantScavenger(new Vector2(100, 300)));
 
 		IsWorldInitialized = true;
 	}

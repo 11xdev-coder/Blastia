@@ -10,4 +10,5 @@ public abstract class Object
 	
 	public abstract void Update();
 	public abstract void Draw(SpriteBatch spriteBatch);
+	public abstract void Draw(SpriteBatch spriteBatch, Vector2 scaledPosition, float scale = 1f);
 }

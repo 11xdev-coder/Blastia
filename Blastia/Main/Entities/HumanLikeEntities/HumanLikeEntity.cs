@@ -95,7 +95,7 @@ public abstract class HumanLikeEntity : Entity
     /// <param name="spriteBatch"></param>
     /// <param name="position">Where to draw the BodyParts</param>
     /// <param name="bodyPartScale">BodyParts scale</param>
-    public void Draw(SpriteBatch spriteBatch, Vector2 position, float bodyPartScale = 1f)
+    public override void Draw(SpriteBatch spriteBatch, Vector2 position, float bodyPartScale = 1f)
     {
         var scaledBodyPartScale = bodyPartScale * Scale;
 		

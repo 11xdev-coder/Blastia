@@ -1,4 +1,5 @@
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -41,6 +42,7 @@ public class Camera : Object
 
 	public override void Update()
 	{
+		// TODO: Rework zoom
 		// zoom
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.OemPlus))
 		{
@@ -55,6 +57,11 @@ public class Camera : Object
 	}
 
 	public override void Draw(SpriteBatch spriteBatch)
+	{
+		
+	}
+	
+	public override void Draw(SpriteBatch spriteBatch, Vector2 scaledPosition, float scale = 1f)
 	{
 		
 	}
@@ -94,16 +101,16 @@ public class Camera : Object
 		}
 	}
 
-	public void RenderPlayer(SpriteBatch spriteBatch, Player player)
+	public void RenderEntity(SpriteBatch spriteBatch, Entity entity)
 	{
 		// scrolling offset
-		float playerX = player.Position.X - Position.X;
-		float playerY = player.Position.Y - Position.Y;
+		float playerX = entity.Position.X - Position.X;
+		float playerY = entity.Position.Y - Position.Y;
 
 		float scaledPositionX = playerX * CameraScale;
 		float scaledPositionY = playerY * CameraScale;
 		
 		Vector2 scaledPosition = new Vector2(scaledPositionX, scaledPositionY);
-		player.Draw(spriteBatch, scaledPosition, CameraScale);
+		entity.Draw(spriteBatch, scaledPosition, CameraScale);
 	}
 }
