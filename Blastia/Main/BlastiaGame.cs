@@ -320,12 +320,12 @@ public class BlastiaGame : Game
 		
 		if (IsWorldInitialized && PlayerManager.Instance.SelectedWorld != null)
 		{
-			MyPlayer?.Camera.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
-			MyPlayer?.Camera.RenderEntity(SpriteBatch, MyPlayer);
+			MyPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
+			MyPlayer?.Camera?.RenderEntity(SpriteBatch, MyPlayer);
 
 			foreach (var entity in Entities)
 			{
-				MyPlayer?.Camera.RenderEntity(SpriteBatch, entity);
+				MyPlayer?.Camera?.RenderEntity(SpriteBatch, entity);
 			}
 		}
 		
@@ -374,8 +374,8 @@ public class BlastiaGame : Game
 	
 	private void InitializeWorld()
 	{
-		MyPlayer = new Player(Vector2.Zero, 0.2f);
-		Entities.Add(new MutantScavenger(new Vector2(100, 300)));
+		MyPlayer = new Player(Vector2.Zero, 0.2f, true);
+		Entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
 	}

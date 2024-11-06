@@ -1,6 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Xna.Framework.Input;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.Utilities;
 
@@ -221,5 +223,41 @@ public static class KeyboardHelper
 
             updateHeldKeyTimerRef(heldKeyTimerRef);
         }
+    }
+
+    /// <summary>
+    /// Goes through each pressed key and tries to map it. Adds result to initialValue
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="initialValue"></param>
+    /// <returns>initialValue + mapped value</returns>
+    public static Vector2 AccumulateValueFromMap(Dictionary<Keys, Vector2> map, ref Vector2 initialValue) 
+    {
+        Keys[] pressedKeys = BlastiaGame.KeyboardState.GetPressedKeys();
+        foreach (var key in pressedKeys)
+        {
+            map.TryGetValue(key, out var newValue);
+            initialValue += newValue;
+        }
+
+        return initialValue;
+    }
+    
+    /// <summary>
+    /// See <see cref="AccumulateValueFromMap(System.Collections.Generic.Dictionary{Microsoft.Xna.Framework.Input.Keys,Vector2},ref Vector2)"/>
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="initialValue"></param>
+    /// <returns></returns>
+    public static float AccumulateValueFromMap(Dictionary<Keys, float> map, ref float initialValue) 
+    {
+        Keys[] pressedKeys = BlastiaGame.KeyboardState.GetPressedKeys();
+        foreach (var key in pressedKeys)
+        {
+            map.TryGetValue(key, out var newValue);
+            initialValue += newValue;
+        }
+
+        return initialValue;
     }
 }

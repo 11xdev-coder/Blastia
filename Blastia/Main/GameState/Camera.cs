@@ -9,8 +9,12 @@ using Microsoft.Xna.Framework.Input;
 namespace Blastia.Main.GameState;
 
 public class Camera : Object
-{	
-	public Rectangle RenderRectangle;
+{
+	private readonly Dictionary<Keys, float> _zoomMap = new()
+	{
+		{Keys.OemPlus, 1},
+		{Keys.OemMinus, -1}
+	};
 	
 	/// <summary>
 	/// in blocks *8 (tile_size = 8)
@@ -21,39 +25,27 @@ public class Camera : Object
 	/// </summary>
 	public int DrawHeight;
 
+	// ZOOM/SCALE
 	private float _cameraScale = 1;
 	public float CameraScale
 	{
 		get => _cameraScale;
 		set => _cameraScale = Math.Clamp(value, 1, 9999);
 	}
-	
+	private const float ScaleSpeed = 0.25f;
+
 	public Camera(Vector2 position) 
 	{
 		Position = position;
-		UpdateRenderRectangle();
-	}
-	
-	private void UpdateRenderRectangle() 
-	{
-		RenderRectangle = new Rectangle(MathUtilities.SmoothRound(Position.X), MathUtilities.SmoothRound(Position.Y), 
-			DrawWidth, DrawHeight);
 	}
 
 	public override void Update()
 	{
-		// TODO: Rework zoom
 		// zoom
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.OemPlus))
-		{
-			CameraScale += 0.25f;
-		}
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.OemMinus))
-		{
-			CameraScale -= 0.25f;
-		}
+		float zoom = 0;
+		KeyboardHelper.AccumulateValueFromMap(_zoomMap, ref zoom);
 		
-		UpdateRenderRectangle();
+		CameraScale += zoom * ScaleSpeed;
 	}
 
 	public override void Draw(SpriteBatch spriteBatch)

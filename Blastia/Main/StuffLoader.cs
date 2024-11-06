@@ -71,7 +71,13 @@ public static class StuffLoader
 				rightArmTexture, legTexture);
 			StuffRegistry.RegisterHumanTextures(id, textures); // register textures first
 
-			if (Activator.CreateInstance(humanType, Vector2.Zero, 1f) is HumanLikeEntity human)
+			if (humanType == typeof(Player))
+			{
+				// player has additional bool argument
+				var player = new Player(Vector2.Zero);
+				StuffRegistry.RegisterHuman(id, player);
+			}
+			else if (Activator.CreateInstance(humanType, Vector2.Zero, 1f) is HumanLikeEntity human)
 			{
 				StuffRegistry.RegisterHuman(id, human);
 			}
