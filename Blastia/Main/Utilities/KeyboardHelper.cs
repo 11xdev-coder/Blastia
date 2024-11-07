@@ -230,8 +230,7 @@ public static class KeyboardHelper
     /// </summary>
     /// <param name="map"></param>
     /// <param name="initialValue"></param>
-    /// <returns>initialValue + mapped value</returns>
-    public static Vector2 AccumulateValueFromMap(Dictionary<Keys, Vector2> map, ref Vector2 initialValue) 
+    public static void AccumulateValueFromMap(Dictionary<Keys, Vector2> map, ref Vector2 initialValue) 
     {
         Keys[] pressedKeys = BlastiaGame.KeyboardState.GetPressedKeys();
         foreach (var key in pressedKeys)
@@ -239,8 +238,6 @@ public static class KeyboardHelper
             map.TryGetValue(key, out var newValue);
             initialValue += newValue;
         }
-
-        return initialValue;
     }
     
     /// <summary>
@@ -248,8 +245,7 @@ public static class KeyboardHelper
     /// </summary>
     /// <param name="map"></param>
     /// <param name="initialValue"></param>
-    /// <returns></returns>
-    public static float AccumulateValueFromMap(Dictionary<Keys, float> map, ref float initialValue) 
+    public static void AccumulateValueFromMap(Dictionary<Keys, float> map, ref float initialValue) 
     {
         Keys[] pressedKeys = BlastiaGame.KeyboardState.GetPressedKeys();
         foreach (var key in pressedKeys)
@@ -257,7 +253,5 @@ public static class KeyboardHelper
             map.TryGetValue(key, out var newValue);
             initialValue += newValue;
         }
-
-        return initialValue;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.GameState;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 
@@ -153,7 +154,7 @@ public class PlayerManager : Singleton<PlayerManager>
 			WorldHeight = worldHeight,
 			Tiles = new ushort[worldWidth * worldHeight]
 		};
-		GenerateWorldTiles(worldData);
+		WorldGen.Generate(52, worldData);
 		
 		New(SaveFolder.World, worldName, Extension.World, worldData);
 	}
@@ -167,18 +168,11 @@ public class PlayerManager : Singleton<PlayerManager>
 		BlastiaGame.RequestWorldInitialization();
 	}
 	
+	// TODO: ACTUAL WorldGen with NoisePasses (test noise pass for grass and for stone)
+	// TODO: maybe try using temperature + perlin formula
 	private void GenerateWorldTiles(WorldState worldState) 
 	{
-		int width = worldState.WorldWidth;
-		int height = worldState.WorldHeight;
 		
-		for (int x = 0; x < width; x++) 
-		{
-			for (int y = 0; y < height; y++) 
-			{
-				worldState.SetTile(x, y, BlockID.Stone);
-			}
-		}
 	}
 }
 
