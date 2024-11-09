@@ -70,6 +70,10 @@ public static class Noise
      
     public static float Perlin(float x, float y)
     {
+        // Ensure positive coordinates
+        x = x < 0 ? -x : x;
+        y = y < 0 ? -y : y;
+        
         // from 0 to 255
         // current point coords
         int xi = (int) x % 255;
@@ -83,30 +87,29 @@ public static class Noise
         float xFaded = Fade(xFraction);
         float yFaded = Fade(yFraction);
         
-        // bottom left
-        var a = DoubledPermutation[xi] + yi;
-        // bottom right
-        var b = DoubledPermutation[xi + 1] + yi;
+        // gradient values for 4 corners
+        var aa = DoubledPermutation[DoubledPermutation[xi] + yi];
+        var ab = DoubledPermutation[DoubledPermutation[xi] + yi + 1];
+        var ba = DoubledPermutation[DoubledPermutation[xi + 1] + yi];
+        var bb = DoubledPermutation[DoubledPermutation[xi + 1] + yi + 1];
+
+        float x1 = Lerp(Gradient(aa, xFraction, yFraction), 
+            Gradient(ba, xFraction - 1, yFraction), 
+            xFaded);
         
-        // gradient values for bottom-left and bottom-right
-        var aa = DoubledPermutation[a];
-        var ab = DoubledPermutation[a + 1];
-        // gradient values for top-left and top-right
-        var ba = DoubledPermutation[b];
-        var bb = DoubledPermutation[b + 1];
+        float x2 = Lerp(Gradient(ab, xFraction, yFraction - 1), 
+            Gradient(bb, xFraction - 1, yFraction - 1), 
+            xFaded);
 
-        float x1, x2;
-        x1 = Lerp(Gradient(aa, xFraction, yFraction), Gradient(ba, xFraction - 1, yFraction), xFaded);
-        x2 = Lerp(Gradient(ab, xFraction, yFraction - 1), Gradient(bb, xFraction - 1, yFraction - 1), xFaded);
-
-        return Lerp(x1, x2, yFaded) * 0.5f + 0.5f;
+        // from [-1, 1] to [0, 1]
+        return (Lerp(x1, x2, yFaded) + 1) * 0.5f;
     }
 
     public static float OctavePerlin(float x, float y, float freq, int octaves, float persistence)
     {
         float total = 0f;
-        float amplitude = 0f;
-        float maxValue = 0f;
+        float amplitude = 1f;
+        float maxValue = 0f;  
 
         for (int i = 0; i < octaves; i++)
         {
@@ -116,6 +119,8 @@ public static class Noise
             freq *= 2;
         }
 
+        if (maxValue == 0f) return 0f;
+    
         return total / maxValue;
     }
 }
