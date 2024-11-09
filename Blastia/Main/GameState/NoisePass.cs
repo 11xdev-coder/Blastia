@@ -11,5 +11,6 @@ public class NoisePass
     public float Threshold { get; set; }
     // strength/intensity
     public float Amplitude { get; set; }
+    public float HeightScale { get; set; }
     public ushort Block { get; set; }
 }

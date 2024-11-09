@@ -6,11 +6,12 @@ public static class WorldGen
 {
     private static readonly NoisePass DirtNoisePass = new()
     {
-        Frequency = 0.05f, 
+        Frequency = 0.03f, 
         Octaves = 4, 
-        Persistence = 0.5f, 
-        Threshold = 0.45f,
+        Persistence = 0.3f, 
+        Threshold = 0.3f,
         Amplitude = 1.0f,
+        HeightScale = 0.4f,
         Block = BlockID.Dirt
     };
     
@@ -26,17 +27,16 @@ public static class WorldGen
 		
         for (int x = 0; x < width; x++) 
         {
-            for (int y = 0; y < height; y++)
+            foreach (var pass in noisePasses)
             {
-                foreach (var pass in noisePasses)
+                float noiseValue = Noise.OctavePerlin(x, 0, 
+                    pass.Frequency, pass.Octaves, pass.Persistence) * pass.Amplitude;
+                
+                int terrainHeight = (int)(height * pass.HeightScale * noiseValue);
+                
+                for (int y = terrainHeight; y < height; y++)
                 {
-                    float noiseValue = Noise.OctavePerlin(x, y, 
-                        pass.Frequency, pass.Octaves, pass.Persistence) * pass.Amplitude;
-
-                    if (noiseValue > pass.Threshold)
-                    {
-                        worldState.SetTile(x, y, pass.Block);
-                    }
+                    worldState.SetTile(x, y, pass.Block);
                 }
             }
         }
