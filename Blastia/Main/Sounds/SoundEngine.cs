@@ -34,7 +34,7 @@ public static class SoundEngine
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error loading sound. ID: {id}, Exception: {ex.Message}");
+            ConsoleHelper.WriteLine($"Error loading sound. ID: {id}, Exception: {ex.Message}");
         }
     }
 
@@ -47,7 +47,7 @@ public static class SoundEngine
         }
         else
         {
-            Console.WriteLine($"Sound with ID: {id} not found.");
+            ConsoleHelper.WriteLine($"Sound with ID: {id} not found.");
         }
     }
 

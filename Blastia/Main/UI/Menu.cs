@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Blastia.Main.Utilities;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
@@ -81,7 +82,7 @@ public class Menu
         {
             elem.OnMenuInactive();
         }
-        Console.WriteLine("Called OnMenuInactive on all UIElements.");
+        ConsoleHelper.WriteLine("Called OnMenuInactive on all UIElements.");
     }
     
     /// <summary>

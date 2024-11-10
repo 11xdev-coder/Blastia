@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Blocks.Common;
+﻿using System.Collections.Concurrent;
+using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
@@ -94,6 +95,11 @@ public class BlastiaGame : Game
 	private double _colorTimer;
 	public static Color ErrorColor { get; private set; }
 	
+	// CONSOLE
+	private Thread _consoleThread;
+	private volatile bool _isConsoleRunning = true;
+	private readonly ConcurrentQueue<string> _consoleCommandQueue = new();
+	
 	// GAMESTATE
 	public List<Entity> Entities;
 	public ushort EntityLimit = 256;
@@ -105,6 +111,8 @@ public class BlastiaGame : Game
 	
 	public BlastiaGame()
 	{
+		InitializeConsole();
+		
 		_graphics = new GraphicsDeviceManager(this);
 		_menus = new List<Menu>();
 		Entities = new List<Entity>();
@@ -124,7 +132,7 @@ public class BlastiaGame : Game
 		AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
 		// load player manager
 		PlayerManager.Instance.Initialize();
-		Console.WriteLine($"Save game directory: {Paths.GetSaveGameDirectory()}");
+		ConsoleHelper.WriteLine($"Save game directory: {Paths.GetSaveGameDirectory()}");
 		
 		ExitRequestEvent += OnExitRequested;
 		ResolutionRequestEvent += UpdateResolution;
@@ -136,6 +144,37 @@ public class BlastiaGame : Game
 			AddressU = TextureAddressMode.Clamp,
 			AddressV = TextureAddressMode.Clamp
 		};
+	}
+
+	private void InitializeConsole()
+	{
+		try 
+		{
+			ConsoleHelper.CreateConsole("Blastia Game Console");
+        
+			// Start console thread
+			_consoleThread = new Thread(() =>
+			{
+				try
+				{
+					var isConsoleRunning = _isConsoleRunning;
+					ConsoleHelper.ConsoleInputLoop(ref isConsoleRunning, _consoleCommandQueue);
+				}
+				catch (Exception ex)
+				{
+					// Log error but don't crash the game
+					System.Diagnostics.Debug.WriteLine($"Console thread error: {ex}");
+				}
+			});
+        
+			_consoleThread.IsBackground = true; // Make it a background thread
+			_consoleThread.Start();
+		}
+		catch (Exception ex)
+		{
+			// Log error but don't crash the game
+			System.Diagnostics.Debug.WriteLine($"Console initialization error: {ex}");
+		}
 	}
 
 	protected override void Initialize()
@@ -216,15 +255,27 @@ public class BlastiaGame : Game
 
 	protected override void UnloadContent()
 	{
+		// stop console thread
+		_isConsoleRunning = false;
+		if (_consoleThread.IsAlive)
+		{
+			// wait to finish
+			_consoleThread.Join(100);
+		}
+		
+		ConsoleHelper.RemoveConsole();
+		
 		base.UnloadContent();
 		
 		SoundEngine.UnloadSounds();
 		MusicEngine.UnloadMusic();
 	}
 
-	#region Update
+	// UPDATE
 	protected override void Update(GameTime gameTime)
 	{
+		ConsoleHelper.UpdateConsole(_consoleCommandQueue);
+		
 		base.Update(gameTime);
 		UpdateGameTime(gameTime);
 		
@@ -305,9 +356,8 @@ public class BlastiaGame : Game
 		_previousMouseState = _currentMouseState;
 		PreviousKeyboardState = KeyboardState;
 	}
-	
-	#endregion
 
+	// DRAW
 	protected override void Draw(GameTime gameTime)
 	{
 		GraphicsDevice.Clear(Color.CornflowerBlue);

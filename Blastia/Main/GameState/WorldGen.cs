@@ -6,13 +6,13 @@ public static class WorldGen
 {
     private static readonly NoisePass DirtNoisePass = new()
     {
-        Frequency = 0.01f, 
+        Frequency = 0.1f, 
         Octaves = 2, 
         Persistence = 0.15f, 
         Threshold = 0.3f,
         Amplitude = 1f,
         HeightScale = 0.1f,
-        MaxHeight = 100,
+        MaxHeight = 0.4f,
         Block = BlockID.Dirt
     };
     
@@ -32,14 +32,17 @@ public static class WorldGen
             {
                 float noiseValue = Noise.OctavePerlin(x, 0, 
                     pass.Frequency, pass.Octaves, pass.Persistence) * pass.Amplitude;
-
-                float heightMultiplier = (float) pass.MaxHeight / height;
-                int terrainVariation = (int)((height * pass.HeightScale * noiseValue) 
-                    / heightMultiplier);
                 
-                for (int y = terrainVariation; y < height; y++)
+                // Calculate base height as percentage of world height
+                int baseHeight = (int)(height * pass.MaxHeight);
+                
+                // Apply variation around base height
+                int terrainVariation = (int)(height * pass.HeightScale * noiseValue);
+                int finalHeight = baseHeight + terrainVariation;
+                
+                for (int y = finalHeight; y < height; y++)
                 {
-                    worldState.SetTile(x, y, pass.Block);
+                    worldState.SetTile(x, y, BlockID.Dirt);
                 }
             }
         }

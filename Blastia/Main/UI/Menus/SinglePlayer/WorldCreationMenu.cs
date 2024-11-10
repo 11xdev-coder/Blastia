@@ -1,4 +1,5 @@
 using Blastia.Main.UI.Buttons;
+using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -56,7 +57,7 @@ public class WorldCreationMenu : CreationMenu
 	{
 		int width = _sizeHandler.GetWidth();
 		int height = _sizeHandler.GetHeight();
-		Console.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
+		ConsoleHelper.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
 		
 		if (NameInput?.Text == null) return;
 		string playerName = NameInput.StringBuilder.ToString();
