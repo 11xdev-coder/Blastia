@@ -44,7 +44,7 @@ public static class MusicEngine
         }
         catch (Exception ex)
         {
-            ConsoleHelper.WriteLine($"Error while loading track. ID: {musicId}, Exception: {ex.Message}");
+            Console.WriteLine($"Error while loading track. ID: {musicId}, Exception: {ex.Message}");
         }
     }
 
@@ -66,11 +66,11 @@ public static class MusicEngine
             _currentlyPlaying = musicId;
             await FadeInMusicTrack();
             
-            ConsoleHelper.WriteLine($"Music volume: {CalculateVolume()}");
+            Console.WriteLine($"Music volume: {CalculateVolume()}");
         }
         else
         {
-            ConsoleHelper.WriteLine($"Music track {musicId} not found.");
+            Console.WriteLine($"Music track {musicId} not found.");
         }
     }
 

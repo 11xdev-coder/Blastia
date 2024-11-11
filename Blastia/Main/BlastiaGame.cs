@@ -96,9 +96,9 @@ public class BlastiaGame : Game
 	public static Color ErrorColor { get; private set; }
 	
 	// CONSOLE
+	public ConsoleWindow? ConsoleWindow;
 	private Thread _consoleThread;
 	private volatile bool _isConsoleRunning = true;
-	private readonly ConcurrentQueue<string> _consoleCommandQueue = new();
 	
 	// GAMESTATE
 	public List<Entity> Entities;
@@ -132,7 +132,7 @@ public class BlastiaGame : Game
 		AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
 		// load player manager
 		PlayerManager.Instance.Initialize();
-		ConsoleHelper.WriteLine($"Save game directory: {Paths.GetSaveGameDirectory()}");
+		Console.WriteLine($"Save game directory: {Paths.GetSaveGameDirectory()}");
 		
 		ExitRequestEvent += OnExitRequested;
 		ResolutionRequestEvent += UpdateResolution;
@@ -148,33 +148,16 @@ public class BlastiaGame : Game
 
 	private void InitializeConsole()
 	{
-		try 
+		ConsoleWindow = new ConsoleWindow();
+		ConsoleWindow.Open("Blastia Game Console");
+
+		_consoleThread = new Thread(() =>
 		{
-			ConsoleHelper.CreateConsole("Blastia Game Console");
-        
-			// Start console thread
-			_consoleThread = new Thread(() =>
-			{
-				try
-				{
-					var isConsoleRunning = _isConsoleRunning;
-					ConsoleHelper.ConsoleInputLoop(ref isConsoleRunning, _consoleCommandQueue);
-				}
-				catch (Exception ex)
-				{
-					// Log error but don't crash the game
-					System.Diagnostics.Debug.WriteLine($"Console thread error: {ex}");
-				}
-			});
-        
-			_consoleThread.IsBackground = true; // Make it a background thread
-			_consoleThread.Start();
-		}
-		catch (Exception ex)
-		{
-			// Log error but don't crash the game
-			System.Diagnostics.Debug.WriteLine($"Console initialization error: {ex}");
-		}
+			var isConsoleRunning = _isConsoleRunning;
+			ConsoleWindow.InputLoop(ref isConsoleRunning);
+		});
+
+		_consoleThread.Start();
 	}
 
 	protected override void Initialize()
@@ -263,7 +246,7 @@ public class BlastiaGame : Game
 			_consoleThread.Join(100);
 		}
 		
-		ConsoleHelper.RemoveConsole();
+		ConsoleWindow?.Close();
 		
 		base.UnloadContent();
 		
@@ -274,8 +257,6 @@ public class BlastiaGame : Game
 	// UPDATE
 	protected override void Update(GameTime gameTime)
 	{
-		ConsoleHelper.UpdateConsole(_consoleCommandQueue);
-		
 		base.Update(gameTime);
 		UpdateGameTime(gameTime);
 		

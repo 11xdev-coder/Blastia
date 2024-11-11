@@ -57,7 +57,7 @@ public class WorldCreationMenu : CreationMenu
 	{
 		int width = _sizeHandler.GetWidth();
 		int height = _sizeHandler.GetHeight();
-		ConsoleHelper.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
+		Console.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
 		
 		if (NameInput?.Text == null) return;
 		string playerName = NameInput.StringBuilder.ToString();

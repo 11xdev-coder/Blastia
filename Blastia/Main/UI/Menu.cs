@@ -82,7 +82,7 @@ public class Menu
         {
             elem.OnMenuInactive();
         }
-        ConsoleHelper.WriteLine("Called OnMenuInactive on all UIElements.");
+        Console.WriteLine("Called OnMenuInactive on all UIElements.");
     }
     
     /// <summary>
