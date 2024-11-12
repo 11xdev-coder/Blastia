@@ -25,7 +25,11 @@ public static class WorldGen
         {
             DirtNoisePass
         };
-		
+
+        int halfWorld = (int) (width * 0.5f);
+        int randomSpawnX = BlastiaGame.Rand.Next(halfWorld - 20, halfWorld + 21);
+        bool spawnPointSet = false;
+        
         for (int x = 0; x < width; x++) 
         {
             foreach (var pass in noisePasses)
@@ -43,6 +47,15 @@ public static class WorldGen
                 for (int y = finalHeight; y < height; y++)
                 {
                     worldState.SetTile(x, y, BlockID.Dirt);
+                }
+                
+                if (x >= randomSpawnX)
+                {
+                    if (spawnPointSet) return;
+                    
+                    // five blocks above current height
+                    worldState.SetSpawnPoint(x, finalHeight - 5);
+                    spawnPointSet = true;
                 }
             }
         }

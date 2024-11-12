@@ -2,6 +2,7 @@
 using Blastia.Main.GameState;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
+using Microsoft.Xna.Framework;
 
 namespace Blastia.Main;
 
@@ -194,14 +195,23 @@ public class WorldState
 	public ushort[] Tiles { get; set; } = [];
 	public int WorldWidth { get; set; }
 	public int WorldHeight { get; set; }
-	
-	public ushort GetTile(int x, int y) 
-	{
-		return Tiles[y * WorldWidth + x];
-	}
+
+	public float SpawnX { get; set; }
+	public float SpawnY { get; set; }
 	
 	public void SetTile(int x, int y, ushort value)
 	{
 		Tiles[y * WorldWidth + x] = value;
 	}
+	
+	public ushort GetTile(int x, int y) => Tiles[y * WorldWidth + x];
+
+	public void SetSpawnPoint(float x, float y)
+	{
+		// from tiles to world coords
+		SpawnX = x * 8;
+		SpawnY = y * 8;
+	}
+
+	public Vector2 GetSpawnPoint() => new(SpawnX, SpawnY);
 }

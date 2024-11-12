@@ -13,33 +13,65 @@ public class ConsoleWindow
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool FreeConsole();
 
+    private Thread _consoleThread;
+    private ConcurrentQueue<string> _commandQueue = new();
+    private volatile bool _isRunning;
+
+    public ConsoleWindow()
+    {
+        _commandQueue = new ConcurrentQueue<string>();
+        _isRunning = false;
+    }
+    
     public void Open(string title)
     {
         AllocConsole();
         Console.Title = title;
+        
+        _isRunning = true;
+        _consoleThread = new Thread(InputLoop);
+        _consoleThread.Start();
     }
 
     public void Close()
     {
+        _isRunning = false;
+        if (_consoleThread.IsAlive)
+        {
+            _consoleThread.Join();
+        }
+        
         FreeConsole();
     }
 
     /// <summary>
     /// While console is running, tries to get input and enqueue it
     /// </summary>
-    /// <param name="isRunning">Flag is console thread running</param>
-    public void InputLoop(ref bool isRunning)
+    public void InputLoop()
     {
         Console.WriteLine("Blastia Game Console");
         Console.WriteLine("Type 'help' for a list of available commands");
         
-        while (isRunning)
+        while (_isRunning)
         {
-            string? input = Console.ReadLine()?.Trim().ToLower();
-            // queue command for further processing
-            if (!string.IsNullOrEmpty(input))
+            if (Console.KeyAvailable)
             {
-                ProcessCommand(input);
+                string? input = Console.ReadLine()?.Trim().ToLower();
+                
+                // queue command for further processing
+                if (!string.IsNullOrEmpty(input))
+                {
+                    ProcessCommand(input);
+                }
+            }
+            else
+            {
+                // process commands
+                while (_commandQueue.TryDequeue(out string? command))
+                {
+                    ProcessCommand(command);
+                }
+                Thread.Sleep(10);
             }
         }
     }

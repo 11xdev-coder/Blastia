@@ -89,7 +89,8 @@ public class BlastiaGame : Game
 	/// </summary>
 	private static event Action? RequestWorldInitializationEvent;
 
-	private static readonly Random Rand = new();
+	// RANDOM
+	public static readonly Random Rand = new();
 
 	// COLORS
 	private double _colorTimer;
@@ -97,8 +98,6 @@ public class BlastiaGame : Game
 	
 	// CONSOLE
 	public ConsoleWindow? ConsoleWindow;
-	private Thread _consoleThread;
-	private volatile bool _isConsoleRunning = true;
 	
 	// GAMESTATE
 	public List<Entity> Entities;
@@ -150,14 +149,6 @@ public class BlastiaGame : Game
 	{
 		ConsoleWindow = new ConsoleWindow();
 		ConsoleWindow.Open("Blastia Game Console");
-
-		_consoleThread = new Thread(() =>
-		{
-			var isConsoleRunning = _isConsoleRunning;
-			ConsoleWindow.InputLoop(ref isConsoleRunning);
-		});
-
-		_consoleThread.Start();
 	}
 
 	protected override void Initialize()
@@ -238,14 +229,6 @@ public class BlastiaGame : Game
 
 	protected override void UnloadContent()
 	{
-		// stop console thread
-		_isConsoleRunning = false;
-		if (_consoleThread.IsAlive)
-		{
-			// wait to finish
-			_consoleThread.Join(100);
-		}
-		
 		ConsoleWindow?.Close();
 		
 		base.UnloadContent();
@@ -405,7 +388,10 @@ public class BlastiaGame : Game
 	
 	private void InitializeWorld()
 	{
-		MyPlayer = new Player(Vector2.Zero, 0.2f, true);
+		var world = PlayerManager.Instance.SelectedWorld;
+		if (world == null) return;
+		
+		MyPlayer = new Player(world.GetSpawnPoint(), 0.2f, true);
 		Entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
@@ -422,9 +408,11 @@ public class BlastiaGame : Game
 
 	private void OnExitRequested()
 	{
+		ConsoleWindow?.Close();
+		
 		Exit();
 	}
-		
+
 	private void AddMenu(Menu? menu)
 	{
 		if (menu != null) _menus.Add(menu);
