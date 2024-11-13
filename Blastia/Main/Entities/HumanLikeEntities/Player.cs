@@ -54,8 +54,9 @@ public class Player : HumanLikeEntity
 		if (LocallyControlled)
 		{
 			HandleMovement();
-		
+			
 			Camera?.Update();
+			MakeCameraFollow();
 		}
 	}
 
@@ -71,6 +72,15 @@ public class Player : HumanLikeEntity
 		
 		MovementVector = directionVector * MovementSpeed;
 		UpdatePosition();
+	}
+
+	private void MakeCameraFollow()
+	{
+		if (Camera == null) return;
+
+		float x = Position.X - Camera.DrawWidth * 0.5f / Camera.CameraScale;
+		float y = Position.Y - Camera.DrawHeight * 0.5f / Camera.CameraScale;
+		Camera.Position = new Vector2(x, y);
 	}
 
 	/// <summary>

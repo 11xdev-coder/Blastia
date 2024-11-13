@@ -14,9 +14,9 @@ public class ConsoleWindow
     private static extern bool FreeConsole();
 
     private Thread _consoleThread;
-    private ConcurrentQueue<string> _commandQueue = new();
-    private volatile bool _isRunning;
-
+    private readonly ConcurrentQueue<string> _commandQueue;
+    private volatile bool _isRunning; // can be edited in any thread
+    
     public ConsoleWindow()
     {
         _commandQueue = new ConcurrentQueue<string>();
@@ -47,7 +47,7 @@ public class ConsoleWindow
     /// <summary>
     /// While console is running, tries to get input and enqueue it
     /// </summary>
-    public void InputLoop()
+    private void InputLoop()
     {
         Console.WriteLine("Blastia Game Console");
         Console.WriteLine("Type 'help' for a list of available commands");
