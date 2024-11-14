@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Entities.Common;
+﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -21,6 +22,9 @@ public class Player : HumanLikeEntity
 	private const float WalkingAnimationDuration = 0.4f;
 
 	public Camera? Camera { get; set; }
+
+	protected override bool ApplyGravity => true;
+	protected override float Height => 2;
 
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
@@ -54,6 +58,7 @@ public class Player : HumanLikeEntity
 		if (LocallyControlled)
 		{
 			HandleMovement();
+			ApplyGravityForce();
 			
 			Camera?.Update();
 			MakeCameraFollow();
