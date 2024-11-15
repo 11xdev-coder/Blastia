@@ -48,6 +48,8 @@ public class Player : HumanLikeEntity
 	{
 		if (IsPreview) PreviewUpdate();
 		else RegularUpdate();
+		
+		base.Update();
 	}
 
 	/// <summary>
@@ -58,7 +60,6 @@ public class Player : HumanLikeEntity
 		if (LocallyControlled)
 		{
 			HandleMovement();
-			ApplyGravityForce();
 			
 			Camera?.Update();
 			MakeCameraFollow();
@@ -76,7 +77,6 @@ public class Player : HumanLikeEntity
 			directionVector = Vector2Extensions.Normalize(directionVector);
 		
 		MovementVector = directionVector * MovementSpeed;
-		UpdatePosition();
 	}
 
 	private void MakeCameraFollow()

@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.GameState;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Object = Blastia.Main.GameState.Object;
@@ -16,12 +17,14 @@ public abstract class Entity : Object
         {Keys.S, new Vector2(0, 1)}
     };
     
+    // velocity
     protected Vector2 MovementVector;
     protected float MovementSpeed;
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
-    protected virtual float Gravity { get; set; } = 9.8f;
+    protected const float Gravity = 9.8f; // G constant
+    protected virtual float Mass { get; set; } = 1f; // kg
     
     // HITBOX
     /// <summary>
@@ -49,9 +52,18 @@ public abstract class Entity : Object
     protected ushort GetId() => ID;
 
     /// <summary>
+    /// Updates position and adds all natural forces
+    /// </summary>
+    public override void Update()
+    {
+        ApplyGravityForce();
+        UpdatePosition();
+    }
+
+    /// <summary>
     /// Adds MovementVector to Position. Call this when Entity should move and MovementVector has been set
     /// </summary>
-    protected void UpdatePosition()
+    private void UpdatePosition()
     {
         Position += MovementVector;
     }
@@ -59,16 +71,20 @@ public abstract class Entity : Object
     /// <summary>
     /// Newton's law of universal gravitation
     /// </summary>
-    protected void ApplyGravityForce()
+    private void ApplyGravityForce()
     {
         if (ApplyGravity)
         {
             var currentWorld = PlayerManager.Instance.SelectedWorld;
             var x = Position.X / Block.Size;
             var y = Position.Y / Block.Size + Height; // correct from top-left corner to bottom
+            
             // less than 0 -> air
             if (currentWorld != null && currentWorld.GetTile((int) x, (int) y) < 1)
-                Position.Y += Gravity;
+            {
+                // Newton's law of universal gravitation
+                
+            }
         }
     }
 }

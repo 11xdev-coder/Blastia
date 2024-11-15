@@ -47,11 +47,6 @@ public abstract class HumanLikeEntity : Entity
 		LeftLeg = new BodyPart(leg, leftLegOffset, 0f, topOrigin);
 		RightLeg = new BodyPart(leg, rightLegOffset, 0f, topOrigin);
 	}
-
-	public override void Update()
-    {
-        
-    }
 	
 	/// <summary>
 	/// Rotates arms and legs overtime with specified duration
