@@ -25,6 +25,7 @@ public class Player : HumanLikeEntity
 
 	protected override bool ApplyGravity => true;
 	protected override float Height => 2;
+	protected override float Mass => 46f;
 
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 

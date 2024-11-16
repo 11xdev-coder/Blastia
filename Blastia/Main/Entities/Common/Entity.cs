@@ -1,5 +1,6 @@
 ﻿using Blastia.Main.Blocks.Common;
 using Blastia.Main.GameState;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Object = Blastia.Main.GameState.Object;
@@ -23,7 +24,7 @@ public abstract class Entity : Object
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
-    protected const float Gravity = 9.8f; // G constant
+    protected const float Gravity = 0.018971875f; // G constant
     protected virtual float Mass { get; set; } = 1f; // kg
     
     // HITBOX
@@ -61,11 +62,22 @@ public abstract class Entity : Object
     }
 
     /// <summary>
-    /// Adds MovementVector to Position. Call this when Entity should move and MovementVector has been set
+    /// Newton's law of inertia
     /// </summary>
     private void UpdatePosition()
     {
         Position += MovementVector;
+    }
+
+    /// <summary>
+    /// Newton's second law (F = ma)
+    /// </summary>
+    /// <param name="force"></param>
+    private void ApplyForce(Vector2 force)
+    {
+        var acceleration = force / Mass;
+        MovementVector += acceleration;
+        Console.WriteLine($"Acceleration: {acceleration}");
     }
     
     /// <summary>
@@ -80,10 +92,24 @@ public abstract class Entity : Object
             var y = Position.Y / Block.Size + Height; // correct from top-left corner to bottom
             
             // less than 0 -> air
-            if (currentWorld != null && currentWorld.GetTile((int) x, (int) y) < 1)
+            if (currentWorld != null && x > 0 && x < currentWorld.WorldWidth && y > 0 && y < currentWorld.WorldHeight &&
+                currentWorld.GetTile((int) x, (int) y) < 1)
             {
-                // Newton's law of universal gravitation
+                var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
+                // m1 * m2
+                var totalMass = worldMass * Mass;
                 
+                // find distance between Entity position and center of Hell
+                // some variables
+                var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
+                var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * 8;
+                // distance squared
+                var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
+
+                // find gravity force
+                var gravityForce = Gravity * (totalMass / r);
+                ApplyForce(new Vector2(0, (float) gravityForce));
+                Console.WriteLine($"Applied gravity: {gravityForce}");
             }
         }
     }

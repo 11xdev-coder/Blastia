@@ -42,4 +42,19 @@ public static class MathUtilities
     {
         return (int) Math.Round(value);
     }
+
+    /// <summary>
+    /// Finds distance between point A and point B and squares it
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static double DistanceBetweenTwoPointsSquared(Vector2 a, Vector2 b)
+    {
+        var dx = b.X - a.X;
+        var dy = b.Y - a.Y;
+        
+        var distance = dx * dx + dy * dy;
+        return distance;
+    }
 }
