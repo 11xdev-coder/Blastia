@@ -27,6 +27,8 @@ public class Player : HumanLikeEntity
 	protected override float Height => 2;
 	protected override float Mass => 46f;
 
+	private Vector2 _walkingVector;
+
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
@@ -42,7 +44,7 @@ public class Player : HumanLikeEntity
 				DrawHeight = (int) BlastiaGame.ScreenHeight
 			};
 		}
-		MovementSpeed = 0.25f;
+		MovementSpeed = 20f;
 	}
 
 	public override void Update()
@@ -69,15 +71,22 @@ public class Player : HumanLikeEntity
 
 	private void HandleMovement()
 	{
-		MovementVector = Vector2.Zero;
+		_walkingVector = Vector2.Zero;
 		
 		Vector2 directionVector = Vector2.Zero;
-		KeyboardHelper.AccumulateValueFromMap(MovementMap, ref directionVector);
+		KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref directionVector);
 		
 		if (directionVector != Vector2.Zero)
 			directionVector = Vector2Extensions.Normalize(directionVector);
 		
-		MovementVector = directionVector * MovementSpeed;
+		_walkingVector = directionVector * MovementSpeed;
+		MovementVector += _walkingVector;
+
+		// jump
+		if (KeyboardHelper.IsKeyJustPressed(Keys.Space))
+		{
+			AddImpulse(new Vector2(0, -5), 0.2f);
+		}
 	}
 
 	private void MakeCameraFollow()

@@ -45,4 +45,26 @@ public static class Vector2Extensions
 
         return false;
     }
+
+    /// <summary>
+    /// Checks if Vector2 a is larger than Vector2 b
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool Larger(this Vector2 a, Vector2 b)
+    {
+        return a.X > b.X && a.Y > b.Y;
+    }
+    
+    /// <summary>
+    /// Checks if Vector2 a is smaller than Vector2 b
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static bool Smaller(this Vector2 a, Vector2 b)
+    {
+        return a.X < b.X && a.Y < b.Y;
+    }
 }

@@ -28,6 +28,9 @@ public class BlastiaGame : Game
 	
 	// TICK
 	public static GameTime GameTime { get; private set; } = new();
+	/// <summary>
+	/// Delta time between frames
+	/// </summary>
 	public static double GameTimeElapsedSeconds { get; private set; }
 	
 	// SCREEN

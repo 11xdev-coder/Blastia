@@ -35,6 +35,12 @@ public static class KeyboardHelper
         return Convert.ToBoolean(GetKeyState(VkCapsLock) & 0x0001);
     }
 
+    public static bool IsKeyJustPressed(Keys key)
+    {
+        // currently -> down, previously -> up
+        return BlastiaGame.KeyboardState.IsKeyDown(key) && BlastiaGame.PreviousKeyboardState.IsKeyUp(key);
+    }
+
     /// <summary>
     /// Processes the input from the current keyboard state and updates the provided StringBuilder
     /// based on the keys that were pressed
