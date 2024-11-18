@@ -93,8 +93,9 @@ public class Player : HumanLikeEntity
 	{
 		if (Camera == null) return;
 
-		float x = Position.X - Camera.DrawWidth * 0.5f / Camera.CameraScale;
-		float y = Position.Y - Camera.DrawHeight * 0.5f / Camera.CameraScale;
+		var matrix = VideoManager.Instance.CalculateResolutionScaleMatrix();
+		float x = Position.X - (BlastiaGame.ScreenWidth * 0.5f / Camera.CameraScale) / matrix.M11;
+		float y = Position.Y - (BlastiaGame.ScreenHeight * 0.5f / Camera.CameraScale) / matrix.M22;
 		Camera.Position = new Vector2(x, y);
 	}
 

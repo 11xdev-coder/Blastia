@@ -46,23 +46,6 @@ public class Camera : Object
 		KeyboardHelper.AccumulateValueFromMap(_zoomMap, ref zoom);
 		
 		CameraScale += zoom * ScaleSpeed;
-
-		// if (BlastiaGame.KeyboardState.IsKeyDown(Keys.A))
-		// {
-		// 	Position.X -= 1.25f;
-		// }
-		// if (BlastiaGame.KeyboardState.IsKeyDown(Keys.D))
-		// {
-		// 	Position.X += 1.25f;
-		// }
-		// if (BlastiaGame.KeyboardState.IsKeyDown(Keys.S))
-		// {
-		// 	Position.Y += 1.25f;
-		// }
-		// if (BlastiaGame.KeyboardState.IsKeyDown(Keys.W))
-		// {
-		// 	Position.Y -= 1.25f;
-		// }
 	}
 
 	public override void Draw(SpriteBatch spriteBatch)
