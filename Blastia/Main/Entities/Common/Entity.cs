@@ -43,6 +43,10 @@ public abstract class Entity : Object
     /// Entity height in blocks
     /// </summary>
     protected virtual float Height { get; set; }
+    /// <summary>
+    /// Entity width in blocks
+    /// </summary>
+    protected virtual float Width { get; set; }
 
     protected virtual ushort ID { get; set; }
 
@@ -84,12 +88,18 @@ public abstract class Entity : Object
         Position = newPosition;
     }
 
+    /// <summary>
+    /// Checks for tiles around newPosition and clamps it
+    /// </summary>
+    /// <param name="newPosition">New position that doesn't clip through blocks</param>
     private void HandleCollision(ref Vector2 newPosition)
     {
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
 
         float tileX = newPosition.X / Block.Size;
+        
+        // Height checks
         float groundTileY = newPosition.Y / Block.Size + Height;
 
         if (tileX <= 0 || tileX >= currentWorld.WorldWidth 
@@ -99,15 +109,46 @@ public abstract class Entity : Object
             return;
         }
 
+        // TODO: Account for Width
         bool isGrounded = currentWorld.GetTile((int) tileX, (int) groundTileY) >= 1;
         IsGrounded = isGrounded;
         
         // clamp Y if grounded
         if (IsGrounded)
         {
+            // from block to world pos
             var newY = (groundTileY - Height) * Block.Size;
             newPosition.Y = newY;
             MovementVector.Y = 0;
+        }
+        
+        // Width checks
+        var leftTileX = tileX - Width;
+        var rightTileX = tileX + Width;
+
+        if (leftTileX <= 0 || leftTileX >= currentWorld.WorldWidth
+                           || rightTileX <= 0 || rightTileX >= currentWorld.WorldWidth)
+        {
+            Console.WriteLine("Tf you doin here");
+            return;
+        } 
+        // TODO: Account for height
+        bool touchesLeft = currentWorld.HasTile((int) leftTileX, (int) groundTileY);
+        bool touchesRight = currentWorld.HasTile((int) rightTileX, (int) groundTileY);
+        
+        // clamp to the left block X
+        if (touchesLeft)
+        {
+            // from block to world pos
+            var newX = (leftTileX - Width) * Block.Size;
+            newPosition.X = newX;
+            MovementVector.X = 0;
+        }
+        else if (touchesRight)
+        {
+            var newX = (rightTileX - Width) * Block.Size;
+            newPosition.X = newX;
+            MovementVector.X = 0;
         }
     }
 
@@ -143,16 +184,16 @@ public abstract class Entity : Object
         var deltaTime = (float)BlastiaGame.GameTimeElapsedSeconds;
         var remainingImpulse = _totalImpulse - _currentImpulse;
     
-        // Calculate how much impulse to apply this frame
-        var impulseThisFrame = Vector2.Multiply(remainingImpulse, deltaTime);
+        // impulse per frame
+        var impulseThisFrame = _totalImpulse / deltaTime;
     
-        // If we're very close to the target impulse, just finish it
-        if (remainingImpulse.LengthSquared() < 0.01f || impulseThisFrame.LengthSquared() > remainingImpulse.LengthSquared())
+        // finish impulse if very close to 0
+        if (remainingImpulse.LengthSquared() < float.Epsilon 
+            || impulseThisFrame.LengthSquared() > remainingImpulse.LengthSquared())
         {
             MovementVector += remainingImpulse;
             _totalImpulse = Vector2.Zero;
             _currentImpulse = Vector2.Zero;
-            Console.WriteLine("Impulse completed");
         }
         else
         {

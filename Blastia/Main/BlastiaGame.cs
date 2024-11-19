@@ -393,6 +393,11 @@ public class BlastiaGame : Game
 	{
 		var world = PlayerManager.Instance.SelectedWorld;
 		if (world == null) return;
+
+		if (LogoMenu != null)
+		{
+			LogoMenu.Active = false;
+		}
 		
 		MyPlayer = new Player(world.GetSpawnPoint(), 0.2f, true);
 		Entities.Add(new MutantScavenger(new Vector2(50, 50)));

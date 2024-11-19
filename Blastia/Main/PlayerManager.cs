@@ -169,8 +169,6 @@ public class PlayerManager : Singleton<PlayerManager>
 		BlastiaGame.RequestWorldInitialization();
 	}
 	
-	// TODO: ACTUAL WorldGen with NoisePasses (test noise pass for grass and for stone)
-	// TODO: maybe try using temperature + perlin formula
 	private void GenerateWorldTiles(WorldState worldState) 
 	{
 		
@@ -205,6 +203,8 @@ public class WorldState
 	}
 	
 	public ushort GetTile(int x, int y) => Tiles[y * WorldWidth + x];
+
+	public bool HasTile(int x, int y) => GetTile(x, y) >= 1;
 
 	public void SetSpawnPoint(float x, float y)
 	{

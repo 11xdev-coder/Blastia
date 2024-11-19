@@ -25,6 +25,7 @@ public class Player : HumanLikeEntity
 
 	protected override bool ApplyGravity => true;
 	protected override float Height => 2;
+	protected override float Width => 1;
 	protected override float Mass => 46f;
 
 	private Vector2 _walkingVector;
