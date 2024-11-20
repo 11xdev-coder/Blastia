@@ -97,58 +97,95 @@ public abstract class Entity : Object
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
 
-        float tileX = newPosition.X / Block.Size;
-        
-        // Height checks
-        float groundTileY = newPosition.Y / Block.Size + Height;
+        float leftTileX = (float)Math.Floor((newPosition.X - Width * Block.Size) / Block.Size);
+        float rightTileX = (float)Math.Floor((newPosition.X + Width * Block.Size) / Block.Size);
+        float topTileY = (float)Math.Floor(newPosition.Y / Block.Size);
+        float bottomTileY = (float)Math.Floor((newPosition.Y + Height * Block.Size) / Block.Size);
 
-        if (tileX <= 0 || tileX >= currentWorld.WorldWidth 
-                       || groundTileY <= 0 || groundTileY >= currentWorld.WorldHeight)
+        // y is flipped, so top is subtraction, so < 0
+        if (leftTileX < 0 || rightTileX >= currentWorld.WorldWidth ||
+            topTileY < 0 || bottomTileY >= currentWorld.WorldHeight)
         {
             Console.WriteLine("Tf you doin here");
             return;
         }
-
-        // TODO: Account for Width
-        bool isGrounded = currentWorld.GetTile((int) tileX, (int) groundTileY) >= 1;
+        
+        // vertical
+        bool isGrounded = false;
+        var startX = Math.Max(0, (int) leftTileX);
+        var endX = Math.Min(currentWorld.WorldWidth - 1, (int) rightTileX);
+        
+        // floor
+        // check only if moving down, or standing
+        if (MovementVector.Y >= 0)
+        {
+            int floorY = (int) bottomTileY;
+            for (int x = startX; x <= endX; x++)
+            {
+                if (currentWorld.HasTile(x, floorY))
+                {
+                    isGrounded = true;
+                    newPosition.Y = floorY * Block.Size - Height * Block.Size; // convert to world pos
+                    MovementVector.Y = 0;
+                    break; // exit early
+                }
+            }
+        }
         IsGrounded = isGrounded;
         
-        // clamp Y if grounded
-        if (IsGrounded)
+        // ceiling
+        // check only if moving up
+        if (MovementVector.Y < 0)
         {
-            // from block to world pos
-            var newY = (groundTileY - Height) * Block.Size;
-            newPosition.Y = newY;
-            MovementVector.Y = 0;
+            int ceilingY = (int) topTileY;
+            for (int x = startX; x <= endX; x++)
+            {
+                if (currentWorld.HasTile(x, ceilingY))
+                {
+                    // +1 so it is the bottom of top tile 
+                    newPosition.Y = (ceilingY + 1) * Block.Size;
+                    MovementVector.Y = 0;
+                    break; // exit early
+                }
+            }
         }
         
-        // Width checks
-        var leftTileX = tileX - Width;
-        var rightTileX = tileX + Width;
-
-        if (leftTileX <= 0 || leftTileX >= currentWorld.WorldWidth
-                           || rightTileX <= 0 || rightTileX >= currentWorld.WorldWidth)
-        {
-            Console.WriteLine("Tf you doin here");
-            return;
-        } 
-        // TODO: Account for height
-        bool touchesLeft = currentWorld.HasTile((int) leftTileX, (int) groundTileY);
-        bool touchesRight = currentWorld.HasTile((int) rightTileX, (int) groundTileY);
+        // horizontal
+        var startY = Math.Max(0, (int) topTileY);
+        var endY = Math.Min(currentWorld.WorldHeight - 1, (int) bottomTileY);
         
-        // clamp to the left block X
-        if (touchesLeft)
+        // left
+        // check only if moving left
+        if (MovementVector.X < 0)
         {
-            // from block to world pos
-            var newX = (leftTileX - Width) * Block.Size;
-            newPosition.X = newX;
-            MovementVector.X = 0;
+            int leftX = (int) leftTileX;
+            for (int y = startY; y <= endY; y++)
+            {
+                if (currentWorld.HasTile(leftX, y))
+                {
+                    // +1 so it is right side of the block, then add Width
+                    newPosition.X = (leftX + 1) * Block.Size + Width * Block.Size;
+                    MovementVector.X = 0;
+                    break;
+                }
+            }
         }
-        else if (touchesRight)
+        
+        // right
+        // check only if moving right
+        if (MovementVector.X > 0)
         {
-            var newX = (rightTileX - Width) * Block.Size;
-            newPosition.X = newX;
-            MovementVector.X = 0;
+            int rightX = (int) rightTileX;
+            for (int y = startY; y <= endY; y++)
+            {
+                if (currentWorld.HasTile(rightX, y))
+                {
+                    // already left side of the block, then subtract Width
+                    newPosition.X = rightX * Block.Size - Width * Block.Size;
+                    MovementVector.X = 0;
+                    break;
+                }
+            }
         }
     }
 
