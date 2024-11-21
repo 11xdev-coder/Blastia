@@ -97,10 +97,10 @@ public abstract class Entity : Object
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
 
-        float leftTileX = (float)Math.Floor((newPosition.X - Width * Block.Size) / Block.Size);
-        float rightTileX = (float)Math.Floor((newPosition.X + Width * Block.Size) / Block.Size);
+        float leftTileX = (float)Math.Floor(newPosition.X / Block.Size);
+        float rightTileX = (float)Math.Floor(newPosition.X / Block.Size + Width);
         float topTileY = (float)Math.Floor(newPosition.Y / Block.Size);
-        float bottomTileY = (float)Math.Floor((newPosition.Y + Height * Block.Size) / Block.Size);
+        float bottomTileY = (float)Math.Floor(newPosition.Y / Block.Size + Height);
 
         // y is flipped, so top is subtraction, so < 0
         if (leftTileX < 0 || rightTileX >= currentWorld.WorldWidth ||
