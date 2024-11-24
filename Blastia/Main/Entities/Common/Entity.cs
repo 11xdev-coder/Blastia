@@ -42,11 +42,11 @@ public abstract class Entity : Object
     /// <summary>
     /// Entity height in blocks
     /// </summary>
-    protected virtual float Height { get; set; }
+    protected virtual int Height { get; set; }
     /// <summary>
     /// Entity width in blocks
     /// </summary>
-    protected virtual float Width { get; set; }
+    protected virtual int Width { get; set; }
 
     protected virtual ushort ID { get; set; }
 
@@ -88,100 +88,104 @@ public abstract class Entity : Object
         Position = newPosition;
     }
 
-    /// <summary>
-    /// Checks for tiles around newPosition and clamps it
-    /// </summary>
-    /// <param name="newPosition">New position that doesn't clip through blocks</param>
     private void HandleCollision(ref Vector2 newPosition)
     {
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
 
-        float leftTileX = (float)Math.Floor(newPosition.X / Block.Size);
-        float rightTileX = (float)Math.Floor(newPosition.X / Block.Size + Width);
-        float topTileY = (float)Math.Floor(newPosition.Y / Block.Size);
-        float bottomTileY = (float)Math.Floor(newPosition.Y / Block.Size + Height);
+        // Store original movement for restoration if needed
+        var originalMovement = MovementVector;
+        
+        // Handle vertical movement first
+        HandleVerticalCollision(ref newPosition, currentWorld);
+        
+        // Then handle horizontal movement
+        HandleHorizontalCollision(ref newPosition, currentWorld);
+    }
 
-        // y is flipped, so top is subtraction, so < 0
-        if (leftTileX < 0 || rightTileX >= currentWorld.WorldWidth ||
-            topTileY < 0 || bottomTileY >= currentWorld.WorldHeight)
-        {
-            Console.WriteLine("Tf you doin here");
-            return;
-        }
-        
-        // vertical
-        bool isGrounded = false;
-        var startX = Math.Max(0, (int) leftTileX);
-        var endX = Math.Min(currentWorld.WorldWidth - 1, (int) rightTileX);
-        
-        // floor
-        // check only if moving down, or standing
+    private void HandleVerticalCollision(ref Vector2 newPosition, WorldState currentWorld)
+    {
+        // For downward movement, check the bottom of player hitbox
+        float checkY = MovementVector.Y >= 0 ? 
+            newPosition.Y + Height * Block.Size :  // bottom of player
+            newPosition.Y;                         // top of player
+    
+        int startTileY = (int)Math.Floor(checkY / Block.Size);
+    
+        // horizontal range
+        int leftTileX = (int)Math.Floor(newPosition.X / Block.Size);
+        int rightTileX = (int)Math.Floor((newPosition.X + Width * Block.Size - 0.1f) / Block.Size);
+    
+        // clamp
+        leftTileX = Math.Max(0, leftTileX);
+        rightTileX = Math.Min(currentWorld.WorldWidth - 1, rightTileX);
+        startTileY = Math.Clamp(startTileY, 0, currentWorld.WorldHeight - 1);
+
+        IsGrounded = false;
+
+        // Moving down
         if (MovementVector.Y >= 0)
         {
-            int floorY = (int) bottomTileY;
-            for (int x = startX; x <= endX; x++)
+            for (int x = leftTileX; x <= rightTileX; x++)
             {
-                if (currentWorld.HasTile(x, floorY))
+                if (currentWorld.HasTile(x, startTileY - Height))
                 {
-                    isGrounded = true;
-                    newPosition.Y = floorY * Block.Size - Height * Block.Size; // convert to world pos
+                    newPosition.Y = startTileY * Block.Size - Height * Block.Size;
                     MovementVector.Y = 0;
-                    break; // exit early
+                    IsGrounded = true;
+                    break;
                 }
             }
         }
-        IsGrounded = isGrounded;
-        
-        // ceiling
-        // check only if moving up
-        if (MovementVector.Y < 0)
+        // up
+        else if (MovementVector.Y < 0)
         {
-            int ceilingY = (int) topTileY;
-            for (int x = startX; x <= endX; x++)
+            for (int x = leftTileX; x <= rightTileX; x++)
             {
-                if (currentWorld.HasTile(x, ceilingY))
+                if (currentWorld.HasTile(x, startTileY))
                 {
-                    // +1 so it is the bottom of top tile 
-                    newPosition.Y = (ceilingY + 1) * Block.Size;
+                    newPosition.Y = (startTileY + 1) * Block.Size; // Move to bottom of blocking tile
                     MovementVector.Y = 0;
-                    break; // exit early
+                    break;
                 }
             }
         }
+    }
+
+    private void HandleHorizontalCollision(ref Vector2 newPosition, WorldState currentWorld)
+    {
+        int startTileX = (int)Math.Floor(newPosition.X / Block.Size);
         
-        // horizontal
-        var startY = Math.Max(0, (int) topTileY);
-        var endY = Math.Min(currentWorld.WorldHeight - 1, (int) bottomTileY);
+        // vertical range
+        int topTileY = (int)Math.Floor(newPosition.Y / Block.Size);
+        int bottomTileY = (int)Math.Floor((newPosition.Y + Height * Block.Size - 0.1f) / Block.Size);
         
-        // left
-        // check only if moving left
-        if (MovementVector.X < 0)
+        // clamp
+        topTileY = Math.Max(0, topTileY);
+        bottomTileY = Math.Min(currentWorld.WorldHeight - 1, bottomTileY);
+        startTileX = Math.Clamp(startTileX, 0, currentWorld.WorldWidth - 1);
+
+        // right
+        if (MovementVector.X > 0)
         {
-            int leftX = (int) leftTileX;
-            for (int y = startY; y <= endY; y++)
+            for (int y = topTileY; y <= bottomTileY; y++)
             {
-                if (currentWorld.HasTile(leftX, y))
+                if (currentWorld.HasTile(startTileX + Width, y))
                 {
-                    // +1 so it is right side of the block, then add Width
-                    newPosition.X = (leftX + 1) * Block.Size + Width * Block.Size;
+                    newPosition.X = startTileX * Block.Size;
                     MovementVector.X = 0;
                     break;
                 }
             }
         }
-        
-        // right
-        // check only if moving right
-        if (MovementVector.X > 0)
+        // left
+        else if (MovementVector.X < 0)
         {
-            int rightX = (int) rightTileX;
-            for (int y = startY; y <= endY; y++)
+            for (int y = topTileY; y <= bottomTileY; y++)
             {
-                if (currentWorld.HasTile(rightX, y))
+                if (currentWorld.HasTile(startTileX, y))
                 {
-                    // already left side of the block, then subtract Width
-                    newPosition.X = rightX * Block.Size - Width * Block.Size;
+                    newPosition.X = startTileX * Block.Size + Width * Block.Size;
                     MovementVector.X = 0;
                     break;
                 }

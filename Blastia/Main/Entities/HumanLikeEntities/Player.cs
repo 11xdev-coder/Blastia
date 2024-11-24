@@ -24,8 +24,8 @@ public class Player : HumanLikeEntity
 	public Camera? Camera { get; set; }
 
 	protected override bool ApplyGravity => true;
-	protected override float Height => 2;
-	protected override float Width => 1;
+	protected override int Height => 2;
+	protected override int Width => 1;
 	protected override float Mass => 46f;
 
 	private Vector2 _walkingVector;
