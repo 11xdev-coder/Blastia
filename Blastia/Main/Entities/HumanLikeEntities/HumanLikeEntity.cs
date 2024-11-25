@@ -102,5 +102,7 @@ public abstract class HumanLikeEntity : Entity
         LeftArm.Draw(spriteBatch, position, scaledBodyPartScale);
         LeftLeg.Draw(spriteBatch, position, scaledBodyPartScale);
         RightLeg.Draw(spriteBatch, position, scaledBodyPartScale);
+        
+        //base.Draw(spriteBatch);
     }
 }

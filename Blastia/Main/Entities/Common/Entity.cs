@@ -2,6 +2,7 @@
 using Blastia.Main.GameState;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Object = Blastia.Main.GameState.Object;
 
@@ -105,46 +106,45 @@ public abstract class Entity : Object
 
     private void HandleVerticalCollision(ref Vector2 newPosition, WorldState currentWorld)
     {
-        // For downward movement, check the bottom of player hitbox
-        float checkY = MovementVector.Y >= 0 ? 
-            newPosition.Y + Height * Block.Size :  // bottom of player
-            newPosition.Y;                         // top of player
+        // Convert to tile coordinates
+        int tileY = (int)Math.Floor(newPosition.Y / Block.Size);
     
-        int startTileY = (int)Math.Floor(checkY / Block.Size);
-    
-        // horizontal range
+        // Get horizontal range
         int leftTileX = (int)Math.Floor(newPosition.X / Block.Size);
-        int rightTileX = (int)Math.Floor((newPosition.X + Width * Block.Size - 0.1f) / Block.Size);
-    
-        // clamp
+        int rightTileX = (int)Math.Floor((newPosition.X + Width * Block.Size) / Block.Size);
+
+        // Clamp coordinates
         leftTileX = Math.Max(0, leftTileX);
         rightTileX = Math.Min(currentWorld.WorldWidth - 1, rightTileX);
-        startTileY = Math.Clamp(startTileY, 0, currentWorld.WorldHeight - 1);
+        tileY = Math.Clamp(tileY, 0, currentWorld.WorldHeight - 1);
 
         IsGrounded = false;
 
-        // Moving down
+        // Moving down (positive Y)
         if (MovementVector.Y >= 0)
         {
             for (int x = leftTileX; x <= rightTileX; x++)
             {
-                if (currentWorld.HasTile(x, startTileY - Height))
+                if (currentWorld.HasTile(x, tileY - Height))
                 {
-                    newPosition.Y = startTileY * Block.Size - Height * Block.Size;
+                    // Position should be tile position minus entity height
+                    newPosition.Y = tileY * Block.Size;
                     MovementVector.Y = 0;
                     IsGrounded = true;
                     break;
                 }
             }
         }
-        // up
+        // Moving up (negative Y)
         else if (MovementVector.Y < 0)
         {
+            // For upward movement, check the tile at the top of the entity
+            int topTileY = (int)Math.Floor(newPosition.Y / Block.Size);
             for (int x = leftTileX; x <= rightTileX; x++)
             {
-                if (currentWorld.HasTile(x, startTileY))
+                if (currentWorld.HasTile(x, topTileY))
                 {
-                    newPosition.Y = (startTileY + 1) * Block.Size; // Move to bottom of blocking tile
+                    newPosition.Y = (topTileY + 1) * Block.Size;
                     MovementVector.Y = 0;
                     break;
                 }
@@ -250,26 +250,26 @@ public abstract class Entity : Object
     private void ApplyGravityForce()
     {
         if (!ApplyGravity) return;
-        
-        var currentWorld = PlayerManager.Instance.SelectedWorld;
-        if (currentWorld == null) return;
-        
-        var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
-        // m1 * m2
-        var totalMass = worldMass * Mass;
-        
-        // find distance between Entity position and center of Hell
-        // some variables
-        var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
-        var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
-        // distance squared
-        var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
-
-        // find gravity force
-        var gravityForce = Gravity * (totalMass / r);
-        
-        if (!IsGrounded) ApplyForce(new Vector2(0, (float) gravityForce));
-        
-        Console.WriteLine($"Applied gravity: {gravityForce}");
+        ApplyForce(new Vector2(0, 15));
+        // var currentWorld = PlayerManager.Instance.SelectedWorld;
+        // if (currentWorld == null) return;
+        //
+        // var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
+        // // m1 * m2
+        // var totalMass = worldMass * Mass;
+        //
+        // // find distance between Entity position and center of Hell
+        // // some variables
+        // var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
+        // var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
+        // // distance squared
+        // var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
+        //
+        // // find gravity force
+        // var gravityForce = Gravity * (totalMass / r);
+        //
+        // if (!IsGrounded) ApplyForce(new Vector2(0, (float) gravityForce));
+        //
+        // Console.WriteLine($"Applied gravity: {gravityForce}");
     }
 }
