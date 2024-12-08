@@ -27,7 +27,7 @@ public class Player : HumanLikeEntity
 	protected override int Height => 1;
 	protected override int Width => 1;
 	protected override float Mass => 46f;
-
+	
 	private Vector2 _walkingVector;
 
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 

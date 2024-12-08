@@ -192,13 +192,14 @@ public class BlastiaGame : Game
 	{
 		SpriteBatch = new SpriteBatch(GraphicsDevice);
 		
+		LoadTextures();
+		
 		SoundEngine.LoadSounds();
 		MusicEngine.LoadMusic();
 		MusicEngine.PlayMusicTrack(ChooseRandomMenuMusic());
 		StuffLoader.LoadBlocks(GraphicsDevice);
 		StuffLoader.LoadHumans(GraphicsDevice);
 		
-		LoadTextures();
 		MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
 		
 		// menus

@@ -50,7 +50,7 @@ public abstract class Entity : Object
     protected virtual int Width { get; set; }
 
     protected virtual ushort ID { get; set; }
-
+    
     protected Entity(Vector2 position, float initialScaleFactor)
     {
         Position = position;
@@ -94,14 +94,10 @@ public abstract class Entity : Object
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
 
-        // Store original movement for restoration if needed
-        var originalMovement = MovementVector;
-        
-        // Handle vertical movement first
-        HandleVerticalCollision(ref newPosition, currentWorld);
-        
-        // Then handle horizontal movement
-        HandleHorizontalCollision(ref newPosition, currentWorld);
+        int leftTile = (int) Math.Floor(newPosition.X / Block.Size);
+        int rightTile = (int) Math.Floor(newPosition.X / Block.Size + Width);
+        int topTile = (int) Math.Floor(newPosition.Y / Block.Size);
+        int bottomTile = (int) Math.Floor(newPosition.Y / Block.Size + Height);
     }
 
     private void HandleVerticalCollision(ref Vector2 newPosition, WorldState currentWorld)
@@ -158,7 +154,7 @@ public abstract class Entity : Object
         
         // vertical range
         int topTileY = (int)Math.Floor(newPosition.Y / Block.Size);
-        int bottomTileY = (int)Math.Floor((newPosition.Y + Height * Block.Size - 0.1f) / Block.Size);
+        int bottomTileY = (int)Math.Floor((newPosition.Y + Height * Block.Size) / Block.Size);
         
         // clamp
         topTileY = Math.Max(0, topTileY);
