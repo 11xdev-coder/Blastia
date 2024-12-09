@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
@@ -92,6 +93,11 @@ public class BlastiaGame : Game
 	/// </summary>
 	private static event Action? RequestWorldInitializationEvent;
 
+	/// <summary>
+	/// Event to request creation of DebugPoint entity for one frame
+	/// </summary>
+	private static event Action<Vector2, float>? RequestDebugPointDrawEvent;
+
 	// RANDOM
 	public static readonly Random Rand = new();
 
@@ -139,6 +145,7 @@ public class BlastiaGame : Game
 		ExitRequestEvent += OnExitRequested;
 		ResolutionRequestEvent += UpdateResolution;
 		RequestWorldInitializationEvent += InitializeWorld;
+		RequestDebugPointDrawEvent += DrawDebugPoint;
 		
 		_pixelatedSamplerState = new SamplerState
 		{
@@ -404,6 +411,25 @@ public class BlastiaGame : Game
 		Entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
+	}
+
+	// DRAW DEBUG POINT
+	public static void RequestDebugPointDraw(Vector2 position, float scale = 1f)
+	{
+		RequestDebugPointDrawEvent?.Invoke(position, scale);
+	}
+
+	private void DrawDebugPoint(Vector2 position, float scale = 1f)
+	{
+		// draw debug point for this frame
+		var debugPoint = new DebugPoint(position, scale);
+		Entities.Add(debugPoint);
+		
+		// schedule removal for next frame
+		debugPoint.RemoveEvent += (sender, args) =>
+		{
+			Entities.Remove(debugPoint);
+		};
 	}
 	
 	// EXIT
