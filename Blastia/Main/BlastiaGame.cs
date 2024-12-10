@@ -110,6 +110,7 @@ public class BlastiaGame : Game
 	
 	// GAMESTATE
 	public List<Entity> Entities;
+	public List<Entity> EntitiesToRemove;
 	public ushort EntityLimit = 256;
 
 	public Player? MyPlayer;
@@ -124,6 +125,7 @@ public class BlastiaGame : Game
 		_graphics = new GraphicsDeviceManager(this);
 		_menus = new List<Menu>();
 		Entities = new List<Entity>();
+		EntitiesToRemove = new List<Entity>();
 		Players = new List<Player>();
 		
 		// root folder of all assets
@@ -267,10 +269,18 @@ public class BlastiaGame : Game
 				player.Update();
 			}
 
-			foreach (var entity in Entities)
+			var entities = Entities.ToList();
+			foreach (var entity in entities)
 			{
 				entity.Update();
 			}
+			
+			// after updating each entity one time, remove ones that are scheduled
+			foreach (var entityToRemove in EntitiesToRemove)
+			{
+				Entities.Remove(entityToRemove);
+			}
+			EntitiesToRemove.Clear();
 		}
 
 		foreach (Menu menu in _menus)
@@ -426,10 +436,7 @@ public class BlastiaGame : Game
 		Entities.Add(debugPoint);
 		
 		// schedule removal for next frame
-		debugPoint.RemoveEvent += (sender, args) =>
-		{
-			Entities.Remove(debugPoint);
-		};
+		EntitiesToRemove.Add(debugPoint);
 	}
 	
 	// EXIT
