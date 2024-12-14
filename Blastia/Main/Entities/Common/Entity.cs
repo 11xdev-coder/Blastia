@@ -98,7 +98,9 @@ public abstract class Entity : Object
         int rightTile = (int) Math.Floor(newPosition.X / Block.Size + Width);
         int topTile = (int) Math.Floor(newPosition.Y / Block.Size);
         int bottomTile = (int) Math.Floor(newPosition.Y / Block.Size + Height);
-        BlastiaGame.RequestDebugPointDraw(new Vector2(leftTile, topTile));
+        
+        // test draw
+        BlastiaGame.RequestDebugPointDraw(new Vector2(leftTile * Block.Size, topTile * Block.Size), 2);
     }
 
     private void HandleVerticalCollision(ref Vector2 newPosition, WorldState currentWorld)

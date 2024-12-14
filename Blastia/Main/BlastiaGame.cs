@@ -274,13 +274,6 @@ public class BlastiaGame : Game
 			{
 				entity.Update();
 			}
-			
-			// after updating each entity one time, remove ones that are scheduled
-			foreach (var entityToRemove in EntitiesToRemove)
-			{
-				Entities.Remove(entityToRemove);
-			}
-			EntitiesToRemove.Clear();
 		}
 
 		foreach (Menu menu in _menus)
@@ -362,6 +355,13 @@ public class BlastiaGame : Game
 			{
 				MyPlayer?.Camera?.RenderEntity(SpriteBatch, entity);
 			}
+			
+			// after updating and drawing each entity one time, remove ones that are scheduled
+			foreach (var entityToRemove in EntitiesToRemove)
+			{
+				Entities.Remove(entityToRemove);
+			}
+			EntitiesToRemove.Clear();
 		}
 		
 		foreach (Menu menu in _menus)
@@ -433,7 +433,10 @@ public class BlastiaGame : Game
 	{
 		// draw debug point for this frame
 		var debugPoint = new DebugPoint(position, scale);
-		Entities.Add(debugPoint);
+		if (Entities.Count <= EntityLimit)
+		{
+			Entities.Add(debugPoint);
+		}
 		
 		// schedule removal for next frame
 		EntitiesToRemove.Add(debugPoint);

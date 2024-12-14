@@ -13,7 +13,7 @@ public class DebugPoint : Entity
     {
         SetId(EntityID.DebugPoint);
 
-        _dot = new BodyPart(BlastiaGame.WhitePixel, new Vector2(0f, 0f));
+        _dot = new BodyPart(BlastiaGame.WhitePixel, Vector2.Zero, color: Color.Red);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
