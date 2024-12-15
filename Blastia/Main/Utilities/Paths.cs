@@ -30,12 +30,6 @@ public static class Paths
 	public static readonly string PeacefulJourney01 = "Sounds/MenuSongs/peaceful journey_01.ogg";
 	public static readonly string PeacefulJourney02 = "Sounds/MenuSongs/peaceful journey_02.ogg";
 	public static readonly string PeacefulJourney03 = "Sounds/MenuSongs/peaceful journey_03.ogg";
-
-	// settings and save paths
-	public static string VideoManagerSavePath { get; private set; } = "";
-	public static string AudioManagerSavePath { get; private set; } = "";
-	public static string PlayerSavePath { get; private set; } = "";
-	public static string WorldsSavePath { get; private set; } = "";
 	
 	// loading
 	public static string BlockTextures { get; private set; } = "";
@@ -50,12 +44,6 @@ public static class Paths
 		ProgrssbarBackgroundPath = Path.Combine(ContentRoot, "Textures/UI/ProgressBarBG.png");
 		WhitePixelPath = Path.Combine(ContentRoot, "Textures/WhitePixel.png");
 		InvisibleTexturePath = Path.Combine(ContentRoot, "Textures/Invisible.png");
-
-		// Save paths
-		VideoManagerSavePath = ContentRoot + "/Saved/videomanager.bin";
-		AudioManagerSavePath = ContentRoot + "/Saved/audiomanager.bin";
-		PlayerSavePath = ContentRoot + "/Saved/Players/";
-		WorldsSavePath = ContentRoot + "/Saved/Worlds/";
 		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";

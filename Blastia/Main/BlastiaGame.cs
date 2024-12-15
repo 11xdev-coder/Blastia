@@ -25,7 +25,9 @@ public class BlastiaGame : Game
 	/// </summary>
 	private readonly GraphicsDeviceManager _graphics;
 	public static SpriteBatch SpriteBatch { get; private set; } = null!;
-	private SamplerState _pixelatedSamplerState;
+	private readonly SamplerState _pixelatedSamplerState;
+	private readonly string CrashLogFileName = "crash_log.txt";
+	private string? _crashLogPath = "";
 	
 	// TICK
 	public static GameTime GameTime { get; private set; } = new();
@@ -120,6 +122,10 @@ public class BlastiaGame : Game
 	
 	public BlastiaGame()
 	{
+		_crashLogPath = Path.Combine(Paths.GetSaveGameDirectory(), CrashLogFileName);
+		if (!File.Exists(_crashLogPath)) File.Create(_crashLogPath).Close(); // create if doesnt exist
+		File.WriteAllText(_crashLogPath, string.Empty); // remove everything
+		
 		InitializeConsole();
 		
 		_graphics = new GraphicsDeviceManager(this);
@@ -165,15 +171,22 @@ public class BlastiaGame : Game
 
 	protected override void Initialize()
 	{
-		base.Initialize();
+		try
+		{
+			base.Initialize();
 
-		int width = VideoManager.Instance.ResolutionHandler.GetCurrentResolutionWidth();
-		int height = VideoManager.Instance.ResolutionHandler.GetCurrentResolutionHeight();
-		_graphics.PreferredBackBufferWidth = width;
-		_graphics.PreferredBackBufferHeight = height;
-		_graphics.ApplyChanges();
-		
-		UpdateResolution();
+			int width = VideoManager.Instance.ResolutionHandler.GetCurrentResolutionWidth();
+			int height = VideoManager.Instance.ResolutionHandler.GetCurrentResolutionHeight();
+			_graphics.PreferredBackBufferWidth = width;
+			_graphics.PreferredBackBufferHeight = height;
+			_graphics.ApplyChanges();
+
+			UpdateResolution();
+		}
+		catch (Exception ex)
+		{
+			LogError(ex, "Error in Initialize");
+		}
 	}
 
 	private void LoadTextures()
@@ -199,45 +212,52 @@ public class BlastiaGame : Game
 	
 	protected override void LoadContent()
 	{
-		SpriteBatch = new SpriteBatch(GraphicsDevice);
-		
-		LoadTextures();
-		
-		SoundEngine.LoadSounds();
-		MusicEngine.LoadMusic();
-		MusicEngine.PlayMusicTrack(ChooseRandomMenuMusic());
-		StuffLoader.LoadBlocks(GraphicsDevice);
-		StuffLoader.LoadHumans(GraphicsDevice);
-		
-		MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
-		
-		// menus
-		LogoMenu = new LogoMenu(MainFont);
-		AddMenu(LogoMenu);
-		
-		MainMenu = new MainMenu(MainFont);
-		AddMenu(MainMenu);
-		
-		PlayersMenu = new PlayersMenu(MainFont);
-		AddMenu(PlayersMenu);
-		
-		WorldsMenu = new WorldsMenu(MainFont);
-		AddMenu(WorldsMenu);
-		
-		PlayerCreationMenu = new PlayerCreationMenu(MainFont);
-		AddMenu(PlayerCreationMenu);
-		
-		WorldCreationMenu = new WorldCreationMenu(MainFont);
-		AddMenu(WorldCreationMenu);
-		
-		SettingsMenu = new SettingsMenu(MainFont);
-		AddMenu(SettingsMenu);
+		try
+		{
+			SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-		AudioSettingsMenu = new AudioSettingsMenu(MainFont);
-		AddMenu(AudioSettingsMenu);
-		
-		VideoSettingsMenu = new VideoSettingsMenu(MainFont);
-		AddMenu(VideoSettingsMenu);
+			LoadTextures();
+
+			SoundEngine.LoadSounds();
+			MusicEngine.LoadMusic();
+			MusicEngine.PlayMusicTrack(ChooseRandomMenuMusic());
+			StuffLoader.LoadBlocks(GraphicsDevice);
+			StuffLoader.LoadHumans(GraphicsDevice);
+
+			MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
+
+			// menus
+			LogoMenu = new LogoMenu(MainFont);
+			AddMenu(LogoMenu);
+
+			MainMenu = new MainMenu(MainFont);
+			AddMenu(MainMenu);
+
+			PlayersMenu = new PlayersMenu(MainFont);
+			AddMenu(PlayersMenu);
+
+			WorldsMenu = new WorldsMenu(MainFont);
+			AddMenu(WorldsMenu);
+
+			PlayerCreationMenu = new PlayerCreationMenu(MainFont);
+			AddMenu(PlayerCreationMenu);
+
+			WorldCreationMenu = new WorldCreationMenu(MainFont);
+			AddMenu(WorldCreationMenu);
+
+			SettingsMenu = new SettingsMenu(MainFont);
+			AddMenu(SettingsMenu);
+
+			AudioSettingsMenu = new AudioSettingsMenu(MainFont);
+			AddMenu(AudioSettingsMenu);
+
+			VideoSettingsMenu = new VideoSettingsMenu(MainFont);
+			AddMenu(VideoSettingsMenu);
+		}
+		catch (Exception ex)
+		{
+			LogError(ex, "Error in LoadContent");
+		}
 	}
 
 	protected override void UnloadContent()
@@ -253,44 +273,51 @@ public class BlastiaGame : Game
 	// UPDATE
 	protected override void Update(GameTime gameTime)
 	{
-		base.Update(gameTime);
-		UpdateGameTime(gameTime);
-		
-		UpdateColors();
-		
-		UpdateMouseState();
-		UpdateKeyboardState();
-
-		if (IsWorldInitialized)
+		try
 		{
-			MyPlayer?.Update();
-			foreach (var player in Players)
-			{
-				player.Update();
-			}
+			base.Update(gameTime);
+			UpdateGameTime(gameTime);
 
-			var entities = Entities.ToList();
-			foreach (var entity in entities)
-			{
-				entity.Update();
-			}
-		}
+			UpdateColors();
 
-		foreach (Menu menu in _menus)
-		{
-			if (menu.Active)
+			UpdateMouseState();
+			UpdateKeyboardState();
+
+			if (IsWorldInitialized)
 			{
-				menu.Update();
-				// prevent new menu from updating when switched
-				if (menu.CheckAndResetMenuSwitchedFlag())
+				MyPlayer?.Update();
+				foreach (var player in Players)
 				{
-					break;
+					player.Update();
+				}
+
+				var entities = Entities.ToList();
+				foreach (var entity in entities)
+				{
+					entity.Update();
 				}
 			}
+
+			foreach (Menu menu in _menus)
+			{
+				if (menu.Active)
+				{
+					menu.Update();
+					// prevent new menu from updating when switched
+					if (menu.CheckAndResetMenuSwitchedFlag())
+					{
+						break;
+					}
+				}
+			}
+
+			// update previous states in the end
+			UpdatePreviousStates();
 		}
-		
-		// update previous states in the end
-		UpdatePreviousStates();
+		catch (Exception ex)
+		{
+			LogError(ex, "Error in Update");
+		}
 	}
 
 	private void UpdateColors()
@@ -461,5 +488,29 @@ public class BlastiaGame : Game
 	private void AddMenu(Menu? menu)
 	{
 		if (menu != null) _menus.Add(menu);
+	}
+
+	/// <summary>
+	/// Writes an error message to crash log (_crashLogPath)
+	/// </summary>
+	/// <param name="ex">Exception, writes its message, stacktrace and source</param>
+	/// <param name="context">Additional information about the error</param>
+	private void LogError(Exception ex, string context = "")
+	{
+		string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+		string errorMessage = $"[{time}] {context} \n" +
+		                      $"Message: {ex.Message} \n" +
+		                      $"Stack Trace: {ex.StackTrace} \n" +
+		                      $"Source: {ex.Source}";
+
+		if (!string.IsNullOrEmpty(_crashLogPath))
+		{
+			File.AppendAllText(_crashLogPath, errorMessage);
+			Console.WriteLine($"Error logged: {context}");
+		}
+		else
+		{
+			Console.WriteLine("Crash Log File not initialized");
+		}
 	}
 }

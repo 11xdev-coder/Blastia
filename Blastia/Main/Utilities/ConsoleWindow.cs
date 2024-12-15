@@ -57,7 +57,7 @@ public class ConsoleWindow
             if (Console.KeyAvailable)
             {
                 string? input = Console.ReadLine()?.Trim().ToLower();
-                
+
                 // queue command for further processing
                 if (!string.IsNullOrEmpty(input))
                 {
@@ -71,6 +71,7 @@ public class ConsoleWindow
                 {
                     ProcessCommand(command);
                 }
+
                 Thread.Sleep(10);
             }
         }
