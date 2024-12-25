@@ -26,8 +26,8 @@ public class BlastiaGame : Game
 	private readonly GraphicsDeviceManager _graphics;
 	public static SpriteBatch SpriteBatch { get; private set; } = null!;
 	private readonly SamplerState _pixelatedSamplerState;
-	private readonly string CrashLogFileName = "crash_log.txt";
-	private string? _crashLogPath = "";
+	private const string CrashLogFileName = "crash_log.txt";
+	private readonly string? _crashLogPath;
 	
 	// TICK
 	public static GameTime GameTime { get; private set; } = new();
@@ -451,6 +451,11 @@ public class BlastiaGame : Game
 	}
 
 	// DRAW DEBUG POINT
+	/// <summary>
+	/// Creates DebugPoint entity and draws if for one frame
+	/// </summary>
+	/// <param name="position">Position of DebugPoint</param>
+	/// <param name="scale">Scale of DebugPoint</param>
 	public static void RequestDebugPointDraw(Vector2 position, float scale = 1f)
 	{
 		RequestDebugPointDrawEvent?.Invoke(position, scale);
@@ -501,7 +506,7 @@ public class BlastiaGame : Game
 		string errorMessage = $"[{time}] {context} \n" +
 		                      $"Message: {ex.Message} \n" +
 		                      $"Stack Trace: {ex.StackTrace} \n" +
-		                      $"Source: {ex.Source}";
+		                      $"Source: {ex.Source} \n";
 
 		if (!string.IsNullOrEmpty(_crashLogPath))
 		{

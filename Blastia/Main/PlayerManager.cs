@@ -41,7 +41,7 @@ public class PlayerManager : Singleton<PlayerManager>
 				// save data if provided
 				if (data != null) 
 				{
-					Saving.Save(fileName, data);
+					Saving.Save(fileName, data, true);
 				}
 				else 
 				{
@@ -152,8 +152,7 @@ public class PlayerManager : Singleton<PlayerManager>
 			Name = worldName, 
 			Difficulty = difficulty,
 			WorldWidth = worldWidth,
-			WorldHeight = worldHeight,
-			Tiles = new ushort[worldWidth * worldHeight]
+			WorldHeight = worldHeight
 		};
 		WorldGen.Generate(52, worldData);
 		
@@ -190,19 +189,49 @@ public class WorldState
 	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
 	
 	// 1D to support serialization
-	public ushort[] Tiles { get; set; } = [];
+	public Dictionary<Vector2, ushort> Tiles { get; set; } = new();
 	public int WorldWidth { get; set; }
 	public int WorldHeight { get; set; }
 
 	public float SpawnX { get; set; }
 	public float SpawnY { get; set; }
 	
+	/// <summary>
+	/// Sets tile's ID at x y coords. If new ID is 0 -> removes the tile completely
+	/// </summary>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="value">New ID</param>
 	public void SetTile(int x, int y, ushort value)
 	{
-		Tiles[y * WorldWidth + x] = value;
+		Vector2 pos = new(x, y);
+		if (value == 0)
+		{
+			// if new ID is air (0) -> remove tile to save space
+			Tiles.Remove(pos);
+		}
+		else
+		{
+			Tiles[pos] = value;
+		}
 	}
-	
-	public ushort GetTile(int x, int y) => Tiles[y * WorldWidth + x];
+
+	/// <summary>
+	/// Gets tile at position and returns its ID
+	/// </summary>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <returns>If tile with such position exists -> returns its ID. Otherwise, returns 0</returns>
+	public ushort GetTile(int x, int y)
+	{
+		Vector2 pos = new(x, y);
+		if (Tiles.TryGetValue(pos, out ushort id))
+		{
+			return id;
+		}
+
+		return 0;
+	}
 
 	public bool HasTile(int x, int y) => GetTile(x, y) >= 1;
 

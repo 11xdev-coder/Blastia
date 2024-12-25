@@ -100,7 +100,7 @@ public abstract class Entity : Object
         int bottomTile = (int) Math.Floor(newPosition.Y / Block.Size + Height);
         
         // test draw
-        BlastiaGame.RequestDebugPointDraw(new Vector2(leftTile * Block.Size, topTile * Block.Size), 2);
+        BlastiaGame.RequestDebugPointDraw(new Vector2(leftTile * Block.Size, bottomTile * Block.Size), 2);
     }
 
     private void HandleVerticalCollision(ref Vector2 newPosition, WorldState currentWorld)
@@ -249,7 +249,7 @@ public abstract class Entity : Object
     private void ApplyGravityForce()
     {
         if (!ApplyGravity) return;
-        ApplyForce(new Vector2(0, 15));
+        ApplyForce(new Vector2(0, 3));
         // var currentWorld = PlayerManager.Instance.SelectedWorld;
         // if (currentWorld == null) return;
         //
