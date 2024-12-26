@@ -36,25 +36,23 @@ public static class Saving
                     Console.WriteLine($"\nInspecting property {property.Name}");
                     Console.WriteLine($"Property type: {property.PropertyType.FullName}");
                 }
-
-                // first check dictionary<vector2, ushort> 
-                if (value.GetType().IsDictionary(typeof(Vector2), typeof(ushort)))
+                
+                switch (value)
                 {
-                    if (value is IDictionary dictionary)
-                    {
-                        Console.WriteLine($"Writing dictionary with {dictionary.Count} items");
-                        writer.Write(dictionary.Count);
-
-                        foreach (DictionaryEntry keyValuePair in dictionary)
+                    case Dictionary<Vector2, ushort> tileDictionary:
+                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, ushort> with {tileDictionary.Count} items");
+                        
+                        writer.Write(tileDictionary.Count);
+                        foreach (var keyValuePair in tileDictionary)
                         {
-                            Vector2 vector = (Vector2)keyValuePair.Key;
-                            ushort id = (ushort)keyValuePair.Value;
-
+                            Vector2 vector = keyValuePair.Key;
+                            ushort id = keyValuePair.Value;
+                            
                             if (debugLogs)
                             {
                                 Console.WriteLine(vector == default
                                     ? "Couldn't write Vector2"
-                                    : $"Writing entry: Position({vector.X}, {vector.Y}), ID: {id}");
+                                    : $"Writing Dictionary<Vector2, ushort> entry: Position({vector.X}, {vector.Y}), ID: {id}");
                             }
                             
                             writer.Write(vector.X);
@@ -63,49 +61,43 @@ public static class Saving
                         }
                         
                         if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
-                    }
-                }
-                else
-                {
-                    switch (value)
-                    {
-                        case Vector2 vectorValue:
-                            // write X and Y
-                            writer.Write(vectorValue.X);
-                            writer.Write(vectorValue.Y);
-                            break;
-                        case ushort[] ushortArrayValue:
-                            writer.Write(ushortArrayValue.Length);
-                            foreach (var item in ushortArrayValue)
-                            {
-                                writer.Write(item);
-                            }
-                            break;
-                        case Enum enumValue:
-                            writer.Write(Convert.ToInt32(enumValue));
-                            break;
-                        case byte byteValue:
-                            writer.Write(byteValue);
-                            break;
-                        case ushort ushortValue:
-                            writer.Write(ushortValue);
-                            break;
-                        case int intValue:
-                            writer.Write(intValue);
-                            break;
-                        case float floatValue:
-                            writer.Write(floatValue);
-                            break;
-                        case double doubleValue:
-                            writer.Write(doubleValue);
-                            break;
-                        case bool boolValue:
-                            writer.Write(boolValue);
-                            break;
-                        case string stringValue:
-                            writer.Write(stringValue);
-                            break;
-                    }
+                        break;
+                    case Vector2 vectorValue:
+                        // write X and Y
+                        writer.Write(vectorValue.X);
+                        writer.Write(vectorValue.Y);
+                        break;
+                    case ushort[] ushortArrayValue:
+                        writer.Write(ushortArrayValue.Length);
+                        foreach (var item in ushortArrayValue)
+                        {
+                            writer.Write(item);
+                        }
+                        break;
+                    case Enum enumValue:
+                        writer.Write(Convert.ToInt32(enumValue));
+                        break;
+                    case byte byteValue:
+                        writer.Write(byteValue);
+                        break;
+                    case ushort ushortValue:
+                        writer.Write(ushortValue);
+                        break;
+                    case int intValue:
+                        writer.Write(intValue);
+                        break;
+                    case float floatValue:
+                        writer.Write(floatValue);
+                        break;
+                    case double doubleValue:
+                        writer.Write(doubleValue);
+                        break;
+                    case bool boolValue:
+                        writer.Write(boolValue);
+                        break;
+                    case string stringValue:
+                        writer.Write(stringValue);
+                        break;
                 }
             }
         }
@@ -116,9 +108,10 @@ public static class Saving
     /// with loaded parameters
     /// </summary>
     /// <param name="filePath"></param>
+    /// <param name="debugLogs">If <c>true</c> prints debugging logs in the console</param>
     /// <typeparam name="T">Serializable state class with empty constructor</typeparam>
     /// <returns>State class with loaded parameters from the file. Returns empty if file doesn't exist</returns>
-    public static T Load<T>(string filePath) where T : new()
+    public static T Load<T>(string filePath, bool debugLogs = false) where T : new()
     {
         T state = new T();
         
@@ -131,7 +124,7 @@ public static class Saving
                 // get property type
                 Type propertyType = property.PropertyType;
                 // read property value
-                object value = ReadValue(reader, propertyType);
+                object value = ReadValue(reader, propertyType, debugLogs);
                 // set state's property to value
                 property.SetValue(state, value);
             }
@@ -140,58 +133,35 @@ public static class Saving
         return state;
     }
 
-    private static object ReadValue(BinaryReader reader, Type type)
+    private static object ReadValue(BinaryReader reader, Type type, bool debugLogs = false)
     {
-        Console.WriteLine($"Reading type: {type.FullName}");
+        if (debugLogs) Console.WriteLine($"Reading type: {type.FullName}");
 
-        // Check for Dictionary with Vector2 key and ushort value
-        if (type.IsGenericType && 
-            (type.GetGenericTypeDefinition() == typeof(Dictionary<,>) ||
-             type == typeof(Dictionary<Vector2, ushort>)))
+        if (type == typeof(Dictionary<Vector2, ushort>))
         {
-            var args = type.GetGenericArguments();
-            if (args.Length == 2 && 
-                (args[0] == typeof(Vector2) || args[0].FullName.Contains("Vector2")) && 
-                (args[1] == typeof(ushort) || args[1].FullName.Contains("UInt16")))
+            var tileDictionary = new Dictionary<Vector2, ushort>();
+            var count = reader.ReadInt32();
+            if (debugLogs) Console.WriteLine($"Reading dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
+            
+            for (int i = 0; i < count; i++)
             {
-                try
+                var x = reader.ReadSingle();
+                var y = reader.ReadSingle();
+                var id = reader.ReadUInt16();
+                
+                if (float.IsInfinity(x) || float.IsNaN(x) || 
+                    float.IsInfinity(y) || float.IsNaN(y))
                 {
-                    var tileDictionary = new Dictionary<Vector2, ushort>();
-                    var count = reader.ReadInt32();
-                    Console.WriteLine($"Reading dictionary with {count} entries from position: {reader.BaseStream.Position}");
-                    
-                    if (count < 0 || count > 1000000) // Sanity check
-                    {
-                        throw new InvalidDataException($"Invalid dictionary count: {count}");
-                    }
-
-                    for (int i = 0; i < count; i++)
-                    {
-                        var x = reader.ReadSingle();
-                        var y = reader.ReadSingle();
-                        var id = reader.ReadUInt16();
-                        
-                        if (float.IsInfinity(x) || float.IsNaN(x) || 
-                            float.IsInfinity(y) || float.IsNaN(y))
-                        {
-                            throw new InvalidDataException(
-                                $"Invalid position values at entry {i}: ({x}, {y})");
-                        }
-                        
-                        Console.WriteLine($"Read entry {i}: Position({x}, {y}), ID: {id}");
-                        tileDictionary.Add(new Vector2(x, y), id);
-                    }
-                    
-                    Console.WriteLine($"Successfully read {tileDictionary.Count} entries");
-                    return tileDictionary;
+                    throw new InvalidDataException(
+                        $"Invalid position values at entry {i}: ({x}, {y})");
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error reading dictionary at position {reader.BaseStream.Position}");
-                    Console.WriteLine($"Exception: {ex.Message}");
-                    throw;
-                }
+                
+                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), ID: {id}");
+                tileDictionary.Add(new Vector2(x, y), id);
             }
+            
+            if (debugLogs) Console.WriteLine($"Successfully read {tileDictionary.Count} entries");
+            return tileDictionary;
         }
             
         if (type == typeof(Vector2))
@@ -235,26 +205,5 @@ public static class Saving
         }
         
         throw new ArgumentException($"Unsupported type: {type.Name} (Full name: {type.FullName})");
-    }
-
-    /// <summary>
-    /// Checks whether dictionary has same key and value type as <c>keyType</c> and <c>valueType</c>
-    /// </summary>
-    /// <param name="dictionaryType"></param>
-    /// <param name="keyType"></param>
-    /// <param name="valueType"></param>
-    /// <param name="keyFullName">If not <c>null</c>, dictionary key can be checked by checking does its <c>key</c>
-    /// contains <c>keyFullName</c></param>
-    /// <returns>Returns <c>true</c> if <c>dictionaryType</c> is dictionary with specified <c>keyType</c> and <c>valueType</c>.
-    /// Otherwise -> <c>false</c></returns>
-    private static bool IsDictionary(this Type dictionaryType, Type keyType, Type valueType, string? keyFullName = null)
-    {
-        if (!dictionaryType.IsGenericType || 
-            dictionaryType.GetGenericTypeDefinition() != typeof(Dictionary<,>))
-            return false;
-    
-        var args = dictionaryType.GetGenericArguments();
-        return args[0] == keyType && args[1] == valueType || 
-               (keyFullName != null && args[0].FullName?.Contains(keyFullName) == true);
     }
 }

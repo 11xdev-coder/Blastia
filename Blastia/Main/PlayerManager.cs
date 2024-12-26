@@ -84,7 +84,7 @@ public class PlayerManager : Singleton<PlayerManager>
 				if (file.EndsWith(extension))
 				{
 					// load new instance
-					var loadedState = Saving.Load<T>(file);
+					var loadedState = Saving.Load<T>(file, true);
 					items.Add(loadedState);				
 				}
 			}
