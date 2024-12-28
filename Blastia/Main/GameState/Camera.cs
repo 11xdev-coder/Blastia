@@ -61,10 +61,10 @@ public class Camera : Object
 	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState) 
 	{
 		// get corners in tiles
-		int startX = Math.Max(0, (int) (Position.X / Block.Size));
-		int startY = Math.Max(0, (int) (Position.Y / Block.Size));
-		int endX = Math.Min(worldState.WorldWidth, startX + (DrawWidth / Block.Size));
-		int endY = Math.Min(worldState.WorldHeight, startY + (DrawHeight / Block.Size));
+		int startX = Math.Max(0, (int) Position.X);
+		int startY = Math.Max(0, (int) Position.Y);
+		int endX = Math.Min(worldState.WorldWidth, startX + DrawWidth);
+		int endY = Math.Min(worldState.WorldHeight, startY + DrawHeight);
 		
 		int scaledBlockSize = MathUtilities.SmoothRound(Block.Size * CameraScale);
 		
@@ -80,8 +80,8 @@ public class Camera : Object
 				if (block == null) continue;
 				
 				// subtract camera position -> scrolling (camera moves right -> move tile to the left)
-				float worldPositionX = x * Block.Size - Position.X;
-				float worldPositionY = y * Block.Size - Position.Y;
+				float worldPositionX = x - Position.X;
+				float worldPositionY = y - Position.Y;
 				Rectangle destRect = new Rectangle(MathUtilities.SmoothRound(worldPositionX * CameraScale), 
 					MathUtilities.SmoothRound(worldPositionY * CameraScale), 
 					scaledBlockSize, scaledBlockSize);

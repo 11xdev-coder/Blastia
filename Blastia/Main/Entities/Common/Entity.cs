@@ -249,7 +249,7 @@ public abstract class Entity : Object
     private void ApplyGravityForce()
     {
         if (!ApplyGravity) return;
-        ApplyForce(new Vector2(0, 3));
+        ApplyForce(new Vector2(0, 0));
         // var currentWorld = PlayerManager.Instance.SelectedWorld;
         // if (currentWorld == null) return;
         //

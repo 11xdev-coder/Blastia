@@ -41,7 +41,7 @@ public class PlayerManager : Singleton<PlayerManager>
 				// save data if provided
 				if (data != null) 
 				{
-					Saving.Save(fileName, data, true);
+					Saving.Save(fileName, data);
 				}
 				else 
 				{
@@ -84,7 +84,7 @@ public class PlayerManager : Singleton<PlayerManager>
 				if (file.EndsWith(extension))
 				{
 					// load new instance
-					var loadedState = Saving.Load<T>(file, true);
+					var loadedState = Saving.Load<T>(file);
 					items.Add(loadedState);				
 				}
 			}
@@ -195,6 +195,8 @@ public class WorldState
 
 	public float SpawnX { get; set; }
 	public float SpawnY { get; set; }
+
+	public bool SetTileLogs { get; set; } = false;
 	
 	/// <summary>
 	/// Sets tile's ID at x y coords. If new ID is 0 -> removes the tile completely
@@ -205,6 +207,8 @@ public class WorldState
 	public void SetTile(int x, int y, ushort value)
 	{
 		Vector2 pos = new(x, y);
+		if (SetTileLogs) Console.WriteLine($"World: {Name}, Set tile at: (X: {x}, Y: {y}), ID: {value}");
+		
 		if (value == 0)
 		{
 			// if new ID is air (0) -> remove tile to save space
@@ -238,9 +242,17 @@ public class WorldState
 	public void SetSpawnPoint(float x, float y)
 	{
 		// from tiles to world coords
-		SpawnX = x * 8;
-		SpawnY = y * 8;
+		SpawnX = x;
+		SpawnY = y;
 	}
 
 	public Vector2 GetSpawnPoint() => new(SpawnX, SpawnY);
+
+	public void LogTiles()
+	{
+		foreach (var kvp in Tiles)
+		{
+			Console.WriteLine($"Tile at (X: {kvp.Key.X}; Y: {kvp.Key.Y}), ID: {kvp.Value}");
+		}
+	}
 }

@@ -44,9 +44,9 @@ public static class WorldGen
                 int terrainVariation = (int)(height * pass.HeightScale * noiseValue);
                 int finalHeight = baseHeight + terrainVariation;
                 
-                for (int y = finalHeight; y < height; y++)
+                for (int y = finalHeight; y < height; y += Block.Size)
                 {
-                    worldState.SetTile(x, y, BlockID.Dirt);
+                    worldState.SetTile(x * Block.Size, y, BlockID.Dirt);
                 }
                 
                 if (x >= randomSpawnX)
