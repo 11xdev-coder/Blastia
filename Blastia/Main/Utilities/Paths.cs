@@ -18,7 +18,8 @@ public static class Paths
 	public static string CursorTexturePath { get; private set; } = "";
 	public static string Logo5XTexturePath { get; private set; } = "";
 	public static string SliderBackgroundPath { get; private set; } = "";
-	public static string ProgrssbarBackgroundPath { get; private set; } = "";
+	public static string RulerBlockHighlightPath { get; private set; } = "";
+	public static string ProgressbarBackgroundPath { get; private set; } = "";
 	public static string WhitePixelPath { get; private set; } = "";
 	public static string InvisibleTexturePath { get; private set; } = "";
 	
@@ -41,7 +42,8 @@ public static class Paths
 		CursorTexturePath = Path.Combine(ContentRoot, "Textures/Cursor.png");
 		Logo5XTexturePath = Path.Combine(ContentRoot, "Textures/Menu/Logo5X.png");
 		SliderBackgroundPath = Path.Combine(ContentRoot, "Textures/UI/SliderBG.png");
-		ProgrssbarBackgroundPath = Path.Combine(ContentRoot, "Textures/UI/ProgressBarBG.png");
+		RulerBlockHighlightPath = Path.Combine(ContentRoot, "Textures/UI/RulerBlockHighlight.png");
+		ProgressbarBackgroundPath = Path.Combine(ContentRoot, "Textures/UI/ProgressBarBG.png");
 		WhitePixelPath = Path.Combine(ContentRoot, "Textures/WhitePixel.png");
 		InvisibleTexturePath = Path.Combine(ContentRoot, "Textures/Invisible.png");
 		

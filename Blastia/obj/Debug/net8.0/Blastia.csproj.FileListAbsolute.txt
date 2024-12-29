@@ -66,3 +66,4 @@ D:\Projects\Blastia\Blastia\obj\Debug\net8.0\refint\Blastia.dll
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\Blastia.pdb
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\Blastia.genruntimeconfig.cache
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\ref\Blastia.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\RulerBlockHighlight.png

@@ -54,6 +54,7 @@ public class BlastiaGame : Game
 	public static Texture2D LogoTexture { get; private set; } = null!;
 	public static Texture2D CursorTexture { get; private set; } = null!;
 	public static Texture2D SliderTexture { get; private set; } = null!;	
+	public static Texture2D RulerBlockHighlight { get; private set; } = null!;	
 	public static Texture2D ProgressBarBackground { get; private set; } = null!;
 	public static Texture2D WhitePixel { get; private set; } = null!;
 	public static Texture2D InvisibleTexture { get; private set; } = null!;
@@ -74,6 +75,7 @@ public class BlastiaGame : Game
 	public static SettingsMenu? SettingsMenu { get; private set; }
 	public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
+	public static Menu? InGameMenu { get; private set; }
 	private readonly List<Menu> _menus;
 
 	/// <summary>
@@ -200,9 +202,12 @@ public class BlastiaGame : Game
 		
 		SliderTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.SliderBackgroundPath);
+		
+		RulerBlockHighlight = LoadingUtilities.LoadTexture(GraphicsDevice,
+			Paths.RulerBlockHighlightPath);
 			
 		ProgressBarBackground = LoadingUtilities.LoadTexture(GraphicsDevice,
-			Paths.ProgrssbarBackgroundPath);
+			Paths.ProgressbarBackgroundPath);
 		
 		WhitePixel = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.WhitePixelPath);
@@ -254,6 +259,9 @@ public class BlastiaGame : Game
 
 			VideoSettingsMenu = new VideoSettingsMenu(MainFont);
 			AddMenu(VideoSettingsMenu);
+			
+			InGameMenu = new Menu(MainFont);
+			AddMenu(InGameMenu);
 		}
 		catch (Exception ex)
 		{
@@ -289,8 +297,8 @@ public class BlastiaGame : Game
 				if (_myPlayer?.Camera != null)
 				{
 					var pos = _myPlayer.Camera.ScreenToWorld(CursorPosition);
-					if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(pos);
-					if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(pos);
+					if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(CursorPosition);
+					if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(CursorPosition);
 				}
 				
 				World.Update();
@@ -446,6 +454,8 @@ public class BlastiaGame : Game
 	
 	private void InitializeWorld()
 	{
+		if (InGameMenu != null) InGameMenu.Active = true;
+
 		var worldState = PlayerManager.Instance.SelectedWorld;
 		if (worldState == null) return;
 

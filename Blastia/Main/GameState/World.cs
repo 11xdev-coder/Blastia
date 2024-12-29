@@ -1,15 +1,37 @@
+using Blastia.Main.UI;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.GameState;
 
-public class World(WorldState worldState)
+public class World
 {
-	private WorldState _state = worldState;
+	private WorldState _state;
 	
 	public bool RulerMode;
 	private Vector2 _rulerStart;
 	private Vector2 _rulerEnd;
+
+	private readonly Image _rulerStartHighlight;
+	private readonly Image _rulerEndHighlight;
+
+	public World(WorldState state)
+	{
+		_state = state;
+
+		_rulerStartHighlight = new Image(Vector2.Zero, BlastiaGame.RulerBlockHighlight);
+		_rulerEndHighlight = new Image(Vector2.Zero, BlastiaGame.RulerBlockHighlight)
+		{
+			DrawColor = Color.Red
+		};
+
+		if (BlastiaGame.InGameMenu != null)
+		{
+			BlastiaGame.InGameMenu.Elements.AddRange([ _rulerStartHighlight, _rulerEndHighlight ]);
+		}
+
+		Awake();
+	}
 
 	public static float GetBlocksAmount(int width, int height)
 	{
@@ -37,9 +59,14 @@ public class World(WorldState worldState)
 	public Vector2 GetRulerStart() => _rulerStart;
 	public Vector2 GetRulerEnd() => _rulerEnd;
 
+	private void Awake()
+	{
+		
+	}
+
 	public void Update()
 	{
-		BlastiaGame.RequestDebugPointDraw(GetRulerStart());
-		BlastiaGame.RequestDebugPointDraw(GetRulerEnd(), 4);
+		_rulerStartHighlight.Position = _rulerStart;
+		_rulerEndHighlight.Position = _rulerEnd;
 	}
 }
