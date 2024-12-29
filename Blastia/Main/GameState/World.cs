@@ -1,9 +1,16 @@
 using Blastia.Main.Utilities.ListHandlers;
+using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.GameState;
 
-public static class World 
-{	
+public class World(WorldState worldState)
+{
+	private WorldState _state = worldState;
+	
+	public bool RulerMode;
+	private Vector2 _rulerStart;
+	private Vector2 _rulerEnd;
+
 	public static float GetBlocksAmount(int width, int height)
 	{
 		return width * height;
@@ -22,5 +29,17 @@ public static class World
 		var mass = stoneMass + dirtMass;
 
 		return mass;
+	}
+
+	public void SetRulerStart(Vector2 start) => _rulerStart = start;
+	public void SetRulerEnd(Vector2 end) => _rulerEnd = end;
+	
+	public Vector2 GetRulerStart() => _rulerStart;
+	public Vector2 GetRulerEnd() => _rulerEnd;
+
+	public void Update()
+	{
+		BlastiaGame.RequestDebugPointDraw(GetRulerStart());
+		BlastiaGame.RequestDebugPointDraw(GetRulerEnd(), 4);
 	}
 }

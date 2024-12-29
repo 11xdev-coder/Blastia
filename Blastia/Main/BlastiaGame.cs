@@ -111,14 +111,15 @@ public class BlastiaGame : Game
 	public ConsoleWindow? ConsoleWindow;
 	
 	// GAMESTATE
-	public List<Entity> Entities;
-	public List<Entity> EntitiesToRemove;
-	public ushort EntityLimit = 256;
+	public World World { get; private set; }
+	private readonly List<Entity> _entities;
+	private readonly List<Entity> _entitiesToRemove;
+	private const ushort EntityLimit = 256;
 
-	public Player? MyPlayer;
-	public List<Player> Players;
+	private Player? _myPlayer;
+	private readonly List<Player> Players;
 	public ushort PlayerLimit = 128;
-	public bool IsWorldInitialized { get; private set; }
+	private bool IsWorldInitialized { get; set; }
 	
 	public BlastiaGame()
 	{
@@ -130,8 +131,8 @@ public class BlastiaGame : Game
 		
 		_graphics = new GraphicsDeviceManager(this);
 		_menus = new List<Menu>();
-		Entities = new List<Entity>();
-		EntitiesToRemove = new List<Entity>();
+		_entities = new List<Entity>();
+		_entitiesToRemove = new List<Entity>();
 		Players = new List<Player>();
 		
 		// root folder of all assets
@@ -285,13 +286,22 @@ public class BlastiaGame : Game
 
 			if (IsWorldInitialized)
 			{
-				MyPlayer?.Update();
+				if (_myPlayer?.Camera != null)
+				{
+					var pos = _myPlayer.Camera.ScreenToWorld(CursorPosition);
+					if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(pos);
+					if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(pos);
+				}
+				
+				World.Update();
+				
+				_myPlayer?.Update();
 				foreach (var player in Players)
 				{
 					player.Update();
 				}
 
-				var entities = Entities.ToList();
+				var entities = _entities.ToList();
 				foreach (var entity in entities)
 				{
 					entity.Update();
@@ -375,20 +385,20 @@ public class BlastiaGame : Game
 		
 		if (IsWorldInitialized && PlayerManager.Instance.SelectedWorld != null)
 		{
-			MyPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
-			MyPlayer?.Camera?.RenderEntity(SpriteBatch, MyPlayer);
+			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
+			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
 
-			foreach (var entity in Entities)
+			foreach (var entity in _entities)
 			{
-				MyPlayer?.Camera?.RenderEntity(SpriteBatch, entity);
+				_myPlayer?.Camera?.RenderEntity(SpriteBatch, entity);
 			}
 			
 			// after updating and drawing each entity one time, remove ones that are scheduled
-			foreach (var entityToRemove in EntitiesToRemove)
+			foreach (var entityToRemove in _entitiesToRemove)
 			{
-				Entities.Remove(entityToRemove);
+				_entities.Remove(entityToRemove);
 			}
-			EntitiesToRemove.Clear();
+			_entitiesToRemove.Clear();
 		}
 		
 		foreach (Menu menu in _menus)
@@ -436,16 +446,17 @@ public class BlastiaGame : Game
 	
 	private void InitializeWorld()
 	{
-		var world = PlayerManager.Instance.SelectedWorld;
-		if (world == null) return;
+		var worldState = PlayerManager.Instance.SelectedWorld;
+		if (worldState == null) return;
 
 		if (LogoMenu != null)
 		{
 			LogoMenu.Active = false;
 		}
 		
-		MyPlayer = new Player(world.GetSpawnPoint(), 0.2f, true);
-		Entities.Add(new MutantScavenger(new Vector2(50, 50)));
+		World = new World(worldState);
+		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.2f, true);
+		_entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
 	}
@@ -465,13 +476,13 @@ public class BlastiaGame : Game
 	{
 		// draw debug point for this frame
 		var debugPoint = new DebugPoint(position, scale);
-		if (Entities.Count <= EntityLimit)
+		if (_entities.Count <= EntityLimit)
 		{
-			Entities.Add(debugPoint);
+			_entities.Add(debugPoint);
 		}
 		
 		// schedule removal for next frame
-		EntitiesToRemove.Add(debugPoint);
+		_entitiesToRemove.Add(debugPoint);
 	}
 	
 	// EXIT
@@ -502,14 +513,14 @@ public class BlastiaGame : Game
 	/// <param name="context">Additional information about the error</param>
 	private void LogError(Exception ex, string context = "")
 	{
-		string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-		string errorMessage = $"[{time}] {context} \n" +
-		                      $"Message: {ex.Message} \n" +
-		                      $"Stack Trace: {ex.StackTrace} \n" +
-		                      $"Source: {ex.Source} \n";
-
 		if (!string.IsNullOrEmpty(_crashLogPath))
 		{
+			string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			string errorMessage = $"[{time}] {context} \n" +
+			                      $"Message: {ex.Message} \n" +
+			                      $"Stack Trace: {ex.StackTrace} \n" +
+			                      $"Source: {ex.Source} \n";
+			
 			File.AppendAllText(_crashLogPath, errorMessage);
 			Console.WriteLine($"Error logged: {context}");
 		}

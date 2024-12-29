@@ -105,4 +105,11 @@ public class Camera : Object
 		Vector2 scaledPosition = new Vector2(scaledPositionX, scaledPositionY);
 		entity.Draw(spriteBatch, scaledPosition, CameraScale);
 	}
+
+	public Vector2 ScreenToWorld(Vector2 screenPosition)
+	{
+		Vector2 unscaledPosition = screenPosition / CameraScale;
+		
+		return unscaledPosition + Position;
+	}
 }
