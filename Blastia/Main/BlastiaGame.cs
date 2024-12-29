@@ -448,8 +448,6 @@ public class BlastiaGame : Game
 		Entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
-
-		world.LogTiles();
 	}
 
 	// DRAW DEBUG POINT
