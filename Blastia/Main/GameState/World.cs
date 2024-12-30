@@ -1,3 +1,4 @@
+using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.UI;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
@@ -7,6 +8,7 @@ namespace Blastia.Main.GameState;
 public class World
 {
 	private WorldState _state;
+	private Player? _myPlayer;
 	
 	public bool RulerMode;
 	private Vector2 _rulerStart;
@@ -19,7 +21,6 @@ public class World
 	{
 		_state = state;
 
-		// TODO: clamp highlight to blocks
 		// TODO: draw a line
 		// TODO: clamp line
 		_rulerStartHighlight = new RulerHighlight();
@@ -34,6 +35,11 @@ public class World
 		}
 
 		Awake();
+	}
+
+	public void SetPlayer(Player myPlayer)
+	{
+		_myPlayer = myPlayer;
 	}
 
 	public static float GetBlocksAmount(int width, int height)
@@ -69,7 +75,9 @@ public class World
 
 	public void Update()
 	{
-		_rulerStartHighlight.SetPosition(_rulerStart);
+		if (_myPlayer?.Camera == null) return;
+		
+		_rulerStartHighlight.SetPosition(_rulerStart, _myPlayer.Camera);
 		_rulerEndHighlight.Position = _rulerEnd;
 	}
 }

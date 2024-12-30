@@ -200,7 +200,7 @@ public abstract class Entity : Object
     {
         var acceleration = force / Mass;
         MovementVector += acceleration;
-        Console.WriteLine($"Acceleration: {acceleration}");
+        //Console.WriteLine($"Acceleration: {acceleration}");
     }
 
     /// <summary>

@@ -67,6 +67,7 @@ public class Camera : Object
 		
 	}
 	
+	// TODO: Issue: low resolution rendering problems
 	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState) 
 	{
 		// get corners in tiles
@@ -120,5 +121,13 @@ public class Camera : Object
 		Vector2 unscaledPosition = screenPosition / CameraScale;
 		
 		return unscaledPosition + Position;
+	}
+	
+	public Vector2 WorldToScreen(Vector2 worldPosition)
+	{
+		return new Vector2(
+			(worldPosition.X - Position.X) * CameraScale,
+			(worldPosition.Y - Position.Y) * CameraScale
+		);
 	}
 }

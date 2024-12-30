@@ -5,7 +5,17 @@ namespace Blastia.Main.GameState;
 
 public abstract class Object
 {
-	public Vector2 Position;
+	public Action<Object>? OnPositionChanged;
+	private Vector2 _position;
+	public Vector2 Position
+	{
+		get => _position;
+		set
+		{
+			_position = value;
+			OnPositionChanged?.Invoke(this);
+		}
+	}
 	public float Scale = 1f;
 	
 	public abstract void Update();

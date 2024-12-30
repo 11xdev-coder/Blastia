@@ -297,8 +297,8 @@ public class BlastiaGame : Game
 				if (_myPlayer?.Camera != null)
 				{
 					var pos = _myPlayer.Camera.ScreenToWorld(CursorPosition);
-					if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(CursorPosition);
-					if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(CursorPosition);
+					if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(pos);
+					if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(pos);
 				}
 				
 				World.Update();
@@ -466,6 +466,8 @@ public class BlastiaGame : Game
 		
 		World = new World(worldState);
 		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.2f, true);
+		World.SetPlayer(_myPlayer);
+		
 		_entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
@@ -479,6 +481,7 @@ public class BlastiaGame : Game
 				{
 					if (element is ICameraScalableUI cameraScalable)
 					{
+						_myPlayer.Camera.OnPositionChanged += cameraScalable.OnChangedPosition;
 						_myPlayer.Camera.OnZoomed += cameraScalable.OnChangedZoom;
 					}
 				}
