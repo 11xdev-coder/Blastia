@@ -20,4 +20,24 @@ public static class Properties
         
         return backUpField;
     }
+    
+    /// <summary>
+    /// Works exactly like <see cref="OnValueChangedProperty{T}(ref T,T,System.Action?)"/>, but passes <c>newValue</c>
+    /// to <c>onChangedAction</c>
+    /// </summary>
+    /// <param name="backUpField"></param>
+    /// <param name="newValue"></param>
+    /// <param name="onChangedAction"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static T OnValueChangedProperty<T>(ref T backUpField, T newValue, Action<T>? onChangedAction = null)
+    {
+        if (!EqualityComparer<T>.Default.Equals(backUpField, newValue))
+        {
+            backUpField = newValue;
+            onChangedAction?.Invoke(newValue);
+        }
+        
+        return backUpField;
+    }
 }

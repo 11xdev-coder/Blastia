@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
-public class RulerHighlight : Image
+public class RulerHighlight : Image, ICameraScalableUI
 {
     public override bool Scalable => false;
     public override bool ScalesWithCamera => true;
@@ -25,5 +25,11 @@ public class RulerHighlight : Image
         var pos = new Vector2((float) newX, (float) newY);
 
         Position = pos;
+    }
+
+    public void OnChangedZoom(float newCameraScale)
+    {
+        Scale = new Vector2(newCameraScale, newCameraScale);
+        Console.WriteLine($"New scale: {Scale}");
     }
 }

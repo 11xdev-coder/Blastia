@@ -469,6 +469,21 @@ public class BlastiaGame : Game
 		_entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
+		
+		// subscribe each UI element with interface to OnZoomed Camera method
+		if (_myPlayer.Camera != null)
+		{
+			foreach (var menu in _menus)
+			{
+				foreach (var element in menu.Elements)
+				{
+					if (element is ICameraScalableUI cameraScalable)
+					{
+						_myPlayer.Camera.OnZoomed += cameraScalable.OnChangedZoom;
+					}
+				}
+			}
+		}
 	}
 
 	// DRAW DEBUG POINT

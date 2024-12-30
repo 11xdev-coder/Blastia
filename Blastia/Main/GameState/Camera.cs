@@ -30,9 +30,18 @@ public class Camera : Object
 	public float CameraScale
 	{
 		get => _cameraScale;
-		set => _cameraScale = Math.Clamp(value, 1, 9999);
+		private set
+		{
+			var clamped = Math.Clamp(value, 1, 9999);
+			Properties.OnValueChangedProperty(ref _cameraScale, clamped, OnZoomed);
+		}
 	}
 	private const float ScaleSpeed = 0.25f;
+
+	/// <summary>
+	/// Event called whenever <c>CameraScale</c> changes
+	/// </summary>
+	public Action<float>? OnZoomed;
 
 	public Camera(Vector2 position) 
 	{
