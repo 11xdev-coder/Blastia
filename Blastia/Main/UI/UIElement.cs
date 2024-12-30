@@ -14,6 +14,15 @@ public abstract class UIElement
     public float Rotation;
     public Vector2 Scale;
 
+    /// <summary>
+    /// Scales with <c>UI Scale</c> setting
+    /// </summary>
+    public virtual bool Scalable { get; set; } = true;
+    /// <summary>
+    /// Scales with <c>CameraScale</c>
+    /// </summary>
+    public virtual bool ScalesWithCamera { get; set; } = false;
+
     #region Alignment
     
     private float _hAlign;

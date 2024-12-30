@@ -12,15 +12,18 @@ public class World
 	private Vector2 _rulerStart;
 	private Vector2 _rulerEnd;
 
-	private readonly Image _rulerStartHighlight;
-	private readonly Image _rulerEndHighlight;
+	private readonly RulerHighlight _rulerStartHighlight;
+	private readonly RulerHighlight _rulerEndHighlight;
 
 	public World(WorldState state)
 	{
 		_state = state;
 
-		_rulerStartHighlight = new Image(Vector2.Zero, BlastiaGame.RulerBlockHighlight);
-		_rulerEndHighlight = new Image(Vector2.Zero, BlastiaGame.RulerBlockHighlight)
+		// TODO: clamp highlight to blocks
+		// TODO: draw a line
+		// TODO: clamp line
+		_rulerStartHighlight = new RulerHighlight();
+		_rulerEndHighlight = new RulerHighlight
 		{
 			DrawColor = Color.Red
 		};
@@ -66,7 +69,7 @@ public class World
 
 	public void Update()
 	{
-		_rulerStartHighlight.Position = _rulerStart;
+		_rulerStartHighlight.SetPosition(_rulerStart);
 		_rulerEndHighlight.Position = _rulerEnd;
 	}
 }
