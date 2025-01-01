@@ -479,7 +479,7 @@ public class BlastiaGame : Game
 			{
 				foreach (var element in menu.Elements)
 				{
-					if (element is ICameraScalableUI cameraScalable)
+					if (element is IWorldPositionUi cameraScalable)
 					{
 						_myPlayer.Camera.OnPositionChanged += cameraScalable.OnChangedPosition;
 						_myPlayer.Camera.OnZoomed += cameraScalable.OnChangedZoom;

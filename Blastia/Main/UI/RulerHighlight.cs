@@ -7,66 +7,41 @@ using Object = Blastia.Main.GameState.Object;
 
 namespace Blastia.Main.UI;
 
-public class RulerHighlight : Image, ICameraScalableUI
+public class RulerHighlight(Vector2 scale = default)
+    : Image(Vector2.Zero, BlastiaGame.RulerBlockHighlight, scale), IWorldPositionUi
 {
     public override bool Scalable => false;
     public override bool ScalesWithCamera => true;
 
-    private Vector2 _worldPosition;
-    private Vector2 _screenPosition;
-    private float _cachedCameraScale;
-
-    public RulerHighlight(Vector2 scale = default) : base(Vector2.Zero, BlastiaGame.RulerBlockHighlight, scale)
-    {
-        
-    }
+    public float CachedCameraScale { get; set; }
+    public Vector2 WorldPosition { get; set; }
+    public Vector2 ScreenPosition { get; set; }
 
     /// <summary>
     /// Automatically clamps <c>newPosition</c> to block grid
     /// </summary>
-    /// <param name="newPosition">World position</param>
-    /// <param name="camera"></param>
-    public void SetPosition(Vector2 newPosition, Camera camera)
+    /// <param name="worldPosition">World position</param>
+    /// <param name="camera">Camera for converting positions</param>
+    public void SetPosition(Vector2 worldPosition, Camera camera)
     {
         // fucking coordiantlknasekjanlfksadhfnsljdafhbnofjkh awer89fhy734298fuirpnfgk,egfn eugfrgunmek gerg
         
-        _cachedCameraScale = camera.CameraScale;
-        
         float gridSize = Block.Size;
         // cache for later drawing
-        _worldPosition = new Vector2(
-            (float)Math.Floor(newPosition.X / gridSize) * gridSize,
-            (float)Math.Floor(newPosition.Y / gridSize) * gridSize);
+        WorldPosition = new Vector2(
+            (float)Math.Floor(worldPosition.X / gridSize) * gridSize,
+            (float)Math.Floor(worldPosition.Y / gridSize) * gridSize);
         
-        _screenPosition = camera.WorldToScreen(_worldPosition);
-    }
-
-    private void UpdateScreenPosition(Camera camera)
-    {
-        _screenPosition = camera.WorldToScreen(_worldPosition);
-    }
-
-    public void OnChangedPosition(Object cameraObj)
-    {
-        if (cameraObj is Camera camera)
-        {
-            UpdateScreenPosition(camera);
-        }
-    }
-
-    public void OnChangedZoom(float newCameraScale)
-    {
-        // TODO: ScalesWithCamera property
-        Scale = new Vector2(newCameraScale, newCameraScale);
-        _cachedCameraScale = newCameraScale;
+        // base method
+        ((IWorldPositionUi) this).SetPositionBase(camera);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        int scale = MathUtilities.SmoothRound(Block.Size * _cachedCameraScale);
-        Rectangle destinationRect = new Rectangle(MathUtilities.SmoothRound(_screenPosition.X), 
-            MathUtilities.SmoothRound(_screenPosition.Y), scale, scale);
+        int scale = MathUtilities.SmoothRound(Block.Size * CachedCameraScale);
+        Rectangle destinationRect = new Rectangle(MathUtilities.SmoothRound(ScreenPosition.X), 
+            MathUtilities.SmoothRound(ScreenPosition.Y), scale, scale);
         
-        spriteBatch.Draw(Texture, destinationRect, Color.White);
+        spriteBatch.Draw(Texture, destinationRect, DrawColor);
     }
 }

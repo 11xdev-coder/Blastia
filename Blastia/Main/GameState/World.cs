@@ -78,6 +78,6 @@ public class World
 		if (_myPlayer?.Camera == null) return;
 		
 		_rulerStartHighlight.SetPosition(_rulerStart, _myPlayer.Camera);
-		_rulerEndHighlight.Position = _rulerEnd;
+		_rulerEndHighlight.SetPosition(_rulerEnd, _myPlayer.Camera);
 	}
 }
