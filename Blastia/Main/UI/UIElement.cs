@@ -117,7 +117,7 @@ public abstract class UIElement
     /// </summary>
     public Color DrawColor { get; set; } = Color.White;
 
-    public float Alpha { get; set; } = 1f;
+    public virtual float Alpha { get; set; } = 1f;
     public bool LerpAlphaToZero { get; set; }
     
     /// <summary>

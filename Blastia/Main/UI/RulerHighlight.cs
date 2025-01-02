@@ -13,6 +13,8 @@ public class RulerHighlight(Vector2 scale = default)
     public override bool Scalable => false;
     public override bool ScalesWithCamera => true;
 
+    public override float Alpha => 0.5f;
+
     public float CachedCameraScale { get; set; }
     public Vector2 WorldPosition { get; set; }
     public Vector2 ScreenPosition { get; set; }
@@ -42,6 +44,6 @@ public class RulerHighlight(Vector2 scale = default)
         Rectangle destinationRect = new Rectangle(MathUtilities.SmoothRound(ScreenPosition.X), 
             MathUtilities.SmoothRound(ScreenPosition.Y), scale, scale);
         
-        spriteBatch.Draw(Texture, destinationRect, DrawColor);
+        spriteBatch.Draw(Texture, destinationRect, DrawColor * Alpha);
     }
 }

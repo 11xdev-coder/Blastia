@@ -299,6 +299,7 @@ public class BlastiaGame : Game
 					var pos = _myPlayer.Camera.ScreenToWorld(CursorPosition);
 					if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(pos);
 					if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(pos);
+					if (KeyboardState.IsKeyDown(Keys.G)) World.DrawRulerLine();
 				}
 				
 				World.Update();

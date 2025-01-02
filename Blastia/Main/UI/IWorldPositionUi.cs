@@ -14,7 +14,7 @@ public interface IWorldPositionUi
     protected Vector2 ScreenPosition { get; set; }
     
     /// <summary>
-    /// Updates screen position (<see cref="UpdateScreenPosition"/>) and caches <c>camera.CameraScale</c>. 
+    /// Updates screen position (<see cref="UpdateScreenPosition"/>) and caches <c>CameraScale</c>. 
     /// </summary>
     /// <param name="camera"></param>
     public void SetPositionBase(Camera camera)
