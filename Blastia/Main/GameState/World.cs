@@ -1,6 +1,7 @@
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.UI;
+using Blastia.Main.UI.Menus.InGame;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.GameState;
@@ -16,29 +17,29 @@ public class World
 
 	private readonly RulerHighlight _rulerStartHighlight;
 	private readonly RulerHighlight _rulerEndHighlight;
-	private List<RulerHighlight> _lineRulerHighlights;
 
 	public World(WorldState state)
 	{
 		_state = state;
 
-		// TODO: draw a line
 		// TODO: clamp line
 		_rulerStartHighlight = new RulerHighlight();
 		_rulerEndHighlight = new RulerHighlight();
-		if (BlastiaGame.InGameMenu != null)
-		{
-			BlastiaGame.InGameMenu.Elements.AddRange([ _rulerStartHighlight, _rulerEndHighlight ]);
-		}
-		
-		_lineRulerHighlights = [];
 
 		Awake();
 	}
 
+	/// <summary>
+	/// Sets World's player and initializes ruler start and end highlight
+	/// </summary>
+	/// <param name="myPlayer"></param>
 	public void SetPlayer(Player myPlayer)
 	{
 		_myPlayer = myPlayer;
+		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
+		
+		BlastiaGame.RulerMenu.AddHighlight(_rulerStartHighlight, Vector2.Zero, _myPlayer.Camera);
+		BlastiaGame.RulerMenu.AddHighlight(_rulerEndHighlight, Vector2.Zero, _myPlayer.Camera);
 	}
 
 	public static float GetBlocksAmount(int width, int height)
@@ -76,7 +77,7 @@ public class World
 	
 	public void DrawRulerLine()
 	{
-		if (BlastiaGame.InGameMenu == null || _myPlayer?.Camera == null) return;
+		if (BlastiaGame.RulerMenu == null || _myPlayer?.Camera == null) return;
 
 		var startX = GetRulerStartRoundedToBlocks().X;
 		var startY = GetRulerStartRoundedToBlocks().Y;
@@ -86,8 +87,7 @@ public class World
 		
 		var blocksX = Math.Abs(xDiff) / 8;
 		var xToAdd = 0;
-		Console.WriteLine(blocksX);
-		for (var block = 0; block < blocksX; block++)
+		for (var block = 1; block <= blocksX; block++)
 		{
 			if (xDiff < 0) xToAdd = block * -8; // go left
 			else if (xDiff > 0) xToAdd = block * 8;
@@ -96,15 +96,16 @@ public class World
 			var rulerHighlight = new RulerHighlight();
 			rulerHighlight.SetPosition(pos, _myPlayer.Camera);
 			
-			BlastiaGame.InGameMenu.Elements.Add(rulerHighlight);
+			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, _myPlayer.Camera);
 		}
 	}
 	
 	public void Update()
 	{
-		if (_myPlayer?.Camera == null) return;
+		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
 		
-		_rulerStartHighlight.SetPosition(_rulerStart, _myPlayer.Camera);
-		_rulerEndHighlight.SetPosition(_rulerEnd, _myPlayer.Camera);
+		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerStartHighlight, _rulerStart, _myPlayer.Camera);
+		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerEndHighlight, _rulerEnd, _myPlayer.Camera);
+		BlastiaGame.RulerMenu.Update();
 	}
 }

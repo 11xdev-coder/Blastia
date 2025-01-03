@@ -7,6 +7,7 @@ using Blastia.Main.GameState;
 using Blastia.Main.Sounds;
 using Blastia.Main.UI;
 using Blastia.Main.UI.Menus;
+using Blastia.Main.UI.Menus.InGame;
 using Blastia.Main.UI.Menus.Settings;
 using Blastia.Main.UI.Menus.SinglePlayer;
 using Blastia.Main.Utilities;
@@ -15,6 +16,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Blastia.Main;
+
+public delegate Player PlayerEventHandler();
 
 public class BlastiaGame : Game
 {
@@ -75,7 +78,7 @@ public class BlastiaGame : Game
 	public static SettingsMenu? SettingsMenu { get; private set; }
 	public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
-	public static Menu? InGameMenu { get; private set; }
+	public static RulerMenu? RulerMenu { get; private set; }
 	private readonly List<Menu> _menus;
 
 	/// <summary>
@@ -101,6 +104,8 @@ public class BlastiaGame : Game
 	/// Event to request creation of DebugPoint entity for one frame
 	/// </summary>
 	private static event Action<Vector2, float>? RequestDebugPointDrawEvent;
+
+	private static event PlayerEventHandler? RequestPlayerEvent;
 
 	// RANDOM
 	public static readonly Random Rand = new();
@@ -157,6 +162,7 @@ public class BlastiaGame : Game
 		ResolutionRequestEvent += UpdateResolution;
 		RequestWorldInitializationEvent += InitializeWorld;
 		RequestDebugPointDrawEvent += DrawDebugPoint;
+		RequestPlayerEvent += OnPlayerRequested;
 		
 		_pixelatedSamplerState = new SamplerState
 		{
@@ -260,8 +266,8 @@ public class BlastiaGame : Game
 			VideoSettingsMenu = new VideoSettingsMenu(MainFont);
 			AddMenu(VideoSettingsMenu);
 			
-			InGameMenu = new Menu(MainFont);
-			AddMenu(InGameMenu);
+			RulerMenu = new RulerMenu(MainFont);
+			AddMenu(RulerMenu);
 		}
 		catch (Exception ex)
 		{
@@ -436,11 +442,7 @@ public class BlastiaGame : Game
 	/// <summary>
 	/// Requests to update the screen resolution by invoking the ResolutionRequestEvent.
 	/// </summary>
-	public static void RequestResolutionUpdate()
-	{
-		ResolutionRequestEvent?.Invoke();
-	}
-
+	public static void RequestResolutionUpdate() => ResolutionRequestEvent?.Invoke();
 	private void UpdateResolution()
 	{
 		ScreenWidth = GraphicsDevice.Viewport.Width;
@@ -448,14 +450,10 @@ public class BlastiaGame : Game
 	}
 	
 	// WORLD INITIALIZATION
-	public static void RequestWorldInitialization() 
-	{
-		RequestWorldInitializationEvent?.Invoke();
-	}	
-	
+	public static void RequestWorldInitialization() => RequestWorldInitializationEvent?.Invoke();
 	private void InitializeWorld()
 	{
-		if (InGameMenu != null) InGameMenu.Active = true;
+		if (RulerMenu != null) RulerMenu.Active = true;
 
 		var worldState = PlayerManager.Instance.SelectedWorld;
 		if (worldState == null) return;
@@ -496,11 +494,8 @@ public class BlastiaGame : Game
 	/// </summary>
 	/// <param name="position">Position of DebugPoint</param>
 	/// <param name="scale">Scale of DebugPoint</param>
-	public static void RequestDebugPointDraw(Vector2 position, float scale = 1f)
-	{
+	public static void RequestDebugPointDraw(Vector2 position, float scale = 1f) => 
 		RequestDebugPointDrawEvent?.Invoke(position, scale);
-	}
-
 	private void DrawDebugPoint(Vector2 position, float scale = 1f)
 	{
 		// draw debug point for this frame
@@ -514,15 +509,19 @@ public class BlastiaGame : Game
 		_entitiesToRemove.Add(debugPoint);
 	}
 	
+	// REQUEST PLAYER
+	/// <summary>
+	/// Requests <c>MyPlayer</c>
+	/// </summary>
+	/// <returns>Returns <c>MyPlayer</c> if world is initialized. Otherwise, returns <c>null</c></returns>
+	public static Player? RequestPlayer() => RequestPlayerEvent?.Invoke();
+	private Player? OnPlayerRequested() => _myPlayer;
+	
 	// EXIT
 	/// <summary>
 	/// Requests to exit the game by invoking ExitRequestEvent
 	/// </summary>
-	public static void RequestExit()
-	{
-		ExitRequestEvent?.Invoke();
-	}
-
+	public static void RequestExit() => ExitRequestEvent?.Invoke();
 	private void OnExitRequested()
 	{
 		ConsoleWindow?.Close();
