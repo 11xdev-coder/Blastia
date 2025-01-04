@@ -22,7 +22,6 @@ public class World
 	{
 		_state = state;
 
-		// TODO: clamp line
 		_rulerStartHighlight = new RulerHighlight();
 		_rulerEndHighlight = new RulerHighlight();
 
@@ -62,11 +61,41 @@ public class World
 		return mass;
 	}
 
-	public void SetRulerStart(Vector2 start) => _rulerStart = start;
-	public void SetRulerEnd(Vector2 end) => _rulerEnd = end;
+	/// <summary>
+	/// Sets start for the ruler line and updates start highlight
+	/// </summary>
+	/// <param name="start"></param>
+	public void SetRulerStart(Vector2 start) 
+	{
+		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
+		
+		_rulerStart = start;
+		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerStartHighlight, start, _myPlayer.Camera);
+	}
+
+	/// <summary>
+	/// Sets end for the ruler line and updates end highlight
+	/// </summary>
+	/// <param name="end"></param>
+	public void SetRulerEnd(Vector2 end)
+	{
+		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
+		
+		_rulerEnd = end;
+		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerEndHighlight, end, _myPlayer.Camera);
+	}
 	
+	/// <summary>
+	/// Rounds ruler start to blocks
+	/// </summary>
+	/// <returns>Ruler start rounded down to nearest block</returns>
 	public Vector2 GetRulerStartRoundedToBlocks() => new((float)Math.Floor(_rulerStart.X / Block.Size) * Block.Size, 
 		(float)Math.Floor(_rulerStart.Y / Block.Size) * Block.Size);
+	
+	/// <summary>
+	/// Rounds ruler end to blocks
+	/// </summary>
+	/// <returns>Ruler end rounded down to nearest block</returns>
 	public Vector2 GetRulerEndRoundedToBlocks() => new((float)Math.Floor(_rulerEnd.X / Block.Size) * Block.Size, 
 		(float)Math.Floor(_rulerEnd.Y / Block.Size) * Block.Size);
 
@@ -75,6 +104,9 @@ public class World
 		
 	}
 	
+	/// <summary>
+	/// Draws ruler line between start and end
+	/// </summary>
 	public void DrawRulerLine()
 	{
 		if (BlastiaGame.RulerMenu == null || _myPlayer?.Camera == null) return;
@@ -99,13 +131,9 @@ public class World
 			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, _myPlayer.Camera);
 		}
 	}
-	
+
 	public void Update()
 	{
-		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
 		
-		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerStartHighlight, _rulerStart, _myPlayer.Camera);
-		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerEndHighlight, _rulerEnd, _myPlayer.Camera);
-		BlastiaGame.RulerMenu.Update();
 	}
 }
