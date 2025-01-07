@@ -1,7 +1,6 @@
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.UI;
-using Blastia.Main.UI.Menus.InGame;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.GameState;
@@ -116,18 +115,33 @@ public class World
 		
 		var xDiff = GetRulerEndRoundedToBlocks().X - GetRulerStartRoundedToBlocks().X;
 		var yDiff = GetRulerEndRoundedToBlocks().Y - GetRulerStartRoundedToBlocks().Y;
-		
+
 		var blocksX = Math.Abs(xDiff) / 8;
-		var xToAdd = 0;
+		if (yDiff == 0) blocksX -= 1; // if on the same Y level
+		var blocksY = Math.Abs(yDiff) / 8 - 1;
+		
+		// X
+		var lastX = startX;
 		for (var block = 1; block <= blocksX; block++)
 		{
+			int xToAdd;
 			if (xDiff < 0) xToAdd = block * -8; // go left
-			else if (xDiff > 0) xToAdd = block * 8;
+			else xToAdd = block * 8;
 
+			lastX = startX + xToAdd;
 			var pos = new Vector2(startX + xToAdd, startY);
 			var rulerHighlight = new RulerHighlight();
-			rulerHighlight.SetPosition(pos, _myPlayer.Camera);
+			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, _myPlayer.Camera);
+		}
+		// Y
+		for (var block = 1; block <= blocksY; block++)
+		{
+			int yToAdd;
+			if (yDiff < 0) yToAdd = block * -8; // go down
+			else yToAdd = block * 8;
 			
+			var pos = new Vector2(lastX, startY + yToAdd);
+			var rulerHighlight = new RulerHighlight();
 			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, _myPlayer.Camera);
 		}
 	}
