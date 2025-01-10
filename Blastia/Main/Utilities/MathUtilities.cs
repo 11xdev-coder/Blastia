@@ -57,4 +57,14 @@ public static class MathUtilities
         var distance = dx * dx + dy * dy;
         return distance;
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns>If value is <c>>= 1</c> returns <c>True</c>, else returns <c>false</c></returns>
+    public static bool CastToBool(int value)
+    {
+        return value >= 1;
+    }
 }

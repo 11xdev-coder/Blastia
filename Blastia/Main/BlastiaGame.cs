@@ -16,8 +16,6 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Blastia.Main;
 
-public delegate Player PlayerEventHandler();
-
 public class BlastiaGame : Game
 {
 	/// <summary>
@@ -467,6 +465,7 @@ public class BlastiaGame : Game
 		World = new World(worldState);
 		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.2f, true);
 		World.SetPlayer(_myPlayer);
+		ConsoleWindow?.InitializeWorldCommands(World);
 		
 		_entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
