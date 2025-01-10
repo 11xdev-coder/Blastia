@@ -6,6 +6,7 @@ namespace Blastia.Main.UI.Menus.InGame;
 
 public class RulerMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
+    public override bool CameraUpdate => true;
     private readonly Dictionary<RulerHighlight, Vector2> _highlightPositions = new();
 
     /// <summary>
@@ -40,15 +41,12 @@ public class RulerMenu(SpriteFont font, bool isActive = false) : Menu(font, isAc
     /// Automatically gets <c>Player</c> from the <c>BlastiaGame</c> and updates all <c>RulerHighlights</c> with their
     /// positions
     /// </summary>
-    public override void Update()
+    public override void Update(Camera playerCamera)
     {
-        var player = BlastiaGame.RequestPlayer();
-        if (player?.Camera == null) return;
-        
         // Update stored positions
         foreach (var highlight in _highlightPositions.Keys)
         {
-            highlight.SetPosition(_highlightPositions[highlight], player.Camera);
+            highlight.SetPosition(_highlightPositions[highlight], playerCamera);
         }
         base.Update();
     }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Blastia.Main.Blocks.Common;
+﻿using Blastia.Main.Commands;
 using Blastia.Main.Entities;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
@@ -65,7 +64,7 @@ public class BlastiaGame : Game
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
 	
-	public SpriteFont MainFont { get; private set; }
+	public SpriteFont? MainFont { get; private set; }
 	
 	
 	// MENUS
@@ -105,8 +104,6 @@ public class BlastiaGame : Game
 	/// </summary>
 	private static event Action<Vector2, float>? RequestDebugPointDrawEvent;
 
-	private static event PlayerEventHandler? RequestPlayerEvent;
-
 	// RANDOM
 	public static readonly Random Rand = new();
 
@@ -118,7 +115,7 @@ public class BlastiaGame : Game
 	public ConsoleWindow? ConsoleWindow;
 	
 	// GAMESTATE
-	public World World { get; private set; }
+	public World? World { get; private set; }
 	private readonly List<Entity> _entities;
 	private readonly List<Entity> _entitiesToRemove;
 	private const ushort EntityLimit = 256;
@@ -162,7 +159,6 @@ public class BlastiaGame : Game
 		ResolutionRequestEvent += UpdateResolution;
 		RequestWorldInitializationEvent += InitializeWorld;
 		RequestDebugPointDrawEvent += DrawDebugPoint;
-		RequestPlayerEvent += OnPlayerRequested;
 		
 		_pixelatedSamplerState = new SamplerState
 		{
@@ -300,15 +296,18 @@ public class BlastiaGame : Game
 
 			if (IsWorldInitialized)
 			{
-				if (_myPlayer?.Camera != null)
+				if (World != null)
 				{
-					var pos = _myPlayer.Camera.ScreenToWorld(CursorPosition);
-					if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(pos);
-					if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(pos);
-					if (KeyboardHelper.IsKeyJustPressed(Keys.G)) World.DrawRulerLine();
-				}
+					if (_myPlayer?.Camera != null)
+					{
+						var pos = _myPlayer.Camera.ScreenToWorld(CursorPosition);
+						if (KeyboardState.IsKeyDown(Keys.E)) World.SetRulerStart(pos);
+						if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(pos);
+						if (KeyboardHelper.IsKeyJustPressed(Keys.G)) World.DrawRulerLine();
+					}
 				
-				World.Update();
+					World.Update();
+				}
 				
 				_myPlayer?.Update();
 				foreach (var player in Players)
@@ -327,7 +326,9 @@ public class BlastiaGame : Game
 			{
 				if (menu.Active)
 				{
-					menu.Update();
+					if (menu.CameraUpdate && _myPlayer?.Camera != null) menu.Update(_myPlayer.Camera);
+					else menu.Update();
+					
 					// prevent new menu from updating when switched
 					if (menu.CheckAndResetMenuSwitchedFlag())
 					{
@@ -508,14 +509,6 @@ public class BlastiaGame : Game
 		// schedule removal for next frame
 		_entitiesToRemove.Add(debugPoint);
 	}
-	
-	// REQUEST PLAYER
-	/// <summary>
-	/// Requests <c>MyPlayer</c>
-	/// </summary>
-	/// <returns>Returns <c>MyPlayer</c> if world is initialized. Otherwise, returns <c>null</c></returns>
-	public static Player? RequestPlayer() => RequestPlayerEvent?.Invoke();
-	private Player? OnPlayerRequested() => _myPlayer;
 	
 	// EXIT
 	/// <summary>

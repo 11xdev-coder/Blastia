@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
-namespace Blastia.Main.Utilities;
+namespace Blastia.Main.Commands;
 
 public class ConsoleWindow
 {
@@ -13,16 +13,9 @@ public class ConsoleWindow
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern bool FreeConsole();
 
-    private Thread _consoleThread;
-    private readonly ConcurrentQueue<string> _commandQueue;
+    private Thread? _consoleThread;
     private volatile bool _isRunning; // can be edited in any thread
-    
-    public ConsoleWindow()
-    {
-        _commandQueue = new ConcurrentQueue<string>();
-        _isRunning = false;
-    }
-    
+
     public void Open(string title)
     {
         AllocConsole();
@@ -36,7 +29,7 @@ public class ConsoleWindow
     public void Close()
     {
         _isRunning = false;
-        if (_consoleThread.IsAlive)
+        if (_consoleThread is {IsAlive: true})
         {
             _consoleThread.Join();
         }
@@ -63,16 +56,6 @@ public class ConsoleWindow
                 {
                     ProcessCommand(input);
                 }
-            }
-            else
-            {
-                // process commands
-                while (_commandQueue.TryDequeue(out string? command))
-                {
-                    ProcessCommand(command);
-                }
-
-                Thread.Sleep(10);
             }
         }
     }

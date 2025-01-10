@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Utilities;
+﻿using Blastia.Main.GameState;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
@@ -9,6 +10,12 @@ public class Menu
     public SpriteFont Font;
 
     public bool Active;
+    
+    /// <summary>
+    /// If <c>true</c> and player camera is initialized will use <see cref="Update(Camera)"/> to update.
+    /// Otherwise, will use <see cref="Update()"/>
+    /// </summary>
+    public virtual bool CameraUpdate { get; set; }
 
     private bool _menuSwitched;
 
@@ -25,6 +32,18 @@ public class Menu
     /// Update each element
     /// </summary>
     public virtual void Update()
+    {
+        foreach (var elem in Elements)
+        {
+            elem.Update();
+        }
+    }
+
+    /// <summary>
+    /// Update each element
+    /// </summary>
+    /// <param name="playerCamera"></param>
+    public virtual void Update(Camera playerCamera)
     {
         foreach (var elem in Elements)
         {
