@@ -28,7 +28,7 @@ public class ConsoleWindow
         _gameRules.AddGameRule("ruler", b =>
         {
             world.RulerMode = b;
-        });
+        }, () => world.RulerMode);
         Console.WriteLine("Commands initialized");
     }
     

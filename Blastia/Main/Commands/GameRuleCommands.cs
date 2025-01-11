@@ -11,10 +11,28 @@ public class GameRuleCommands(bool log = true)
     /// </summary>
     public bool Log { get; set; } = log;
     private readonly Dictionary<string, Action<bool>> _gameRules = [];
-    private Dictionary<string, GameRuleGetter> _gameRuleGetters = [];
+    private readonly Dictionary<string, GameRuleGetter> _gameRuleGetters = [];
 
-    public void AddGameRule(string gameRule, Action<bool> onValueChanged) => _gameRules[gameRule] = onValueChanged;
-    public void RemoveGameRule(string gameRule) => _gameRules.Remove(gameRule);
+    public bool HasGameRule(string gameRule) => _gameRules.ContainsKey(gameRule);
+    
+    /// <summary>
+    /// Adds new <c>GameRule</c> command
+    /// </summary>
+    /// <param name="gameRule">Name</param>
+    /// <param name="onValueChanged">Function executed whenever <c>GameRule</c> state is trying to change (<see cref="SetGameRule(string, int)"/>,
+    /// <see cref="SetGameRule(string, bool)"/>)</param>
+    /// <param name="getter">Function that returns <c>bool</c> representing <c>GameRule</c> state</param>
+    public void AddGameRule(string gameRule, Action<bool> onValueChanged, GameRuleGetter getter)
+    {
+        _gameRules[gameRule] = onValueChanged;
+        _gameRuleGetters[gameRule] = getter;
+    }
+
+    public void RemoveGameRule(string gameRule)
+    {
+        _gameRules.Remove(gameRule);
+        _gameRuleGetters.Remove(gameRule);
+    }
     
     /// <summary>
     /// Prints <c>gameRule</c> current state
@@ -22,7 +40,8 @@ public class GameRuleCommands(bool log = true)
     /// <param name="gameRule"></param>
     public void SetGameRule(string gameRule)
     {
-        Console.WriteLine($"{gameRule}: {_gameRules[gameRule]}");
+        var state = _gameRuleGetters[gameRule].Invoke();
+        Console.WriteLine($"{gameRule}: {state}");
     }
 
     /// <summary>
@@ -47,6 +66,4 @@ public class GameRuleCommands(bool log = true)
         _gameRules[gameRule].Invoke(value);
         if (Log) Console.WriteLine($"{gameRule} is now set to: {value}");
     }
-
-    public bool HasGameRule(string gameRule) => _gameRules.ContainsKey(gameRule);
 }
