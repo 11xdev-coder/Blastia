@@ -452,8 +452,6 @@ public class BlastiaGame : Game
 	public static void RequestWorldInitialization() => RequestWorldInitializationEvent?.Invoke();
 	private void InitializeWorld()
 	{
-		if (RulerMenu != null) RulerMenu.Active = true;
-
 		var worldState = PlayerManager.Instance.SelectedWorld;
 		if (worldState == null) return;
 
@@ -465,6 +463,7 @@ public class BlastiaGame : Game
 		World = new World(worldState);
 		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.2f, true);
 		World.SetPlayer(_myPlayer);
+		if (RulerMenu != null) RulerMenu.Active = World.RulerMode;
 		ConsoleWindow?.InitializeWorldCommands(World);
 		
 		_entities.Add(new MutantScavenger(new Vector2(50, 50)));

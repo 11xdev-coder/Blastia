@@ -1,6 +1,7 @@
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.UI;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.GameState;
@@ -9,8 +10,14 @@ public class World
 {
 	private WorldState _state;
 	private Player? _myPlayer;
+
+	private bool _rulerMode;
+	public bool RulerMode
+	{
+		get => _rulerMode;
+		set => Properties.OnValueChangedProperty(ref _rulerMode, value, OnRulerModeUpdated);
+	}
 	
-	public bool RulerMode;
 	private Vector2 _rulerStart;
 	private Vector2 _rulerEnd;
 
@@ -38,6 +45,12 @@ public class World
 		
 		BlastiaGame.RulerMenu.AddHighlight(_rulerStartHighlight, Vector2.Zero, _myPlayer.Camera);
 		BlastiaGame.RulerMenu.AddHighlight(_rulerEndHighlight, Vector2.Zero, _myPlayer.Camera);
+	}
+
+	private void OnRulerModeUpdated()
+	{
+		if (BlastiaGame.RulerMenu == null) return;
+		BlastiaGame.RulerMenu.Active = _rulerMode;
 	}
 
 	public static float GetBlocksAmount(int width, int height)
