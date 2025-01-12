@@ -230,7 +230,7 @@ public class BlastiaGame : Game
 			StuffLoader.LoadBlocks(GraphicsDevice);
 			StuffLoader.LoadHumans(GraphicsDevice);
 
-			MainFont = Content.Load<SpriteFont>("Font/Andy_24_Regular");
+			MainFont = Content.Load<SpriteFont>("Font/Raleway_24_Regular");
 
 			// menus
 			LogoMenu = new LogoMenu(MainFont);

@@ -12,7 +12,7 @@ public abstract class UIElement
     /// </summary>
     public Vector2 Position;
     public float Rotation;
-    public Vector2 Scale;
+    public Vector2 Scale = Vector2.One;
 
     /// <summary>
     /// Scales with <c>UI Scale</c> setting
@@ -401,7 +401,7 @@ public abstract class UIElement
             Bounds.Center.Y);
         
         spriteBatch.DrawString(Font, Text, position, DrawColor * Alpha, 
-            Rotation, origin, Vector2.One, SpriteEffects.None, 0f);
+            Rotation, origin, Scale, SpriteEffects.None, 0f);
     }
 
     private void DrawTexture(SpriteBatch spriteBatch)

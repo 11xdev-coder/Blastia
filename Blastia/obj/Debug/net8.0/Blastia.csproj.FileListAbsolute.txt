@@ -1,12 +1,3 @@
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_20_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_21_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_22_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_23_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_24_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_25_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_26_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_8_Regular.xnb
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Andy_9_Regular.xnb
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Arial.xnb
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_00.ogg
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peaceful journey_01.ogg
@@ -67,3 +58,6 @@ D:\Projects\Blastia\Blastia\obj\Debug\net8.0\Blastia.pdb
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\Blastia.genruntimeconfig.cache
 D:\Projects\Blastia\Blastia\obj\Debug\net8.0\ref\Blastia.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\RulerBlockHighlight.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Raleway_24_Regular.xnb
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Raleway_25_Regular.xnb
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Raleway_26_Regular.xnb
