@@ -18,12 +18,37 @@ public class RulerMenu : Menu
     {
         var rulerModeText = new Text(Vector2.Zero, "Ruler Mode", Font)
         {
-            HAlign = 0.91f,
+            HAlign = 0.9f,
             VAlign = 0.98f,
             Scale = new Vector2(3f)
         };
         Elements.Add(rulerModeText);
-        // TODO: more text + highlight on click
+
+        var placeStartText = new Text(Vector2.Zero, "V: Place starting point", Font)
+        {
+            HAlign = 1.025f,
+            VAlign = 0.93f,
+            Scale = new Vector2(0.7f)
+        };
+        Elements.Add(placeStartText);
+        
+        var placeEndText = new Text(Vector2.Zero, "B: Place ending point", Font)
+        {
+            HAlign = 1.0235f,
+            VAlign = 0.9f,
+            Scale = new Vector2(0.7f)
+        };
+        Elements.Add(placeEndText);
+
+        var removeRulerText = new Text(Vector2.Zero, "RMB: Remove ruler", Font)
+        {
+            HAlign = 1.0225f,
+            VAlign = 0.87f,
+            Scale = new Vector2(0.7f)
+        };
+        Elements.Add(removeRulerText);
+        
+        // TODO: implement bindings
     }
     
     /// <summary>
