@@ -76,6 +76,8 @@ public class BlastiaGame : Game
 	public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
 	public static RulerMenu? RulerMenu { get; private set; }
+	public static InGameMenu? InGameMenu { get; private set; }
+	public static InGameSettingsMenu? InGameSettingsMenu { get; private set; }
 	private readonly List<Menu> _menus;
 
 	/// <summary>
@@ -262,6 +264,12 @@ public class BlastiaGame : Game
 			
 			RulerMenu = new RulerMenu(MainFont);
 			AddMenu(RulerMenu);
+
+			InGameMenu = new InGameMenu(MainFont);
+			AddMenu(InGameMenu);
+			
+			InGameSettingsMenu = new InGameSettingsMenu(MainFont);
+			AddMenu(InGameSettingsMenu);
 		}
 		catch (Exception ex)
 		{
@@ -454,16 +462,15 @@ public class BlastiaGame : Game
 	{
 		var worldState = PlayerManager.Instance.SelectedWorld;
 		if (worldState == null) return;
-
-		if (LogoMenu != null)
-		{
-			LogoMenu.Active = false;
-		}
 		
 		World = new World(worldState);
 		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.2f, true);
 		World.SetPlayer(_myPlayer);
+		
+		if (LogoMenu != null) LogoMenu.Active = false;
 		if (RulerMenu != null) RulerMenu.Active = World.RulerMode;
+		if (InGameMenu != null) InGameMenu.Active = true;
+		
 		ConsoleWindow?.InitializeWorldCommands(World);
 		
 		_entities.Add(new MutantScavenger(new Vector2(50, 50)));

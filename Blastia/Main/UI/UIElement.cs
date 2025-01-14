@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Utilities;
+﻿using Blastia.Main.Sounds;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -414,5 +415,13 @@ public abstract class UIElement
         
         spriteBatch.Draw(Texture, position, null, DrawColor * Alpha, 
             Rotation, origin, Scale, SpriteEffects.None, 0f);
+    }
+    
+    /// <summary>
+    /// Plays <c>Tick</c> sound
+    /// </summary>
+    protected void PlayTickSound()
+    {
+        SoundEngine.PlaySound(SoundID.Tick);
     }
 }

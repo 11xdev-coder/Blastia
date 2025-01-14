@@ -20,11 +20,6 @@ public class Button : UIElement
         OnEndHovering = Deselect;
     }
 
-    private void PlayTickSound()
-    {
-        SoundEngine.PlaySound(SoundID.Tick);
-    }
-
     private void Select()
     {
         DrawColor = SelectedColor;

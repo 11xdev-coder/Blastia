@@ -294,23 +294,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\matvei\\.nuget\\packages\\": {},
+    "C:\\Users\\matve\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\Blastia\\Blastia\\Blastia.csproj",
+      "projectUniqueName": "C:\\Users\\matve\\projects\\Blastia\\Blastia\\Blastia.csproj",
       "projectName": "Blastia",
-      "projectPath": "D:\\Projects\\Blastia\\Blastia\\Blastia.csproj",
-      "packagesPath": "C:\\Users\\matvei\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\Blastia\\Blastia\\obj\\",
+      "projectPath": "C:\\Users\\matve\\projects\\Blastia\\Blastia\\Blastia.csproj",
+      "packagesPath": "C:\\Users\\matve\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\matve\\projects\\Blastia\\Blastia\\obj\\",
       "projectStyle": "PackageReference",
+      "UsingMicrosoftNETSdk": false,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\matvei\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\matve\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -320,7 +321,6 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\dotnet\\library-packs": {},
-        "C:\\Users\\matvei\\AppData\\Roaming\\Cosmos User Kit\\packages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -365,7 +365,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.206/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.404/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
