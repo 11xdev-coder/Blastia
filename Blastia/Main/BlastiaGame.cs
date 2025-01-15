@@ -58,6 +58,8 @@ public class BlastiaGame : Game
 	public static Texture2D ProgressBarBackground { get; private set; } = null!;
 	public static Texture2D WhitePixel { get; private set; } = null!;
 	public static Texture2D InvisibleTexture { get; private set; } = null!;
+	public static Texture2D MonitorTexture { get; private set; } = null!;
+	public static Texture2D AudioTexture { get; private set; } = null!;
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -216,6 +218,12 @@ public class BlastiaGame : Game
 		
 		InvisibleTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
 			Paths.InvisibleTexturePath);
+		
+		MonitorTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+			Paths.MonitorTexturePath);
+		
+		AudioTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+			Paths.AudioTexturePath);
 	}
 	
 	protected override void LoadContent()

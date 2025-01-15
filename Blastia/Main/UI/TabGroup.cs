@@ -23,10 +23,17 @@ public class TabGroup : UIElement
         
         Initialize(currentMenu);
     }
-
+    
+    public override void UpdateBounds()
+    {
+        if (Texture == null) return;
+        
+        UpdateBoundsBase(Texture.Width, Texture.Height);
+    }
+    
     private void Initialize(Menu currentMenu)
     {
-        var startingPosition = Position;
+        var startingPosition = new Vector2(Bounds.Left, Bounds.Top);
 
         foreach (var tabData in _tabsData)
         {
@@ -36,7 +43,7 @@ public class TabGroup : UIElement
             });
             currentMenu.Elements.Add(tabButton);
             
-            startingPosition.X += _tabSpacing;
+            startingPosition.X += _tabSpacing + tabData.TabTexture.Width;
         }    
     }
 }

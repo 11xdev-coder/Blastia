@@ -22,6 +22,8 @@ public static class Paths
 	public static string ProgressbarBackgroundPath { get; private set; } = "";
 	public static string WhitePixelPath { get; private set; } = "";
 	public static string InvisibleTexturePath { get; private set; } = "";
+	public static string MonitorTexturePath { get; private set; } = "";
+	public static string AudioTexturePath { get; private set; } = "";
 	
 	// sounds
 	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
@@ -46,6 +48,8 @@ public static class Paths
 		ProgressbarBackgroundPath = Path.Combine(ContentRoot, "Textures/UI/ProgressBarBG.png");
 		WhitePixelPath = Path.Combine(ContentRoot, "Textures/WhitePixel.png");
 		InvisibleTexturePath = Path.Combine(ContentRoot, "Textures/Invisible.png");
+		MonitorTexturePath = Path.Combine(ContentRoot, "Textures/UI/Monitor.png");
+		AudioTexturePath = Path.Combine(ContentRoot, "Textures/UI/Audio.png");
 		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";

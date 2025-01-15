@@ -132,7 +132,7 @@ public abstract class UIElement
         Position = position;
         Texture = texture;
         UseTexture = true;
-        // if scale is not set -> Vector one; otherwise -> scale
+        // if scale is not set -> Vector one; otherwse -> scale
         Scale = scale == default ? Vector2.One : scale;
         
         Initialize();
@@ -193,9 +193,18 @@ public abstract class UIElement
         bool isHoldingLeft = BlastiaGame.IsHoldingLeft;
         IsHovered = Bounds.Contains(cursorX, cursorY);
     
-        if(IsHovered) OnHover?.Invoke(); // if hovering
-        if(IsHovered && !_prevIsHovered) OnStartHovering?.Invoke(); // if started hovering
-        if(!IsHovered && _prevIsHovered) OnEndHovering?.Invoke(); // end hovering
+        if (IsHovered) OnHover?.Invoke(); // if hovering
+        
+        switch (IsHovered)
+        {
+            case true when !_prevIsHovered:
+                OnStartHovering?.Invoke(); // if started hovering
+                break;
+            case false when _prevIsHovered:
+                OnEndHovering?.Invoke(); // end hovering
+                break;
+        }
+
         if (IsHovered && hasClicked) // focus + click
         {
             OnFocus();

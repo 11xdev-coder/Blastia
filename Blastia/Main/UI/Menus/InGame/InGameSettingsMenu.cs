@@ -13,7 +13,8 @@ public class InGameSettingsMenu : Menu
     private void AddElements()
     {
         var tabs = new TabGroup(new Vector2(100, 100), 15, this, 
-            new Tab("Video", BlastiaGame.RulerBlockHighlight, BlastiaGame.PlayersMenu));
+            new Tab("Video", BlastiaGame.MonitorTexture, BlastiaGame.PlayersMenu),
+            new Tab("Audio", BlastiaGame.AudioTexture, BlastiaGame.PlayersMenu));
     }
 
     private void OpenVideoSettings()
