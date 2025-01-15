@@ -7,43 +7,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/UI/Audio.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/UI/Monitor.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BlasterMaster/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BlasterMaster/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BlasterMaster/.idea/indexLayout.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.BlasterMaster/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/indexLayout.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="tab buttons and images">
       <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/TabGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/TabGroup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/Paths.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/Paths.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Blastia.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Blastia.csproj.nuget.dgspec.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.GeneratedMSBuildEditorConfig.editorconfig" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,6 +45,7 @@
     &quot;accountId&quot;: &quot;cc990d2b-172d-4f86-aca0-9fd5fd0ce118&quot;
   }
 }</component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="SWEA" />
   </component>
@@ -127,15 +105,27 @@
       <option name="presentableId" value="Default" />
       <updated>1736946275736</updated>
       <workItem from="1736946279630" duration="233000" />
-      <workItem from="1736946527928" duration="2625000" />
+      <workItem from="1736946527928" duration="4026000" />
     </task>
+    <task id="LOCAL-00001" summary="tab buttons and images">
+      <option name="closed" value="true" />
+      <created>1736970256339</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1736970256339</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="tab buttons and images" />
+    <option name="LAST_COMMIT_MESSAGE" value="tab buttons and images" />
   </component>
 </project>

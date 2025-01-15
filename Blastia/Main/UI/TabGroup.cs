@@ -4,9 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
-public struct Tab(string title, Texture2D texture, Menu? menu)
+public struct Tab(string title, Texture2D texture, Menu? menu, Vector2 scale = default)
 {
     public string Title = title;
+    public Vector2 Scale = scale == default ? Vector2.One : scale;
     public readonly Texture2D TabTexture = texture;
     public readonly Menu? OnClickMenu = menu;
 }
@@ -40,10 +41,13 @@ public class TabGroup : UIElement
             var tabButton = new ImageButton(startingPosition, tabData.TabTexture, () =>
             {
                 if (tabData.OnClickMenu != null) currentMenu.SwitchToMenu(tabData.OnClickMenu);
-            });
+            })
+            {
+                Scale = tabData.Scale
+            };
             currentMenu.Elements.Add(tabButton);
             
-            startingPosition.X += _tabSpacing + tabData.TabTexture.Width;
+            startingPosition.X += _tabSpacing + tabData.TabTexture.Width * tabData.Scale.X;
         }    
     }
 }

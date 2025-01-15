@@ -12,9 +12,10 @@ public class InGameSettingsMenu : Menu
 
     private void AddElements()
     {
+        var scale = new Vector2(1.4f);
         var tabs = new TabGroup(new Vector2(100, 100), 15, this, 
-            new Tab("Video", BlastiaGame.MonitorTexture, BlastiaGame.PlayersMenu),
-            new Tab("Audio", BlastiaGame.AudioTexture, BlastiaGame.PlayersMenu));
+            new Tab("Video", BlastiaGame.MonitorTexture, BlastiaGame.PlayersMenu, scale),
+            new Tab("Audio", BlastiaGame.AudioTexture, BlastiaGame.PlayersMenu, scale));
     }
 
     private void OpenVideoSettings()
