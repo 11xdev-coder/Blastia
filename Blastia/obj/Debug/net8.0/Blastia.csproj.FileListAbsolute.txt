@@ -126,3 +126,5 @@ C:\Users\matve\projects\Blastia\Blastia\obj\Debug\net8.0\Blastia.genruntimeconfi
 C:\Users\matve\projects\Blastia\Blastia\obj\Debug\net8.0\ref\Blastia.dll
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\Monitor.png
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\Audio.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\Audio.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\Monitor.png

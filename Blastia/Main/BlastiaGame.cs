@@ -80,6 +80,8 @@ public class BlastiaGame : Game
 	public static RulerMenu? RulerMenu { get; private set; }
 	public static InGameMenu? InGameMenu { get; private set; }
 	public static InGameSettingsMenu? InGameSettingsMenu { get; private set; }
+	public static InGameVideoSettingsMenu? InGameVideoSettingsMenu { get; private set; }
+	public static InGameAudioSettingsMenu? InGameAudioSettingsMenu { get; private set; }
 	private readonly List<Menu> _menus;
 
 	/// <summary>
@@ -278,6 +280,12 @@ public class BlastiaGame : Game
 			
 			InGameSettingsMenu = new InGameSettingsMenu(MainFont);
 			AddMenu(InGameSettingsMenu);
+			
+			InGameVideoSettingsMenu = new InGameVideoSettingsMenu(MainFont);
+			AddMenu(InGameVideoSettingsMenu);
+			
+			InGameAudioSettingsMenu = new InGameAudioSettingsMenu(MainFont);
+			AddMenu(InGameAudioSettingsMenu);
 		}
 		catch (Exception ex)
 		{

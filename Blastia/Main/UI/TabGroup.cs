@@ -4,18 +4,23 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
-public struct Tab(string title, Texture2D texture, Menu? menu, Vector2 scale = default)
+public struct Tab(string title, Texture2D texture, Func<Menu?> menuFactory, Vector2 scale = default)
 {
     public string Title = title;
     public Vector2 Scale = scale == default ? Vector2.One : scale;
     public readonly Texture2D TabTexture = texture;
-    public readonly Menu? OnClickMenu = menu;
+
+    public Menu? GetMenu() => menuFactory();
 }
 
 public class TabGroup : UIElement
 {
     private readonly List<Tab> _tabsData = [];
     private readonly float _tabSpacing;
+    
+    // for now, max menus per button is 1
+    // cache only one menu
+    private Menu? _cachedActiveMenu;
     
     public TabGroup(Vector2 position, float tabSpacing, Menu currentMenu, params Tab[] tabs) : base(position, BlastiaGame.InvisibleTexture)
     {
@@ -40,7 +45,13 @@ public class TabGroup : UIElement
         {
             var tabButton = new ImageButton(startingPosition, tabData.TabTexture, () =>
             {
-                if (tabData.OnClickMenu != null) currentMenu.SwitchToMenu(tabData.OnClickMenu);
+                if (_cachedActiveMenu != null) _cachedActiveMenu.Active = false;
+                
+                var menu = tabData.GetMenu();
+                if (menu == null) return;
+                
+                menu.Active = true;
+                _cachedActiveMenu = menu;
             })
             {
                 Scale = tabData.Scale
