@@ -1,5 +1,6 @@
 ﻿using Blastia.Main.GameState;
 using Blastia.Main.Utilities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
@@ -114,5 +115,63 @@ public class Menu
         bool wasSwitched = _menuSwitched;
         _menuSwitched = false;
         return wasSwitched;
+    }
+    
+    // COMMON METHODS
+    protected void AddMasterVolumeSlider(float hAlign, float vAlign)
+    {
+        var text = new Text(Vector2.Zero, "Master Volume", Font)
+        {
+            HAlign = hAlign - 0.06f,
+            VAlign = vAlign
+        };
+        Elements.Add(text);
+        
+        var slider = new Slider(Vector2.Zero, Font,
+            () => AudioManager.Instance.MasterVolume,
+            f => AudioManager.Instance.MasterVolume = f, true)
+        {
+            HAlign = hAlign,
+            VAlign = vAlign
+        };
+        Elements.Add(slider);
+    }
+    
+    protected void AddMusicVolumeSlider(float hAlign, float vAlign)
+    {
+        var text = new Text(Vector2.Zero, "Music Volume", Font)
+        {
+            HAlign = hAlign - 0.06f,
+            VAlign = vAlign
+        };
+        Elements.Add(text);
+        
+        var slider = new Slider(Vector2.Zero, Font,
+            () => AudioManager.Instance.MusicVolume,
+            f => AudioManager.Instance.MusicVolume = f, true)
+        {
+            HAlign = hAlign,
+            VAlign = vAlign
+        };
+        Elements.Add(slider);
+    }
+
+    protected void AddSoundVolumeSlider(float hAlign, float vAlign)
+    {
+        var text = new Text(Vector2.Zero, "Sound Volume", Font)
+        {
+            HAlign = hAlign - 0.06f,
+            VAlign = vAlign
+        };
+        Elements.Add(text);
+        
+        var slider = new Slider(Vector2.Zero, Font,
+            () => AudioManager.Instance.SoundsVolume,
+            f => AudioManager.Instance.SoundsVolume = f, true)
+        {
+            HAlign = hAlign,
+            VAlign = vAlign
+        };
+        Elements.Add(slider);
     }
 }

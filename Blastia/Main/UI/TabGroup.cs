@@ -37,6 +37,7 @@ public class TabGroup : UIElement
         UpdateBoundsBase(Texture.Width, Texture.Height);
     }
     
+    // TODO: nice menus and common methods
     private void Initialize(Menu currentMenu)
     {
         var startingPosition = new Vector2(Bounds.Left, Bounds.Top);

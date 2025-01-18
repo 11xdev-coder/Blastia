@@ -1,28 +1,18 @@
-﻿using Blastia.Main.UI.Buttons;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
-public class Slider : Button
+public class Slider : Image
 {
-    public override bool Draggable => true;
-
     private const string InitialPercentText = "100%";
-    private const string SliderText = "O";
-    
-    private Image? _backgroundImage;
-    private float _sliderTextSizeX;
-    
-    private float _sliderBgLeftBound;
-    private float _sliderBgRightBound;
-    
-    private Text? _percentText;
-    private Vector2 _percentTextSize;
-    private float _percentTextOffset;
 
-    private Func<float> _getValue;
-    private Action<float> _setValue;
+    private readonly SliderHandle? _handle;
+    private readonly Text? _percentText;
+    private readonly Vector2 _percentTextSize;
+    private readonly float _percentTextOffset;
+
+    private readonly Action<float> _setValue;
     
     private float _percent;
     public float Percent
@@ -40,132 +30,77 @@ public class Slider : Button
     public Slider(Vector2 position, SpriteFont font, 
         Func<float> getValue, Action<float> setValue,
         bool showPercent = false, float percentTextOffset = 35) : 
-        base(position, SliderText, font, null)
+        base(position, BlastiaGame.SliderTexture)
     {
-        _backgroundImage = new Image(Position, BlastiaGame.SliderTexture);
-        
-        _sliderTextSizeX = font.MeasureString(SliderText).X;
-        
-        _getValue = getValue;
         _setValue = setValue;
+
+        _handle = new SliderHandle(position, "O", font, this, () => Percent = CalculatePercent());
         
         _percentTextOffset = percentTextOffset;
-        _percentText = showPercent ? new Text(Vector2.Zero, InitialPercentText, font) : null;
-        _percentTextSize = font.MeasureString(InitialPercentText);
+        if (showPercent)
+        {
+            _percentText = new Text(Vector2.Zero, InitialPercentText, font);
+            _percentTextSize = font.MeasureString(InitialPercentText);
+        }
 
-        InitializeSlider();
+        Percent = getValue();
+        _handle.Update();
     }
     
     /// <summary>
-    /// Initializes the percentage for the slider based on the value from the getValue function.
-    /// </summary>
-    private void InitializeSlider()
-    {
-        Percent = _getValue();
-        UpdateSliderPosition();
-    }
-
-    private void UpdateBackgroundImagePositionAndBounds()
-    {
-        if (_backgroundImage == null) return;
-        
-        _backgroundImage.Position = CalculateBackgroundImagePosition();
-        _backgroundImage.Update();
-        
-        _sliderBgLeftBound = _backgroundImage.Bounds.Left - _sliderTextSizeX * 0.5f;
-        _sliderBgRightBound = _backgroundImage.Bounds.Right - _sliderTextSizeX * 0.5f;
-    }
-    
-    private Vector2 CalculateBackgroundImagePosition()
-    {
-        if (_backgroundImage?.Texture == null) return Position;
-        
-        float x = Bounds.Left + _sliderTextSizeX * 0.5f;
-        float y = Bounds.Center.Y - _backgroundImage.Texture.Height * 0.65f;
-        return new Vector2(x, y);
-    }
-
-    public override void OnAlignmentChanged()
-    {
-        base.OnAlignmentChanged();
-        
-        UpdateSliderVisuals();
-    }
-
-    /// <summary>
-    /// Updates background image position and bounds. Updates percent text and position.
-    /// Updates slider position.
-    /// </summary>
-    private void UpdateSliderVisuals()
-    {
-        UpdateBackgroundImagePositionAndBounds();
-        UpdatePercentTextAndPosition();
-        UpdateSliderPosition();
-    }
-
-    /// <summary>
-    /// Updates percent text, and position using offset.
+    /// Updates <c>_percentText</c> position
     /// </summary>
     private void UpdatePercentTextAndPosition()
     {
         if (_percentText == null) return;
         
         _percentText.Text = $"{Percent * 100:0.00}%";
-        _percentText.Position = new Vector2(_sliderBgRightBound + _percentTextOffset,
+        _percentText.Position = new Vector2(Bounds.Right + _percentTextOffset,
             Bounds.Center.Y - _percentTextSize.Y * 0.5f);
         _percentText.Update();
     }
 
-    /// <summary>
-    /// Updates slider position using Percent considering the HAlign
-    /// </summary>
-    private void UpdateSliderPosition()
+    public override void UpdateBounds()
     {
-        float rightBound = _sliderBgRightBound - 1;
-        float newX = _sliderBgLeftBound + Percent * (rightBound - _sliderBgLeftBound);
-        float alignedX = GetAlignedPositionX(newX);
+        base.UpdateBounds();
+        UpdatePercentTextAndPosition();
         
-        Position = new Vector2(alignedX, Position.Y);
-    }
-    
-    protected override void UpdateDragPosition(Vector2 cursorPosition)
-    {
-        // get drag X position (clamped to the BG)
-        Vector2 newDrag = GetDragPositionNoYClamped(cursorPosition.X, 
-            _sliderBgLeftBound, 
-            _sliderBgRightBound); 
-        Position = newDrag;
-        
-        // calculate percent
-        Percent = CalculatePercent();
+        _handle?.UpdateBounds();
+        _percentText?.UpdateBounds();
     }
 
     private float CalculatePercent()
     {
-        float rightBound = _sliderBgRightBound - 1;
-        return (Bounds.Left - _sliderBgLeftBound) / 
-               (rightBound - _sliderBgLeftBound);
+        if (_handle == null) return Percent;
+
+        var leftBound = _handle.CalculateSliderLeftBound();
+        var rightBound = _handle.CalculateSliderRightBound();
+        
+        var relativeX = _handle.Position.X - leftBound;
+        var width = rightBound - leftBound;
+        float newPercent = relativeX / width;
+        
+        if (Math.Abs(_percent - newPercent) > 0.001f) // Only update if there's meaningful change
+        {
+            return newPercent;
+        }
+
+        return Percent;
     }
     
     public override void Update()
     {
         base.Update();
         
-        _backgroundImage?.Update();
+        _handle?.Update();
         _percentText?.Update();
     }
 
-    public override void UpdateBounds()
+    public override void Draw(SpriteBatch spriteBatch)
     {
-        base.UpdateBounds();
-        _backgroundImage?.UpdateBounds();
-        _percentText?.UpdateBounds();
-    }
-    
-    public void AddToElements(List<UIElement> elements)
-    {
-        if (_backgroundImage != null) elements.Add(_backgroundImage);
-        if (_percentText != null) elements.Add(_percentText);
-        elements.Add(this);
+        base.Draw(spriteBatch);
+        
+        _handle?.Draw(spriteBatch);
+        _percentText?.Draw(spriteBatch);
     }
 }
