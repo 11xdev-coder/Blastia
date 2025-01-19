@@ -44,7 +44,7 @@ public abstract class CollectionMenu : Menu
 		Elements.Add(backButton);
 	}
 	
-	public override void OnMenuActive()
+	protected override void OnMenuActive()
 	{
 		base.OnMenuActive();
 		

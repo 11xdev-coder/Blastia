@@ -21,9 +21,9 @@ public class AudioSettingsMenu : Menu
         };
         Elements.Add(randomMusicButton);
         
-        AddMasterVolumeSlider(0.468f, 0.48f);
-        AddMusicVolumeSlider(0.468f, 0.52f);
-        AddSoundVolumeSlider(0.468f, 0.56f);
+        AddMasterVolumeSlider(0.55f, 0.48f);
+        AddMusicVolumeSlider(0.55f, 0.52f);
+        AddSoundVolumeSlider(0.55f, 0.56f);
         
         Button backButton = new Button(new Vector2(0, 650), "Back", Font, OnClickBack)
         {

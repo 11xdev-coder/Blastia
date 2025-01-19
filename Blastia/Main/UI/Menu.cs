@@ -1,16 +1,17 @@
-﻿using Blastia.Main.GameState;
-using Blastia.Main.Utilities;
-using Microsoft.Xna.Framework;
+﻿using System.Numerics;
+using Blastia.Main.GameState;
+using Blastia.Main.UI.Buttons;
 using Microsoft.Xna.Framework.Graphics;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.UI;
 
-public class Menu
+public class Menu(SpriteFont font, bool isActive = false)
 {
-    public List<UIElement> Elements;
-    public SpriteFont Font;
+    public readonly List<UIElement> Elements = [];
+    protected readonly SpriteFont Font = font;
 
-    public bool Active;
+    public bool Active = isActive;
     
     /// <summary>
     /// If <c>true</c> and player camera is initialized will use <see cref="Update(Camera)"/> to update.
@@ -20,15 +21,6 @@ public class Menu
 
     private bool _menuSwitched;
 
-    public Menu(SpriteFont font, bool isActive = false)
-    {
-        Elements = new List<UIElement>();
-        Font = font;
-        Active = isActive;
-        
-        _menuSwitched = false;
-    }
-    
     /// <summary>
     /// Update each element
     /// </summary>
@@ -70,7 +62,7 @@ public class Menu
     /// Sets current menu to inactive and new menu to active
     /// </summary>
     /// <param name="menu"></param>
-    public void SwitchToMenu(Menu? menu)
+    protected void SwitchToMenu(Menu? menu)
     {
         if (menu != null && menu != this && !menu.Active)
         {
@@ -87,7 +79,7 @@ public class Menu
     /// <summary>
     /// Called when SwitchToMenu is called on the new menu
     /// </summary>
-    public virtual void OnMenuActive()
+    protected virtual void OnMenuActive()
     {
         
     }
@@ -118,18 +110,19 @@ public class Menu
     }
     
     // COMMON METHODS
-    protected void AddMasterVolumeSlider(float hAlign, float vAlign)
+    private void AddSlider(Vector2 textPosition, Vector2 sliderPosition, 
+        float hAlign, float vAlign, string text, Func<float> sliderGetValue,
+        Action<float> sliderSetValue)
     {
-        var text = new Text(Vector2.Zero, "Master Volume", Font)
+        var textUi = new Text(textPosition, text, Font)
         {
-            HAlign = hAlign - 0.06f,
+            HAlign = hAlign - 0.13f,
             VAlign = vAlign
         };
-        Elements.Add(text);
+        Elements.Add(textUi);
         
-        var slider = new Slider(Vector2.Zero, Font,
-            () => AudioManager.Instance.MasterVolume,
-            f => AudioManager.Instance.MasterVolume = f, true)
+        var slider = new Slider(sliderPosition, Font,
+            sliderGetValue, sliderSetValue, true)
         {
             HAlign = hAlign,
             VAlign = vAlign
@@ -137,41 +130,44 @@ public class Menu
         Elements.Add(slider);
     }
     
-    protected void AddMusicVolumeSlider(float hAlign, float vAlign)
+    protected void AddMasterVolumeSlider(float hAlign, float vAlign) =>
+        AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Master Volume",
+            () => AudioManager.Instance.MasterVolume, 
+            f => AudioManager.Instance.MasterVolume = f);
+    
+    
+    protected void AddMusicVolumeSlider(float hAlign, float vAlign) =>
+        AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Music Volume",
+            () => AudioManager.Instance.MusicVolume, 
+            f => AudioManager.Instance.MusicVolume = f);
+
+    protected void AddSoundVolumeSlider(float hAlign, float vAlign) =>
+        AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Sound Volume",
+            () => AudioManager.Instance.SoundsVolume, 
+            f => AudioManager.Instance.SoundsVolume = f);
+
+    protected void AddFullscreenSwitch(float hAlign, float vAlign, Action onClick)
     {
-        var text = new Text(Vector2.Zero, "Music Volume", Font)
-        {
-            HAlign = hAlign - 0.06f,
-            VAlign = vAlign
-        };
-        Elements.Add(text);
-        
-        var slider = new Slider(Vector2.Zero, Font,
-            () => AudioManager.Instance.MusicVolume,
-            f => AudioManager.Instance.MusicVolume = f, true)
+        BoolSwitchButton isFullScreenButton = new BoolSwitchButton(Vector2.Zero, "Full Screen", Font, 
+            onClick, 
+            () => VideoManager.Instance.IsFullScreen,
+            _ => VideoManager.Instance.ToggleFullscreen())
         {
             HAlign = hAlign,
             VAlign = vAlign
         };
-        Elements.Add(slider);
+        Elements.Add(isFullScreenButton);
     }
 
-    protected void AddSoundVolumeSlider(float hAlign, float vAlign)
+    protected void AddResolutionHandler(float hAlign, float vAlign, Action onClick)
     {
-        var text = new Text(Vector2.Zero, "Sound Volume", Font)
-        {
-            HAlign = hAlign - 0.06f,
-            VAlign = vAlign
-        };
-        Elements.Add(text);
-        
-        var slider = new Slider(Vector2.Zero, Font,
-            () => AudioManager.Instance.SoundsVolume,
-            f => AudioManager.Instance.SoundsVolume = f, true)
+        HandlerArrowButton<DisplayMode> resolutionSwitcher = new HandlerArrowButton<DisplayMode>(Vector2.Zero, "Resolution", Font,
+            onClick, 10, VideoManager.Instance.ResolutionHandler)
         {
             HAlign = hAlign,
             VAlign = vAlign
         };
-        Elements.Add(slider);
+        resolutionSwitcher.AddToElements(Elements);
+
     }
 }
