@@ -157,6 +157,7 @@ public abstract class UIElement
     private void Initialize()
     {
         UpdateBounds();
+        _prevIsHovered = Bounds.Contains((int)BlastiaGame.CursorPosition.X, (int)BlastiaGame.CursorPosition.Y);
     }
 
     /// <summary>
