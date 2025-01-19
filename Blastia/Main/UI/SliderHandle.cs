@@ -27,13 +27,13 @@ public class SliderHandle(Vector2 position, string text, SpriteFont font, Slider
 
     public override void Update()
     {
-        base.Update();
-        
         var rightBound = CalculateSliderRightBound();
         var leftBound = CalculateSliderLeftBound();
         var newX = leftBound + parentSlider.Percent * (rightBound - leftBound);
         var alignedX = GetAlignedPositionX(newX);
         
         Position = new Vector2(alignedX, CalculateSliderVertical());
+        
+        base.Update();
     }
 }

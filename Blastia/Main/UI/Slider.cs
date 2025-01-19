@@ -33,7 +33,8 @@ public class Slider : Image
         base(position, BlastiaGame.SliderTexture)
     {
         _setValue = setValue;
-
+        Percent = getValue();
+        
         _handle = new SliderHandle(position, "O", font, this, () => Percent = CalculatePercent());
         
         _percentTextOffset = percentTextOffset;
@@ -42,9 +43,6 @@ public class Slider : Image
             _percentText = new Text(Vector2.Zero, InitialPercentText, font);
             _percentTextSize = font.MeasureString(InitialPercentText);
         }
-
-        Percent = getValue();
-        _handle.Update();
     }
     
     /// <summary>
