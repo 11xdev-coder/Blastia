@@ -16,7 +16,9 @@ public struct Tab(string title, Texture2D texture, Func<Menu?> menuFactory, Vect
 public class TabGroup : UIElement
 {
     private readonly List<Tab> _tabsData = [];
+    private readonly List<UIElement> _initializedTabs = [];
     private readonly float _tabSpacing;
+    private readonly Menu _currentMenu;
     
     // for now, max menus per button is 1
     // cache only one menu
@@ -26,10 +28,16 @@ public class TabGroup : UIElement
     {
         _tabSpacing = tabSpacing;
         _tabsData.AddRange(tabs);
-        
-        Initialize(currentMenu);
+        _currentMenu = currentMenu;
     }
-    
+
+    public override void OnAlignmentChanged()
+    {
+        base.OnAlignmentChanged();
+        
+        Initialize(_currentMenu);
+    }
+
     public override void UpdateBounds()
     {
         if (Texture == null) return;
@@ -37,9 +45,14 @@ public class TabGroup : UIElement
         UpdateBoundsBase(Texture.Width, Texture.Height);
     }
     
-    // TODO: nice menus and common methods
     private void Initialize(Menu currentMenu)
     {
+        // remove previously initialized tabs
+        var tabsToRemove = new HashSet<UIElement>(_initializedTabs);
+        currentMenu.Elements.RemoveAll(element => tabsToRemove.Contains(element));
+        
+        _initializedTabs.Clear();
+        
         var startingPosition = new Vector2(Bounds.Left, Bounds.Top);
 
         foreach (var tabData in _tabsData)
@@ -57,6 +70,7 @@ public class TabGroup : UIElement
             {
                 Scale = tabData.Scale
             };
+            _initializedTabs.Add(tabButton);
             currentMenu.Elements.Add(tabButton);
             
             startingPosition.X += _tabSpacing + tabData.TabTexture.Width * tabData.Scale.X;

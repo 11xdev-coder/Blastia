@@ -9,6 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/TabGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/TabGroup.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -46,7 +48,7 @@
 }</component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="SWEA" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -110,6 +112,8 @@
       <workItem from="1737110628213" duration="3416000" />
       <workItem from="1737189403846" duration="1626000" />
       <workItem from="1737199913687" duration="14092000" />
+      <workItem from="1737277429005" duration="13613000" />
+      <workItem from="1737372703574" duration="3800000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -135,7 +139,31 @@
       <option name="project" value="LOCAL" />
       <updated>1737228871376</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="bug fix: SliderHandle on first frame played Tick sound">
+      <option name="closed" value="true" />
+      <created>1737284184105</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1737284184105</updated>
+    </task>
+    <task id="LOCAL-00005" summary="bug fix: SliderHandle being in incorrect position for one frame">
+      <option name="closed" value="true" />
+      <created>1737285239451</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1737285239451</updated>
+    </task>
+    <task id="LOCAL-00006" summary="common methods for video and audio menus">
+      <option name="closed" value="true" />
+      <created>1737314587082</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737314587082</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -148,6 +176,9 @@
     <MESSAGE value="tab buttons and images" />
     <MESSAGE value="tab group improvements" />
     <MESSAGE value="slider rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="slider rework" />
+    <MESSAGE value="bug fix: SliderHandle on first frame played Tick sound" />
+    <MESSAGE value="bug fix: SliderHandle being in incorrect position for one frame" />
+    <MESSAGE value="common methods for video and audio menus" />
+    <option name="LAST_COMMIT_MESSAGE" value="common methods for video and audio menus" />
   </component>
 </project>

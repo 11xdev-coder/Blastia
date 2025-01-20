@@ -13,8 +13,12 @@ public class InGameSettingsMenu : Menu
     private void AddElements()
     {
         var scale = new Vector2(1.4f);
-        var tabs = new TabGroup(new Vector2(100, 100), 15, this, 
+        var tabs = new TabGroup(Vector2.Zero, 40, this,
             new Tab("Video", BlastiaGame.MonitorTexture, () => BlastiaGame.InGameVideoSettingsMenu, scale),
-            new Tab("Audio", BlastiaGame.AudioTexture, () => BlastiaGame.InGameAudioSettingsMenu, scale));
+            new Tab("Audio", BlastiaGame.AudioTexture, () => BlastiaGame.InGameAudioSettingsMenu, scale))
+        {
+            HAlign = 0.35f,
+            VAlign = 0.4f
+        };
     }
 }
