@@ -113,7 +113,8 @@
       <workItem from="1737189403846" duration="1626000" />
       <workItem from="1737199913687" duration="14092000" />
       <workItem from="1737277429005" duration="13613000" />
-      <workItem from="1737372703574" duration="3800000" />
+      <workItem from="1737372703574" duration="11367000" />
+      <workItem from="1737461524346" duration="2829000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -163,7 +164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737314587082</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="tab group now works with alignment">
+      <option name="closed" value="true" />
+      <created>1737388133154</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1737388133154</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -179,6 +188,7 @@
     <MESSAGE value="bug fix: SliderHandle on first frame played Tick sound" />
     <MESSAGE value="bug fix: SliderHandle being in incorrect position for one frame" />
     <MESSAGE value="common methods for video and audio menus" />
-    <option name="LAST_COMMIT_MESSAGE" value="common methods for video and audio menus" />
+    <MESSAGE value="tab group now works with alignment" />
+    <option name="LAST_COMMIT_MESSAGE" value="tab group now works with alignment" />
   </component>
 </project>

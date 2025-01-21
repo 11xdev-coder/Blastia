@@ -18,24 +18,17 @@ public class TabGroup : UIElement
     private readonly List<Tab> _tabsData = [];
     private readonly List<UIElement> _initializedTabs = [];
     private readonly float _tabSpacing;
-    private readonly Menu _currentMenu;
     
     // for now, max menus per button is 1
     // cache only one menu
     private Menu? _cachedActiveMenu;
     
-    public TabGroup(Vector2 position, float tabSpacing, Menu currentMenu, params Tab[] tabs) : base(position, BlastiaGame.InvisibleTexture)
+    public TabGroup(Vector2 position, float tabSpacing, params Tab[] tabs) : base(position, BlastiaGame.InvisibleTexture)
     {
         _tabSpacing = tabSpacing;
         _tabsData.AddRange(tabs);
-        _currentMenu = currentMenu;
-    }
-
-    public override void OnAlignmentChanged()
-    {
-        base.OnAlignmentChanged();
         
-        Initialize(_currentMenu);
+        CreateTabs();
     }
 
     public override void UpdateBounds()
@@ -43,15 +36,17 @@ public class TabGroup : UIElement
         if (Texture == null) return;
         
         UpdateBoundsBase(Texture.Width, Texture.Height);
+        
+        UpdateTabs();
     }
     
-    private void Initialize(Menu currentMenu)
+    private void CreateTabs()
     {
         // remove previously initialized tabs
-        var tabsToRemove = new HashSet<UIElement>(_initializedTabs);
-        currentMenu.Elements.RemoveAll(element => tabsToRemove.Contains(element));
-        
-        _initializedTabs.Clear();
+        if (_initializedTabs.Count > 0)
+        {
+            _initializedTabs.Clear();
+        }
         
         var startingPosition = new Vector2(Bounds.Left, Bounds.Top);
 
@@ -71,9 +66,50 @@ public class TabGroup : UIElement
                 Scale = tabData.Scale
             };
             _initializedTabs.Add(tabButton);
-            currentMenu.Elements.Add(tabButton);
             
             startingPosition.X += _tabSpacing + tabData.TabTexture.Width * tabData.Scale.X;
         }    
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        foreach (var tab in _initializedTabs)
+        {
+            tab.Update();
+        }
+    }
+
+    private void UpdateTabs()
+    {
+        if (_initializedTabs.Count <= 0) return;
+        
+        var tabsSet = new HashSet<UIElement>(_initializedTabs);
+        var startingPosition = new Vector2(Bounds.Left, Bounds.Top);
+
+        foreach (var tab in _initializedTabs)
+        {
+            if (!tabsSet.Contains(tab)) continue;
+            
+            var tabDataIndex = _initializedTabs.IndexOf(tab);
+            if (tabDataIndex < 0) continue;
+            var tabData = _tabsData[tabDataIndex];
+
+            tab.Position = startingPosition;
+            startingPosition.X += _tabSpacing + tabData.TabTexture.Width * tabData.Scale.X;
+            
+            tab.UpdateBounds();
+        }
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+
+        foreach (var tab in _initializedTabs)
+        {
+            tab.Draw(spriteBatch);
+        }
     }
 }
