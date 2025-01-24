@@ -27,6 +27,7 @@
 
     <ItemGroup>
       <PackageReference Include="FNA.NET" Version="1.0.15.2403" />
+      <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
     </ItemGroup>
 
 </Project>

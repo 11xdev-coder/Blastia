@@ -22,6 +22,8 @@ public class TabGroup : UIElement
     // for now, max menus per button is 1
     // cache only one menu
     private Menu? _cachedActiveMenu;
+    private ImageButton? _cachedButton;
+    private Tab? _cachedTabData;
     
     public TabGroup(Vector2 position, float tabSpacing, params Tab[] tabs) : base(position, BlastiaGame.InvisibleTexture)
     {
@@ -52,15 +54,27 @@ public class TabGroup : UIElement
 
         foreach (var tabData in _tabsData)
         {
-            var tabButton = new ImageButton(startingPosition, tabData.TabTexture, () =>
+            ImageButton tabButton = null!;
+            var button = tabButton;
+            
+            tabButton = new ImageButton(startingPosition, tabData.TabTexture, () =>
             {
                 if (_cachedActiveMenu != null) _cachedActiveMenu.Active = false;
+                if (_cachedButton != null && _cachedTabData != null) // reset previous button scale
+                {
+                    _cachedButton.Scale = _cachedTabData.Value.Scale;
+                }
                 
                 var menu = tabData.GetMenu();
                 if (menu == null) return;
                 
                 menu.Active = true;
                 _cachedActiveMenu = menu;
+                _cachedButton = button;
+                _cachedTabData = tabData;
+                
+                Scale = tabData.Scale + new Vector2(0.2f, 0.2f);
+                
             })
             {
                 Scale = tabData.Scale

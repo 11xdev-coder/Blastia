@@ -54,6 +54,10 @@
             "FNA.NET": {
               "target": "Package",
               "version": "[1.0.15.2403, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[9.0.1, )"
             }
           },
           "imports": [
