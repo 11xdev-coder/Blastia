@@ -54,30 +54,28 @@ public class TabGroup : UIElement
 
         foreach (var tabData in _tabsData)
         {
-            ImageButton tabButton = null!;
-            var button = tabButton;
-            
-            tabButton = new ImageButton(startingPosition, tabData.TabTexture, () =>
-            {
-                if (_cachedActiveMenu != null) _cachedActiveMenu.Active = false;
-                if (_cachedButton != null && _cachedTabData != null) // reset previous button scale
-                {
-                    _cachedButton.Scale = _cachedTabData.Value.Scale;
-                }
-                
-                var menu = tabData.GetMenu();
-                if (menu == null) return;
-                
-                menu.Active = true;
-                _cachedActiveMenu = menu;
-                _cachedButton = button;
-                _cachedTabData = tabData;
-                
-                Scale = tabData.Scale + new Vector2(0.2f, 0.2f);
-                
-            })
+            var tabButton = new ImageButton(startingPosition, tabData.TabTexture, () => {})
             {
                 Scale = tabData.Scale
+            };
+        
+            tabButton.OnClick = () =>
+            {
+                if (_cachedActiveMenu != null) 
+                    _cachedActiveMenu.Active = false;
+                
+                if (_cachedButton != null && _cachedTabData != null)
+                    _cachedButton.Scale = _cachedTabData.Value.Scale;
+            
+                var menu = tabData.GetMenu();
+                if (menu == null) return;
+            
+                menu.Active = true;
+                _cachedActiveMenu = menu;
+                _cachedButton = tabButton;
+                _cachedTabData = tabData;
+            
+                tabButton.Scale = tabData.Scale + new Vector2(0.2f, 0.2f);
             };
             _initializedTabs.Add(tabButton);
             
