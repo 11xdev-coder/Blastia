@@ -3,14 +3,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.InGame;
 
-public class InGameSettingsMenu : Menu
+public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-    public InGameSettingsMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-    {
-        AddElements();
-    }
-
-    private void AddElements()
+    protected override void AddElements()
     {
         var scale = new Vector2(1.2f);
         var tabs = new TabGroup(Vector2.Zero, 40,

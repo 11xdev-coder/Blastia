@@ -4,14 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.InGame;
 
-public class InGameMenu : Menu
+public class InGameMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-    public InGameMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-    {
-        AddElements();
-    }
-
-    private void AddElements()
+    protected override void AddElements()
     {
         Button settingsButton = new Button(Vector2.Zero, "Settings", Font, OpenSettings)
         {

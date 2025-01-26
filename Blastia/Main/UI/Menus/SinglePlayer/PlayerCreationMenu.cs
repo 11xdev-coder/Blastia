@@ -3,19 +3,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
-public class PlayerCreationMenu : CreationMenu
+public class PlayerCreationMenu(SpriteFont font, bool isActive = false) : CreationMenu(font, isActive)
 {
 	private PlayerPreview? _playerPreview;
-	
-	public PlayerCreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-	{
-		AddElements();
-	}
 
 	protected override string GetNameLabel() => "Player name";
 	protected override string GetExistsText() => "Player already exists!";
 	
-	private void AddElements()
+	protected override void AddElements()
 	{
 		_playerPreview = new PlayerPreview(Vector2.Zero, Font)
 		{

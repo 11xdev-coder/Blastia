@@ -6,25 +6,18 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
-public class WorldCreationMenu : CreationMenu
+public class WorldCreationMenu(SpriteFont font, bool isActive = false) : CreationMenu(font, isActive)
 {
 	private HandlerArrowButton<WorldDifficulty>? _difficultyButton;
-	private WorldDifficultyHandler _difficultyHandler;
+	private readonly WorldDifficultyHandler _difficultyHandler = new();
 	private HandlerArrowButton<WorldSize>? _sizeButton;
-	private WorldSizeHandler _sizeHandler;
-	
-	public WorldCreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-	{
-		_difficultyHandler = new WorldDifficultyHandler();
-		_sizeHandler = new WorldSizeHandler();
-		AddElements();
-	}
+	private readonly WorldSizeHandler _sizeHandler = new();
 
 	protected override string GetNameLabel() => "World name";
 	protected override string GetExistsText() => "World already exists!";
 	protected override float CreateButtonVAlign => 0.65f;
 
-	private void AddElements()
+	protected override void AddElements()
 	{		
 		_difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
 		"Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)

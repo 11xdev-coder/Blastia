@@ -6,12 +6,15 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.UI;
 
-public class Menu(SpriteFont font, bool isActive = false)
+public class Menu
 {
+    public float HAlignOffset;
+    public float VAlignOffset;
+    
     public readonly List<UIElement> Elements = [];
-    protected readonly SpriteFont Font = font;
+    protected readonly SpriteFont Font;
 
-    public bool Active = isActive;
+    public bool Active;
     
     /// <summary>
     /// If <c>true</c> and player camera is initialized will use <see cref="Update(Camera)"/> to update.
@@ -20,6 +23,24 @@ public class Menu(SpriteFont font, bool isActive = false)
     public virtual bool CameraUpdate { get; set; }
 
     private bool _menuSwitched;
+
+    protected Menu(SpriteFont font, bool isActive = false)
+    {
+        Font = font;
+        Active = isActive;
+        
+        Initialize();
+    }
+    
+    private void Initialize()
+    {
+        AddElements();
+    }
+    
+    protected virtual void AddElements()
+    {
+        
+    }
 
     /// <summary>
     /// Update each element
@@ -55,8 +76,6 @@ public class Menu(SpriteFont font, bool isActive = false)
             elem.Draw(spriteBatch);
         }
     }
-
-    
     
     /// <summary>
     /// Sets current menu to inactive and new menu to active

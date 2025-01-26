@@ -7,7 +7,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="" />
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -103,6 +107,8 @@
       <workItem from="1737549368995" duration="2954000" />
       <workItem from="1737636663739" duration="1192000" />
       <workItem from="1737741688153" duration="3961000" />
+      <workItem from="1737806386241" duration="6251000" />
+      <workItem from="1737883151536" duration="962000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -176,7 +182,23 @@
       <option name="project" value="LOCAL" />
       <updated>1737749335942</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="TabGroup button scaling">
+      <option name="closed" value="true" />
+      <created>1737823455504</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1737823455504</updated>
+    </task>
+    <task id="LOCAL-00011" summary="selected tab y offset">
+      <option name="closed" value="true" />
+      <created>1737835733987</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1737835733987</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -195,6 +217,8 @@
     <MESSAGE value="tab group now works with alignment" />
     <MESSAGE value="TabGroup now updates tabs itself" />
     <MESSAGE value="button caching" />
-    <option name="LAST_COMMIT_MESSAGE" value="button caching" />
+    <MESSAGE value="TabGroup button scaling" />
+    <MESSAGE value="selected tab y offset" />
+    <option name="LAST_COMMIT_MESSAGE" value="selected tab y offset" />
   </component>
 </project>

@@ -4,14 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus;
 
-public class MainMenu : Menu
+public class MainMenu(SpriteFont font, bool isActive = true) : Menu(font, isActive)
 {
-	public MainMenu(SpriteFont font, bool isActive = true) : base(font, isActive)
-	{
-		AddElements();
-	}
-
-	private void AddElements()
+	protected override void AddElements()
 	{
 		Button singlePlayerButton = new Button(new Vector2(0, 500), "Single Player",
 			Font, OnClickSinglePlayer)

@@ -4,14 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.Settings;
 
-public class VideoSettingsMenu : Menu
+public class VideoSettingsMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-    public VideoSettingsMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-    {
-        AddElements();
-    }
-
-    private void AddElements()
+    protected override void AddElements()
     {
         AddResolutionHandler(0.5f, 0.52f, OnClickResolution);
         AddFullscreenSwitch(0.5f, 0.56f, OnClickFullScreen);

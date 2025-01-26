@@ -5,14 +5,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.Settings;
 
-public class AudioSettingsMenu : Menu
+public class AudioSettingsMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-    public AudioSettingsMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-    {
-        AddElements();
-    }
-
-    private void AddElements()
+    protected override void AddElements()
     {
         // RANDOM
         Button randomMusicButton = new Button(new Vector2(0, 450), "Play random menu track", Font, PlayRandomMusic)

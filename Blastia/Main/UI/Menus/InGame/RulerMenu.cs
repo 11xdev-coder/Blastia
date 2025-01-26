@@ -4,17 +4,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.InGame;
 
-public class RulerMenu : Menu
+public class RulerMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
     public override bool CameraUpdate => true;
     private readonly Dictionary<RulerHighlight, Vector2> _highlightPositions = new();
 
-    public RulerMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-    {
-        AddElements();
-    }
-
-    private void AddElements()
+    protected override void AddElements()
     {
         var rulerModeText = new Text(Vector2.Zero, "Ruler Mode", Font)
         {

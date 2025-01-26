@@ -15,7 +15,7 @@ public struct Tab(string title, Texture2D texture, Func<Menu?> menuFactory, Vect
 
 public class TabGroup : UIElement
 {
-    private const float SelectedTabUpScale = 0.2f;
+    private const float SelectedTabUpScale = 0.4f;
     
     private readonly List<Tab> _tabsData = [];
     private readonly List<UIElement> _initializedTabs = [];
@@ -72,16 +72,22 @@ public class TabGroup : UIElement
 
                 if (_cachedButton != null && _cachedTabData != null)
                     _cachedButton.Scale = _cachedTabData.Value.Scale;
-
+                
                 var menu = tabData.GetMenu();
                 if (menu == null) return;
-
+                menu.HAlignOffset = HAlign;
+                menu.VAlignOffset = VAlign;
                 menu.Active = true;
+                
                 _cachedActiveMenu = menu;
                 _cachedButton = tabButton;
                 _cachedTabData = tabData;
 
                 tabButton.Scale = tabData.Scale + new Vector2(SelectedTabUpScale);
+                
+                // apply offset immediately
+                tabButton.Position.Y -= CalculateYOffset(tabData);
+                
                 _selectedTabIndex = buttonIndex;
             };
             _initializedTabs.Add(tabButton);
@@ -100,6 +106,8 @@ public class TabGroup : UIElement
         }
     }
 
+    private float CalculateYOffset(Tab tabData) => tabData.TabTexture.Height * 0.5f * tabData.Scale.Y;
+
     private void UpdateTabs()
     {
         if (_initializedTabs.Count <= 0) return;
@@ -114,14 +122,12 @@ public class TabGroup : UIElement
             var tabDataIndex = _initializedTabs.IndexOf(tab);
             if (tabDataIndex < 0) continue;
             var tabData = _tabsData[tabDataIndex];
-            
-            if (tabDataIndex == _selectedTabIndex)
-            {
-                // scale selected tabs
-                var scaledHalf = tabData.TabTexture.Height * 0.5f * tabData.Scale.Y;
-                tab.Position = new Vector2(startingPosition.X, startingPosition.Y - scaledHalf);
-            }
-            else tab.Position = startingPosition;
+
+            // scale selected tabs
+            tab.Position = 
+                tabDataIndex == _selectedTabIndex ? 
+                    new Vector2(startingPosition.X, startingPosition.Y - CalculateYOffset(tabData)) : 
+                    startingPosition;
             
             startingPosition.X += _tabSpacing + tabData.TabTexture.Width * tabData.Scale.X;
         }

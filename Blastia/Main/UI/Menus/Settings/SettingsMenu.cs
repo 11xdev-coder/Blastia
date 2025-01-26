@@ -4,14 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.Settings;
 
-public class SettingsMenu : Menu
+public class SettingsMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-    public SettingsMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-    {
-        AddElements();
-    }
-
-    private void AddElements()
+    protected override void AddElements()
     {
         Button audioButton = new Button(new Vector2(0, 550), "Audio Settings", Font, OnClickAudioSettings)
         {
