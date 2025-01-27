@@ -4,22 +4,17 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
-public abstract class CollectionMenu : Menu
+public abstract class CollectionMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
 	protected ScrollableArea? Collection;
-	
-	public CollectionMenu(SpriteFont font, bool isActive = false) : base(font, isActive) 
-	{
-		AddCommonElements();
-	}
-	
+
 	protected abstract string GetCreateButtonLabel();	
 	protected abstract void Create();
 	protected abstract void Back();
 	protected abstract IEnumerable<object> LoadItems();
 	protected abstract void SelectItem(object item);
 	
-	private void AddCommonElements() 
+	protected override void AddElements() 
 	{
 		Viewport collectionViewport = new Viewport(2000, 450);
 		Collection = new ScrollableArea(Vector2.Zero, collectionViewport) 

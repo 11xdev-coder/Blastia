@@ -18,7 +18,9 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Creatio
 	protected override float CreateButtonVAlign => 0.65f;
 
 	protected override void AddElements()
-	{		
+	{
+		base.AddElements();
+		
 		_difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
 		"Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
 		{

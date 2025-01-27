@@ -4,17 +4,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
-public abstract class CreationMenu : Menu 
+public abstract class CreationMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
 	protected Input? NameInput;
 	protected Text? ExistsText;
-	
-	public CreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-	{
-		AddCommonElements();
-	}
-	
-	private void AddCommonElements() 
+
+	protected override void AddElements() 
 	{
 		Text nameLabel = new Text(Vector2.Zero, GetNameLabel(), Font) 
 		{

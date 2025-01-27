@@ -3,16 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.InGame;
 
-public class InGameVideoSettingsMenu : Menu
+public class InGameVideoSettingsMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-    // TODO: TabGroup menu, AddElements not in constructor (to init HAlignOffset)
-    public InGameVideoSettingsMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
-    {
-        
-    }
-
     protected override void AddElements()
     {
-        AddFullscreenSwitch(HAlignOffset, VAlignOffset, () => {});
+        AddResolutionHandler(HAlignOffset, VAlignOffset, () => {});
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using Blastia.Main.GameState;
 using Blastia.Main.UI.Buttons;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -8,8 +9,19 @@ namespace Blastia.Main.UI;
 
 public class Menu
 {
-    public float HAlignOffset;
-    public float VAlignOffset;
+    private float _hAlignOffset;
+    public float HAlignOffset
+    {
+        get => _hAlignOffset;
+        set => Properties.OnValueChangedProperty(ref _hAlignOffset, value, OnAlignmentOffsetChanged);
+    }
+    
+    private float _vAlignOffset;
+    public float VAlignOffset
+    {
+        get => _vAlignOffset;
+        set => Properties.OnValueChangedProperty(ref _vAlignOffset, value, OnAlignmentOffsetChanged);
+    }
     
     public readonly List<UIElement> Elements = [];
     protected readonly SpriteFont Font;
@@ -42,6 +54,17 @@ public class Menu
         
     }
 
+    /// <summary>
+    /// Updates <c>AlignOffset</c> property in each element from <c>Elements</c>
+    /// </summary>
+    private void OnAlignmentOffsetChanged()
+    {
+        foreach (var element in Elements)
+        {
+            element.AlignOffset = new Vector2(HAlignOffset, VAlignOffset);
+        }
+    }
+    
     /// <summary>
     /// Update each element
     /// </summary>

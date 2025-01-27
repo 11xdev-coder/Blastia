@@ -45,6 +45,13 @@ public abstract class UIElement
         get => _vAlign;
         set => Properties.OnValueChangedProperty(ref _vAlign, value, OnAlignmentChanged);
     }
+
+    private Vector2 _alignOffset;
+    public Vector2 AlignOffset
+    {
+        get => _alignOffset;
+        set => Properties.OnValueChangedProperty(ref _alignOffset, value, OnAlignmentChanged);
+    }
     
     #endregion
 
@@ -288,20 +295,23 @@ public abstract class UIElement
     /// <param name="height">The height for the bounding rectangle.</param>
     protected void UpdateBoundsBase(float width, float height)
     {
+        var hAlign = HAlign + AlignOffset.X;
+        var vAlign = VAlign + AlignOffset.Y;
+        
         float targetResX = VideoManager.Instance.TargetResolution.X;
         float targetResY = VideoManager.Instance.TargetResolution.Y;
         
         int positionX = (int)Position.X;
         int positionY = (int)Position.Y;
 
-        if (HAlign > 0)
+        if (hAlign > 0)
         {
-            positionX += (int)((targetResX * HAlign) - (width * HAlign));
+            positionX += (int)((targetResX * hAlign) - (width * hAlign));
         }
 
-        if (VAlign > 0)
+        if (vAlign > 0)
         {
-            positionY += (int)((targetResY * VAlign) - (height * VAlign));
+            positionY += (int)((targetResY * vAlign) - (height * vAlign));
         }
 
         Bounds = new Rectangle(positionX, positionY, (int)width, (int)height);

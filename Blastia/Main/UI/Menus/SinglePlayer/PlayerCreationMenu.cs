@@ -12,6 +12,8 @@ public class PlayerCreationMenu(SpriteFont font, bool isActive = false) : Creati
 	
 	protected override void AddElements()
 	{
+		base.AddElements();
+		
 		_playerPreview = new PlayerPreview(Vector2.Zero, Font)
 		{
 			HAlign = 0.7f,
