@@ -26,10 +26,15 @@ public class HandlerArrowButton<T> : Button
 	{
 		_arrowSpacing = arrowSpacing;
 		_handler = handler;
-		
-		LeftButton = new Button(_leftArrowPosition, "<", font, OnLeftArrowClick);
-		RightButton = new Button(_rightArrowPosition, ">", font, OnRightArrowClick);
-		
+
+		LeftButton = new Button(_leftArrowPosition, "<", font, OnLeftArrowClick)
+		{
+			AffectedByAlignOffset = false
+		};
+		RightButton = new Button(_rightArrowPosition, ">", font, OnRightArrowClick)
+		{
+			AffectedByAlignOffset = false
+		};
 		_leftArrowSizeY = font.MeasureString(LeftButton.Text).Y;
 		_rightArrowSizeX = font.MeasureString(RightButton.Text).Y;
 		UpdateArrowPositions();

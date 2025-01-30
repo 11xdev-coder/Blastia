@@ -46,10 +46,12 @@ public abstract class UIElement
         set => Properties.OnValueChangedProperty(ref _vAlign, value, OnAlignmentChanged);
     }
 
+    public virtual bool AffectedByAlignOffset { get; set; } = true;
+    
     private Vector2 _alignOffset;
     public Vector2 AlignOffset
     {
-        get => _alignOffset;
+        get => AffectedByAlignOffset ? _alignOffset : Vector2.Zero;
         set => Properties.OnValueChangedProperty(ref _alignOffset, value, OnAlignmentChanged);
     }
     
@@ -277,6 +279,9 @@ public abstract class UIElement
         }
     }
 
+    protected float GetHAlign() => HAlign + AlignOffset.X;
+    protected float GetVAlign() => VAlign + AlignOffset.Y;
+
     /// <summary>
     /// Updates the bounding rectangle of the UI element based on its current properties such as position, text size, or texture size.
     /// </summary>
@@ -295,8 +300,8 @@ public abstract class UIElement
     /// <param name="height">The height for the bounding rectangle.</param>
     protected void UpdateBoundsBase(float width, float height)
     {
-        var hAlign = HAlign + AlignOffset.X;
-        var vAlign = VAlign + AlignOffset.Y;
+        var hAlign = GetHAlign();
+        var vAlign = GetVAlign();
         
         float targetResX = VideoManager.Instance.TargetResolution.X;
         float targetResY = VideoManager.Instance.TargetResolution.Y;
@@ -333,12 +338,14 @@ public abstract class UIElement
     /// <returns></returns>
     protected float GetAlignedPositionX(float calculatedX)
     {
+        var hAlign = GetHAlign();
+        
         float targetResX = VideoManager.Instance.TargetResolution.X;
         float newX = calculatedX;
 
-        if (HAlign > 0)
+        if (hAlign > 0)
         {
-            newX -= (targetResX * HAlign) - (Bounds.Width * HAlign);
+            newX -= (targetResX * hAlign) - (Bounds.Width * hAlign);
         }
 
         return newX;
@@ -351,6 +358,9 @@ public abstract class UIElement
     /// <returns>The new position for the dragged element</returns>
     protected Vector2 GetDragPosition(Vector2 cursorPosition)
     {
+        var hAlign = GetHAlign();
+        var vAlign = GetVAlign();
+        
         if (Font == null) return Position;
         
         Vector2 textSize = Font.MeasureString(Text);
@@ -360,14 +370,14 @@ public abstract class UIElement
         float positionX = cursorPosition.X - textSize.X * 0.5f;
         float positionY = cursorPosition.Y - textSize.Y * 0.5f;
 
-        if (HAlign > 0)
+        if (hAlign > 0)
         {
-            positionX -= (targetResX * HAlign) - (textSize.X * HAlign);
+            positionX -= (targetResX * hAlign) - (textSize.X * hAlign);
         }
 
-        if (VAlign > 0)
+        if (vAlign > 0)
         {
-            positionY -= (targetResY * VAlign) - (textSize.Y * VAlign);
+            positionY -= (targetResY * vAlign) - (textSize.Y * vAlign);
         }
         
         return new Vector2(positionX, positionY);
@@ -383,6 +393,8 @@ public abstract class UIElement
     /// <returns>A Vector2 representing the clamped X position and the current Y position.</returns>
     protected Vector2 GetDragPositionNoYClamped(float x, float minValue, float maxValue)
     {
+        var hAlign = GetHAlign();
+        
         if (Font == null) return Position;
         
         Vector2 textSize = Font.MeasureString(Text);
@@ -391,9 +403,9 @@ public abstract class UIElement
         float positionX = x - textSize.X * 0.5f;
         positionX = Math.Clamp(positionX, minValue, maxValue);
 
-        if (HAlign > 0)
+        if (hAlign > 0)
         {
-            positionX -= (targetResX * HAlign) - (textSize.X * HAlign);
+            positionX -= (targetResX * hAlign) - (textSize.X * hAlign);
         }
         
         return new Vector2(positionX, Position.Y);
