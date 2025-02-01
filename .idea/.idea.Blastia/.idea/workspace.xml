@@ -9,8 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/HandlerArrowButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/HandlerArrowButton.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameVideoSettingsMenu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameVideoSettingsMenu.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/SliderHandle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/SliderHandle.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -124,7 +124,8 @@
       <workItem from="1737988916481" duration="4689000" />
       <workItem from="1738065646806" duration="6304000" />
       <workItem from="1738169524953" duration="2561000" />
-      <workItem from="1738243232046" duration="709000" />
+      <workItem from="1738243232046" duration="3693000" />
+      <workItem from="1738330030705" duration="1210000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -230,7 +231,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737991461812</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="align offset bug fix">
+      <option name="closed" value="true" />
+      <created>1738260059888</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1738260059888</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -253,6 +262,7 @@
     <MESSAGE value="selected tab y offset" />
     <MESSAGE value="menu refactor" />
     <MESSAGE value="menu alignment offset" />
-    <option name="LAST_COMMIT_MESSAGE" value="menu alignment offset" />
+    <MESSAGE value="align offset bug fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="align offset bug fix" />
   </component>
 </project>

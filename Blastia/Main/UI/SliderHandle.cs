@@ -8,7 +8,8 @@ public class SliderHandle(Vector2 position, string text, SpriteFont font, Slider
     : Button(position, text, font, null)
 {
     public override bool Draggable => true;
-    
+    public override bool AffectedByAlignOffset => false;
+
     private readonly Vector2 _fontSize = font.MeasureString(text);
 
     public float CalculateSliderLeftBound() => parentSlider.Bounds.Left - _fontSize.X * 0.5f;

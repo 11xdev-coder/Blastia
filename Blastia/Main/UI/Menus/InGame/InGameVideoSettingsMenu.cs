@@ -7,6 +7,18 @@ public class InGameVideoSettingsMenu(SpriteFont font, bool isActive = false) : M
 {
     protected override void AddElements()
     {
-        AddResolutionHandler(HAlignOffset, VAlignOffset, () => {});
+        // TODO: Save
+        AddResolutionHandler(0.2f, 0.2f, OnResolutionClicked);
+        AddFullscreenSwitch(0.2f, 0.24f, OnFullScreenClicked);
+    }
+
+    private void OnFullScreenClicked()
+    {
+        
+    }
+
+    private void OnResolutionClicked()
+    {
+        VideoManager.Instance.ApplyHandlerResolution();
     }
 }

@@ -484,6 +484,7 @@ public class BlastiaGame : Game
 		World.SetPlayer(_myPlayer);
 		
 		if (LogoMenu != null) LogoMenu.Active = false;
+		if (WorldsMenu != null) WorldsMenu.Active = false;
 		if (RulerMenu != null) RulerMenu.Active = World.RulerMode;
 		if (InGameMenu != null) InGameMenu.Active = true;
 		

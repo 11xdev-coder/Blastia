@@ -85,8 +85,8 @@ public class TabGroup : UIElement
 
                 tabButton.Scale = tabData.Scale + new Vector2(SelectedTabUpScale);
                 
-                // apply offset immediately
-                tabButton.Position.Y -= CalculateYOffset(tabData);
+                // apply offset immediately if didn't select yet
+                if (buttonIndex != _selectedTabIndex) tabButton.Position.Y -= CalculateYOffset(tabData);
                 
                 _selectedTabIndex = buttonIndex;
             };
