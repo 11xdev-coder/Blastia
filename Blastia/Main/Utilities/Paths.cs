@@ -29,6 +29,7 @@ public static class Paths
 	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
 	
 	// music
+	public static readonly string RatsOnSaturn = "Sounds/MenuSongs/rats_on_saturn.ogg";
 	public static readonly string PeacefulJourney00 = "Sounds/MenuSongs/peaceful journey_00.ogg";
 	public static readonly string PeacefulJourney01 = "Sounds/MenuSongs/peaceful journey_01.ogg";
 	public static readonly string PeacefulJourney02 = "Sounds/MenuSongs/peaceful journey_02.ogg";

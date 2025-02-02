@@ -454,7 +454,7 @@ public class BlastiaGame : Game
 
 	public static MusicID ChooseRandomMenuMusic()
 	{
-		float randomIndex = Rand.Next(0, 3);
+		float randomIndex = Rand.Next(0, 4);
 		
 		MusicID musicId = (MusicID)randomIndex;
 

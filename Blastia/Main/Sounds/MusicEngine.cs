@@ -6,6 +6,7 @@ namespace Blastia.Main.Sounds;
 
 public enum MusicID
 {
+    RatsOnSaturn,
     PeacefulJourney00,
     PeacefulJourney01,
     PeacefulJourney02,
@@ -28,6 +29,7 @@ public static class MusicEngine
 
     public static void LoadMusic()
     {
+	LoadMusicTrack(MusicID.RatsOnSaturn, Paths.RatsOnSaturn);
         LoadMusicTrack(MusicID.PeacefulJourney00, Paths.PeacefulJourney00);
         LoadMusicTrack(MusicID.PeacefulJourney01, Paths.PeacefulJourney01);
         LoadMusicTrack(MusicID.PeacefulJourney02, Paths.PeacefulJourney02);
