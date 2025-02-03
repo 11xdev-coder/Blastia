@@ -4,11 +4,20 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
-public struct Tab(string title, Texture2D texture, Func<Menu?> menuFactory, Vector2 scale = default)
+/// <summary>
+/// New Tab for <c>TabGroup</c>
+/// </summary>
+/// <param name="title">Name of the tab</param>
+/// <param name="texture">Texture of the tab</param>
+/// <param name="menuFactory">Function that returns <c>Menu</c> that will show when this tab is opened</param>
+/// <param name="scale"></param>
+/// <param name="onClick"></param>
+public struct Tab(string title, Texture2D texture, Func<Menu?> menuFactory, Vector2 scale = default, Action? onClick = null)
 {
     public string Title = title;
     public Vector2 Scale = scale == default ? Vector2.One : scale;
     public readonly Texture2D TabTexture = texture;
+    public readonly Action? OnClick = onClick;
     
     public Menu? GetMenu() => menuFactory();
 }
@@ -59,13 +68,13 @@ public class TabGroup : UIElement
         {
             var tabData = _tabsData[i];
             
-            var tabButton = new ImageButton(startingPosition, tabData.TabTexture, () => { })
+            var tabButton = new ImageButton(startingPosition, tabData.TabTexture, tabData.OnClick)
             {
                 Scale = tabData.Scale
             };
 
             var buttonIndex = i;
-            tabButton.OnClick = () =>
+            tabButton.OnClick += () =>
             {
                 if (_cachedActiveMenu != null)
                     _cachedActiveMenu.Active = false;

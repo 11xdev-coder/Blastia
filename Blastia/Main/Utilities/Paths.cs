@@ -24,6 +24,7 @@ public static class Paths
 	public static string InvisibleTexturePath { get; private set; } = "";
 	public static string MonitorTexturePath { get; private set; } = "";
 	public static string AudioTexturePath { get; private set; } = "";
+	public static string RedCrossPath { get; private set; } = "";
 	
 	// sounds
 	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
@@ -51,6 +52,7 @@ public static class Paths
 		InvisibleTexturePath = Path.Combine(ContentRoot, "Textures/Invisible.png");
 		MonitorTexturePath = Path.Combine(ContentRoot, "Textures/UI/Monitor.png");
 		AudioTexturePath = Path.Combine(ContentRoot, "Textures/UI/Audio.png");
+		RedCrossPath = Path.Combine(ContentRoot, "Textures/UI/RedCross.png");
 		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";
