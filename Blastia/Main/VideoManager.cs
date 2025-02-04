@@ -12,7 +12,7 @@ public class VideoManager : ManagerWithStateSaving<VideoManager>
     
     // if graphics are null -> false
     // property will update on itself
-    public bool IsFullScreen => _graphics?.IsFullScreen ?? false;
+    public bool IsFullScreen;
     
     private ResolutionListHandler? _resolutionHandler;
     public ResolutionListHandler ResolutionHandler
@@ -34,6 +34,7 @@ public class VideoManager : ManagerWithStateSaving<VideoManager>
         base.Initialize();
         
         _graphics = graphics;
+        IsFullScreen = graphics.IsFullScreen;
         
         ResolutionHandler = new ResolutionListHandler();
     }
@@ -43,6 +44,7 @@ public class VideoManager : ManagerWithStateSaving<VideoManager>
         if (_graphics != null)
         {
             _graphics.ToggleFullScreen();
+            IsFullScreen = !IsFullScreen;
         }
     }
 
@@ -52,6 +54,8 @@ public class VideoManager : ManagerWithStateSaving<VideoManager>
         {
             _graphics.IsFullScreen = val;
             _graphics.ApplyChanges();
+            
+            IsFullScreen = val;
         }
     }
 

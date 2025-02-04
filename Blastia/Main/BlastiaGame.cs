@@ -61,6 +61,7 @@ public class BlastiaGame : Game
 	public static Texture2D MonitorTexture { get; private set; } = null!;
 	public static Texture2D AudioTexture { get; private set; } = null!;
 	public static Texture2D RedCrossTexture { get; private set; } = null!;
+	public static Texture2D ExitTexture { get; private set; } = null!;
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -229,6 +230,7 @@ public class BlastiaGame : Game
 			Paths.AudioTexturePath);
 
 		RedCrossTexture = LoadingUtilities.LoadTexture(GraphicsDevice, Paths.RedCrossPath);
+		ExitTexture = LoadingUtilities.LoadTexture(GraphicsDevice, Paths.ExitPath);
 	}
 	
 	protected override void LoadContent()
