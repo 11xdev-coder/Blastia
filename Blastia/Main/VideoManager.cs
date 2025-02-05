@@ -7,12 +7,19 @@ namespace Blastia.Main;
 
 public class VideoManager : ManagerWithStateSaving<VideoManager>
 {
+    public Action? PropertyChanged;
+    
     private GraphicsDeviceManager? _graphics;
     protected override string SaveFileName => "videomanager.bin";
     
     // if graphics are null -> false
     // property will update on itself
-    public bool IsFullScreen;
+    private bool _isFullScreen;
+    public bool IsFullScreen
+    {
+        get => _isFullScreen;
+        private set => Properties.OnValueChangedProperty(ref _isFullScreen, value, OnPropertyUpdated);
+    }
     
     private ResolutionListHandler? _resolutionHandler;
     public ResolutionListHandler ResolutionHandler
@@ -37,6 +44,11 @@ public class VideoManager : ManagerWithStateSaving<VideoManager>
         IsFullScreen = graphics.IsFullScreen;
         
         ResolutionHandler = new ResolutionListHandler();
+    }
+
+    private void OnPropertyUpdated()
+    {
+        PropertyChanged?.Invoke();
     }
     
     public void ToggleFullscreen()

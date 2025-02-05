@@ -193,7 +193,8 @@ public class Menu
         BoolSwitchButton isFullScreenButton = new BoolSwitchButton(Vector2.Zero, "Full Screen", Font, 
             onClick, 
             () => VideoManager.Instance.IsFullScreen,
-            _ => VideoManager.Instance.ToggleFullscreen())
+            _ => VideoManager.Instance.ToggleFullscreen(),
+            handler => VideoManager.Instance.PropertyChanged += handler)
         {
             HAlign = hAlign,
             VAlign = vAlign

@@ -7,7 +7,7 @@ public class BoolSwitchButton : Button
 {
     private Func<bool> _getValue;
     private Action<bool> _setValue;
-    
+
     /// <summary>
     /// Constructor
     /// </summary>
@@ -17,14 +17,17 @@ public class BoolSwitchButton : Button
     /// <param name="onClick"></param>
     /// <param name="getValue">Get value lambda for the bool switch</param>
     /// <param name="setValue">Lambda for setting the switch value to new value</param>
+    /// <param name="subscribeToEvent"></param>
     public BoolSwitchButton(Vector2 position, string text, SpriteFont font, Action onClick,
-        Func<bool> getValue, Action<bool> setValue) : base(position, text, font, onClick)
+        Func<bool> getValue, Action<bool> setValue, Action<Action> subscribeToEvent) : base(position, text, font, onClick)
     {
         _getValue = getValue;
         _setValue = setValue;
 
         OnClick += OnClickChangeValue;
         Text = InitialText + $": {getValue()}";
+        
+        subscribeToEvent(UpdateLabel);
     }
 
     private void OnClickChangeValue()
@@ -34,5 +37,10 @@ public class BoolSwitchButton : Button
         Text = InitialText + $": {current}";
         
         _setValue(current);
+    }
+
+    private void UpdateLabel()
+    {
+        Text = InitialText + $": {_getValue()}";
     }
 }
