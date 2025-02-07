@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
-public class Slider : Image
+public class Slider : Image, IValueStorageUi<float>
 {
     private const string InitialPercentText = "100%";
 
@@ -12,7 +12,8 @@ public class Slider : Image
     private readonly Vector2 _percentTextSize;
     private readonly float _percentTextOffset;
 
-    private readonly Action<float> _setValue;
+    public Func<float> GetValue { get; set; }
+    public Action<float> SetValue { get; set; }
     
     private float _percent;
     public float Percent
@@ -21,18 +22,19 @@ public class Slider : Image
         private set
         {
             _percent = Math.Clamp(value, 0, 1);
-            _setValue(_percent);
+            SetValue(_percent);
             
             UpdatePercentTextAndPosition();
         }
     }
 
     public Slider(Vector2 position, SpriteFont font, 
-        Func<float> getValue, Action<float> setValue,
+        Func<float> getValue, Action<float> setValue, Action<Action> subscribeToEvent,
         bool showPercent = false, float percentTextOffset = 35) : 
         base(position, BlastiaGame.SliderTexture)
     {
-        _setValue = setValue;
+        SetValue = setValue;
+        GetValue = getValue;
         Percent = getValue();
         
         _handle = new SliderHandle(position, "O", font, this, () => Percent = CalculatePercent());
@@ -43,6 +45,8 @@ public class Slider : Image
             _percentText = new Text(Vector2.Zero, InitialPercentText, font);
             _percentTextSize = font.MeasureString(InitialPercentText);
         }
+        
+        subscribeToEvent(UpdateLabel);
     }
     
     /// <summary>
@@ -100,5 +104,11 @@ public class Slider : Image
         
         _handle?.Draw(spriteBatch);
         _percentText?.Draw(spriteBatch);
+    }
+    
+    public void UpdateLabel()
+    {
+        Percent = GetValue();
+        UpdatePercentTextAndPosition();
     }
 }

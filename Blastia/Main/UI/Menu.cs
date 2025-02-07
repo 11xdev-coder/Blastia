@@ -154,7 +154,7 @@ public class Menu
     // COMMON METHODS
     private void AddSlider(Vector2 textPosition, Vector2 sliderPosition, 
         float hAlign, float vAlign, string text, Func<float> sliderGetValue,
-        Action<float> sliderSetValue)
+        Action<float> sliderSetValue, Action<Action> subscribeToEvent)
     {
         var textUi = new Text(textPosition, text, Font)
         {
@@ -164,7 +164,7 @@ public class Menu
         Elements.Add(textUi);
         
         var slider = new Slider(sliderPosition, Font,
-            sliderGetValue, sliderSetValue, true)
+            sliderGetValue, sliderSetValue, subscribeToEvent, true)
         {
             HAlign = hAlign,
             VAlign = vAlign
@@ -175,18 +175,20 @@ public class Menu
     protected void AddMasterVolumeSlider(float hAlign, float vAlign) =>
         AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Master Volume",
             () => AudioManager.Instance.MasterVolume, 
-            f => AudioManager.Instance.MasterVolume = f);
-    
+            f => AudioManager.Instance.MasterVolume = f,
+            handler => AudioManager.Instance.MasterVolumeChanged += handler);
     
     protected void AddMusicVolumeSlider(float hAlign, float vAlign) =>
         AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Music Volume",
             () => AudioManager.Instance.MusicVolume, 
-            f => AudioManager.Instance.MusicVolume = f);
+            f => AudioManager.Instance.MusicVolume = f,
+            handler => AudioManager.Instance.MusicVolumeChanged += handler);
 
     protected void AddSoundVolumeSlider(float hAlign, float vAlign) =>
         AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Sound Volume",
             () => AudioManager.Instance.SoundsVolume, 
-            f => AudioManager.Instance.SoundsVolume = f);
+            f => AudioManager.Instance.SoundsVolume = f,
+            handler => AudioManager.Instance.SoundsVolumeChanged += handler);
 
     protected void AddFullscreenSwitch(float hAlign, float vAlign, Action onClick)
     {

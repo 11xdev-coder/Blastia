@@ -7,7 +7,6 @@ public class InGameAudioSettingsMenu(SpriteFont font, bool isActive = false) : M
 {
     protected override void AddElements()
     {
-        var text = new Text(new Vector2(200, 200), "test 2", Font);
-        Elements.Add(text);
+        AddMusicVolumeSlider(0.2f, 0.2f);
     }
 }

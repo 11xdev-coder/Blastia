@@ -3,10 +3,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Buttons;
 
-public class BoolSwitchButton : Button
+public class BoolSwitchButton : Button, IValueStorageUi<bool>
 {
-    private Func<bool> _getValue;
-    private Action<bool> _setValue;
+    public Func<bool> GetValue { get; set; }
+    public Action<bool> SetValue { get; set; }
 
     /// <summary>
     /// Constructor
@@ -17,13 +17,14 @@ public class BoolSwitchButton : Button
     /// <param name="onClick"></param>
     /// <param name="getValue">Get value lambda for the bool switch</param>
     /// <param name="setValue">Lambda for setting the switch value to new value</param>
-    /// <param name="subscribeToEvent"></param>
+    /// <param name="subscribeToEvent">Lambda which subscribes this <c>Action</c> to desired <c>Action</c></param>
     public BoolSwitchButton(Vector2 position, string text, SpriteFont font, Action onClick,
         Func<bool> getValue, Action<bool> setValue, Action<Action> subscribeToEvent) : base(position, text, font, onClick)
     {
-        _getValue = getValue;
-        _setValue = setValue;
+        GetValue = getValue;
+        SetValue = setValue;
 
+        OnClick += onClick;
         OnClick += OnClickChangeValue;
         Text = InitialText + $": {getValue()}";
         
@@ -32,15 +33,15 @@ public class BoolSwitchButton : Button
 
     private void OnClickChangeValue()
     {
-        bool current = !_getValue();
-        // add bool value to the end of initial text
-        Text = InitialText + $": {current}";
+        bool current = !GetValue();
+        SetValue(current);
         
-        _setValue(current);
+        Text = InitialText + $": {GetValue()}";
     }
 
-    private void UpdateLabel()
+    public void UpdateLabel()
     {
-        Text = InitialText + $": {_getValue()}";
+        Text = InitialText + $": {GetValue()}";
     }
+    
 }
