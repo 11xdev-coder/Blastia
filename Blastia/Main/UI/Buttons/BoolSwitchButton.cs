@@ -5,8 +5,8 @@ namespace Blastia.Main.UI.Buttons;
 
 public class BoolSwitchButton : Button, IValueStorageUi<bool>
 {
-    public Func<bool> GetValue { get; set; }
-    public Action<bool> SetValue { get; set; }
+    public Func<bool>? GetValue { get; set; }
+    public Action<bool>? SetValue { get; set; }
 
     /// <summary>
     /// Constructor
@@ -19,7 +19,7 @@ public class BoolSwitchButton : Button, IValueStorageUi<bool>
     /// <param name="setValue">Lambda for setting the switch value to new value</param>
     /// <param name="subscribeToEvent">Lambda which subscribes this <c>Action</c> to desired <c>Action</c></param>
     public BoolSwitchButton(Vector2 position, string text, SpriteFont font, Action onClick,
-        Func<bool> getValue, Action<bool> setValue, Action<Action> subscribeToEvent) : base(position, text, font, onClick)
+        Func<bool> getValue, Action<bool> setValue, Action<Action>? subscribeToEvent = null) : base(position, text, font, onClick)
     {
         GetValue = getValue;
         SetValue = setValue;
@@ -28,7 +28,7 @@ public class BoolSwitchButton : Button, IValueStorageUi<bool>
         OnClick += OnClickChangeValue;
         Text = InitialText + $": {getValue()}";
         
-        subscribeToEvent(UpdateLabel);
+        if (subscribeToEvent != null) subscribeToEvent(UpdateLabel);
     }
 
     private void OnClickChangeValue()

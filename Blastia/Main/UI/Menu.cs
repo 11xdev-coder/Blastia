@@ -196,7 +196,7 @@ public class Menu
             onClick, 
             () => VideoManager.Instance.IsFullScreen,
             _ => VideoManager.Instance.ToggleFullscreen(),
-            handler => VideoManager.Instance.PropertyChanged += handler)
+            handler => VideoManager.Instance.FullScreenChanged += handler)
         {
             HAlign = hAlign,
             VAlign = vAlign
@@ -207,7 +207,8 @@ public class Menu
     protected void AddResolutionHandler(float hAlign, float vAlign, Action onClick)
     {
         HandlerArrowButton<DisplayMode> resolutionSwitcher = new HandlerArrowButton<DisplayMode>(Vector2.Zero, "Resolution", Font,
-            onClick, 10, VideoManager.Instance.ResolutionHandler)
+            onClick, 10, VideoManager.Instance.ResolutionHandler,
+            handler => VideoManager.Instance.ResolutionChanged += handler)
         {
             HAlign = hAlign,
             VAlign = vAlign

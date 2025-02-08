@@ -8,8 +8,11 @@ namespace Blastia.Main.UI.Buttons;
 /// Accepts handler, creates 2 arrows that will go to next/previous item.
 /// <para>T -> ListHandler's class</para>
 /// </summary>
-public class HandlerArrowButton<T> : Button
+public class HandlerArrowButton<T> : Button, IValueStorageUi<ListHandler<T>>
 {
+	public Func<ListHandler<T>>? GetValue { get; set; }
+	public Action<ListHandler<T>>? SetValue { get; set; }
+	
 	public Button? LeftButton;
 	public Button? RightButton;
 
@@ -22,7 +25,7 @@ public class HandlerArrowButton<T> : Button
 	private float _rightArrowSizeX;
 	
 	public HandlerArrowButton(Vector2 position, string text, SpriteFont font, Action onClick, 
-		float arrowSpacing, ListHandler<T>? handler) : base(position, text, font, onClick)
+		float arrowSpacing, ListHandler<T>? handler, Action<Action>? subscribeToEvent = null) : base(position, text, font, onClick)
 	{
 		_arrowSpacing = arrowSpacing;
 		_handler = handler;
@@ -39,6 +42,8 @@ public class HandlerArrowButton<T> : Button
 		_rightArrowSizeX = font.MeasureString(RightButton.Text).Y;
 		UpdateArrowPositions();
 		UpdateButtonText();
+
+		if (subscribeToEvent != null) subscribeToEvent(UpdateLabel);
 	}
 
 	public override void UpdateBounds()
@@ -98,5 +103,10 @@ public class HandlerArrowButton<T> : Button
 		_handler.Next();
 		UpdateButtonText();
 		OnClick?.Invoke();
+	}
+
+	public void UpdateLabel()
+	{
+		UpdateButtonText();
 	}
 }

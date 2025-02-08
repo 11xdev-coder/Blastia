@@ -12,8 +12,8 @@ public class Slider : Image, IValueStorageUi<float>
     private readonly Vector2 _percentTextSize;
     private readonly float _percentTextOffset;
 
-    public Func<float> GetValue { get; set; }
-    public Action<float> SetValue { get; set; }
+    public Func<float>? GetValue { get; set; }
+    public Action<float>? SetValue { get; set; }
     
     private float _percent;
     public float Percent
@@ -22,14 +22,14 @@ public class Slider : Image, IValueStorageUi<float>
         private set
         {
             _percent = Math.Clamp(value, 0, 1);
-            SetValue(_percent);
+            SetValue?.Invoke(_percent);
             
             UpdatePercentTextAndPosition();
         }
     }
 
     public Slider(Vector2 position, SpriteFont font, 
-        Func<float> getValue, Action<float> setValue, Action<Action> subscribeToEvent,
+        Func<float> getValue, Action<float> setValue, Action<Action>? subscribeToEvent = null,
         bool showPercent = false, float percentTextOffset = 35) : 
         base(position, BlastiaGame.SliderTexture)
     {
@@ -46,7 +46,7 @@ public class Slider : Image, IValueStorageUi<float>
             _percentTextSize = font.MeasureString(InitialPercentText);
         }
         
-        subscribeToEvent(UpdateLabel);
+        if (subscribeToEvent != null) subscribeToEvent(UpdateLabel);
     }
     
     /// <summary>
@@ -108,7 +108,7 @@ public class Slider : Image, IValueStorageUi<float>
     
     public void UpdateLabel()
     {
-        Percent = GetValue();
+        if (GetValue != null) Percent = GetValue();
         UpdatePercentTextAndPosition();
     }
 }

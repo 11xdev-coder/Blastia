@@ -6,13 +6,13 @@
 public interface IValueStorageUi<T>
 {
     /// <summary>
-    /// Must be set in the constructor. Lambda for returning the original variable value
+    /// Must be set in the constructor. Lambda for returning the original variable value. 
     /// </summary>
-    protected Func<T> GetValue { get; set; }
+    protected Func<T>? GetValue { get; set; }
     /// <summary>
     /// Must be set in the constructor. Lambda for setting the original variable value
     /// </summary>
-    protected Action<T> SetValue { get; set; }
+    protected Action<T>? SetValue { get; set; }
     
     /// <summary>
     /// Must be called when original variable has changed (subscribe to original event)

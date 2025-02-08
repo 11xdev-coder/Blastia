@@ -7,13 +7,8 @@ namespace Blastia.Main.Utilities.ListHandlers;
 /// Previous() that add/subtract current index and wrap around.
 /// Also, can be converted ToString()
 /// </summary>
-public class ResolutionListHandler : ListHandler<DisplayMode>
+public class ResolutionListHandler() : ListHandler<DisplayMode>(VideoManager.Instance.GetSupportedResolutions())
 {
-    public ResolutionListHandler() : base(VideoManager.Instance.GetSupportedResolutions())
-    {
-        
-    }
-    
     public DisplayMode CurrentResolution => CurrentItem;
 
     public override string GetString() => GetCurrentResolutionWidth() + "x" +
