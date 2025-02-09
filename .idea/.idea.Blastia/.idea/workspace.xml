@@ -9,17 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/BoolSwitchButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/BoolSwitchButton.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/HandlerArrowButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/HandlerArrowButton.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/IValueStorageUi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/IValueStorageUi.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Menu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menu.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Menus/Settings/VideoSettingsMenu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/Settings/VideoSettingsMenu.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Slider.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Slider.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/ListHandlers/EnumListHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/ListHandlers/EnumListHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/ListHandlers/ListHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/ListHandlers/ListHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/ListHandlers/ResolutionListHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/ListHandlers/ResolutionListHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/VideoManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/VideoManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/TabGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/TabGroup.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -74,22 +65,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    ".NET Project.Blastia.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "reference.settingsdialog.IDE.editor.colors.Color Scheme Font",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;.NET Project.Blastia.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Color Scheme Font&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Blastia" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" />
@@ -147,7 +138,7 @@
       <workItem from="1738846177479" duration="3316000" />
       <workItem from="1738934683660" duration="5916000" />
       <workItem from="1739001823556" duration="1420000" />
-      <workItem from="1739014769754" duration="12332000" />
+      <workItem from="1739014769754" duration="14892000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -309,7 +300,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738952065593</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="lots of refactoring + handler button sync">
+      <option name="closed" value="true" />
+      <created>1739045431880</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1739045431880</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -339,6 +338,7 @@
     <MESSAGE value="Exit from game to menu" />
     <MESSAGE value="BoolSwitchButton updated when property is changed" />
     <MESSAGE value="refactoring + slider value sync" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactoring + slider value sync" />
+    <MESSAGE value="lots of refactoring + handler button sync" />
+    <option name="LAST_COMMIT_MESSAGE" value="lots of refactoring + handler button sync" />
   </component>
 </project>

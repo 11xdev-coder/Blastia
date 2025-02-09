@@ -33,8 +33,6 @@ public class TabGroup : UIElement
     // for now, max menus per button is 1
     // cache only one menu
     private Menu? _cachedActiveMenu;
-    private ImageButton? _cachedButton;
-    private Tab? _cachedTabData;
     private int _selectedTabIndex = -1;
     
     public TabGroup(Vector2 position, float tabSpacing, params Tab[] tabs) : base(position, BlastiaGame.InvisibleTexture)
@@ -78,9 +76,6 @@ public class TabGroup : UIElement
             {
                 if (_cachedActiveMenu != null)
                     _cachedActiveMenu.Active = false;
-
-                if (_cachedButton != null && _cachedTabData != null)
-                    _cachedButton.Scale = _cachedTabData.Value.Scale;
                 
                 var menu = tabData.GetMenu();
                 if (menu == null) return;
@@ -89,8 +84,6 @@ public class TabGroup : UIElement
                 menu.Active = true;
                 
                 _cachedActiveMenu = menu;
-                _cachedButton = tabButton;
-                _cachedTabData = tabData;
 
                 tabButton.Scale = tabData.Scale + new Vector2(SelectedTabUpScale);
                 
@@ -115,6 +108,15 @@ public class TabGroup : UIElement
         }
     }
 
+    /// <summary>
+    /// This method must be called when this <c>TabGroup</c> becomes inactive
+    /// </summary>
+    public void DeselectAll()
+    {
+        _selectedTabIndex = -1;
+        UpdateTabs();
+    }
+
     private float CalculateYOffset(Tab tabData) => tabData.TabTexture.Height * 0.5f * tabData.Scale.Y;
 
     private void UpdateTabs()
@@ -133,10 +135,14 @@ public class TabGroup : UIElement
             var tabData = _tabsData[tabDataIndex];
 
             // scale selected tabs
+            tab.Scale =
+                tabDataIndex == _selectedTabIndex ? tabData.Scale + new Vector2(SelectedTabUpScale) : tabData.Scale;
+            
             tab.Position = 
                 tabDataIndex == _selectedTabIndex ? 
                     new Vector2(startingPosition.X, startingPosition.Y - CalculateYOffset(tabData)) : 
                     startingPosition;
+            tab.UpdateBounds();
             
             startingPosition.X += _tabSpacing + tabData.TabTexture.Width * tabData.Scale.X;
         }
