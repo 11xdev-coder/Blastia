@@ -163,4 +163,9 @@ public class World
 	{
 		
 	}
+
+	public void Unload()
+	{
+		RulerMode = false;
+	}
 }

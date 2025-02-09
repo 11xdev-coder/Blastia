@@ -4,7 +4,7 @@ namespace Blastia.Main.Commands;
 
 public delegate bool GameRuleGetter();
 
-public class GameRuleCommands(bool log = true)
+public class GameRuleCommands(bool log = true) : ICommands
 {
     /// <summary>
     /// Whether to log GameRule state changes
@@ -65,5 +65,11 @@ public class GameRuleCommands(bool log = true)
     {
         _gameRules[gameRule].Invoke(value);
         if (Log) Console.WriteLine($"{gameRule} is now set to: {value}");
+    }
+
+    public void Clear()
+    {
+        _gameRules.Clear();
+        _gameRuleGetters.Clear();
     }
 }

@@ -92,19 +92,17 @@ public class BlastiaGame : Game
 	/// all necessary operations are completed prior to exiting.
 	/// </summary>
 	private static event Action? ExitRequestEvent;
-	
 	/// <summary>
 	/// Event triggered when a request to update resolution is made.
 	/// This event allows for ScreenWidth and ScreenHeight values to
 	/// properly update when resolution has changed.
 	/// </summary>
 	private static event Action? ResolutionRequestEvent;
-	
 	/// <summary>
 	/// Event to request world initialization 
 	/// </summary>
 	private static event Action? RequestWorldInitializationEvent;
-
+	private static event Action? RequestWorldUnloadEvent;
 	/// <summary>
 	/// Event to request creation of DebugPoint entity for one frame
 	/// </summary>
@@ -164,6 +162,7 @@ public class BlastiaGame : Game
 		ExitRequestEvent += OnExitRequested;
 		ResolutionRequestEvent += UpdateResolution;
 		RequestWorldInitializationEvent += InitializeWorld;
+		RequestWorldUnloadEvent += UnloadWorld;
 		RequestDebugPointDrawEvent += DrawDebugPoint;
 		
 		_pixelatedSamplerState = new SamplerState
@@ -300,6 +299,7 @@ public class BlastiaGame : Game
 
 	protected override void UnloadContent()
 	{
+		UnloadWorld();
 		ConsoleWindow?.Close();
 		
 		base.UnloadContent();
@@ -514,6 +514,20 @@ public class BlastiaGame : Game
 				}
 			}
 		}
+	}
+
+	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
+	private void UnloadWorld()
+	{
+		if (LogoMenu != null) LogoMenu.Active = true;
+		
+		ConsoleWindow?.UnloadWorldCommands();
+		
+		IsWorldInitialized = false;
+		World?.Unload();
+		World = null;
+		_myPlayer = null;
+		_entities.Clear();
 	}
 
 	// DRAW DEBUG POINT

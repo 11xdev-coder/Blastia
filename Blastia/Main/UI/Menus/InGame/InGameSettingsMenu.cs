@@ -36,6 +36,6 @@ public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(f
         
         _tabGroup?.DeselectAll();
         SwitchToMenu(BlastiaGame.MainMenu);
-        if (BlastiaGame.LogoMenu != null) BlastiaGame.LogoMenu.Active = true;
+        BlastiaGame.RequestWorldUnload();
     }
 }

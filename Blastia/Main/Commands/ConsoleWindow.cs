@@ -31,6 +31,13 @@ public class ConsoleWindow
         }, () => world.RulerMode);
         Console.WriteLine("Commands initialized");
     }
+
+    public void UnloadWorldCommands()
+    {
+        _gameRules.Clear();
+        _world = null;
+        Console.WriteLine("Commands unloaded");
+    }
     
     public void Open(string title)
     {

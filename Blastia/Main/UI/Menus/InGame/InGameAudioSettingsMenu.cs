@@ -7,6 +7,8 @@ public class InGameAudioSettingsMenu(SpriteFont font, bool isActive = false) : M
 {
     protected override void AddElements()
     {
-        AddMusicVolumeSlider(0.2f, 0.2f);
+        AddMasterVolumeSlider(0.24f, 0.2f);
+        AddMusicVolumeSlider(0.24f, 0.24f);
+        AddSoundVolumeSlider(0.24f, 0.28f);
     }
 }
