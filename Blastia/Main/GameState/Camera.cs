@@ -67,7 +67,6 @@ public class Camera : Object
 		
 	}
 	
-	// TODO: Issue: low resolutions don't render half of the world, render only if zooming in
 	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState) 
 	{
 		// get corners in tiles
@@ -97,7 +96,6 @@ public class Camera : Object
 					scaledBlockSize, scaledBlockSize);
 						
 				Rectangle sourceRect = BlockRectangles.All;
-				
 				block.Draw(spriteBatch, destRect, sourceRect);				
 			}
 		}

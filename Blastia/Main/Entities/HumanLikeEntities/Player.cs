@@ -41,8 +41,8 @@ public class Player : HumanLikeEntity
 		{
 			Camera = new Camera(position)
 			{
-				DrawWidth = (int) BlastiaGame.ScreenWidth,
-				DrawHeight = (int) BlastiaGame.ScreenHeight
+				DrawWidth = 240 * Block.Size,
+				DrawHeight = 135 * Block.Size
 			};
 		}
 		MovementSpeed = 20f;
