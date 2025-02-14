@@ -33,6 +33,8 @@ public class BoolSwitchButton : Button, IValueStorageUi<bool>
 
     private void OnClickChangeValue()
     {
+        if (GetValue == null || SetValue == null) return;
+        
         bool current = !GetValue();
         SetValue(current);
         
@@ -41,6 +43,7 @@ public class BoolSwitchButton : Button, IValueStorageUi<bool>
 
     public void UpdateLabel()
     {
+        if (GetValue == null) return;
         Text = InitialText + $": {GetValue()}";
     }
     

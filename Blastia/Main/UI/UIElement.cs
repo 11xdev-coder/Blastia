@@ -12,6 +12,7 @@ public abstract class UIElement
     /// Left corner of Bounds rectangle
     /// </summary>
     public Vector2 Position;
+
     public float Rotation;
     public Vector2 Scale = Vector2.One;
 
@@ -19,14 +20,16 @@ public abstract class UIElement
     /// Scales with <c>UI Scale</c> setting
     /// </summary>
     public virtual bool Scalable { get; set; } = true;
+
     /// <summary>
     /// Scales with <c>CameraScale</c>
     /// </summary>
     public virtual bool ScalesWithCamera { get; set; } = false;
 
     #region Alignment
-    
+
     private float _hAlign;
+
     /// <summary>
     /// Horizontal Alignment, when changed UpdateBounds() is called
     /// </summary>
@@ -35,8 +38,9 @@ public abstract class UIElement
         get => _hAlign;
         set => Properties.OnValueChangedProperty(ref _hAlign, value, OnAlignmentChanged);
     }
-    
+
     private float _vAlign;
+
     /// <summary>
     /// Vertical alignment, when changed UpdateBounds() is called
     /// </summary>
@@ -47,85 +51,113 @@ public abstract class UIElement
     }
 
     public virtual bool AffectedByAlignOffset { get; set; } = true;
-    
+
     private Vector2 _alignOffset;
+
     public Vector2 AlignOffset
     {
         get => AffectedByAlignOffset ? _alignOffset : Vector2.Zero;
         set => Properties.OnValueChangedProperty(ref _alignOffset, value, OnAlignmentChanged);
     }
-    
+
     #endregion
 
     public Rectangle Bounds { get; set; }
-    
+
     #region Hovering events
-    
+
     public bool IsHovered { get; set; }
     private bool _prevIsHovered;
+
     /// <summary>
     /// Called every Update() when mouse is hovered
     /// </summary>
     public Action? OnHover { get; set; }
+
     /// <summary>
     /// Called once when mouse hovered
     /// </summary>
     public Action? OnStartHovering { get; set; }
+
     /// <summary>
     /// Called once when mouse un-hovered
     /// </summary>
     public Action? OnEndHovering { get; set; }
-    
+
     #endregion
-    
+
     /// <summary>
     /// Called once when LMB is released while hovered
     /// </summary>
     public Action? OnClick { get; set; }
-    
+
     /// <summary>
     /// If clicked on this element -> focused; otherwise if clicked somewhere else -> unfocused
     /// </summary>
     public bool IsFocused { get; set; }
-    
+
     #region Dragging
-    
+
     public virtual bool Draggable { get; set; }
     private bool _isDragging;
-    
+
     #endregion
-    
+
     #region Texture
-    
+
     public Texture2D? Texture;
+
     /// <summary>
     /// If true, UIElement won't Text, but will draw Texture
     /// </summary>
     public bool UseTexture;
-    
+
     #endregion
-    
+
     #region Text
-    
+
     /// <summary>
     /// TextToDraw will be drawn using this Font
     /// </summary>
     public SpriteFont? Font { get; set; }
+
     /// <summary>
     /// Text to draw in Draw method
     /// </summary>
     public string? Text { get; set; }
+
     /// <summary>
     /// Additional text variable for custom text logic
     /// </summary>
     public string? InitialText { get; private set; }
-    
+
     #endregion
-    
+
     /// <summary>
     /// Draw color applied to Texture and Text
     /// </summary>
     public Color DrawColor { get; set; } = Color.White;
+
+    /// <summary>
+    /// Color of the Border. Only used when rendering text (<c>UseTexture = false</c>). If border color is transparent (<c>A = 0</c>)
+    /// then border is not rendered. Defaults to <c>Color.Black</c>
+    /// </summary>
+    public Color BorderColor { get; set; } = Color.Black;
+    /// <summary>
+    /// Thickness of the Border. Only used when rendering text (<c>UseTexture = false</c>). Defaults to <c>1.4f</c>
+    /// </summary>
+    public float BorderOffsetFactor { get; set; } = 2f;
+    private readonly Vector2[] _borderOffsets =
+    [
+        new(-1, 0),
+        new(1, 0),
+        new(0, -1),
+        new(0, 1),
+        new(-1, -1),
+        new(1, -1),
+        new(-1, 1),
+        new(1, 1)
+    ];
 
     public virtual float Alpha { get; set; } = 1f;
     public bool LerpAlphaToZero { get; set; }
@@ -432,6 +464,15 @@ public abstract class UIElement
         Vector2 origin = textSize / 2f;
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
+
+        if (BorderColor.A > 0)
+        {
+            foreach (var offset in _borderOffsets)
+            {
+                spriteBatch.DrawString(Font, Text, position + offset * BorderOffsetFactor, BorderColor * Alpha, 
+                    Rotation, origin, Scale, SpriteEffects.None, 0f);
+            }
+        }
         
         spriteBatch.DrawString(Font, Text, position, DrawColor * Alpha, 
             Rotation, origin, Scale, SpriteEffects.None, 0f);
