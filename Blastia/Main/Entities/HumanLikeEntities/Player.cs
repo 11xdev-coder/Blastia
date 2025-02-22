@@ -50,10 +50,10 @@ public class Player : HumanLikeEntity
 
 	public override void Update()
 	{
+		base.Update();
+		
 		if (IsPreview) PreviewUpdate();
 		else RegularUpdate();
-		
-		base.Update();
 	}
 
 	/// <summary>
@@ -97,12 +97,16 @@ public class Player : HumanLikeEntity
 
 	private void MakeCameraFollow()
 	{
-		if (Camera == null) return;
+		if (Camera == null)
+			return;
 
-		var matrix = VideoManager.Instance.CalculateResolutionScaleMatrix();
-		float x = Position.X - (BlastiaGame.ScreenWidth * 0.5f / Camera.CameraScale) / matrix.M11;
-		float y = Position.Y - (BlastiaGame.ScreenHeight * 0.5f / Camera.CameraScale) / matrix.M22;
-		Camera.Position = new Vector2(x, y);
+		float effectiveViewWidth = Camera.DrawWidth / Camera.CameraScale;
+		float effectiveViewHeight = Camera.DrawHeight / Camera.CameraScale;
+
+		Camera.Position = new Vector2(
+			Position.X - effectiveViewWidth * 0.5f,
+			Position.Y - effectiveViewHeight * 0.5f
+		);
 	}
 
 	/// <summary>

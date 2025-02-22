@@ -73,8 +73,8 @@ public abstract class Entity : Object
     /// </summary>
     public override void Update()
     {
-        ApplyGravityForce();
-        UpdateImpulse();
+        // ApplyGravityForce();
+        // UpdateImpulse();
         UpdatePosition();
     }
 
@@ -93,15 +93,24 @@ public abstract class Entity : Object
     {
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
+
+        int heightPixels = Height * Block.Size;
+        int widthPixels = Width * Block.Size;
+
+        float left = newPosition.X - widthPixels * 0.5f;
+        float top = newPosition.Y - heightPixels * 0.5f;
+        float right = newPosition.X + widthPixels * 0.5f;
+        float bottom = newPosition.Y + heightPixels * 0.5f;
         
-        if (currentWorld.HasTile((int)Position.X, (int)Position.Y)) Console.WriteLine("Test");
-
-        float left = Position.X;
-        float top = Position.Y;
-        float bottom = Position.Y + Height;
-        BlastiaGame.RequestDebugPointDraw(new Vector2(left, top), 2);
-        BlastiaGame.RequestDebugPointDraw(new Vector2(left, bottom), 2);
-
+        Vector2 topLeft = new Vector2(left, top);
+        Vector2 bottomLeft = new Vector2(left, bottom);
+        Vector2 topRight = new Vector2(right, top);
+        Vector2 bottomRight = new Vector2(right, bottom);
+        
+        BlastiaGame.RequestDebugPointDraw(topLeft, 2);
+        BlastiaGame.RequestDebugPointDraw(bottomLeft, 2);
+        BlastiaGame.RequestDebugPointDraw(topRight, 2);
+        BlastiaGame.RequestDebugPointDraw(bottomRight, 2);
         // test draw
         //BlastiaGame.RequestDebugPointDraw(new Vector2(leftTile * Block.Size, bottomTile * Block.Size), 2);
     }
@@ -251,8 +260,8 @@ public abstract class Entity : Object
     /// </summary>
     private void ApplyGravityForce()
     {
-        if (!ApplyGravity) return;
-        ApplyForce(new Vector2(0, 0));
+        //if (!ApplyGravity) return;
+        //ApplyForce(new Vector2(0, 0));
         // var currentWorld = PlayerManager.Instance.SelectedWorld;
         // if (currentWorld == null) return;
         //

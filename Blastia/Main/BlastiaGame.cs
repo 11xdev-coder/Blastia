@@ -495,7 +495,7 @@ public class BlastiaGame : Game
 		
 		ConsoleWindow?.InitializeWorldCommands(World);
 		
-		_entities.Add(new MutantScavenger(new Vector2(50, 50)));
+		//_entities.Add(new MutantScavenger(new Vector2(50, 50)));
 
 		IsWorldInitialized = true;
 		
