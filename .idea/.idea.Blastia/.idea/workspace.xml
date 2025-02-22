@@ -8,21 +8,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/BoolSwitchButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Buttons/BoolSwitchButton.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Physics/Physics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Physics.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -144,7 +145,9 @@
       <workItem from="1739191210237" duration="7177000" />
       <workItem from="1739278588405" duration="2904000" />
       <workItem from="1739451732776" duration="6561000" />
-      <workItem from="1739547519163" duration="4490000" />
+      <workItem from="1739547519163" duration="6102000" />
+      <workItem from="1739623050480" duration="6975000" />
+      <workItem from="1739735947259" duration="599000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -338,7 +341,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739473978929</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="text border">
+      <option name="closed" value="true" />
+      <created>1739557323028</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1739557323028</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -372,6 +383,7 @@
     <MESSAGE value="tab group visual improvements" />
     <MESSAGE value="world unloading" />
     <MESSAGE value="fixed camera world rendering issue" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed camera world rendering issue" />
+    <MESSAGE value="text border" />
+    <option name="LAST_COMMIT_MESSAGE" value="text border" />
   </component>
 </project>

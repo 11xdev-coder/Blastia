@@ -93,12 +93,15 @@ public abstract class Entity : Object
     {
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
-
-        int leftTile = (int) Math.Floor(newPosition.X / Block.Size);
-        int rightTile = (int) Math.Floor(newPosition.X / Block.Size + Width);
-        int topTile = (int) Math.Floor(newPosition.Y / Block.Size);
-        int bottomTile = (int) Math.Floor(newPosition.Y / Block.Size + Height);
         
+        if (currentWorld.HasTile((int)Position.X, (int)Position.Y)) Console.WriteLine("Test");
+
+        float left = Position.X;
+        float top = Position.Y;
+        float bottom = Position.Y + Height;
+        BlastiaGame.RequestDebugPointDraw(new Vector2(left, top), 2);
+        BlastiaGame.RequestDebugPointDraw(new Vector2(left, bottom), 2);
+
         // test draw
         //BlastiaGame.RequestDebugPointDraw(new Vector2(leftTile * Block.Size, bottomTile * Block.Size), 2);
     }

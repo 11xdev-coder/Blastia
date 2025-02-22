@@ -88,6 +88,11 @@ public class Player : HumanLikeEntity
 		{
 			AddImpulse(new Vector2(0, -5), 0.2f);
 		}
+
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Down))
+		{
+			Position = new Vector2(Position.X, Position.Y + 1);
+		}
 	}
 
 	private void MakeCameraFollow()

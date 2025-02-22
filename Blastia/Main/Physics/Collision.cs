@@ -1,6 +1,6 @@
 ﻿namespace Blastia.Main.Physics;
 
-public static class Physics
+public class Collision
 {
     
 }
