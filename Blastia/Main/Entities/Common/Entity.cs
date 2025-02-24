@@ -111,8 +111,50 @@ public abstract class Entity : Object
         BlastiaGame.RequestDebugPointDraw(bottomLeft, 2);
         BlastiaGame.RequestDebugPointDraw(topRight, 2);
         BlastiaGame.RequestDebugPointDraw(bottomRight, 2);
-        // test draw
-        //BlastiaGame.RequestDebugPointDraw(new Vector2(leftTile * Block.Size, bottomTile * Block.Size), 2);
+        
+        // moving right
+        if (MovementVector.X > 0)
+        {
+            for (float y = top; y < bottom; y++)
+            {
+                if (currentWorld.HasTile((int) right, (int) y))
+                {
+                    // TODO: revert pos
+                }
+            }
+        }
+        else if (MovementVector.X < 0) // left
+        {
+            for (float y = top; y < bottom; y++)
+            {
+                if (currentWorld.HasTile((int) left, (int) y))
+                {
+                    // revert pos
+                }
+            }
+        }
+        
+        // down
+        if (MovementVector.Y > 0)
+        {
+            for (float x = left; x < right; x++)
+            {
+                if (currentWorld.HasTile((int) x, (int) bottom))
+                {
+                    
+                }
+            }
+        }
+        else if (MovementVector.Y < 0) // moving up
+        {
+            for (float x = left; x < right; x++)
+            {
+                if (currentWorld.HasTile((int) x, (int) top))
+                {
+                    
+                }
+            }
+        }
     }
 
     private void HandleVerticalCollision(ref Vector2 newPosition, WorldState currentWorld)

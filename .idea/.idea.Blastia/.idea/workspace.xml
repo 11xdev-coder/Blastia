@@ -8,22 +8,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Physics/Physics.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Physics.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,7 +77,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Color Scheme Font&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -148,6 +146,11 @@
       <workItem from="1739547519163" duration="6102000" />
       <workItem from="1739623050480" duration="6975000" />
       <workItem from="1739735947259" duration="599000" />
+      <workItem from="1740229260508" duration="6208000" />
+      <workItem from="1740305080672" duration="5297000" />
+      <workItem from="1740338154782" duration="1490000" />
+      <workItem from="1740399729088" duration="409000" />
+      <workItem from="1740400156246" duration="3353000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -349,7 +352,23 @@
       <option name="project" value="LOCAL" />
       <updated>1739557323028</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="simple collision test">
+      <option name="closed" value="true" />
+      <created>1740257959184</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1740257959184</updated>
+    </task>
+    <task id="LOCAL-00027" summary="corner collision tests + fixed player camera centering">
+      <option name="closed" value="true" />
+      <created>1740260199746</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1740260199746</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -359,8 +378,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="tab buttons and images" />
-    <MESSAGE value="tab group improvements" />
     <MESSAGE value="slider rework" />
     <MESSAGE value="bug fix: SliderHandle on first frame played Tick sound" />
     <MESSAGE value="bug fix: SliderHandle being in incorrect position for one frame" />
@@ -384,6 +401,8 @@
     <MESSAGE value="world unloading" />
     <MESSAGE value="fixed camera world rendering issue" />
     <MESSAGE value="text border" />
-    <option name="LAST_COMMIT_MESSAGE" value="text border" />
+    <MESSAGE value="simple collision test" />
+    <MESSAGE value="corner collision tests + fixed player camera centering" />
+    <option name="LAST_COMMIT_MESSAGE" value="corner collision tests + fixed player camera centering" />
   </component>
 </project>
