@@ -21,7 +21,6 @@
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,8 +53,7 @@
     <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
-  &quot;customColor&quot;: &quot;&quot;,
-  &quot;associatedIndex&quot;: 3
+  &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="2rfNfmEsjt4N0ycnrTyxfh3k6Gt" />
   <component name="ProjectLevelVcsManager">
@@ -150,7 +148,15 @@
       <workItem from="1740305080672" duration="5297000" />
       <workItem from="1740338154782" duration="1490000" />
       <workItem from="1740399729088" duration="409000" />
-      <workItem from="1740400156246" duration="3353000" />
+      <workItem from="1740400156246" duration="3556000" />
+      <workItem from="1740482230237" duration="5190000" />
+      <workItem from="1740575439909" duration="2767000" />
+      <workItem from="1740771384599" duration="1197000" />
+      <workItem from="1740843846191" duration="2392000" />
+      <workItem from="1740915075643" duration="1194000" />
+      <workItem from="1741094551049" duration="1472000" />
+      <workItem from="1741195861671" duration="598000" />
+      <workItem from="1741272374986" duration="1797000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -368,7 +374,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740260199746</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="basic collision structure">
+      <option name="closed" value="true" />
+      <created>1740425696115</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1740425696115</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -378,7 +392,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="slider rework" />
     <MESSAGE value="bug fix: SliderHandle on first frame played Tick sound" />
     <MESSAGE value="bug fix: SliderHandle being in incorrect position for one frame" />
     <MESSAGE value="common methods for video and audio menus" />
@@ -403,6 +416,7 @@
     <MESSAGE value="text border" />
     <MESSAGE value="simple collision test" />
     <MESSAGE value="corner collision tests + fixed player camera centering" />
-    <option name="LAST_COMMIT_MESSAGE" value="corner collision tests + fixed player camera centering" />
+    <MESSAGE value="basic collision structure" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic collision structure" />
   </component>
 </project>

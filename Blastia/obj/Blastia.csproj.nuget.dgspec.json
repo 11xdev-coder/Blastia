@@ -56,9 +56,25 @@
               "target": "Package",
               "version": "[1.0.15.2403, )"
             },
+            "ImGui.NET": {
+              "target": "Package",
+              "version": "[1.91.6.1, )"
+            },
+            "NAudio": {
+              "target": "Package",
+              "version": "[2.2.1, )"
+            },
             "System.Drawing.Common": {
               "target": "Package",
               "version": "[9.0.1, )"
+            },
+            "Veldrid": {
+              "target": "Package",
+              "version": "[4.9.0, )"
+            },
+            "Veldrid.StartupUtilities": {
+              "target": "Package",
+              "version": "[4.9.0, )"
             }
           },
           "imports": [

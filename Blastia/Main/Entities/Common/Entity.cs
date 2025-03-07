@@ -119,7 +119,8 @@ public abstract class Entity : Object
             {
                 if (currentWorld.HasTile((int) right, (int) y))
                 {
-                    // TODO: revert pos
+                    MovementVector.X = 0;
+                    newPosition.X = Position.X;
                 }
             }
         }
@@ -129,7 +130,8 @@ public abstract class Entity : Object
             {
                 if (currentWorld.HasTile((int) left, (int) y))
                 {
-                    // revert pos
+                    MovementVector.X = 0;
+                    newPosition.X = Position.X;
                 }
             }
         }
@@ -141,7 +143,8 @@ public abstract class Entity : Object
             {
                 if (currentWorld.HasTile((int) x, (int) bottom))
                 {
-                    
+                    MovementVector.Y = 0;
+                    newPosition.Y = Position.Y;
                 }
             }
         }
@@ -151,7 +154,8 @@ public abstract class Entity : Object
             {
                 if (currentWorld.HasTile((int) x, (int) top))
                 {
-                    
+                    MovementVector.Y = 0;
+                    newPosition.Y = Position.Y;
                 }
             }
         }
