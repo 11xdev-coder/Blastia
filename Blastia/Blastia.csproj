@@ -7,6 +7,7 @@
         <CaseSensitiveFilenames>true</CaseSensitiveFilenames>
         <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

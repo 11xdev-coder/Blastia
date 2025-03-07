@@ -137,6 +137,10 @@ public class Synthesizer
     private static void CreateFontTexture()
     {
         ImGuiIOPtr io = ImGui.GetIO();
+        string path = @"D:\Projects\Blastia\Blastia\Main\Content\Font\Roboto_Condensed-Thin.ttf";
+        float fontSize = 14.0f;
+        ImFontConfigPtr config = new ImFontConfigPtr();
+        io.Fonts.AddFontFromFileTTF(path, fontSize, config, io.Fonts.GetGlyphRangesDefault());
         
         // Build font texture
         io.Fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
@@ -274,7 +278,7 @@ public class Synthesizer
     
     private static void RenderDrawData(ImDrawDataPtr drawData)
     {
-        // Avoid rendering when minimized
+        // Skip if minimized
         if (drawData.DisplaySize.X <= 0.0f || drawData.DisplaySize.Y <= 0.0f)
             return;
         
@@ -283,7 +287,11 @@ public class Synthesizer
         {
             ImDrawListPtr cmdList = drawData.CmdLists[cmdListIdx];
             
-            // For each command in the list
+            // Get vertex/index buffers
+            ImPtrVector<ImDrawVertPtr> vtxBuffer = cmdList.VtxBuffer;
+            ImVector<ushort> idxBuffer = cmdList.IdxBuffer;
+            
+            // For each command in the command list
             for (int cmdIdx = 0; cmdIdx < cmdList.CmdBuffer.Size; cmdIdx++)
             {
                 ImDrawCmdPtr cmd = cmdList.CmdBuffer[cmdIdx];
@@ -298,49 +306,89 @@ public class Synthesizer
                 };
                 SDL.SDL_RenderSetClipRect(_renderer, ref r);
                 
-                // Get the texture ID (important for font rendering)
-                IntPtr textureId = cmd.TextureId;
-                
-                // We'll use the texture if it's valid
-                bool useTexture = textureId != IntPtr.Zero;
-                
-                // Process all triangles in this command
-                for (int i = 0; i < cmd.ElemCount; i += 3)
+                // Check if we're using a texture (font or other)
+                if (cmd.TextureId != IntPtr.Zero && cmd.TextureId == _fontTexture)
                 {
-                    // Get indices for this triangle
-                    ushort idx1 = cmdList.IdxBuffer[(int)cmd.IdxOffset + i];
-                    ushort idx2 = cmdList.IdxBuffer[(int)cmd.IdxOffset + i + 1];
-                    ushort idx3 = cmdList.IdxBuffer[(int)cmd.IdxOffset + i + 2];
-                    
-                    // Get the three vertices for this triangle
-                    ImDrawVertPtr v1 = cmdList.VtxBuffer[idx1];
-                    ImDrawVertPtr v2 = cmdList.VtxBuffer[idx2];
-                    ImDrawVertPtr v3 = cmdList.VtxBuffer[idx3];
-                    
-                    // Convert ImGui color format (ABGR) to SDL color format (RGBA)
-                    byte r1 = (byte)(v1.col & 0xFF);
-                    byte g1 = (byte)((v1.col >> 8) & 0xFF);
-                    byte b1 = (byte)((v1.col >> 16) & 0xFF);
-                    byte a1 = (byte)((v1.col >> 24) & 0xFF);
-                    
-                    // For filled triangles, we'll draw them as three connected lines
-                    // In a proper implementation, you'd use a triangle filling algorithm
-                    // or SDL2_gfx's filledTrigonRGBA function
-                    
-                    // Set color for this triangle
-                    SDL.SDL_SetRenderDrawColor(_renderer, r1, g1, b1, a1);
-                    SDL.SDL_SetRenderDrawBlendMode(_renderer, SDL.SDL_BlendMode.SDL_BLENDMODE_BLEND);
-                    
-                    // Get points as arrays for easier filling
-                    short[] vx = new short[3] { (short)v1.pos.X, (short)v2.pos.X, (short)v3.pos.X };
-                    short[] vy = new short[3] { (short)v1.pos.Y, (short)v2.pos.Y, (short)v3.pos.Y };
-                    
-                    // Fill the triangle using a simple algorithm
-                    FillTriangle(_renderer, vx, vy, r1, g1, b1, a1);
-                    
-                    // If we have a texture and it's the font texture, we should render it
-                    // but this requires more complex texture rendering that's beyond
-                    // simple SDL2 rendering without additional libraries
+                    // Text rendering - we need to use SDL_RenderGeometry
+                    // For each triangle in this draw command
+                    for (int i = 0; i < cmd.ElemCount; i += 3)
+                    {
+                        // Get triangle indices
+                        ushort idx1 = idxBuffer[(int)cmd.IdxOffset + i];
+                        ushort idx2 = idxBuffer[(int)cmd.IdxOffset + i + 1];
+                        ushort idx3 = idxBuffer[(int)cmd.IdxOffset + i + 2];
+                        
+                        // Get vertices from buffer
+                        ImDrawVertPtr v1 = vtxBuffer[idx1];
+                        ImDrawVertPtr v2 = vtxBuffer[idx2];
+                        ImDrawVertPtr v3 = vtxBuffer[idx3];
+
+                        // Create SDL_Vertex array for this triangle
+                        SDL.SDL_Vertex[] sdlVertices = new SDL.SDL_Vertex[3];
+                        
+                        // Set position, color and UV for first vertex
+                        sdlVertices[0].position.x = v1.pos.X;
+                        sdlVertices[0].position.y = v1.pos.Y;
+                        sdlVertices[0].color.r = (byte)(v1.col & 0xFF);
+                        sdlVertices[0].color.g = (byte)((v1.col >> 8) & 0xFF);
+                        sdlVertices[0].color.b = (byte)((v1.col >> 16) & 0xFF);
+                        sdlVertices[0].color.a = (byte)((v1.col >> 24) & 0xFF);
+                        sdlVertices[0].tex_coord.x = v1.uv.X;
+                        sdlVertices[0].tex_coord.y = v1.uv.Y;
+                        
+                        // Set position, color and UV for second vertex
+                        sdlVertices[1].position.x = v2.pos.X;
+                        sdlVertices[1].position.y = v2.pos.Y;
+                        sdlVertices[1].color.r = (byte)(v2.col & 0xFF);
+                        sdlVertices[1].color.g = (byte)((v2.col >> 8) & 0xFF);
+                        sdlVertices[1].color.b = (byte)((v2.col >> 16) & 0xFF);
+                        sdlVertices[1].color.a = (byte)((v2.col >> 24) & 0xFF);
+                        sdlVertices[1].tex_coord.x = v2.uv.X;
+                        sdlVertices[1].tex_coord.y = v2.uv.Y;
+                        
+                        // Set position, color and UV for third vertex
+                        sdlVertices[2].position.x = v3.pos.X;
+                        sdlVertices[2].position.y = v3.pos.Y;
+                        sdlVertices[2].color.r = (byte)(v3.col & 0xFF);
+                        sdlVertices[2].color.g = (byte)((v3.col >> 8) & 0xFF);
+                        sdlVertices[2].color.b = (byte)((v3.col >> 16) & 0xFF);
+                        sdlVertices[2].color.a = (byte)((v3.col >> 24) & 0xFF);
+                        sdlVertices[2].tex_coord.x = v3.uv.X;
+                        sdlVertices[2].tex_coord.y = v3.uv.Y;
+                        
+                        // Render this triangle with texture - corrected version
+                        SDL.SDL_RenderGeometry(
+                            _renderer,
+                            _fontTexture,
+                            sdlVertices,  // Pass the array directly
+                            3,
+                            null,  // No indices
+                            0
+                        );
+                    }
+                }
+                else
+                {
+                    // Non-text triangles - use color fill approach
+                    for (int i = 0; i < cmd.ElemCount; i += 3)
+                    {
+                        ushort idx1 = idxBuffer[(int)cmd.IdxOffset + i];
+                        ushort idx2 = idxBuffer[(int)cmd.IdxOffset + i + 1];
+                        ushort idx3 = idxBuffer[(int)cmd.IdxOffset + i + 2];
+                        ImDrawVertPtr v1 = vtxBuffer[idx1];
+                        ImDrawVertPtr v2 = vtxBuffer[idx2];
+                        ImDrawVertPtr v3 = vtxBuffer[idx3];
+                        
+                        byte r1 = (byte)(v1.col & 0xFF);
+                        byte g1 = (byte)((v1.col >> 8) & 0xFF);
+                        byte b1 = (byte)((v1.col >> 16) & 0xFF);
+                        byte a1 = (byte)((v1.col >> 24) & 0xFF);
+                        
+                        FillTriangle(_renderer,
+                            new short[] { (short)v1.pos.X, (short)v2.pos.X, (short)v3.pos.X },
+                            new short[] { (short)v1.pos.Y, (short)v2.pos.Y, (short)v3.pos.Y },
+                            r1, g1, b1, a1);
+                    }
                 }
             }
         }
