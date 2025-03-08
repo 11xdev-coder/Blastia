@@ -1,14 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.InteropServices;
+﻿using System.Numerics;
 using ImGuiNET;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using SDL2;
-using Veldrid;
-using Veldrid.Sdl2;
-using Veldrid.StartupUtilities;
 
 namespace Blastia.Main.Synthesizer;
 
@@ -33,10 +26,12 @@ public class Synthesizer
     private static float[] _waveFormPoints = new float[600];
     
     // audio
-    private static WaveSynthesizer _synth;
+    private static MultipleWaveSynth _synth;
+    private static List<WaveData> _waves = [];
     private static WaveOutEvent _waveOut;
     private static uint _time;
     private static IntPtr _fontTexture;
+    private static double _timeWindow = 0.015; // 15ms window to visualize
 
     public static void Launch(string[] args)
     {
@@ -137,10 +132,6 @@ public class Synthesizer
     private static void CreateFontTexture()
     {
         ImGuiIOPtr io = ImGui.GetIO();
-        string path = @"D:\Projects\Blastia\Blastia\Main\Content\Font\Roboto_Condensed-Thin.ttf";
-        float fontSize = 14.0f;
-        ImFontConfigPtr config = new ImFontConfigPtr();
-        io.Fonts.AddFontFromFileTTF(path, fontSize, config, io.Fonts.GetGlyphRangesDefault());
         
         // Build font texture
         io.Fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
@@ -450,9 +441,15 @@ public class Synthesizer
 
     private static void InitializeAudio()
     {
-        _synth = new WaveSynthesizer((WaveSynthesizer.WaveType)_currentWaveType);
-        _synth.SetFrequency(_frequency);
-        _synth.SetAmplitude(_amplitude);
+        _synth = new MultipleWaveSynth();
+        
+        // add initial wave
+        if (_waves.Count == 0)
+        {
+            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType));
+        }
+
+        UpdateSynthesizer();
 
         _waveOut = new WaveOutEvent();
         _waveOut.Init(_synth);
@@ -470,7 +467,7 @@ public class Synthesizer
         
         // Draw waveform visualization placeholder
         float width = ImGui.GetContentRegionAvail().X;
-        float height = 200;
+        float height = 100;
         Vector2 pos = ImGui.GetCursorScreenPos();
         
         ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -504,22 +501,84 @@ public class Synthesizer
         
         ImGui.Dummy(new Vector2(0, height));
         ImGui.Separator();
-        
-        // Controls
-        if (ImGui.SliderFloat("Frequency (Hz)", ref _frequency, 20.0f, 2000.0f))
+            
+            // Wave list and controls
+        if (_waves.Count == 0)
         {
-            _synth.SetFrequency(_frequency);
+            // Add initial wave if none exist
+            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType));
         }
         
-        if (ImGui.SliderFloat("Amplitude", ref _amplitude, 0f, 1f))
+        bool wavesChanged = false;
+        int waveToRemove = -1;
+        
+        // Display each wave's parameters
+        for (int i = 0; i < _waves.Count; i++)
         {
-            _synth.SetAmplitude(_amplitude);
+            WaveData wave = _waves[i];
+            
+            ImGui.PushID(i);
+            
+            // Wave header with enable/disable checkbox
+            bool isEnabled = wave.IsEnabled;
+            if (ImGui.Checkbox($"Wave {i+1}##enabled{i}", ref isEnabled))
+            {
+                wave.IsEnabled = isEnabled;
+                wavesChanged = true;
+            }
+            
+            ImGui.SameLine();
+            
+            // Remove wave button
+            if (ImGui.Button("X##remove" + i) && _waves.Count > 1)
+            {
+                waveToRemove = i;
+                wavesChanged = true;
+            }
+            
+            // Wave parameters
+            float freq = wave.Frequency;
+            if (ImGui.SliderFloat($"Frequency (Hz)##freq{i}", ref freq, 20.0f, 2000.0f))
+            {
+                wave.Frequency = freq;
+                wavesChanged = true;
+            }
+            
+            float amp = wave.Amplitude;
+            if (ImGui.SliderFloat($"Amplitude##amp{i}", ref amp, 0f, 1f))
+            {
+                wave.Amplitude = amp;
+                wavesChanged = true;
+            }
+            
+            int waveType = (int)wave.WaveType;
+            if (ImGui.Combo($"Wave Type##type{i}", ref waveType, _waveTypes, _waveTypes.Length))
+            {
+                wave.WaveType = (WaveType)waveType;
+                wavesChanged = true;
+            }
+            
+            ImGui.Separator();
+            ImGui.PopID();
         }
         
-        if (ImGui.Combo("Wave Type", ref _currentWaveType, _waveTypes, _waveTypes.Length))
+        // Remove wave if requested
+        if (waveToRemove >= 0 && _waves.Count > 1)
         {
-            _synth.SetWaveType((WaveSynthesizer.WaveType)_currentWaveType);
+            _waves.RemoveAt(waveToRemove);
         }
+        
+        // Add wave and play buttons in a row
+        ImGui.BeginGroup();
+        
+        if (ImGui.Button("Add Wave", new Vector2(100, 40)))
+        {
+            // Clone the last wave's settings for the new wave
+            _waves.Add(_waves[^1].Clone());
+            wavesChanged = true;
+        }
+        
+        ImGui.SameLine();
         
         if (ImGui.Button(_isPlaying ? "Stop" : "Play", new Vector2(100, 40)))
         {
@@ -535,19 +594,58 @@ public class Synthesizer
             }
         }
         
+        ImGui.EndGroup();
+        
+        // Update synth if any parameters changed
+        if (wavesChanged)
+        {
+            UpdateSynthesizer();
+        }
+        
         ImGui.End();
+    }
+    
+    private static void UpdateSynthesizer()
+    {
+        // Clear existing waves
+        for (int i = _waves.Count - 1; i >= 0; i--)
+        {
+            _synth.RemoveWave(i);
+        }
+    
+        // Add all waves from our list
+        foreach (var wave in _waves)
+        {
+            _synth.AddWave(wave.Frequency, wave.Amplitude, wave.WaveType, wave.IsEnabled);
+        }
     }
 
     private static void UpdateWaveformVisuals()
     {
-        // Generate waveform points for visualization
-        double samplesPerCycle = _waveFormPoints.Length / 2.0;
+        // Clear out points if no waves are enabled
+        if (!_waves.Any(w => w.IsEnabled))
+        {
+            Array.Clear(_waveFormPoints, 0, _waveFormPoints.Length);
+            return;
+        }
         
+        // Calculate combined waveform
         for (int i = 0; i < _waveFormPoints.Length; i++)
         {
-            double phase = 2 * Math.PI * i / samplesPerCycle;
-            _waveFormPoints[i] = (float)(_synth.GenerateSample(phase) * _amplitude);
+            // Convert array index to a time position
+            double timePosition = (i / (double)_waveFormPoints.Length) * _timeWindow;
+            float sample = 0f;
+            
+            // Sum all enabled waves
+            foreach (var wave in _waves.Where(w => w.IsEnabled))
+            {
+                // Calculate phase based on frequency and time
+                double phase = 2 * Math.PI * wave.Frequency * timePosition;
+                
+                sample += _synth.GenerateWaveSample(phase, wave.Amplitude, wave.WaveType);
+            }
+            
+            _waveFormPoints[i] = sample;
         }
     }
-
 }
