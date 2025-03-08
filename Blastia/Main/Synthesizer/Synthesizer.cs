@@ -13,7 +13,7 @@ public class Synthesizer
     
     // synth
     private static float _frequency = 444.0f;
-    private static float _amplitude = 0.5f;
+    private static float _amplitude = 0.15f;
     private static int _currentWaveType = 0;
     private static bool _isPlaying = false;
     private static string[] _waveTypes =
@@ -558,8 +558,39 @@ public class Synthesizer
                 wavesChanged = true;
             }
             
+            ImGui.Spacing();
+            
+            ImGui.Text("ADSR (Envelope)");
+            float attackTime = wave.Envelope.AttackTime;
+            if (ImGui.SliderFloat($"Attack time##attackTime{i}", ref attackTime, 0f, 5f))
+            {
+                wave.Envelope.AttackTime = attackTime;
+            }
+            
+            float decayTime = wave.Envelope.DecayTime;
+            if (ImGui.SliderFloat($"Decay Time##decayTime{i}", ref decayTime, 0f, 5f))
+            {
+                wave.Envelope.DecayTime = decayTime;
+            }
+            
+            float sustainLevel = wave.Envelope.SustainLevel;
+            if (ImGui.SliderFloat($"Sustain level##sustainLevel{i}", ref sustainLevel, 0f, 1f))
+            {
+                wave.Envelope.SustainLevel = sustainLevel;
+            }
+            
+            float releaseTime = wave.Envelope.ReleaseTime;
+            if (ImGui.SliderFloat($"Release time##releaseTime{i}", ref releaseTime, 0f, 5f))
+            {
+                wave.Envelope.ReleaseTime = releaseTime;
+            }
+            
             ImGui.Separator();
             ImGui.PopID();
+            
+            ImGui.Spacing();
+            ImGui.Spacing();
+            ImGui.Spacing();
         }
         
         // Remove wave if requested
@@ -571,27 +602,30 @@ public class Synthesizer
         // Add wave and play buttons in a row
         ImGui.BeginGroup();
         
-        if (ImGui.Button("Add Wave", new Vector2(100, 40)))
+        if (ImGui.Button(_isPlaying ? "Note Off" : "Note On", new Vector2(70, 20)))
         {
-            // Clone the last wave's settings for the new wave
-            _waves.Add(_waves[^1].Clone());
-            wavesChanged = true;
+            if (!_isPlaying)
+            {
+                // Start playing and trigger Note On
+                _isPlaying = true;
+                _waveOut.Play();
+                _synth.NoteOn();
+            }
+            else
+            {
+                // Trigger Note Off but keep audio device running
+                _isPlaying = false;
+                _synth.NoteOff();
+            }
         }
         
         ImGui.SameLine();
         
-        if (ImGui.Button(_isPlaying ? "Stop" : "Play", new Vector2(100, 40)))
+        if (ImGui.Button("Add Wave", new Vector2(70, 20)))
         {
-            _isPlaying = !_isPlaying;
-            
-            if (_isPlaying)
-            {
-                _waveOut.Play();
-            }
-            else
-            {
-                _waveOut.Stop();
-            }
+            // Clone the last wave's settings for the new wave
+            _waves.Add(_waves[^1].Clone());
+            wavesChanged = true;
         }
         
         ImGui.EndGroup();
@@ -607,16 +641,24 @@ public class Synthesizer
     
     private static void UpdateSynthesizer()
     {
-        // Clear existing waves
-        for (int i = _waves.Count - 1; i >= 0; i--)
+        while (_synth.Waves.Count < _waves.Count)
         {
-            _synth.RemoveWave(i);
+            // Add any missing waves
+            int index = _synth.Waves.Count;
+            var wave = _waves[index];
+            _synth.AddWave(wave.Frequency, wave.Amplitude, wave.WaveType, wave.IsEnabled);
         }
     
-        // Add all waves from our list
-        foreach (var wave in _waves)
+        while (_synth.Waves.Count > _waves.Count)
         {
-            _synth.AddWave(wave.Frequency, wave.Amplitude, wave.WaveType, wave.IsEnabled);
+            // Remove any extra waves
+            _synth.RemoveWave(_synth.Waves.Count - 1);
+        }
+        
+        for (int i = 0; i < _waves.Count; i++)
+        {
+            var uiWave = _waves[i];
+            _synth.UpdateWave(i, uiWave.Frequency, uiWave.Amplitude, uiWave.WaveType, uiWave.IsEnabled);
         }
     }
 

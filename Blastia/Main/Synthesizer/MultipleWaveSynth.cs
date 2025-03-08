@@ -47,8 +47,6 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
             sample += GenerateWaveSample(_phase * wave.Frequency / 440f, wave.Amplitude, wave.WaveType);
         }
         
-        // TODO: Normalize checkbox
-
         return sample;
     }
 
@@ -95,6 +93,9 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
                 float sample = 0f;
                 sample += GenerateWaveSample(_wavePhases[waveIndex], wave.Amplitude, wave.WaveType);
                 
+                float envelopeValue = wave.Envelope.Process();
+                sample *= envelopeValue;
+                
                 buffer[offset + i] += sample;
                 
                 _wavePhases[waveIndex] += Math.PI * 2 * wave.Frequency / _sampleRate;
@@ -107,5 +108,21 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
         }
 
         return count;
+    }
+    
+    public void NoteOn()
+    {
+        foreach (var wave in Waves.Where(w => w.IsEnabled))
+        {
+            wave.Envelope.NoteOn();
+        }
+    }
+
+    public void NoteOff()
+    {
+        foreach (var wave in Waves.Where(w => w.IsEnabled))
+        {
+            wave.Envelope.NoteOff();
+        }
     }
 }
