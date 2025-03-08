@@ -13,14 +13,14 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
     
     public void AddWave(float frequency, float amplitude, WaveType type, bool isEnabled)
     {
-        var newData = new WaveData(frequency, amplitude, type)
+        var newData = new WaveData(frequency, amplitude, type, new EnvelopeGenerator())
         {
             IsEnabled = isEnabled
         };
         Waves.Add(newData);
     }
     
-    public void UpdateWave(int index, float frequency, float amplitude, WaveType type, bool isEnabled)
+    public void UpdateWave(int index, float frequency, float amplitude, WaveType type, bool isEnabled, EnvelopeGenerator envelope)
     {
         if (index < 0 || index >= Waves.Count) return;
         
@@ -28,6 +28,7 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
         Waves[index].Amplitude = amplitude;
         Waves[index].WaveType = type;
         Waves[index].IsEnabled = isEnabled;
+        Waves[index].Envelope = envelope;
     }
 
     public void RemoveWave(int index)

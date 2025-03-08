@@ -32,6 +32,7 @@ public class Synthesizer
     private static uint _time;
     private static IntPtr _fontTexture;
     private static double _timeWindow = 0.015; // 15ms window to visualize
+    private static bool _showAdsrHelp;
 
     public static void Launch(string[] args)
     {
@@ -446,7 +447,7 @@ public class Synthesizer
         // add initial wave
         if (_waves.Count == 0)
         {
-            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType));
+            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType, new EnvelopeGenerator()));
         }
 
         UpdateSynthesizer();
@@ -502,11 +503,10 @@ public class Synthesizer
         ImGui.Dummy(new Vector2(0, height));
         ImGui.Separator();
             
-            // Wave list and controls
         if (_waves.Count == 0)
         {
             // Add initial wave if none exist
-            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType));
+            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType, new EnvelopeGenerator()));
         }
         
         bool wavesChanged = false;
@@ -561,28 +561,50 @@ public class Synthesizer
             ImGui.Spacing();
             
             ImGui.Text("ADSR (Envelope)");
+            ImGui.SameLine();
+            if (ImGui.Button("?##ADSRHelp"))
+            {
+                _showAdsrHelp = true;
+            }
+
+            if (_showAdsrHelp)
+            {
+                ImGui.SetNextWindowPos(ImGui.GetMousePos(), ImGuiCond.Appearing);
+                ImGui.SetWindowSize(new Vector2(500, 400));
+
+                if (ImGui.Begin("ADSR Help", ref _showAdsrHelp,
+                        ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
+                {
+                    RenderAdsrHelpContent();
+                }
+            }
+            
             float attackTime = wave.Envelope.AttackTime;
-            if (ImGui.SliderFloat($"Attack time##attackTime{i}", ref attackTime, 0f, 5f))
+            if (ImGui.SliderFloat($"Attack time##attackTime{i}", ref attackTime, 0f, 10f))
             {
                 wave.Envelope.AttackTime = attackTime;
+                wavesChanged = true;
             }
             
             float decayTime = wave.Envelope.DecayTime;
-            if (ImGui.SliderFloat($"Decay Time##decayTime{i}", ref decayTime, 0f, 5f))
+            if (ImGui.SliderFloat($"Decay time##decayTime{i}", ref decayTime, 0f, 10f))
             {
                 wave.Envelope.DecayTime = decayTime;
+                wavesChanged = true;
             }
             
             float sustainLevel = wave.Envelope.SustainLevel;
             if (ImGui.SliderFloat($"Sustain level##sustainLevel{i}", ref sustainLevel, 0f, 1f))
             {
                 wave.Envelope.SustainLevel = sustainLevel;
+                wavesChanged = true;
             }
             
             float releaseTime = wave.Envelope.ReleaseTime;
-            if (ImGui.SliderFloat($"Release time##releaseTime{i}", ref releaseTime, 0f, 5f))
+            if (ImGui.SliderFloat($"Release time##releaseTime{i}", ref releaseTime, 0f, 10f))
             {
                 wave.Envelope.ReleaseTime = releaseTime;
+                wavesChanged = true;
             }
             
             ImGui.Separator();
@@ -638,6 +660,18 @@ public class Synthesizer
         
         ImGui.End();
     }
+
+    private static void RenderAdsrHelpContent()
+    {
+        ImGui.Text("ADSR Help");
+
+        if (ImGui.Button("Close", new Vector2(70, 20)))
+        {
+            _showAdsrHelp = false;
+        }
+                    
+        ImGui.End();
+    }
     
     private static void UpdateSynthesizer()
     {
@@ -658,7 +692,7 @@ public class Synthesizer
         for (int i = 0; i < _waves.Count; i++)
         {
             var uiWave = _waves[i];
-            _synth.UpdateWave(i, uiWave.Frequency, uiWave.Amplitude, uiWave.WaveType, uiWave.IsEnabled);
+            _synth.UpdateWave(i, uiWave.Frequency, uiWave.Amplitude, uiWave.WaveType, uiWave.IsEnabled, uiWave.Envelope);
         }
     }
 
