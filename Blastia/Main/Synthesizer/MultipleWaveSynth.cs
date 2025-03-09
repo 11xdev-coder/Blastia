@@ -10,17 +10,18 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
     private Dictionary<int, double> _wavePhases = [];
 
     public WaveFormat WaveFormat => WaveFormat.CreateIeeeFloatWaveFormat((int)_sampleRate, 1);
+    public bool UseAntiAliasing { get; set; } = true;
     
     public void AddWave(float frequency, float amplitude, WaveType type, bool isEnabled)
     {
-        var newData = new WaveData(frequency, amplitude, type, new EnvelopeGenerator())
+        var newData = new WaveData(frequency, amplitude, type, new EnvelopeGenerator(), new Filter())
         {
             IsEnabled = isEnabled
         };
         Waves.Add(newData);
     }
     
-    public void UpdateWave(int index, float frequency, float amplitude, WaveType type, bool isEnabled, EnvelopeGenerator envelope)
+    public void UpdateWave(int index, float frequency, float amplitude, WaveType type, bool isEnabled, EnvelopeGenerator envelope, Filter filter)
     {
         if (index < 0 || index >= Waves.Count) return;
         
@@ -29,8 +30,9 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
         Waves[index].WaveType = type;
         Waves[index].IsEnabled = isEnabled;
         Waves[index].Envelope = envelope;
+        Waves[index].Filter = filter;
     }
-
+    
     public void RemoveWave(int index)
     {
         if (index < 0 || index >= Waves.Count) return;
@@ -38,38 +40,75 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
         Waves.RemoveAt(index);
     }
 
-    public float GenerateSample()
+    public float GenerateWaveSample(double phase, float frequency, float amplitude, WaveType type)
     {
-        float sample = 0f;
+        phase %= (Math.PI * 2);
+        float t = (float) (phase / (Math.PI * 2));
+        float result = 0;
+        float dt = 1 / _sampleRate; // normalized sample period
         
-        // sum all enabled waves
-        foreach (WaveData wave in Waves.Where(d => d.IsEnabled))
-        {
-            sample += GenerateWaveSample(_phase * wave.Frequency / 440f, wave.Amplitude, wave.WaveType);
-        }
-        
-        return sample;
-    }
-
-    public float GenerateWaveSample(double phase, float amplitude, WaveType type)
-    {
         switch (type)
         {
             case WaveType.Sine:
                 return (float)(Math.Sin(phase) * amplitude);
                 
             case WaveType.Square:
-                return (float)(Math.Sign(Math.Sin(phase)) * amplitude);
+                // basic square wave
+                result = t < 0.5f ? 1f : -1f;
+
+                if (UseAntiAliasing)
+                {
+                    // apply PolyBLEP anti-aliasing
+                    if (t < dt) // apply smoothing at rising edge (0.0)
+                    {
+                        result -= PolyBlep(t / dt);
+                    }
+                    else if (t > 0.5f && t < 0.5f + dt) // else apply smoothing at falling edge (0.5)
+                    {
+                        result += PolyBlep((t - 0.5f) / dt);
+                    }
+                }
+                return result * amplitude;
                 
             case WaveType.Triangle:
-                return (float)(Math.Asin(Math.Sin(phase)) * (2 / Math.PI) * amplitude);
+                result = t < 0.5f ? 
+                    (float)(4.0 * t - 1.0) : 
+                    (float)(3.0 - 4.0 * t);
+                
+                return result * amplitude;
                 
             case WaveType.Sawtooth:
-                return (float)((2 * (phase / (2 * Math.PI) - Math.Floor(phase / (2 * Math.PI) + 0.5))) * amplitude);
+                result = (float) (2 * (t - Math.Floor(t + 0.5f)));
+
+                if (UseAntiAliasing)
+                {
+                    if (t < dt) // apply smoothing at wrap point
+                    {
+                        result += PolyBlep(t / dt);
+                    }
+                    else if (t > 1 - dt)
+                    {
+                        result += PolyBlep((t - 1) / dt);
+                    }
+                }
+                return result * amplitude;
                 
             default:
                 return 0f;
         }
+    }
+
+    private float PolyBlep(float t)
+    {
+        if (t < 0) return 0;
+        if (t > 1) return 0;
+
+        if (t < 0.5f)
+        {
+            return 2 * t * t;
+        }
+
+        return 1 - 2 * (1 - t) * (1 - t);
     }
 
     public int Read(float[] buffer, int offset, int count)
@@ -92,10 +131,11 @@ public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
             for (int i = 0; i < count; i++)
             {
                 float sample = 0f;
-                sample += GenerateWaveSample(_wavePhases[waveIndex], wave.Amplitude, wave.WaveType);
+                sample += GenerateWaveSample(_wavePhases[waveIndex], wave.Frequency, wave.Amplitude, wave.WaveType);
                 
                 float envelopeValue = wave.Envelope.Process();
                 sample *= envelopeValue;
+                sample = wave.Filter.Process(sample);
                 
                 buffer[offset + i] += sample;
                 

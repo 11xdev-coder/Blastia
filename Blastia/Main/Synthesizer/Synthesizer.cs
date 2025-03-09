@@ -32,7 +32,12 @@ public class Synthesizer
     private static uint _time;
     private static IntPtr _fontTexture;
     private static double _timeWindow = 0.015; // 15ms window to visualize
+    
     private static bool _showAdsrHelp;
+    private static int _selectedAdsrWaveIndex;
+
+    private const int WINDOW_WIDTH = 1920;
+    private const int WINDOW_HEIGHT = 1080;
 
     public static void Launch(string[] args)
     {
@@ -43,7 +48,7 @@ public class Synthesizer
         }
         
         // create window
-        _window = SDL.SDL_CreateWindow("Blastia Synthesizer", SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,  800, 600, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
+        _window = SDL.SDL_CreateWindow("Blastia Synthesizer", SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,  WINDOW_WIDTH, WINDOW_HEIGHT, SDL.SDL_WindowFlags.SDL_WINDOW_SHOWN);
         if (_window == IntPtr.Zero)
         {
             Console.WriteLine($"Error creating SDL window: {SDL.SDL_GetError()}");
@@ -447,7 +452,7 @@ public class Synthesizer
         // add initial wave
         if (_waves.Count == 0)
         {
-            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType, new EnvelopeGenerator()));
+            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType, new EnvelopeGenerator(), new Filter()));
         }
 
         UpdateSynthesizer();
@@ -459,7 +464,7 @@ public class Synthesizer
     private static void RenderUI()
     {
         ImGui.SetNextWindowPos(new Vector2(0, 0));
-        ImGui.SetNextWindowSize(new Vector2(800, 600));
+        ImGui.SetNextWindowSize(new Vector2(WINDOW_WIDTH, WINDOW_HEIGHT));
         ImGui.Begin("Synthesizer Controls", 
             ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | 
             ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar);
@@ -506,7 +511,7 @@ public class Synthesizer
         if (_waves.Count == 0)
         {
             // Add initial wave if none exist
-            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType, new EnvelopeGenerator()));
+            _waves.Add(new WaveData(_frequency, _amplitude, (WaveType)_currentWaveType, new EnvelopeGenerator(), new Filter()));
         }
         
         bool wavesChanged = false;
@@ -558,25 +563,12 @@ public class Synthesizer
                 wavesChanged = true;
             }
             
-            ImGui.Spacing();
-            
-            ImGui.Text("ADSR (Envelope)");
+            ImGui.BulletText("ADSR (Envelope)");
             ImGui.SameLine();
-            if (ImGui.Button("?##ADSRHelp"))
+            if (ImGui.Button("?##ADSRHelp", new Vector2(17, 17)))
             {
-                _showAdsrHelp = true;
-            }
-
-            if (_showAdsrHelp)
-            {
-                ImGui.SetNextWindowPos(ImGui.GetMousePos(), ImGuiCond.Appearing);
-                ImGui.SetWindowSize(new Vector2(500, 400));
-
-                if (ImGui.Begin("ADSR Help", ref _showAdsrHelp,
-                        ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
-                {
-                    RenderAdsrHelpContent();
-                }
+                _showAdsrHelp = !_showAdsrHelp;
+                _selectedAdsrWaveIndex = i;
             }
             
             float attackTime = wave.Envelope.AttackTime;
@@ -607,12 +599,46 @@ public class Synthesizer
                 wavesChanged = true;
             }
             
+            ImGui.BulletText("Filter");
+            float cutoff = wave.Filter.Cutoff;
+            if (ImGui.SliderFloat($"Cutoff##cutoff{i}", ref cutoff, 20f, 20000f))
+            {
+                wave.Filter.Cutoff = cutoff;
+                wavesChanged = true;
+            }
+            
+            float resonance = wave.Filter.Resonance;
+            if (ImGui.SliderFloat($"Resonance##resonance{i}", ref resonance, 0.01f, 0.99f))
+            {
+                wave.Filter.Resonance = resonance;
+                wavesChanged = true;
+            }
+            
+            int filterType = (int)wave.Filter.Type;
+            if (ImGui.Combo($"Type##filterType{i}", ref filterType, Filter.FilterTypes, Filter.FilterTypes.Length))
+            {
+                wave.Filter.Type = (FilterType) filterType;
+                wavesChanged = true;
+            }
+            
             ImGui.Separator();
             ImGui.PopID();
             
             ImGui.Spacing();
             ImGui.Spacing();
             ImGui.Spacing();
+        }
+        
+        if (_showAdsrHelp)
+        {
+            ImGui.SetNextWindowPos(ImGui.GetMousePos(), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(500, 400));
+
+            if (ImGui.Begin("ADSR Help", ref _showAdsrHelp,
+                    ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                RenderAdsrHelpContent();
+            }
         }
         
         // Remove wave if requested
@@ -643,7 +669,7 @@ public class Synthesizer
         
         ImGui.SameLine();
         
-        if (ImGui.Button("Add Wave", new Vector2(70, 20)))
+        if (ImGui.Button("Add wave", new Vector2(70, 20)))
         {
             // Clone the last wave's settings for the new wave
             _waves.Add(_waves[^1].Clone());
@@ -651,6 +677,12 @@ public class Synthesizer
         }
         
         ImGui.EndGroup();
+
+        bool useAntiAliasing = _synth.UseAntiAliasing;
+        if (ImGui.Checkbox("Use anti-aliasing", ref useAntiAliasing))
+        {
+            _synth.UseAntiAliasing = useAntiAliasing;
+        }
         
         // Update synth if any parameters changed
         if (wavesChanged)
@@ -663,14 +695,94 @@ public class Synthesizer
 
     private static void RenderAdsrHelpContent()
     {
-        ImGui.Text("ADSR Help");
+        ImGui.Text($"ADSR Help (selected wave index: {_selectedAdsrWaveIndex})");
+        ImGui.Separator();
 
+        if (ImGui.CollapsingHeader("ADSR"))
+        {
+            ImGui.TextWrapped("ADSR - Attack, Decay, Sustain, Release");
+            ImGui.Bullet(); ImGui.TextWrapped("Attack -> How quickly sound rises from 0 to max volume");
+            ImGui.Bullet(); ImGui.TextWrapped("Decay -> How quickly sound falls from max volume to sustain level");
+            ImGui.Bullet(); ImGui.TextWrapped("Sustain -> Volume level maintained while note is held");
+            ImGui.Bullet(); ImGui.TextWrapped("Release -> Fade out time");
+        }
+
+        if (ImGui.CollapsingHeader("Sound presets"))
+        {
+            if (ImGui.BeginTable("presetTable", 5, ImGuiTableFlags.Borders))
+            {
+                ImGui.TableSetupColumn("Preset");
+                ImGui.TableSetupColumn("Attack");
+                ImGui.TableSetupColumn("Decay");
+                ImGui.TableSetupColumn("Sustain");
+                ImGui.TableSetupColumn("Release");
+                ImGui.TableHeadersRow();
+                
+                RenderAdsrPresetRow("Plucked string", 0.005f, 0.1f, 0.0f, 0.1f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Piano", 0.01f, 0.2f, 0.5f, 0.5f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Organ", 0.02f, 0.0f, 1.0f, 0.05f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Pad/Strings", 0.5f, 0.5f, 0.8f, 1f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Brass", 0.1f, 0.1f, 0.8f, 0.2f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Percussive", 0.001f, 0.2f, 0f, 0.01f, _selectedAdsrWaveIndex);
+                
+                ImGui.EndTable();
+            }
+        }
+        
+        if (ImGui.CollapsingHeader("Mood presets"))
+        {
+            if (ImGui.BeginTable("moodTable", 5, ImGuiTableFlags.Borders))
+            {
+                ImGui.TableSetupColumn("Mood");
+                ImGui.TableSetupColumn("Attack");
+                ImGui.TableSetupColumn("Decay");
+                ImGui.TableSetupColumn("Sustain");
+                ImGui.TableSetupColumn("Release");
+                ImGui.TableHeadersRow();
+                
+                RenderAdsrPresetRow("Happy/Upbeat", 0.01f, 0.1f, 0.7f, 0.2f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Sad", 0.15f, 0.4f, 0.5f, 1f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Tense", 0.005f, 0.05f, 0.9f, 0.1f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Mysterious", 0.3f, 0.5f, 0.6f, 0.8f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Aggressive", 0.001f, 0.1f, 0.8f, 0.05f, _selectedAdsrWaveIndex);
+                RenderAdsrPresetRow("Ambient", 0.8f, 1f, 0.7f, 2f, _selectedAdsrWaveIndex);
+                
+                ImGui.EndTable();
+            }
+        }
+        
         if (ImGui.Button("Close", new Vector2(70, 20)))
         {
             _showAdsrHelp = false;
         }
                     
         ImGui.End();
+    }
+
+    private static void RenderAdsrPresetRow(string name, float attack, float decay, float sustain, float release, int waveIndex)
+    {
+        ImGui.TableNextRow();
+        
+        ImGui.TableNextColumn();
+        if (ImGui.Button($"Apply##{name}"))
+        {
+            _waves[waveIndex].Envelope.AttackTime = attack;
+            _waves[waveIndex].Envelope.DecayTime = decay;
+            _waves[waveIndex].Envelope.SustainLevel = sustain;
+            _waves[waveIndex].Envelope.ReleaseTime = release;
+            UpdateSynthesizer();
+        }
+        ImGui.SameLine();
+        ImGui.Text(name);
+        
+        ImGui.TableNextColumn();
+        ImGui.Text($"{attack:F3}");
+        ImGui.TableNextColumn();
+        ImGui.Text($"{decay:F3}");
+        ImGui.TableNextColumn();
+        ImGui.Text($"{sustain:F3}");
+        ImGui.TableNextColumn();
+        ImGui.Text($"{release:F3}");
     }
     
     private static void UpdateSynthesizer()
@@ -692,7 +804,7 @@ public class Synthesizer
         for (int i = 0; i < _waves.Count; i++)
         {
             var uiWave = _waves[i];
-            _synth.UpdateWave(i, uiWave.Frequency, uiWave.Amplitude, uiWave.WaveType, uiWave.IsEnabled, uiWave.Envelope);
+            _synth.UpdateWave(i, uiWave.Frequency, uiWave.Amplitude, uiWave.WaveType, uiWave.IsEnabled, uiWave.Envelope, uiWave.Filter);
         }
     }
 
@@ -718,7 +830,7 @@ public class Synthesizer
                 // Calculate phase based on frequency and time
                 double phase = 2 * Math.PI * wave.Frequency * timePosition;
                 
-                sample += _synth.GenerateWaveSample(phase, wave.Amplitude, wave.WaveType);
+                sample += _synth.GenerateWaveSample(phase, wave.Frequency, wave.Amplitude, wave.WaveType);
             }
             
             _waveFormPoints[i] = sample;
