@@ -35,6 +35,9 @@ public class Synthesizer
     
     private static bool _showAdsrHelp;
     private static int _selectedAdsrWaveIndex;
+    
+    private static bool _showFilterHelp;
+    private static int _selectedFilterWaveIndex;
 
     private const int WINDOW_WIDTH = 1920;
     private const int WINDOW_HEIGHT = 1080;
@@ -600,6 +603,13 @@ public class Synthesizer
             }
             
             ImGui.BulletText("Filter");
+            ImGui.SameLine();
+            if (ImGui.Button("?##FilterHelp", new Vector2(17, 17)))
+            {
+                _showFilterHelp = !_showFilterHelp;
+                _selectedFilterWaveIndex = i;
+            }
+            
             float cutoff = wave.Filter.Cutoff;
             if (ImGui.SliderFloat($"Cutoff##cutoff{i}", ref cutoff, 20f, 20000f))
             {
@@ -632,12 +642,24 @@ public class Synthesizer
         if (_showAdsrHelp)
         {
             ImGui.SetNextWindowPos(ImGui.GetMousePos(), ImGuiCond.Appearing);
-            ImGui.SetNextWindowSize(new Vector2(500, 400));
+            ImGui.SetNextWindowSize(new Vector2(600, 500));
 
             if (ImGui.Begin("ADSR Help", ref _showAdsrHelp,
                     ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
             {
                 RenderAdsrHelpContent();
+            }
+        }
+        
+        if (_showFilterHelp)
+        {
+            ImGui.SetNextWindowPos(ImGui.GetMousePos(), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(600, 500));
+
+            if (ImGui.Begin("Filter Help", ref _showFilterHelp,
+                    ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.AlwaysAutoResize))
+            {
+                RenderFilterHelpContent();
             }
         }
         
@@ -783,6 +805,92 @@ public class Synthesizer
         ImGui.Text($"{sustain:F3}");
         ImGui.TableNextColumn();
         ImGui.Text($"{release:F3}");
+    }
+    
+    private static void RenderFilterHelpContent()
+    {
+        ImGui.Text($"Filter Help (selected wave index: {_selectedFilterWaveIndex})");
+        ImGui.Separator();
+
+        if (ImGui.CollapsingHeader("Cutoff"))
+        {
+            ImGui.Bullet(); ImGui.TextWrapped("LowPass: only frequencies below Cutoff pass through");
+            ImGui.Bullet(); ImGui.TextWrapped("HighPass: only frequencies above Cutoff pass through");
+            ImGui.Bullet(); ImGui.TextWrapped("BandPass: only frequencies near Cutoff pass through");
+            ImGui.Bullet(); ImGui.TextWrapped("Notch: frequencies near Cutoff are removed");
+        }
+
+        if (ImGui.CollapsingHeader("Sound presets"))
+        {
+            if (ImGui.BeginTable("filterPresetTable", 4, ImGuiTableFlags.Borders))
+            {
+                ImGui.TableSetupColumn("Preset");
+                ImGui.TableSetupColumn("Cutoff");
+                ImGui.TableSetupColumn("Resonance");
+                ImGui.TableSetupColumn("Type");
+                ImGui.TableHeadersRow();
+                
+                RenderFilterPresetRow("Plucked string", 3000, 0.3f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Piano", 5000, 0.1f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Organ", 2500, 0.6f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Pad/Strings", 2000, 0.2f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Brass", 1500, 0.7f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Percussive", 1000, 0.5f, FilterType.BandPass, _selectedFilterWaveIndex);
+                
+                ImGui.EndTable();
+            }
+        }
+        
+        if (ImGui.CollapsingHeader("Mood presets"))
+        {
+            if (ImGui.BeginTable("filterMoodTable", 4, ImGuiTableFlags.Borders))
+            {
+                ImGui.TableSetupColumn("Mood");
+                ImGui.TableSetupColumn("Cutoff");
+                ImGui.TableSetupColumn("Resonance");
+                ImGui.TableSetupColumn("Type");
+                ImGui.TableHeadersRow();
+                
+                RenderFilterPresetRow("Happy/Upbeat", 5000, 0.2f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Sad", 1000, 0.1f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Tense", 500, 0.8f, FilterType.HighPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Mysterious", 800, 0.6f, FilterType.BandPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Aggressive", 3000, 0.9f, FilterType.LowPass, _selectedFilterWaveIndex);
+                RenderFilterPresetRow("Ambient", 1200, 0.3f, FilterType.LowPass, _selectedFilterWaveIndex);
+                
+                ImGui.EndTable();
+            }
+        }
+        
+        if (ImGui.Button("Close", new Vector2(70, 20)))
+        {
+            _showFilterHelp = false;
+        }
+                    
+        ImGui.End();
+    }
+
+    private static void RenderFilterPresetRow(string name, float cutoff, float resonance, FilterType type, int waveIndex)
+    {
+        ImGui.TableNextRow();
+        
+        ImGui.TableNextColumn();
+        if (ImGui.Button($"Apply##{name}"))
+        {
+            _waves[waveIndex].Filter.Cutoff = cutoff;
+            _waves[waveIndex].Filter.Resonance = resonance;
+            _waves[waveIndex].Filter.Type = type;
+            UpdateSynthesizer();
+        }
+        ImGui.SameLine();
+        ImGui.Text(name);
+        
+        ImGui.TableNextColumn();
+        ImGui.Text($"{cutoff:F3}");
+        ImGui.TableNextColumn();
+        ImGui.Text($"{resonance:F3}");
+        ImGui.TableNextColumn();
+        ImGui.Text($"{type}");
     }
     
     private static void UpdateSynthesizer()

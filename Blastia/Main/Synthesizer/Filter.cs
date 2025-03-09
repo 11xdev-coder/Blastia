@@ -120,6 +120,7 @@ public class Filter
         _a1 /= a0;
         _a2 /= a0;
     }
+    
 
     public float Process(float input)
     {

@@ -7,19 +7,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Filter.cs" afterDir="false" />
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="anti-aliasing + filters">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/MultipleWaveSynth.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/MultipleWaveSynth.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Filter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Filter.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Synthesizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Synthesizer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/WaveData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/WaveData.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
@@ -172,7 +169,7 @@
       <workItem from="1741272374986" duration="1797000" />
       <workItem from="1741357299359" duration="18165000" />
       <workItem from="1741426330137" duration="27635000" />
-      <workItem from="1741510822928" duration="4253000" />
+      <workItem from="1741510822928" duration="8475000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -438,7 +435,15 @@
       <option name="project" value="LOCAL" />
       <updated>1741456714778</updated>
     </task>
-    <option name="localTasksCounter" value="34" />
+    <task id="LOCAL-00034" summary="anti-aliasing + filters">
+      <option name="closed" value="true" />
+      <created>1741515444567</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1741515444567</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -448,7 +453,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="button caching" />
     <MESSAGE value="TabGroup button scaling" />
     <MESSAGE value="selected tab y offset" />
     <MESSAGE value="menu refactor" />
@@ -473,6 +477,7 @@
     <MESSAGE value="multiple waves" />
     <MESSAGE value="ADSR" />
     <MESSAGE value="ADSR bug fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="ADSR bug fix" />
+    <MESSAGE value="anti-aliasing + filters" />
+    <option name="LAST_COMMIT_MESSAGE" value="anti-aliasing + filters" />
   </component>
 </project>
