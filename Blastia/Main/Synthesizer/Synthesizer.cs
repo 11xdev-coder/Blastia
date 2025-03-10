@@ -89,7 +89,7 @@ public class Synthesizer
         InitializeAudio();
 
         // Main loop
-        _time = (uint)SDL.SDL_GetTicks();
+        _time = SDL.SDL_GetTicks();
         bool running = true;
         while (running)
         {
@@ -107,7 +107,7 @@ public class Synthesizer
             NewFrame();
             
             // Render UI
-            RenderUI();
+            RenderUi();
             
             // Render
             ImGui.Render();
@@ -123,8 +123,15 @@ public class Synthesizer
         }
         
         // Cleanup
-        _waveOut?.Stop();
-        _waveOut?.Dispose();
+        Cleanup();
+    }
+
+    private static void Cleanup()
+    {
+        AiMusicGenerator.Cleanup();
+        
+        _waveOut.Stop();
+        _waveOut.Dispose();
         
         if (_fontTexture != IntPtr.Zero)
         {
@@ -450,6 +457,8 @@ public class Synthesizer
 
     private static void InitializeAudio()
     {
+        AiMusicGenerator.Initialize();
+        
         _synth = new MultipleWaveSynth();
         
         // add initial wave
@@ -464,7 +473,17 @@ public class Synthesizer
         _waveOut.Init(_synth);
     }
 
-    private static void RenderUI()
+    private static void RenderUi()
+    {
+        RenderAiUi();
+    }
+
+    private static void RenderAiUi()
+    {
+        AiMusicGenerator.RenderUi();
+    }
+    
+    private static void RenderUiNormal()
     {
         ImGui.SetNextWindowPos(new Vector2(0, 0));
         ImGui.SetNextWindowSize(new Vector2(WINDOW_WIDTH, WINDOW_HEIGHT));
