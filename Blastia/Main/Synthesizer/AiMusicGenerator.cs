@@ -1,6 +1,10 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
+using System.Text;
 using NAudio.Midi;
 using ImGuiNET;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Blastia.Main.Synthesizer
 {
@@ -9,11 +13,8 @@ namespace Blastia.Main.Synthesizer
         private static Random _rng = new();
         private static MusicTrack? _currentTrack;
         private static List<MusicTrack> _savedTracks = [];
-        private static MidiOut? _midiOut;
         private static bool _isPlaying;
-        private static Timer? _sequencerTimer;
-        private static int _currentStep;
-        private static int _currentBar;
+        private static bool _isLooping;
         private static DateTime _generationStart;
         private static float _generationProgress;
 
@@ -34,219 +35,232 @@ namespace Blastia.Main.Synthesizer
         private static bool _includeDelay = true;
         private static bool _isGeneratingTrack;
         private static string _currentStatusMessage = "";
+        private static string _exportStatus = "Not exporting";
 
-        public static void Initialize()
+        // Main Synthesizer sync
+        private static Func<List<WaveData>>? _wavesFactory;
+        private static Action? _updateSynthesizerAction;
+        
+        // Synth provider
+        private static WaveOutEvent? _waveOut;
+        private static StreamingSynthesizer? _synth;
+        private static bool _isInitialized;
+        
+        public static void Initialize(Func<List<WaveData>>? wavesFactory, Action? updateSynthesizerAction)
         {
             // Initialize MIDI output for preview
-            InitializeMidi();
+            _wavesFactory = wavesFactory;
+            _updateSynthesizerAction = updateSynthesizerAction;
+
+            InitializeAudioSystem();
         }
 
-        private static void InitializeMidi()
+        public static void RenderUi(ref bool show)
         {
-            try
+            if (!show) return;
+            
+            ImGui.SetNextWindowSize(new Vector2(1200, 1000));
+            ImGui.SetNextWindowPos(new Vector2(0, 0), ImGuiCond.Appearing);
+
+            if (ImGui.Begin("AI", ref show, ImGuiWindowFlags.NoCollapse))
             {
-                if (MidiOut.NumberOfDevices > 0)
+                if (ImGui.CollapsingHeader("AI Music Generator"))
                 {
-                    _midiOut = new MidiOut(0);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error initializing MIDI: {ex.Message}");
-            }
-        }
+                    ImGui.Text("Generate complete music tracks in piano style");
+                    ImGui.Separator();
 
-        public static void RenderUi()
-        {
-            if (ImGui.CollapsingHeader("AI Music Generator"))
-            {
-                ImGui.Text("Generate complete music tracks in electronic/synth style");
-                ImGui.Separator();
-
-                // Style selection
-                if (ImGui.Combo("Style", ref _selectedStyle, _trackStyles, _trackStyles.Length))
-                {
-                    // Adjust defaults based on style
-                    switch (_selectedStyle)
+                    // Style selection
+                    if (ImGui.Combo("Style", ref _selectedStyle, _trackStyles, _trackStyles.Length))
                     {
-                        case 0: // Industrial
-                            _tempo = 110;
-                            _complexity = 0.7f;
-                            _intensity = 0.8f;
-                            _includeArpeggios = true;
-                            _includePads = false;
-                            _includeGlitch = true;
-                            break;
-                        case 1: // Ambient
-                            _tempo = 90;
-                            _complexity = 0.5f;
-                            _intensity = 0.4f;
-                            _includeArpeggios = true;
-                            _includePads = true;
-                            _includeGlitch = false;
-                            break;
-                        case 2: // Combat
-                            _tempo = 125;
-                            _complexity = 0.8f;
-                            _intensity = 1.0f;
-                            _includeArpeggios = true;
-                            _includePads = false;
-                            _includeGlitch = true;
-                            break;
-                        case 3: // Exploration
-                            _tempo = 100;
-                            _complexity = 0.6f;
-                            _intensity = 0.5f;
-                            _includeArpeggios = true;
-                            _includePads = true;
-                            _includeGlitch = false;
-                            break;
-                        case 4: // Tense
-                            _tempo = 105;
-                            _complexity = 0.9f;
-                            _intensity = 0.7f;
-                            _includeArpeggios = true;
-                            _includePads = true;
-                            _includeGlitch = true;
-                            break;
-                    }
-                }
-
-                // Generation parameters
-                ImGui.SliderInt("Tempo", ref _tempo, 70, 140);
-                ImGui.SliderInt("Length (bars)", ref _trackLength, 8, 32);
-                ImGui.SliderFloat("Complexity", ref _complexity, 0.1f, 1.0f);
-                ImGui.SliderFloat("Intensity", ref _intensity, 0.1f, 1.0f);
-
-                // Track element toggles
-                ImGui.Text("Track Elements:");
-                ImGui.Checkbox("Bass", ref _includeBass); ImGui.SameLine();
-                ImGui.Checkbox("Percussion", ref _includePercussion); ImGui.SameLine();
-                ImGui.Checkbox("Arpeggios", ref _includeArpeggios);
-                ImGui.Checkbox("Pads", ref _includePads); ImGui.SameLine();
-                ImGui.Checkbox("Lead", ref _includeLead); ImGui.SameLine();
-                ImGui.Checkbox("Glitch Effects", ref _includeGlitch);
-
-                // Effects
-                ImGui.Text("Effects:");
-                ImGui.Checkbox("Reverb", ref _includeReverb); ImGui.SameLine();
-                ImGui.Checkbox("Delay", ref _includeDelay);
-
-                ImGui.Separator();
-
-                // Generate button
-                if (!_isGeneratingTrack)
-                {
-                    if (ImGui.Button("Generate Track", new Vector2(150, 30)))
-                    {
-                        StartTrackGeneration();
-                    }
-
-                    ImGui.SameLine();
-
-                    if (_currentTrack != null)
-                    {
-                        if (!_isPlaying)
+                        // Adjust defaults based on style
+                        switch (_selectedStyle)
                         {
-                            if (ImGui.Button("Play Track", new Vector2(120, 30)))
-                            {
-                                StartPlayback();
-                            }
+                            case 0: // Industrial
+                                _tempo = 110;
+                                _complexity = 0.7f;
+                                _intensity = 0.8f;
+                                _includeArpeggios = true;
+                                _includePads = false;
+                                _includeGlitch = true;
+                                break;
+                            case 1: // Ambient
+                                _tempo = 90;
+                                _complexity = 0.5f;
+                                _intensity = 0.4f;
+                                _includeArpeggios = true;
+                                _includePads = true;
+                                _includeGlitch = false;
+                                break;
+                            case 2: // Combat
+                                _tempo = 125;
+                                _complexity = 0.8f;
+                                _intensity = 1.0f;
+                                _includeArpeggios = true;
+                                _includePads = false;
+                                _includeGlitch = true;
+                                break;
+                            case 3: // Exploration
+                                _tempo = 100;
+                                _complexity = 0.6f;
+                                _intensity = 0.5f;
+                                _includeArpeggios = true;
+                                _includePads = true;
+                                _includeGlitch = false;
+                                break;
+                            case 4: // Tense
+                                _tempo = 105;
+                                _complexity = 0.9f;
+                                _intensity = 0.7f;
+                                _includeArpeggios = true;
+                                _includePads = true;
+                                _includeGlitch = true;
+                                break;
                         }
-                        else
+                    }
+
+                    // Generation parameters
+                    ImGui.SliderInt("Tempo", ref _tempo, 40, 140);
+                    ImGui.SliderInt("Length (bars)", ref _trackLength, 8, 32);
+                    ImGui.SliderFloat("Complexity", ref _complexity, 0.1f, 1.0f);
+                    ImGui.SliderFloat("Intensity", ref _intensity, 0.1f, 1.0f);
+
+                    // Track element toggles
+                    ImGui.Text("Track Elements:");
+                    ImGui.Checkbox("Bass", ref _includeBass); ImGui.SameLine();
+                    ImGui.Checkbox("Percussion", ref _includePercussion); ImGui.SameLine();
+                    ImGui.Checkbox("Arpeggios", ref _includeArpeggios);
+                    ImGui.Checkbox("Pads", ref _includePads); ImGui.SameLine();
+                    ImGui.Checkbox("Lead", ref _includeLead); ImGui.SameLine();
+                    ImGui.Checkbox("Glitch Effects", ref _includeGlitch);
+
+                    // Effects
+                    ImGui.Text("Effects:");
+                    ImGui.Checkbox("Reverb", ref _includeReverb); ImGui.SameLine();
+                    ImGui.Checkbox("Delay", ref _includeDelay);
+
+                    ImGui.Separator();
+
+                    // Generate button
+                    if (!_isGeneratingTrack)
+                    {
+                        if (ImGui.Button("Generate Track", new Vector2(150, 30)))
                         {
-                            if (ImGui.Button("Stop", new Vector2(120, 30)))
-                            {
-                                StopPlayback();
-                            }
+                            StartTrackGeneration();
                         }
 
                         ImGui.SameLine();
-                        
-                        // TODO: Apply to Synth
-                        // if (ImGui.Button("Apply to Synth", new Vector2(120, 30)))
-                        // {
-                        //     ApplyToSynth();
-                        // }
-                    }
-                }
-                else
-                {
-                    // Show progress
-                    ImGui.Button("Generating...", new Vector2(150, 30));
-                    ImGui.ProgressBar(_generationProgress, new Vector2(-1, 0));
-                    ImGui.Text(_currentStatusMessage);
-                }
 
-                ImGui.Separator();
-
-                // Display current track info
-                if (_currentTrack != null)
-                {
-                    ImGui.Text($"Current Track: {_currentTrack.Name}");
-                    ImGui.Text($"Style: {_trackStyles[_currentTrack.Style]}, Tempo: {_currentTrack.Tempo}, {_currentTrack.BarCount} bars");
-                    
-                    // Show parts
-                    ImGui.Text("Parts:");
-                    foreach (var part in _currentTrack.Parts)
-                    {
-                        ImGui.BulletText($"{part.Type}: {part.Notes.Count} notes, {part.Patterns.Count} patterns");
-                    }
-
-                    // Track visualization
-                    RenderTrackVisualization();
-                }
-
-                ImGui.Separator();
-
-                // Saved tracks
-                if (_savedTracks.Count > 0)
-                {
-                    ImGui.Text("Saved Tracks:");
-                    if (ImGui.BeginTable("savedTracks", 3, ImGuiTableFlags.Borders))
-                    {
-                        ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
-                        ImGui.TableSetupColumn("Style", ImGuiTableColumnFlags.WidthFixed, 100);
-                        ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 200);
-                        ImGui.TableHeadersRow();
-
-                        for (int i = 0; i < _savedTracks.Count; i++)
+                        if (_currentTrack != null)
                         {
-                            var track = _savedTracks[i];
-                            
-                            ImGui.TableNextRow();
-                            ImGui.TableNextColumn();
-                            ImGui.Text(track.Name);
-                            
-                            ImGui.TableNextColumn();
-                            ImGui.Text(_trackStyles[track.Style]);
-                            
-                            ImGui.TableNextColumn();
-                            if (ImGui.Button($"Load##load{i}", new Vector2(60, 20)))
+                            if (!_isPlaying)
                             {
-                                _currentTrack = track;
+                                if (ImGui.Button("Play Track", new Vector2(120, 30)))
+                                {
+                                    StartPlayback();
+                                }
+                            }
+                            else
+                            {
+                                if (ImGui.Button("Stop", new Vector2(120, 30)))
+                                {
+                                    StopPlayback();
+                                }
+                            }
+
+                            ImGui.SameLine();
+
+                            var isLooping = _isLooping;
+                            if (ImGui.Checkbox("Is Looping", ref isLooping))
+                            {
+                                _isLooping = isLooping;
                             }
                             
-                            ImGui.SameLine();
-                            
-                            // TODO: Fix exporting
-                            // if (ImGui.Button($"Export##export{i}", new Vector2(60, 20)))
+                            // if (ImGui.Button("Apply to Synth", new Vector2(120, 30)))
                             // {
-                            //     ExportTrackToMidi(track);
+                            //     ApplyToSynth();
                             // }
-                            
-                            ImGui.SameLine();
-                            
-                            if (ImGui.Button($"Delete##delete{i}", new Vector2(60, 20)))
-                            {
-                                _savedTracks.RemoveAt(i);
-                                i--;
-                            }
+                        }
+                    }
+                    else
+                    {
+                        // Show progress
+                        ImGui.Button("Generating...", new Vector2(150, 30));
+                        ImGui.ProgressBar(_generationProgress, new Vector2(-1, 0));
+                        ImGui.Text(_currentStatusMessage);
+                    }
+
+                    ImGui.Separator();
+
+                    // Display current track info
+                    if (_currentTrack != null)
+                    {
+                        ImGui.Text($"Current Track: {_currentTrack.Name}");
+                        ImGui.Text($"Style: {_trackStyles[_currentTrack.Style]}, Tempo: {_currentTrack.Tempo}, {_currentTrack.BarCount} bars");
+                        
+                        // Show parts
+                        ImGui.Text("Parts:");
+                        foreach (var part in _currentTrack.Parts)
+                        {
+                            ImGui.BulletText($"{part.Type}: {part.Notes.Count} notes, {part.Patterns.Count} patterns");
                         }
 
-                        ImGui.EndTable();
+                        // Track visualization
+                        RenderTrackVisualization();
+                    }
+
+                    ImGui.Separator();
+
+                    // Saved tracks
+                    if (_savedTracks.Count > 0)
+                    {
+                        ImGui.Text(_exportStatus);
+                        ImGui.Text("Saved Tracks:");
+                        if (ImGui.BeginTable("savedTracks", 3, ImGuiTableFlags.Borders))
+                        {
+                            ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch);
+                            ImGui.TableSetupColumn("Style", ImGuiTableColumnFlags.WidthFixed, 100);
+                            ImGui.TableSetupColumn("Actions", ImGuiTableColumnFlags.WidthFixed, 200);
+                            ImGui.TableHeadersRow();
+
+                            for (int i = 0; i < _savedTracks.Count; i++)
+                            {
+                                var track = _savedTracks[i];
+                                
+                                ImGui.TableNextRow();
+                                ImGui.TableNextColumn();
+                                ImGui.Text(track.Name);
+                                
+                                ImGui.TableNextColumn();
+                                ImGui.Text(_trackStyles[track.Style]);
+                                
+                                ImGui.TableNextColumn();
+                                if (ImGui.Button($"Load##load{i}", new Vector2(60, 20)))
+                                {
+                                    _currentTrack = track;
+                                }
+                                
+                                ImGui.SameLine();
+                                
+                                if (ImGui.Button($"Export##export{i}", new Vector2(60, 20)))
+                                {
+                                    ExportTrackToAudio(track);
+                                }
+                                
+                                ImGui.SameLine();
+                                
+                                if (ImGui.Button($"Delete##delete{i}", new Vector2(60, 20)))
+                                {
+                                    _savedTracks.RemoveAt(i);
+                                    i--;
+                                }
+                            }
+
+                            ImGui.EndTable();
+                        }
                     }
                 }
+                
+                ImGui.End();
             }
         }
 
@@ -258,7 +272,7 @@ namespace Blastia.Main.Synthesizer
             _generationStart = DateTime.Now;
 
             // Start generation in a separate thread
-            System.Threading.ThreadPool.QueueUserWorkItem(state =>
+            ThreadPool.QueueUserWorkItem(state =>
             {
                 try
                 {
@@ -3245,140 +3259,76 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
+        private static void InitializeAudioSystem()
+        {
+            if (_isInitialized) return;
+
+            _waveOut = new WaveOutEvent();
+            _synth = new StreamingSynthesizer();
+            _waveOut.Init(_synth);
+
+            _isInitialized = true;
+        }
+        
         private static void StartPlayback()
         {
             if (_currentTrack == null) return;
-            
-            // Stop any current playback
-            StopPlayback();
-            
-            // Initialize MIDI output if needed
-            if (_midiOut == null)
-            {
-                try
-                {
-                    if (MidiOut.NumberOfDevices > 0)
-                    {
-                        _midiOut = new MidiOut(0);
-                    }
-                    else
-                    {
-                        _currentStatusMessage = "No MIDI output devices available";
-                        return;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _currentStatusMessage = $"MIDI error: {ex.Message}";
-                    return;
-                }
-            }
-            
-            // Set track parameters
-            _currentStep = 0;
-            _currentBar = 0;
-            _isPlaying = true;
-            
-            // Calculate time per step based on tempo
-            double millisPerBeat = 60000.0 / _currentTrack.Tempo;
-            double millisPerStep = millisPerBeat / 4; // 16th notes
-            
-            // Start the sequencer timer
-            _sequencerTimer = new Timer(PlaybackCallback, null, 0, (int)millisPerStep);
-        }
 
-        private static void PlaybackCallback(object? state)
-        {
-            if (!_isPlaying || _currentTrack == null) return;
-            
-            // Play all notes that start on this step
-            int stepsPerBar = 16;
-            int absoluteStep = _currentBar * stepsPerBar + _currentStep;
-            
-            foreach (var part in _currentTrack.Parts)
-            {
-                foreach (var note in part.Notes)
-                {
-                    if (note.StartStep == absoluteStep)
-                    {
-                        // Note On
-                        if (_midiOut != null)
-                        {
-                            try
-                            {
-                                _midiOut.Send(MidiMessage.StartNote(note.Note, note.Velocity, note.Channel).RawData);
-                                
-                                // Schedule note off
-                                int noteDuration = Math.Max(1, note.Duration);
-                                Timer? noteOffTimer = null;
-                                noteOffTimer = new Timer(
-                                    _ =>
-                                    {
-                                        try
-                                        {
-                                            _midiOut.Send(MidiMessage.StopNote(note.Note, 0, note.Channel).RawData);
-                                        }
-                                        catch
-                                        {
-                                            // ignored
-                                        }
+            // Ensure any previous playback is stopped
+            StopPlayback(true);
 
-                                        noteOffTimer?.Dispose();
-                                    },
-                                    null,
-                                    (int)(noteDuration * (60000.0 / _currentTrack.Tempo / 4)),
-                                    Timeout.Infinite
-                                );
-                            }
-                            catch
-                            {
-                                // ignored
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Move to next step
-            _currentStep++;
-            if (_currentStep >= stepsPerBar)
+            try
             {
-                _currentStep = 0;
-                _currentBar++;
+                _synth = new StreamingSynthesizer();
+                _synth.LoadTrack(_currentTrack, _isLooping);
                 
-                // Loop back if we reach the end
-                if (_currentBar >= _currentTrack.BarCount)
-                {
-                    _currentBar = 0;
-                }
+                _waveOut = new WaveOutEvent();
+                _waveOut.Init(_synth);
+                
+                _waveOut.Play();
+                _isPlaying = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error starting playback: {ex.Message}");
+                StopPlayback(true);
             }
         }
 
-        private static void StopPlayback()
+        private static void StopPlayback(bool fullCleanup = false)
         {
-            if (!_isPlaying) return;
+            if (!_isPlaying && !fullCleanup) return;
             
-            // Stop the timer
-            _sequencerTimer?.Dispose();
-            _sequencerTimer = null;
-            
-            // Send all notes off message
-            if (_midiOut != null)
+            try
             {
-                for (int channel = 0; channel < 16; channel++)
+                _isPlaying = false;
+                
+                if (_waveOut != null)
                 {
                     try
                     {
-                        _midiOut.Send(new ControlChangeEvent(0, channel, MidiController.AllNotesOff, 0).GetAsShortMessage());
+                        _waveOut.Stop();
+                        
+                        if (fullCleanup)
+                        {
+                            _waveOut.Dispose();
+                            _waveOut = null;
+                            _synth = null;
+                        }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // ignored
+                        Console.WriteLine($"Error stopping audio: {ex.Message}");
+                        _waveOut = null;
+                        _synth = null;
                     }
                 }
+                
             }
-            
-            _isPlaying = false;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in StopPlayback: {ex.Message}");
+            }
         }
 
         private static void ApplyToSynth()
@@ -3404,49 +3354,50 @@ namespace Blastia.Main.Synthesizer
             if (part == null || part.SynthParams == null) return;
             
             // Update the synth with the generated parameters
-            // UpdateSynthesizerWithPart(part); // TODO: Apply to Synth
+            UpdateSynthesizerWithPart(part);
         }
 
-        // private static void UpdateSynthesizerWithPart(TrackPart part)
-        // {
-        //     // Clear current waves
-        //     _waves.Clear();
-        //     
-        //     // Add oscillators from the part
-        //     foreach (var osc in part.SynthParams.Oscillators)
-        //     {
-        //         // Create a new wave for each oscillator
-        //         var wave = new WaveData(
-        //             440.0f, // Default frequency
-        //             osc.Amplitude,
-        //             osc.WaveType,
-        //             new EnvelopeGenerator
-        //             {
-        //                 AttackTime = osc.Envelope.AttackTime,
-        //                 DecayTime = osc.Envelope.DecayTime,
-        //                 SustainLevel = osc.Envelope.SustainLevel,
-        //                 ReleaseTime = osc.Envelope.ReleaseTime
-        //             },
-        //             new Filter
-        //             {
-        //                 Cutoff = osc.Filter.Cutoff,
-        //                 Resonance = osc.Filter.Resonance,
-        //                 Type = osc.Filter.Type
-        //             }
-        //         )
-        //         {
-        //             IsEnabled = osc.IsEnabled
-        //         };
-        //         
-        //         _waves.Add(wave);
-        //     }
-        //     
-        //     // Update the synth
-        //     UpdateSynthesizer();
-        //     
-        //     // Set status message
-        //     _currentStatusMessage = $"Applied {part.Type} to synthesizer";
-        // }
+        private static void UpdateSynthesizerWithPart(TrackPart part)
+        {
+            // Clear current waves
+            var waves = _wavesFactory?.Invoke();
+            waves?.Clear();
+            
+            // Add oscillators from the part
+            foreach (var osc in part.SynthParams.Oscillators)
+            {
+                // Create a new wave for each oscillator
+                var wave = new WaveData(
+                    440.0f, // Default frequency
+                    osc.Amplitude,
+                    osc.WaveType,
+                    new EnvelopeGenerator
+                    {
+                        AttackTime = osc.Envelope.AttackTime,
+                        DecayTime = osc.Envelope.DecayTime,
+                        SustainLevel = osc.Envelope.SustainLevel,
+                        ReleaseTime = osc.Envelope.ReleaseTime
+                    },
+                    new Filter
+                    {
+                        Cutoff = osc.Filter.Cutoff,
+                        Resonance = osc.Filter.Resonance,
+                        Type = osc.Filter.Type
+                    }
+                )
+                {
+                    IsEnabled = osc.IsEnabled
+                };
+                
+                waves?.Add(wave);
+            }
+            
+            // Update the synth
+            _updateSynthesizerAction?.Invoke();
+            
+            // Set status message
+            _currentStatusMessage = $"Applied {part.Type} to synthesizer";
+        }
 
         private static void RenderTrackVisualization()
         {
@@ -3562,9 +3513,9 @@ namespace Blastia.Main.Synthesizer
             }
             
             // Draw playback position
-            if (_isPlaying)
+            if (_isPlaying && _synth != null)
             {
-                float playbackX = startPos.X + (_currentBar + _currentStep / 16.0f) * barWidth;
+                float playbackX = startPos.X + (_synth.CurrentBar + _synth.CurrentStep / 16.0f) * barWidth;
                 
                 drawList.AddLine(
                     new Vector2(playbackX, startPos.Y),
@@ -3574,93 +3525,182 @@ namespace Blastia.Main.Synthesizer
                 );
             }
         }
+        
+        private static void ExportTrackToAudio(MusicTrack track, string format = "mp3")
+        {
+            if (track == null) return;
+            
+            string outputPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "Blastia AI", 
+                $"{track.Name}.{format}");
+                
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+            
+            // Create an in-memory audio renderer
+            WaveFormat waveFormat = new WaveFormat(44100, 16, 2);
+            string tempWavPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".wav");
+            _exportStatus = "Exporting Temp .wav file";
+            
+            using (var fileStream = new FileStream(tempWavPath, FileMode.Create))
+            {
+                RenderAudioToStream(track, fileStream, waveFormat);
+            }
 
-        // TODO: Fix export errors
-        // private static void ExportTrackToMidi(MusicTrack track)
-        // {
-        //     // Create a MIDI file from the track
-        //     MidiFile midiFile = new MidiFile();
-        //     
-        //     // Add a track for each part
-        //     foreach (var part in track.Parts)
-        //     {
-        //         MidiTrack midiTrack = new MidiTrack();
-        //         
-        //         // Add track name
-        //         midiTrack.Events.Add(new TextEvent($"{part.Type}", MetaEventType.SequenceTrackName, 0));
-        //         
-        //         // Set tempo
-        //         midiTrack.Events.Add(new TempoEvent(Convert.ToInt32(60000000 / track.Tempo), 0));
-        //         
-        //         // Set instrument
-        //         if (part.Type != TrackPartType.Percussion) // Skip for percussion (channel 10)
-        //         {
-        //             midiTrack.Events.Add(new ProgramChangeEvent(0, part.Channel, part.Program));
-        //         }
-        //         
-        //         // Add notes
-        //         foreach (var note in part.Notes)
-        //         {
-        //             // Note on - absolute timing
-        //             int absoluteTicks = note.StartStep * 120; // 120 ticks per 16th note
-        //             midiTrack.Events.Add(new NoteOnEvent(absoluteTicks, part.Channel, note.Note, note.Velocity));
-        //             
-        //             // Note off
-        //             int duration = Math.Max(1, note.Duration) * 120; // 120 ticks per 16th note
-        //             midiTrack.Events.Add(new NoteOffEvent(absoluteTicks + duration, part.Channel, note.Note, 0));
-        //         }
-        //         
-        //         // Add track to file
-        //         midiFile.Tracks.Add(midiTrack);
-        //     }
-        //     
-        //     // Sort events by time
-        //     foreach (var track in midiFile.Tracks)
-        //     {
-        //         track.Events.Sort((a, b) => a.AbsoluteTicks.CompareTo(b.AbsoluteTicks));
-        //     }
-        //     
-        //     // Save to file
-        //     try
-        //     {
-        //         string documentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        //         string exportFolder = Path.Combine(documentsFolder, "DRG Music Generator");
-        //         
-        //         // Create directory if it doesn't exist
-        //         if (!Directory.Exists(exportFolder))
-        //         {
-        //             Directory.CreateDirectory(exportFolder);
-        //         }
-        //         
-        //         string filename = $"{track.Name}.mid";
-        //         string filePath = Path.Combine(exportFolder, filename);
-        //         
-        //         midiFile.Save(filePath);
-        //         
-        //         _currentStatusMessage = $"Exported to {filePath}";
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _currentStatusMessage = $"Export error: {ex.Message}";
-        //     }
-        // }
+            _exportStatus = $"Converting to .{format}";
 
+            if (format.ToLower() == "wav")
+            {
+                File.Copy(tempWavPath, outputPath, true);
+            }
+            else
+            {
+                using (var reader = new AudioFileReader(tempWavPath))
+                {
+                    if (format.ToLower() == "mp3")
+                    {
+                        MediaFoundationEncoder.EncodeToMp3(reader, outputPath);
+                    }
+                    else if (format.ToLower() == "ogg")
+                    {
+                        MediaFoundationEncoder.EncodeToWma(reader, outputPath);
+                    }
+                }
+            }
+            
+            _exportStatus = $"Exported to {outputPath}";
+        }
+
+        private static void RenderAudioToStream(MusicTrack track, FileStream fileStream, WaveFormat waveFormat)
+        {
+            using (var writer = new WaveFileWriter(fileStream, waveFormat))
+            {
+                // Set up a sample generator - this replaces the MIDI system
+                var exportNotes = new List<StreamingSynthesizer.ActiveNote>();
+                var exportLock = new object();
+                //var synthProvider = new SynthesizerSampleProvider(waveFormat, exportNotes, exportLock);
+                // TODO:
+                
+                // Pre-calculate note timing and store in a dictionary for quick access
+                Dictionary<int, List<NoteEvent>> noteEvents = new Dictionary<int, List<NoteEvent>>();
+                double samplesPerStep = waveFormat.SampleRate * (60.0 / track.Tempo / 4.0);
+                
+                foreach (var part in track.Parts)
+                {
+                    foreach (var note in part.Notes)
+                    {
+                        int startSample = (int)(note.StartStep * samplesPerStep);
+                        int duration = (int)(note.Duration * samplesPerStep);
+                        
+                        if (!noteEvents.ContainsKey(startSample))
+                            noteEvents[startSample] = new List<NoteEvent>();
+                            
+                        noteEvents[startSample].Add(new NoteEvent { 
+                            Note = note.Note,
+                            Velocity = note.Velocity / 127.0f,
+                            Duration = duration,
+                            Channel = part.Channel,
+                            Program = part.Program
+                        });
+                    }
+                }
+                
+                // Calculate total samples needed
+                int totalSteps = track.BarCount * 16; // 16 steps per bar
+                int totalSamples = (int)(totalSteps * samplesPerStep);
+
+                float[] sampleBuffer = new float[waveFormat.SampleRate / 10]; // 100ms buffer
+                byte[] byteBuffer = new byte[sampleBuffer.Length * waveFormat.BlockAlign];
+
+                _exportStatus = "Rendering audio";
+                
+                // process audio in chunks
+                for (int currentSample = 0; currentSample < totalSamples; currentSample += sampleBuffer.Length)
+                {
+                    // start new notes for each chunk
+                    for (int s = 0; s < sampleBuffer.Length; s++)
+                    {
+                        int absoluteSample = currentSample + s;
+
+                        if (noteEvents.ContainsKey(absoluteSample))
+                        {
+                            foreach (var noteEvent in noteEvents[absoluteSample])
+                            {
+                                lock (exportLock)
+                                {
+                                    exportNotes.Add(new StreamingSynthesizer.ActiveNote
+                                    {
+                                        Frequency = MidiNoteToFrequency(noteEvent.Note),
+                                        Amplitude = noteEvent.Velocity,
+                                        Duration = noteEvent.Duration,
+                                        SamplesPlayed = 0,
+                                        Program = noteEvent.Program
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    
+                    // read from synthesizer
+                    //synthProvider.Read(sampleBuffer, 0, sampleBuffer.Length);
+                    
+                    // convert to bytes
+                    for (int i = 0; i < sampleBuffer.Length; i++)
+                    {
+                        short sampleValue = (short)(sampleBuffer[i] * short.MaxValue);
+                        
+                        // for stereo -> copy to both channels
+                        int bufferIndex = i * waveFormat.BlockAlign;
+                        byteBuffer[bufferIndex] = (byte)(sampleValue & 0xFF);
+                        byteBuffer[bufferIndex + 1] = (byte)(sampleValue >> 8);
+
+                        if (waveFormat.Channels == 2)
+                        {
+                            byteBuffer[bufferIndex + 2] = byteBuffer[bufferIndex];
+                            byteBuffer[bufferIndex + 3] = byteBuffer[bufferIndex + 1];
+                        }
+                    }
+                    
+                    // write
+                    writer.Write(byteBuffer, 0, byteBuffer.Length);
+                    
+                    // update progress
+                    if (currentSample % (waveFormat.SampleRate * 2) == 0)
+                    {
+                        _exportStatus = $"Rendering audio: {currentSample * 100 / totalSamples}%";
+                    }
+                }
+                
+                writer.Flush();
+                _exportStatus = "Finalizing audio file";
+            }
+        }
+
+        // Helper methods
+        private static float MidiNoteToFrequency(int midiNote)
+        {
+            return 440.0f * (float)Math.Pow(2, (midiNote - 69) / 12.0);
+        }
+        
         public static void Cleanup()
         {
             StopPlayback();
             
-            if (_midiOut != null)
+            if (_waveOut != null)
             {
-                _midiOut.Dispose();
-                _midiOut = null;
-            }
-            
-            if (_sequencerTimer != null)
-            {
-                _sequencerTimer.Dispose();
-                _sequencerTimer = null;
+                _waveOut.Dispose();
+                _waveOut = null;
             }
         }
+    }
+    
+    public struct NoteEvent
+    {
+        public int Note;
+        public float Velocity;
+        public int Duration;
+        public int Channel;
+        public int Program;
     }
 
     // Music data structures

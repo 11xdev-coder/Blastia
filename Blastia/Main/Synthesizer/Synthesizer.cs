@@ -39,6 +39,8 @@ public class Synthesizer
     private static bool _showFilterHelp;
     private static int _selectedFilterWaveIndex;
 
+    private static bool _showAi;
+
     private const int WINDOW_WIDTH = 1920;
     private const int WINDOW_HEIGHT = 1080;
 
@@ -457,7 +459,7 @@ public class Synthesizer
 
     private static void InitializeAudio()
     {
-        AiMusicGenerator.Initialize();
+        AiMusicGenerator.Initialize(() => _waves, UpdateSynthesizer);
         
         _synth = new MultipleWaveSynth();
         
@@ -475,12 +477,13 @@ public class Synthesizer
 
     private static void RenderUi()
     {
+        RenderUiNormal();
         RenderAiUi();
     }
 
     private static void RenderAiUi()
     {
-        AiMusicGenerator.RenderUi();
+        AiMusicGenerator.RenderUi(ref _showAi);
     }
     
     private static void RenderUiNormal()
@@ -492,6 +495,11 @@ public class Synthesizer
             ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoTitleBar);
         
         ImGui.Text("Waveform Visual");
+        ImGui.SameLine();
+        if (ImGui.Button("AI"))
+        {
+            _showAi = !_showAi;
+        }
         
         // Draw waveform visualization placeholder
         float width = ImGui.GetContentRegionAvail().X;
