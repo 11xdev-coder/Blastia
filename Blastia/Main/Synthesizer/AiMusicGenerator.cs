@@ -19,7 +19,7 @@ namespace Blastia.Main.Synthesizer
         private static float _generationProgress;
 
         // Generation parameters
-        private static readonly string[] _trackStyles = { "Industrial", "Ambient", "Combat", "Exploration", "Tense" };
+        private static readonly string[] TrackStyles = ["Industrial", "Ambient", "Combat", "Exploration", "Tense"];
         private static int _selectedStyle;
         private static int _tempo = 110;
         private static int _trackLength = 16; // bars
@@ -42,6 +42,9 @@ namespace Blastia.Main.Synthesizer
         private static Action? _updateSynthesizerAction;
         
         // Synth provider
+        private static int _selectedSynth;
+        private static readonly string[] SynthStyles = ["Default", "Electronic"];
+        
         private static WaveOutEvent? _waveOut;
         private static StreamingSynthesizer? _synth;
         private static bool _isInitialized;
@@ -66,11 +69,11 @@ namespace Blastia.Main.Synthesizer
             {
                 if (ImGui.CollapsingHeader("AI Music Generator"))
                 {
-                    ImGui.Text("Generate complete music tracks in piano style");
+                    ImGui.Text("Generate complete music tracks");
                     ImGui.Separator();
 
                     // Style selection
-                    if (ImGui.Combo("Style", ref _selectedStyle, _trackStyles, _trackStyles.Length))
+                    if (ImGui.Combo("Style", ref _selectedStyle, TrackStyles, TrackStyles.Length))
                     {
                         // Adjust defaults based on style
                         switch (_selectedStyle)
@@ -137,6 +140,14 @@ namespace Blastia.Main.Synthesizer
                     ImGui.Text("Effects:");
                     ImGui.Checkbox("Reverb", ref _includeReverb); ImGui.SameLine();
                     ImGui.Checkbox("Delay", ref _includeDelay);
+                    
+                    // synthesizer
+                    if (ImGui.Combo("Synthesizer Style", ref _selectedSynth, SynthStyles, SynthStyles.Length))
+                    {
+                        if (_synth == null) return;
+                        
+                        _synth.CurrentStyle = (Style) _selectedSynth;
+                    }
 
                     ImGui.Separator();
 
@@ -195,7 +206,7 @@ namespace Blastia.Main.Synthesizer
                     if (_currentTrack != null)
                     {
                         ImGui.Text($"Current Track: {_currentTrack.Name}");
-                        ImGui.Text($"Style: {_trackStyles[_currentTrack.Style]}, Tempo: {_currentTrack.Tempo}, {_currentTrack.BarCount} bars");
+                        ImGui.Text($"Style: {TrackStyles[_currentTrack.Style]}, Tempo: {_currentTrack.Tempo}, {_currentTrack.BarCount} bars");
                         
                         // Show parts
                         ImGui.Text("Parts:");
@@ -231,7 +242,7 @@ namespace Blastia.Main.Synthesizer
                                 ImGui.Text(track.Name);
                                 
                                 ImGui.TableNextColumn();
-                                ImGui.Text(_trackStyles[track.Style]);
+                                ImGui.Text(TrackStyles[track.Style]);
                                 
                                 ImGui.TableNextColumn();
                                 if (ImGui.Button($"Load##load{i}", new Vector2(60, 20)))
@@ -297,16 +308,15 @@ namespace Blastia.Main.Synthesizer
             // Create new track
             MusicTrack track = new MusicTrack
             {
-                Name = $"{_trackStyles[_selectedStyle]} Track {DateTime.Now.ToString("yyyyMMdd-HHmmss")}",
+                Name = $"{TrackStyles[_selectedStyle]} Track {DateTime.Now.ToString("yyyyMMdd-HHmmss")}",
                 Style = _selectedStyle,
                 Tempo = _tempo,
                 BarCount = _trackLength
             };
 
-            // Select key and scale - DRG often uses minor keys
             UpdateStatus("Selecting musical key...", 0.1f);
             track.Key = _rng.Next(12); // 0 = C, 1 = C#, etc.
-            track.IsMinor = _rng.NextDouble() < 0.8; // 80% chance of minor key for DRG style
+            track.IsMinor = _rng.NextDouble() < 0.8;
 
             // Generate chord progression
             UpdateStatus("Generating chord progression...", 0.15f);
@@ -375,7 +385,6 @@ namespace Blastia.Main.Synthesizer
 
         private static void GenerateChordProgression(MusicTrack track)
         {
-            // DRG-style chord progressions often use minor keys and interesting variations
             List<int[]> chordProgression = [];
             
             // Determine scale degrees based on key type
@@ -384,7 +393,6 @@ namespace Blastia.Main.Synthesizer
             
             int[] scaleDegrees = track.IsMinor ? minorScaleDegrees : majorScaleDegrees;
             
-            // Define some common DRG-style chord progressions (as scale degree sequences)
             List<int[]> progressionTemplates = [];
             
             if (track.IsMinor)
@@ -450,7 +458,6 @@ namespace Blastia.Main.Synthesizer
                 Program = 38 // Synth Bass 1
             };
             
-            // DRG-style bass lines are often driving, repetitive, and heavy
             int patternLength = 4; // bars
             
             // Calculate steps per bar (16th notes)
@@ -476,7 +483,6 @@ namespace Blastia.Main.Synthesizer
                 basePattern.Durations[i] = 0;
             }
             
-            // Create DRG-style bass rhythm
             for (int bar = 0; bar < patternLength; bar++)
             {
                 int chordIndex = (bar / track.BarsPerChord) % track.ChordProgression.Count;
@@ -627,7 +633,6 @@ namespace Blastia.Main.Synthesizer
             int stepsPerBar = 16;  // 16th notes
             int totalSteps = patternLength * stepsPerBar;
             
-            // Define DRG-style percussion pattern
             PercussionPattern mainPattern = new PercussionPattern
             {
                 KickSteps = new bool[totalSteps],
@@ -697,7 +702,6 @@ namespace Blastia.Main.Synthesizer
 
         private static void GenerateIndustrialPercussion(PercussionPattern pattern, int totalSteps, int stepsPerBar)
         {
-            // DRG industrial pattern - heavy 4/4 with syncopation
             for (int step = 0; step < totalSteps; step++)
             {
                 int barStep = step % stepsPerBar;
@@ -1145,7 +1149,6 @@ namespace Blastia.Main.Synthesizer
                 patterns.Add(variation);
             }
             
-            // Add glitchy pattern for DRG style
             ArpeggioPattern glitchPattern = GenerateGlitchArpeggio(track, totalSteps, stepsPerBar);
             patterns.Add(glitchPattern);
             
@@ -1470,7 +1473,6 @@ namespace Blastia.Main.Synthesizer
             
             patterns.Add(variation);
             
-            // Create "tension" pad for DRG style
             PadPattern tensionPad = new PadPattern
             {
                 Notes = new List<int[]>(),
@@ -1651,7 +1653,6 @@ namespace Blastia.Main.Synthesizer
                 int chordIndex = (bar / track.BarsPerChord) % track.ChordProgression.Count;
                 int[] chord = track.ChordProgression[chordIndex];
                 
-                // DRG melodies often emphasize chord tones but with some dissonance
                 for (int beat = 0; beat < 4; beat++)
                 {
                     int beatStart = bar * stepsPerBar + beat * 4;
@@ -1943,7 +1944,6 @@ namespace Blastia.Main.Synthesizer
             }
             else
             {
-                // Default DRG industrial glitches
                 GenerateIndustrialGlitches(mainPattern, totalSteps, stepsPerBar);
             }
             
@@ -1998,8 +1998,6 @@ namespace Blastia.Main.Synthesizer
 
         private static void GenerateIndustrialGlitches(GlitchPattern pattern, int totalSteps, int stepsPerBar)
         {
-            // DRG industrial style glitches - rhythmic and digital
-            
             // Add rhythmic stutter effect
             int stutterStart = _rng.Next(totalSteps - 8);
             for (int i = 0; i < 4; i++)
@@ -2853,18 +2851,16 @@ namespace Blastia.Main.Synthesizer
 
         private static void GenerateBassParameters(SynthParameters parameters, MusicTrack track)
         {
-            // DRG-style bass sounds
             parameters.Oscillators.Clear();
             
             // Main oscillator
             WaveParameters main = new WaveParameters
             {
-                WaveType = _intensity > 0.7 ? WaveType.Square : WaveType.Sawtooth,
+                WaveType = WaveType.Square,
                 Amplitude = 0.8f,
                 IsEnabled = true
             };
             
-            // ADSR
             main.Envelope = new EnvelopeParameters
             {
                 AttackTime = 0.01f,
@@ -2877,58 +2873,17 @@ namespace Blastia.Main.Synthesizer
             main.Filter = new FilterParameters
             {
                 Type = FilterType.LowPass,
-                Cutoff = 500 + _intensity * 1000,
-                Resonance = 0.3f + _intensity * 0.4f
+                Cutoff = 200 + _intensity * 800, // deeper cutoff
+                Resonance = 0.3f
             };
             
-            parameters.Oscillators.Add(main);
-            
-            // Sub-oscillator for power
-            if (_intensity > 0.4)
-            {
-                WaveParameters sub = new WaveParameters
-                {
-                    WaveType = WaveType.Sine,
-                    Amplitude = 0.5f,
-                    FrequencyOffset = -12, // One octave down
-                    IsEnabled = true
-                };
-                
-                // ADSR - slower attack for sub
-                sub.Envelope = new EnvelopeParameters
-                {
-                    AttackTime = 0.05f,
-                    DecayTime = 0.3f,
-                    SustainLevel = 0.7f,
-                    ReleaseTime = 0.4f
-                };
-                
-                // Filter - darker for sub
-                sub.Filter = new FilterParameters
-                {
-                    Type = FilterType.LowPass,
-                    Cutoff = 300,
-                    Resonance = 0.1f
-                };
-                
-                parameters.Oscillators.Add(sub);
-            }
-            
-            // Effects
             parameters.Effects.Add(new EffectParameters
             {
-                Type = EffectType.Distortion,
-                Amount = 0.2f + _intensity * 0.3f
+                Type = EffectType.BitCrusher,
+                Amount = 0.15f
             });
             
-            if (_includeReverb)
-            {
-                parameters.Effects.Add(new EffectParameters
-                {
-                    Type = EffectType.Reverb,
-                    Amount = 0.1f
-                });
-            }
+            parameters.Oscillators.Add(main);
         }
 
         private static void GeneratePercussionParameters(SynthParameters parameters, MusicTrack track)
@@ -2977,7 +2932,6 @@ namespace Blastia.Main.Synthesizer
 
         private static void GenerateArpeggioParameters(SynthParameters parameters, MusicTrack track)
         {
-            // DRG arpeggios are typically bright and metallic
             parameters.Oscillators.Clear();
             
             // Main oscillator - typically square wave
@@ -2987,8 +2941,6 @@ namespace Blastia.Main.Synthesizer
                 Amplitude = 0.6f,
                 IsEnabled = true
             };
-            
-            // ADSR - quick attack and decay for arpeggio
             main.Envelope = new EnvelopeParameters
             {
                 AttackTime = 0.01f,
@@ -2996,15 +2948,12 @@ namespace Blastia.Main.Synthesizer
                 SustainLevel = 0.4f,
                 ReleaseTime = 0.1f
             };
-            
-            // Filter - brighter for arpeggio
             main.Filter = new FilterParameters
             {
-                Type = FilterType.LowPass,
-                Cutoff = 2000 + _intensity * 2000,
+                Type = FilterType.BandPass,
+                Cutoff = 3000,
                 Resonance = 0.5f
             };
-            
             parameters.Oscillators.Add(main);
             
             // Secondary oscillator for richness
@@ -3052,13 +3001,12 @@ namespace Blastia.Main.Synthesizer
 
         private static void GeneratePadParameters(SynthParameters parameters, MusicTrack track)
         {
-            // DRG pads are typically dark and atmospheric
             parameters.Oscillators.Clear();
             
             // Main oscillator
             WaveParameters main = new WaveParameters
             {
-                WaveType = track.IsMinor ? WaveType.Sawtooth : WaveType.Sine,
+                WaveType = WaveType.Sawtooth,
                 Amplitude = 0.5f,
                 IsEnabled = true
             };
@@ -3076,7 +3024,7 @@ namespace Blastia.Main.Synthesizer
             main.Filter = new FilterParameters
             {
                 Type = FilterType.LowPass,
-                Cutoff = 800 + _complexity * 700,
+                Cutoff = 400 + _complexity * 1200,
                 Resonance = 0.2f
             };
             
@@ -3121,7 +3069,6 @@ namespace Blastia.Main.Synthesizer
 
         private static void GenerateLeadParameters(SynthParameters parameters, MusicTrack track)
         {
-            // DRG leads are typically bright and cutting
             parameters.Oscillators.Clear();
             
             // Main oscillator
@@ -3129,27 +3076,32 @@ namespace Blastia.Main.Synthesizer
             {
                 WaveType = _intensity > 0.6 ? WaveType.Sawtooth : WaveType.Square,
                 Amplitude = 0.7f,
+                IsEnabled = true,
+                Envelope = new EnvelopeParameters
+                {
+                    AttackTime = 0.05f,
+                    DecayTime = 0.2f,
+                    SustainLevel = 0.6f,
+                    ReleaseTime = 0.3f
+                },
+                Filter = new FilterParameters
+                {
+                    Type = FilterType.LowPass,
+                    Cutoff = 3000 + _intensity * 2000,
+                    Resonance = 0.4f + _intensity * 0.3f
+                }
+            };
+
+            parameters.Oscillators.Add(main);
+
+            WaveParameters modulator = new WaveParameters
+            {
+                WaveType = WaveType.Square,
+                Amplitude = 0.4f,
+                FrequencyOffset = 7,
                 IsEnabled = true
             };
-            
-            // ADSR - medium attack for leads
-            main.Envelope = new EnvelopeParameters
-            {
-                AttackTime = 0.05f,
-                DecayTime = 0.2f,
-                SustainLevel = 0.6f,
-                ReleaseTime = 0.3f
-            };
-            
-            // Filter - brighter for leads
-            main.Filter = new FilterParameters
-            {
-                Type = FilterType.LowPass,
-                Cutoff = 3000 + _intensity * 2000,
-                Resonance = 0.4f + _intensity * 0.3f
-            };
-            
-            parameters.Oscillators.Add(main);
+            parameters.Oscillators.Add(modulator);
             
             // Secondary oscillator for richness
             if (_complexity > 0.4)
@@ -3206,7 +3158,6 @@ namespace Blastia.Main.Synthesizer
 
         private static void GenerateGlitchParameters(SynthParameters parameters, MusicTrack track)
         {
-            // DRG glitch effects are very digital and distorted
             parameters.Oscillators.Clear();
             
             // Main oscillator - typically noisy
@@ -3264,7 +3215,7 @@ namespace Blastia.Main.Synthesizer
             if (_isInitialized) return;
 
             _waveOut = new WaveOutEvent();
-            _synth = new StreamingSynthesizer();
+            _synth = new StreamingSynthesizer((Style) _selectedSynth);
             _waveOut.Init(_synth);
 
             _isInitialized = true;
@@ -3279,7 +3230,7 @@ namespace Blastia.Main.Synthesizer
 
             try
             {
-                _synth = new StreamingSynthesizer();
+                _synth = new StreamingSynthesizer((Style) _selectedSynth);
                 _synth.LoadTrack(_currentTrack, _isLooping);
                 
                 _waveOut = new WaveOutEvent();
@@ -3329,74 +3280,6 @@ namespace Blastia.Main.Synthesizer
             {
                 Console.WriteLine($"Error in StopPlayback: {ex.Message}");
             }
-        }
-
-        private static void ApplyToSynth()
-        {
-            if (_currentTrack == null) return;
-            
-            // Find a suitable part to apply to the synthesizer
-            TrackPart? part = null;
-            
-            if (_includeLead && _currentTrack.Parts.Any(p => p.Type == TrackPartType.Lead))
-            {
-                part = _currentTrack.Parts.First(p => p.Type == TrackPartType.Lead);
-            }
-            else if (_includeArpeggios && _currentTrack.Parts.Any(p => p.Type == TrackPartType.Arpeggio))
-            {
-                part = _currentTrack.Parts.First(p => p.Type == TrackPartType.Arpeggio);
-            }
-            else if (_includeBass && _currentTrack.Parts.Any(p => p.Type == TrackPartType.Bass))
-            {
-                part = _currentTrack.Parts.First(p => p.Type == TrackPartType.Bass);
-            }
-            
-            if (part == null || part.SynthParams == null) return;
-            
-            // Update the synth with the generated parameters
-            UpdateSynthesizerWithPart(part);
-        }
-
-        private static void UpdateSynthesizerWithPart(TrackPart part)
-        {
-            // Clear current waves
-            var waves = _wavesFactory?.Invoke();
-            waves?.Clear();
-            
-            // Add oscillators from the part
-            foreach (var osc in part.SynthParams.Oscillators)
-            {
-                // Create a new wave for each oscillator
-                var wave = new WaveData(
-                    440.0f, // Default frequency
-                    osc.Amplitude,
-                    osc.WaveType,
-                    new EnvelopeGenerator
-                    {
-                        AttackTime = osc.Envelope.AttackTime,
-                        DecayTime = osc.Envelope.DecayTime,
-                        SustainLevel = osc.Envelope.SustainLevel,
-                        ReleaseTime = osc.Envelope.ReleaseTime
-                    },
-                    new Filter
-                    {
-                        Cutoff = osc.Filter.Cutoff,
-                        Resonance = osc.Filter.Resonance,
-                        Type = osc.Filter.Type
-                    }
-                )
-                {
-                    IsEnabled = osc.IsEnabled
-                };
-                
-                waves?.Add(wave);
-            }
-            
-            // Update the synth
-            _updateSynthesizerAction?.Invoke();
-            
-            // Set status message
-            _currentStatusMessage = $"Applied {part.Type} to synthesizer";
         }
 
         private static void RenderTrackVisualization()
@@ -3575,7 +3458,7 @@ namespace Blastia.Main.Synthesizer
         {
             using (var writer = new WaveFileWriter(fileStream, waveFormat))
             {
-                var synth = new StreamingSynthesizer();
+                var synth = new StreamingSynthesizer((Style) _selectedSynth);
                 synth.LoadTrack(track);
         
                 // Calculate SAMPLES PER STEP (not frames)
@@ -3613,12 +3496,6 @@ namespace Blastia.Main.Synthesizer
                 writer.Flush();
             }
         }
-
-        // Helper methods
-        private static float MidiNoteToFrequency(int midiNote)
-        {
-            return 440.0f * (float)Math.Pow(2, (midiNote - 69) / 12.0);
-        }
         
         public static void Cleanup()
         {
@@ -3632,15 +3509,6 @@ namespace Blastia.Main.Synthesizer
         }
     }
     
-    public struct NoteEvent
-    {
-        public int Note;
-        public float Velocity;
-        public int Duration;
-        public int Channel;
-        public int Program;
-    }
-
     // Music data structures
     public class MusicTrack
     {

@@ -2,6 +2,12 @@
 
 namespace Blastia.Main.Synthesizer;
 
+public enum Style
+{
+    Default,
+    Electronic
+}
+
 public class StreamingSynthesizer : ISampleProvider
 {
     // Audio format definition
@@ -35,9 +41,16 @@ public class StreamingSynthesizer : ISampleProvider
     }
     public int StepInBar => _currentStep % _stepsPerBar;
 
-    public void SetNotes(List<ActiveNote> activeNotes)
+    private volatile Style _currentStyle;
+    public Style CurrentStyle
     {
-        _activeNotes = activeNotes;
+        get => _currentStyle;
+        set => _currentStyle = value;
+    }
+
+    public StreamingSynthesizer(Style style)
+    {
+        CurrentStyle = style;
     }
     
     public void LoadTrack(MusicTrack track, bool looping = false)
@@ -60,6 +73,15 @@ public class StreamingSynthesizer : ISampleProvider
             // Precalculate all note events by start time
             foreach (var part in track.Parts)
             {
+                // get list of OscillatorData for each part
+                var oscillators = part.SynthParams.Oscillators.Where(o => o.IsEnabled)
+                    .Select(o => new OscillatorData
+                    {
+                        WaveType = o.WaveType,
+                        Amplitude = o.Amplitude,
+                        FrequencyOffset = o.FrequencyOffset
+                    }).ToList();
+                
                 foreach (var note in part.Notes)
                 {
                     int startSample = (int)(note.StartStep * _samplesPerStep);
@@ -73,7 +95,8 @@ public class StreamingSynthesizer : ISampleProvider
                         Velocity = note.Velocity / 127.0f,
                         Duration = duration,
                         Channel = part.Channel,
-                        Program = part.Program
+                        Program = part.Program,
+                        Oscillators = oscillators
                     });
                 }
             }
@@ -90,11 +113,6 @@ public class StreamingSynthesizer : ISampleProvider
             _currentStep = 0;
             _activeNotes.Clear();
         }
-    }
-    
-    public void SetLooping(bool looping)
-    {
-        _isLooping = looping;
     }
     
     public int Read(float[] buffer, int offset, int count)
@@ -121,7 +139,8 @@ public class StreamingSynthesizer : ISampleProvider
                         Amplitude = n.Velocity,
                         Duration = n.Duration,
                         SamplesPlayed = 0,
-                        Program = n.Program
+                        Program = n.Program,
+                        Oscillators = n.Oscillators
                     }));
                 }
 
@@ -163,11 +182,87 @@ public class StreamingSynthesizer : ISampleProvider
                 Reset();
             }
             
+            Console.WriteLine(CurrentStyle);
             return framesProcessed * 2; // Return actual samples processed
         }
     }
 
     private float SynthesizeNote(ActiveNote note)
+    {
+        return CurrentStyle switch
+        {
+            Style.Default => GenerateDefaultSound(note),
+            Style.Electronic => GenerateElectronicSound(note),
+            _ => GenerateDefaultSound(note)
+        };
+    }
+    
+    private float GenerateElectronicSound(ActiveNote note)
+    {
+        float sampleSum = 0f;
+        double baseFrequency = note.Frequency;
+        
+        // More subtle filtering parameters
+        float filterState = 0f;
+        const float filterCutoff = 0.5f; // Higher cutoff (0.0-1.0)
+        const float resonance = 0.1f; // Reduced resonance
+
+        foreach (var osc in note.Oscillators)
+        {
+            double frequency = baseFrequency * Math.Pow(2, osc.FrequencyOffset / 12.0);
+            double phase = (note.SamplesPlayed * frequency) / WaveFormat.SampleRate;
+            double t = phase % 1.0;
+
+            float sample = osc.WaveType switch
+            {
+                // Less aggressive wave shaping
+                WaveType.Square => ImprovedSquareWave(t),
+                WaveType.Sawtooth => BalancedSawtoothWave(t),
+                WaveType.Triangle => CrispTriangleWave(t),
+                _ => (float)Math.Sin(2 * Math.PI * t)
+            };
+
+            // Gentler filter with resonance control
+            float filterInput = sample - filterState * resonance;
+            filterState += filterCutoff * filterInput;
+            
+            sampleSum += filterState * osc.Amplitude;
+        }
+
+        // Add subtle saturation instead of heavy filtering
+        float saturated = sampleSum / (1 + Math.Abs(sampleSum)); // Soft clipping
+        return Math.Clamp(saturated * 0.8f, -1f, 1f); // Increased output volume
+    }
+
+    // Waveform helpers with better high-frequency preservation
+    private float ImprovedSquareWave(double t)
+    {
+        // Square wave with gentle slope (5% smoothing)
+        return (float)Math.Sign(Math.Sin(2 * Math.PI * t)) * 0.95f;
+    }
+
+    private float BalancedSawtoothWave(double t)
+    {
+        // Band-limited sawtooth using polyBLEP algorithm
+        float saw = (float)(2 * t - 1);
+        float phase = (float)t % 1.0f;
+        
+        // PolyBLEP antialiasing
+        if (phase < 0.5f)
+            saw += (phase * phase * 2 - 0.5f) * 0.2f;
+        else
+            saw -= ((1 - phase) * (1 - phase) * 2 - 0.5f) * 0.2f;
+
+        return saw;
+    }
+
+    private float CrispTriangleWave(double t)
+    {
+        // Cleaner triangle wave with minimal shaping
+        return (float)(1 - 4 * Math.Abs(t - Math.Floor(t + 0.5)));
+    }
+
+    private float GenerateDefaultSound(ActiveNote note)
     {
         // Calculate phase based on frequency and samples played
         double phase = (note.SamplesPlayed * note.Frequency) / WaveFormat.SampleRate;
@@ -230,8 +325,24 @@ public class StreamingSynthesizer : ISampleProvider
     {
         return 440.0f * (float)Math.Pow(2, (midiNote - 69) / 12.0);
     }
+    
+    private struct NoteEvent
+    {
+        public int Note;
+        public float Velocity;
+        public int Duration;
+        public int Channel;
+        public int Program;
+        public List<OscillatorData> Oscillators;
+    }
+    
+    public struct OscillatorData
+    {
+        public WaveType WaveType;
+        public float Amplitude;
+        public float FrequencyOffset;
+    }
 
-    // Internal classes for note management
     public class ActiveNote
     {
         public float Frequency;
@@ -239,5 +350,6 @@ public class StreamingSynthesizer : ISampleProvider
         public int Duration;
         public int SamplesPlayed;
         public int Program;
+        public List<OscillatorData> Oscillators = [];
     }
 }

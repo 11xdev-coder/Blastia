@@ -6,7 +6,7 @@ public static class MainEntry
     public static void Main()
     {
         Synthesizer.Synthesizer.Launch([]);
-        //BlastiaGame game = new BlastiaGame();
-        //game.Run();
+        // BlastiaGame game = new BlastiaGame();
+        // game.Run();
     }
 }
