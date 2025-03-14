@@ -1,4 +1,4 @@
-﻿using NAudio.Wave;
+﻿﻿using NAudio.Wave;
 
 namespace Blastia.Main.Synthesizer;
 
@@ -17,21 +17,27 @@ public class StreamingSynthesizer : ISampleProvider
     private bool _isLooping;
     private int _totalSamples;
     private int _totalBars;
+    private double _samplesPerStep;
+    private readonly int _stepsPerBar = 16;
 
     private int _currentStep;
-    private int _currentBar;
-    private double _samplesPerStep;
-
     public int CurrentStep
     {
         get => _currentStep;
-        set => _currentStep = Math.Max(0, value);
+        set => _currentStep = value;
     }
+    private int _currentBar;
 
     public int CurrentBar
     {
         get => _currentBar;
-        set => _currentBar = Math.Max(0, value);
+        set => _currentBar = value;
+    }
+    public int StepInBar => _currentStep % _stepsPerBar;
+
+    public void SetNotes(List<ActiveNote> activeNotes)
+    {
+        _activeNotes = activeNotes;
     }
     
     public void LoadTrack(MusicTrack track, bool looping = false)
@@ -39,15 +45,17 @@ public class StreamingSynthesizer : ISampleProvider
         lock (_noteLock)
         {
             _isLooping = looping;
+            _totalBars = track.BarCount;
+
+            // calculate timing
+            double millisPerStep = 60000f / track.Tempo / 4f;
+            _samplesPerStep = millisPerStep / 1000 * WaveFormat.SampleRate;
             
             // Reset state
             _currentSample = 0;
             _currentStep = 0;
             _noteEvents.Clear();
             _activeNotes.Clear();
-            
-            // Calculate samples per step
-            _samplesPerStep = WaveFormat.SampleRate * (60.0 / track.Tempo / 4.0);
             
             // Precalculate all note events by start time
             foreach (var part in track.Parts)
@@ -67,17 +75,10 @@ public class StreamingSynthesizer : ISampleProvider
                         Channel = part.Channel,
                         Program = part.Program
                     });
-                    
-                    Console.WriteLine($"Added note: {note.Note}");
                 }
             }
             
-            // Calculate total sample length
-            int totalSteps = track.BarCount * 16; // 16 steps per bar
-            _totalSamples = (int)(totalSteps * _samplesPerStep);
-            _totalBars = track.BarCount;
-            
-            Console.WriteLine($"Track loaded: {_noteEvents.Count} note events, {_totalSamples} total samples");
+            _totalSamples = (int)(_totalBars * _stepsPerBar * _samplesPerStep);
         }
     }
     
@@ -88,7 +89,6 @@ public class StreamingSynthesizer : ISampleProvider
             _currentSample = 0;
             _currentStep = 0;
             _activeNotes.Clear();
-            Console.WriteLine("Playback reset to beginning");
         }
     }
     
@@ -100,15 +100,17 @@ public class StreamingSynthesizer : ISampleProvider
     public int Read(float[] buffer, int offset, int count)
     {
         Array.Clear(buffer, offset, count);
-    
+
         lock (_noteLock)
         {
             if (_currentSample >= _totalSamples && _isLooping) Reset();
-            
-            // process each sample
-            for (int i = 0; i < count; i++)
+
+            int framesProcessed = 0;
+            int frameCount = count / 2;
+
+            while (framesProcessed < frameCount && _currentSample < _totalSamples)
             {
-                int absoluteSample = _currentSample + i;
+                int absoluteSample = _currentSample + framesProcessed;
 
                 // Add new notes
                 if (_noteEvents.TryGetValue(absoluteSample, out var events))
@@ -130,35 +132,38 @@ public class StreamingSynthesizer : ISampleProvider
                     var note = _activeNotes[noteIndex];
                     note.SamplesPlayed++;
 
-                    if (note.SamplesPlayed >= note.Duration)
+                    float env = CalculateEnvelope(note);
+                    
+                    if (env <= 0.001f)
                     {
                         _activeNotes.RemoveAt(noteIndex);
                         continue;
                     }
-
-                    float env = CalculateEnvelope(note);
+                    
                     sampleSum += SynthesizeNote(note) * env * note.Amplitude;
                 }
 
-                buffer[offset + i] = Math.Clamp(sampleSum * 0.2f, -1, 1);
+                // Write stereo frame
+                float sample = Math.Clamp(sampleSum * 0.2f, -1, 1);
+                buffer[offset + framesProcessed * 2] = sample;
+                buffer[offset + framesProcessed * 2 + 1] = sample;
+
+                framesProcessed++;
             }
 
-            _currentSample += count;
+            _currentSample += framesProcessed;
 
-            var stepsPerBar = 16;
+            // Calculate timeline position from actual samples
             _currentStep = (int)(_currentSample / _samplesPerStep);
-            if (_currentStep >= stepsPerBar)
-            {
-                _currentStep = 0;
-                _currentBar += 1;
+            _currentBar = _currentStep / _stepsPerBar;
 
-                if (_currentBar >= _totalBars)
-                {
-                    _currentBar = 0;
-                }
+            // Handle looping
+            if (_isLooping && _currentSample >= _totalSamples)
+            {
+                Reset();
             }
             
-            return count;
+            return framesProcessed * 2; // Return actual samples processed
         }
     }
 
@@ -187,47 +192,38 @@ public class StreamingSynthesizer : ISampleProvider
 
     private float CalculateEnvelope(ActiveNote note)
     {
-        float attackTime = 0.01f;
-        float decayTime = 0.1f;
-        float sustainLevel = 0.7f;
-        float releaseTime = 0.3f;
-        
-        // Adjust envelope parameters based on program
-        if (note.Program >= 88 && note.Program < 96) // Pads
-        {
-            attackTime = 0.4f;
-            releaseTime = 0.8f;
-        }
-        else if (note.Program >= 32 && note.Program < 40) // Bass
-        {
-            attackTime = 0.005f;
-            decayTime = 0.2f;
-        }
-        
-        // Convert times to samples
+        // Get parameters based on program
+        (float attackTime, float decayTime, float sustainLevel, float releaseTime) = GetEnvelopeParams(note.Program);
+    
         int attackSamples = (int)(attackTime * WaveFormat.SampleRate);
         int decaySamples = (int)(decayTime * WaveFormat.SampleRate);
         int releaseSamples = (int)(releaseTime * WaveFormat.SampleRate);
-        
-        // Calculate envelope position
+        int totalDuration = attackSamples + decaySamples + releaseSamples;
+
+        if (note.SamplesPlayed >= totalDuration)
+            return 0f;
+
         if (note.SamplesPlayed < attackSamples)
-        {
             return (float)note.SamplesPlayed / attackSamples;
-        }
-        else if (note.SamplesPlayed < attackSamples + decaySamples)
+
+        if (note.SamplesPlayed < attackSamples + decaySamples)
         {
             float decayPos = (float)(note.SamplesPlayed - attackSamples) / decaySamples;
             return 1.0f - ((1.0f - sustainLevel) * decayPos);
         }
-        else if (note.SamplesPlayed < note.Duration - releaseSamples)
+
+        float releasePos = (float)(note.SamplesPlayed - (attackSamples + decaySamples)) / releaseSamples;
+        return Math.Max(0, sustainLevel * (1.0f - releasePos));
+    }
+
+    private (float attack, float decay, float sustain, float release) GetEnvelopeParams(int program)
+    {
+        return program switch
         {
-            return sustainLevel;
-        }
-        else
-        {
-            float releasePos = (float)(note.SamplesPlayed - (note.Duration - releaseSamples)) / releaseSamples;
-            return sustainLevel * (1.0f - releasePos);
-        }
+            >= 88 and < 96 => (0.4f, 0.2f, 0.7f, 0.8f), // Pads
+            >= 32 and < 40 => (0.005f, 0.2f, 0.7f, 0.3f), // Bass
+            _ => (0.01f, 0.1f, 0.7f, 0.3f) // Default
+        };
     }
     
     private static float MidiNoteToFrequency(int midiNote)

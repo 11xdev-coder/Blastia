@@ -3515,7 +3515,7 @@ namespace Blastia.Main.Synthesizer
             // Draw playback position
             if (_isPlaying && _synth != null)
             {
-                float playbackX = startPos.X + (_synth.CurrentBar + _synth.CurrentStep / 16.0f) * barWidth;
+                float playbackX = startPos.X + (_synth.CurrentBar + _synth.StepInBar / 16.0f) * barWidth;
                 
                 drawList.AddLine(
                     new Vector2(playbackX, startPos.Y),
@@ -3575,104 +3575,42 @@ namespace Blastia.Main.Synthesizer
         {
             using (var writer = new WaveFileWriter(fileStream, waveFormat))
             {
-                // Set up a sample generator - this replaces the MIDI system
-                var exportNotes = new List<StreamingSynthesizer.ActiveNote>();
-                var exportLock = new object();
-                //var synthProvider = new SynthesizerSampleProvider(waveFormat, exportNotes, exportLock);
-                // TODO:
-                
-                // Pre-calculate note timing and store in a dictionary for quick access
-                Dictionary<int, List<NoteEvent>> noteEvents = new Dictionary<int, List<NoteEvent>>();
-                double samplesPerStep = waveFormat.SampleRate * (60.0 / track.Tempo / 4.0);
-                
-                foreach (var part in track.Parts)
+                var synth = new StreamingSynthesizer();
+                synth.LoadTrack(track);
+        
+                // Calculate SAMPLES PER STEP (not frames)
+                double secondsPerStep = (60000.0 / track.Tempo / 4.0) / 1000.0;
+                double samplesPerStep = secondsPerStep * waveFormat.SampleRate;
+        
+                // Total SAMPLES = steps * samples/step * channels
+                int totalSamples = (int)Math.Round(track.BarCount * 16 * samplesPerStep) * waveFormat.Channels;
+        
+                // Buffer size in SAMPLES (not frames)
+                int bufferSize = (int)(waveFormat.SampleRate * 0.1) * waveFormat.Channels;
+                float[] sampleBuffer = new float[bufferSize];
+        
+                int samplesRendered = 0;
+                while (samplesRendered < totalSamples)
                 {
-                    foreach (var note in part.Notes)
+                    int samplesToRead = Math.Min(bufferSize, totalSamples - samplesRendered);
+                    int samplesRead = synth.Read(sampleBuffer, 0, samplesToRead);
+            
+                    if (samplesRead == 0) break;
+            
+                    // Convert to 16-bit PCM
+                    byte[] byteBuffer = new byte[samplesRead * 2];
+                    for (int i = 0; i < samplesRead; i++)
                     {
-                        int startSample = (int)(note.StartStep * samplesPerStep);
-                        int duration = (int)(note.Duration * samplesPerStep);
-                        
-                        if (!noteEvents.ContainsKey(startSample))
-                            noteEvents[startSample] = new List<NoteEvent>();
-                            
-                        noteEvents[startSample].Add(new NoteEvent { 
-                            Note = note.Note,
-                            Velocity = note.Velocity / 127.0f,
-                            Duration = duration,
-                            Channel = part.Channel,
-                            Program = part.Program
-                        });
+                        short sample = (short)(sampleBuffer[i] * short.MaxValue);
+                        byteBuffer[i * 2] = (byte)(sample & 0xFF);
+                        byteBuffer[i * 2 + 1] = (byte)(sample >> 8);
                     }
-                }
-                
-                // Calculate total samples needed
-                int totalSteps = track.BarCount * 16; // 16 steps per bar
-                int totalSamples = (int)(totalSteps * samplesPerStep);
-
-                float[] sampleBuffer = new float[waveFormat.SampleRate / 10]; // 100ms buffer
-                byte[] byteBuffer = new byte[sampleBuffer.Length * waveFormat.BlockAlign];
-
-                _exportStatus = "Rendering audio";
-                
-                // process audio in chunks
-                for (int currentSample = 0; currentSample < totalSamples; currentSample += sampleBuffer.Length)
-                {
-                    // start new notes for each chunk
-                    for (int s = 0; s < sampleBuffer.Length; s++)
-                    {
-                        int absoluteSample = currentSample + s;
-
-                        if (noteEvents.ContainsKey(absoluteSample))
-                        {
-                            foreach (var noteEvent in noteEvents[absoluteSample])
-                            {
-                                lock (exportLock)
-                                {
-                                    exportNotes.Add(new StreamingSynthesizer.ActiveNote
-                                    {
-                                        Frequency = MidiNoteToFrequency(noteEvent.Note),
-                                        Amplitude = noteEvent.Velocity,
-                                        Duration = noteEvent.Duration,
-                                        SamplesPlayed = 0,
-                                        Program = noteEvent.Program
-                                    });
-                                }
-                            }
-                        }
-                    }
-                    
-                    // read from synthesizer
-                    //synthProvider.Read(sampleBuffer, 0, sampleBuffer.Length);
-                    
-                    // convert to bytes
-                    for (int i = 0; i < sampleBuffer.Length; i++)
-                    {
-                        short sampleValue = (short)(sampleBuffer[i] * short.MaxValue);
-                        
-                        // for stereo -> copy to both channels
-                        int bufferIndex = i * waveFormat.BlockAlign;
-                        byteBuffer[bufferIndex] = (byte)(sampleValue & 0xFF);
-                        byteBuffer[bufferIndex + 1] = (byte)(sampleValue >> 8);
-
-                        if (waveFormat.Channels == 2)
-                        {
-                            byteBuffer[bufferIndex + 2] = byteBuffer[bufferIndex];
-                            byteBuffer[bufferIndex + 3] = byteBuffer[bufferIndex + 1];
-                        }
-                    }
-                    
-                    // write
+            
                     writer.Write(byteBuffer, 0, byteBuffer.Length);
-                    
-                    // update progress
-                    if (currentSample % (waveFormat.SampleRate * 2) == 0)
-                    {
-                        _exportStatus = $"Rendering audio: {currentSample * 100 / totalSamples}%";
-                    }
+                    samplesRendered += samplesRead;
                 }
-                
+        
                 writer.Flush();
-                _exportStatus = "Finalizing audio file";
             }
         }
 
