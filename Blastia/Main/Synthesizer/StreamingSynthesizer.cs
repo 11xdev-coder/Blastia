@@ -182,7 +182,6 @@ public class StreamingSynthesizer : ISampleProvider
                 Reset();
             }
             
-            Console.WriteLine(CurrentStyle);
             return framesProcessed * 2; // Return actual samples processed
         }
     }
@@ -231,14 +230,14 @@ public class StreamingSynthesizer : ISampleProvider
 
         // Add subtle saturation instead of heavy filtering
         float saturated = sampleSum / (1 + Math.Abs(sampleSum)); // Soft clipping
-        return Math.Clamp(saturated * 0.8f, -1f, 1f); // Increased output volume
+        return Math.Clamp(saturated, -1f, 1f); // Increased output volume
     }
 
     // Waveform helpers with better high-frequency preservation
     private float ImprovedSquareWave(double t)
     {
         // Square wave with gentle slope (5% smoothing)
-        return (float)Math.Sign(Math.Sin(2 * Math.PI * t)) * 0.95f;
+        return Math.Sign(Math.Sin(2 * Math.PI * t)) * 0.95f;
     }
 
     private float BalancedSawtoothWave(double t)

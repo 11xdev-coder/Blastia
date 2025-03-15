@@ -36,25 +36,19 @@ namespace Blastia.Main.Synthesizer
         private static bool _isGeneratingTrack;
         private static string _currentStatusMessage = "";
         private static string _exportStatus = "Not exporting";
-
-        // Main Synthesizer sync
-        private static Func<List<WaveData>>? _wavesFactory;
-        private static Action? _updateSynthesizerAction;
+        private static bool _showExportMenu;
+        private static int _selectedTrackIndex;
         
         // Synth provider
-        private static int _selectedSynth;
+        private static int _selectedSynthStyle;
         private static readonly string[] SynthStyles = ["Default", "Electronic"];
         
         private static WaveOutEvent? _waveOut;
         private static StreamingSynthesizer? _synth;
         private static bool _isInitialized;
         
-        public static void Initialize(Func<List<WaveData>>? wavesFactory, Action? updateSynthesizerAction)
+        public static void Initialize()
         {
-            // Initialize MIDI output for preview
-            _wavesFactory = wavesFactory;
-            _updateSynthesizerAction = updateSynthesizerAction;
-
             InitializeAudioSystem();
         }
 
@@ -142,11 +136,11 @@ namespace Blastia.Main.Synthesizer
                     ImGui.Checkbox("Delay", ref _includeDelay);
                     
                     // synthesizer
-                    if (ImGui.Combo("Synthesizer Style", ref _selectedSynth, SynthStyles, SynthStyles.Length))
+                    if (ImGui.Combo("Synthesizer Style", ref _selectedSynthStyle, SynthStyles, SynthStyles.Length))
                     {
                         if (_synth == null) return;
                         
-                        _synth.CurrentStyle = (Style) _selectedSynth;
+                        _synth.CurrentStyle = (Style) _selectedSynthStyle;
                     }
 
                     ImGui.Separator();
@@ -254,7 +248,8 @@ namespace Blastia.Main.Synthesizer
                                 
                                 if (ImGui.Button($"Export##export{i}", new Vector2(60, 20)))
                                 {
-                                    ExportTrackToAudio(track);
+                                    _selectedTrackIndex = i;
+                                    _showExportMenu = !_showExportMenu;
                                 }
                                 
                                 ImGui.SameLine();
@@ -268,6 +263,28 @@ namespace Blastia.Main.Synthesizer
 
                             ImGui.EndTable();
                         }
+                    }
+
+                    if (_showExportMenu)
+                    {
+                        ImGui.SetNextWindowSize(new Vector2(180, 100));
+                        ImGui.SetNextWindowPos(ImGui.GetMousePos(), ImGuiCond.Appearing);
+
+                        if (ImGui.Begin("Export", ref _showExportMenu, ImGuiWindowFlags.Modal))
+                        {
+                            ImGui.Text($"Selected track index: {_selectedTrackIndex}");
+                            
+                            if (ImGui.Button("MP3##mp3", new Vector2(40, 20)))
+                            {
+                                ExportTrackToAudio(_savedTracks[_selectedTrackIndex]);
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("WAV##wav", new Vector2(40, 20)))
+                            {
+                                ExportTrackToAudio(_savedTracks[_selectedTrackIndex], "wav");
+                            }
+                        }
+                        ImGui.End();
                     }
                 }
                 
@@ -3215,7 +3232,7 @@ namespace Blastia.Main.Synthesizer
             if (_isInitialized) return;
 
             _waveOut = new WaveOutEvent();
-            _synth = new StreamingSynthesizer((Style) _selectedSynth);
+            _synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
             _waveOut.Init(_synth);
 
             _isInitialized = true;
@@ -3230,7 +3247,7 @@ namespace Blastia.Main.Synthesizer
 
             try
             {
-                _synth = new StreamingSynthesizer((Style) _selectedSynth);
+                _synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
                 _synth.LoadTrack(_currentTrack, _isLooping);
                 
                 _waveOut = new WaveOutEvent();
@@ -3444,10 +3461,11 @@ namespace Blastia.Main.Synthesizer
                     {
                         MediaFoundationEncoder.EncodeToMp3(reader, outputPath);
                     }
-                    else if (format.ToLower() == "ogg")
-                    {
-                        MediaFoundationEncoder.EncodeToWma(reader, outputPath);
-                    }
+                    // OGG doesnt work
+                    // else if (format.ToLower() == "ogg")
+                    // {
+                    //     MediaFoundationEncoder.EncodeToWma(reader, outputPath);
+                    // }
                 }
             }
             
@@ -3458,7 +3476,7 @@ namespace Blastia.Main.Synthesizer
         {
             using (var writer = new WaveFileWriter(fileStream, waveFormat))
             {
-                var synth = new StreamingSynthesizer((Style) _selectedSynth);
+                var synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
                 synth.LoadTrack(track);
         
                 // Calculate SAMPLES PER STEP (not frames)

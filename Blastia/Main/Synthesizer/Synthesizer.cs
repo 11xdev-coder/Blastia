@@ -459,7 +459,7 @@ public class Synthesizer
 
     private static void InitializeAudio()
     {
-        AiMusicGenerator.Initialize(() => _waves, UpdateSynthesizer);
+        AiMusicGenerator.Initialize();
         
         _synth = new MultipleWaveSynth();
         
