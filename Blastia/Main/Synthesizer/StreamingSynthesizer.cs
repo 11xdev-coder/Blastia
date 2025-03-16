@@ -5,7 +5,8 @@ namespace Blastia.Main.Synthesizer;
 public enum Style
 {
     Default,
-    Electronic
+    Electronic,
+    Synthwave
 }
 
 public class StreamingSynthesizer : ISampleProvider
@@ -47,10 +48,40 @@ public class StreamingSynthesizer : ISampleProvider
         get => _currentStyle;
         set => _currentStyle = value;
     }
+    
+    // delay
+    private float[] _delayBuffer = [];
+    private int _delayBufferSize;
+    private int _delayWriteIndex;
+    private int _delayReadIndex;
+    private float _delayMix = 0.3f; // how much of the delayed signal mixed in
+    private float _delayFeedback = 0.5f; // how much of the delayed signal is fed back
+    private int _delaySamples; // delay time (in samples)
+    
+    // reverb
+    private float[] _reverbBuffer = [];
+    private int _reverbBufferSize;
+    private int _reverbWriteIndex;
+    private float _reverbMix = 0.4f; // reverb wet/dry mix
 
     public StreamingSynthesizer(Style style)
     {
         CurrentStyle = style;
+    }
+
+    private void InitializeEffects()
+    {
+        // delay time of 0.3 seconds
+        _delaySamples = (int) (0.3f * WaveFormat.SampleRate);
+        _delayBufferSize = _delaySamples;
+        _delayBuffer = new float[_delayBufferSize];
+        _delayWriteIndex = 0;
+        _delayReadIndex = 0;
+        
+        // reverb time of 0.5 seconds
+        _reverbBufferSize = (int)(0.5f * WaveFormat.SampleRate);
+        _reverbBuffer = new float[_reverbBufferSize];
+        _reverbWriteIndex = 0;
     }
     
     public void LoadTrack(MusicTrack track, bool looping = false)
@@ -96,12 +127,15 @@ public class StreamingSynthesizer : ISampleProvider
                         Duration = duration,
                         Channel = part.Channel,
                         Program = part.Program,
-                        Oscillators = oscillators
+                        Oscillators = oscillators,
+                        SynthParams = part.SynthParams
                     });
                 }
             }
             
             _totalSamples = (int)(_totalBars * _stepsPerBar * _samplesPerStep);
+            
+            InitializeEffects();
         }
     }
     
@@ -140,7 +174,8 @@ public class StreamingSynthesizer : ISampleProvider
                         Duration = n.Duration,
                         SamplesPlayed = 0,
                         Program = n.Program,
-                        Oscillators = n.Oscillators
+                        Oscillators = n.Oscillators,
+                        SynthParams = n.SynthParams
                     }));
                 }
 
@@ -161,7 +196,7 @@ public class StreamingSynthesizer : ISampleProvider
                     
                     sampleSum += SynthesizeNote(note) * env * note.Amplitude;
                 }
-
+                
                 // Write stereo frame
                 float sample = Math.Clamp(sampleSum * 0.2f, -1, 1);
                 buffer[offset + framesProcessed * 2] = sample;
@@ -188,12 +223,29 @@ public class StreamingSynthesizer : ISampleProvider
 
     private float SynthesizeNote(ActiveNote note)
     {
-        return CurrentStyle switch
+        float sample = CurrentStyle switch
         {
             Style.Default => GenerateDefaultSound(note),
             Style.Electronic => GenerateElectronicSound(note),
             _ => GenerateDefaultSound(note)
         };
+        
+        // process effects
+        foreach (var effect in note.SynthParams.Effects)
+        {
+            switch (effect.Type)
+            {
+                case EffectType.Reverb:
+                    sample = ProcessReverb(sample);
+                    break;
+                case EffectType.Delay:
+                    sample = ProcessDelay(sample);
+                    break;
+                // TODO: implement more
+            }
+        }
+
+        return sample;
     }
     
     private float GenerateElectronicSound(ActiveNote note)
@@ -319,6 +371,41 @@ public class StreamingSynthesizer : ISampleProvider
             _ => (0.01f, 0.1f, 0.7f, 0.3f) // Default
         };
     }
+
+    private float ProcessDelay(float input)
+    {
+        float delayedSample = _delayBuffer[_delayReadIndex];
+        
+        float output = input + _delayMix * delayedSample;
+        _delayBuffer[_delayWriteIndex] = input + _delayFeedback * delayedSample;
+        
+        _delayWriteIndex = (_delayWriteIndex + 1) % _delayBufferSize;
+        _delayReadIndex = (_delayReadIndex + 1) % _delayBufferSize;
+
+        return output;
+    }
+
+    private float ProcessReverb(float input)
+    {
+        // very simple reverb
+        // use several taps from reverb buffer
+        float reverbOutput = 0;
+        // taps
+        int[] tapDelays = [500, 1000, 1500];
+        float[] tapGains = [0.3f, 0.2f, 0.1f];
+
+        for (int i = 0; i < tapDelays.Length; i++)
+        {
+            int tapIndex = (_reverbWriteIndex - tapDelays[i] + _reverbBufferSize) % _reverbBufferSize;
+            reverbOutput += _reverbBuffer[tapIndex] * tapGains[i];
+        }
+
+        // write input + a bit of output
+        _reverbBuffer[_reverbWriteIndex] = input + reverbOutput * 0.5f;
+        _reverbWriteIndex = (_reverbWriteIndex + 1) % _reverbBufferSize;
+
+        return input + reverbOutput * _reverbMix;
+    }
     
     private static float MidiNoteToFrequency(int midiNote)
     {
@@ -333,6 +420,7 @@ public class StreamingSynthesizer : ISampleProvider
         public int Channel;
         public int Program;
         public List<OscillatorData> Oscillators;
+        public SynthParameters SynthParams;
     }
     
     public struct OscillatorData
@@ -350,5 +438,6 @@ public class StreamingSynthesizer : ISampleProvider
         public int SamplesPlayed;
         public int Program;
         public List<OscillatorData> Oscillators = [];
+        public SynthParameters SynthParams = new();
     }
 }

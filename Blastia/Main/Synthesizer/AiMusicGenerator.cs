@@ -21,6 +21,8 @@ namespace Blastia.Main.Synthesizer
         // Generation parameters
         private static readonly string[] TrackStyles = ["Industrial", "Ambient", "Combat", "Exploration", "Tense"];
         private static int _selectedStyle;
+        private static readonly string[] SynthGenerationStyles = ["Default", "Synthwave"];
+        private static int _selectedSynthGeneration;
         private static int _tempo = 110;
         private static int _trackLength = 16; // bars
         private static float _complexity = 0.7f;
@@ -41,7 +43,7 @@ namespace Blastia.Main.Synthesizer
         
         // Synth provider
         private static int _selectedSynthStyle;
-        private static readonly string[] SynthStyles = ["Default", "Electronic"];
+        private static readonly string[] SynthStyles = ["Default", "Electronic - uses synth", "Synthwave - uses synth"];
         
         private static WaveOutEvent? _waveOut;
         private static StreamingSynthesizer? _synth;
@@ -84,9 +86,12 @@ namespace Blastia.Main.Synthesizer
                                 _tempo = 90;
                                 _complexity = 0.5f;
                                 _intensity = 0.4f;
+                                _includeBass = false;
+                                _includePercussion = true;
                                 _includeArpeggios = true;
-                                _includePads = true;
-                                _includeGlitch = false;
+                                _includePads = false;
+                                _includeLead = true;
+                                _includeGlitch = true;
                                 break;
                             case 2: // Combat
                                 _tempo = 125;
@@ -112,6 +117,30 @@ namespace Blastia.Main.Synthesizer
                                 _includePads = true;
                                 _includeGlitch = true;
                                 break;
+                            case 5: // synthwave
+                                _tempo = 118;
+                                _complexity = 0.6f;
+                                _intensity = 0.7f;
+                                _includeArpeggios = true;
+                                _includePads = true;
+                                _includeGlitch = false;
+                                _includeBass = true;
+                                _includeLead = true;
+                                _includeDelay = true;
+                                _includeReverb = true;
+                                _selectedSynthStyle = 2;
+                                break;
+                        }
+                    }
+
+                    if (ImGui.Combo("Synth Generation Style", ref _selectedSynthGeneration, SynthGenerationStyles,
+                            SynthGenerationStyles.Length))
+                    {
+                        switch (_selectedSynthGeneration)
+                        {
+                            case 1: // synthwave
+                                _selectedSynthStyle = 2;
+                                break;
                         }
                     }
 
@@ -131,7 +160,12 @@ namespace Blastia.Main.Synthesizer
                     ImGui.Checkbox("Glitch Effects", ref _includeGlitch);
 
                     // Effects
-                    ImGui.Text("Effects:");
+                    ImGui.Text("Generate Effects:");
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip("Effects are generated automatically at track creation and cannot be modified later.");
+                    }
+
                     ImGui.Checkbox("Reverb", ref _includeReverb); ImGui.SameLine();
                     ImGui.Checkbox("Delay", ref _includeDelay);
                     
@@ -2834,39 +2868,168 @@ namespace Blastia.Main.Synthesizer
             foreach (var part in track.Parts)
             {
                 SynthParameters parameters = new SynthParameters();
-                
-                switch (part.Type)
+
+                if (_selectedSynthGeneration == 1) // synthwave
                 {
-                    case TrackPartType.Bass:
-                        GenerateBassParameters(parameters, track);
-                        break;
+                    Console.WriteLine("Generating Synthwave parameters");
+                    GenerateSynthwaveParameters(part, parameters, track);
+                }
+                else // default
+                {
+                    switch (part.Type)
+                    {
+                        case TrackPartType.Bass:
+                            GenerateBassSynthParameters(parameters);
+                            break;
                     
-                    case TrackPartType.Percussion:
-                        GeneratePercussionParameters(parameters, track);
-                        break;
+                        case TrackPartType.Percussion:
+                            GeneratePercussionSynthParameters(parameters);
+                            break;
                     
-                    case TrackPartType.Arpeggio:
-                        GenerateArpeggioParameters(parameters, track);
-                        break;
+                        case TrackPartType.Arpeggio:
+                            GenerateArpeggioSynthParameters(parameters);
+                            break;
                     
-                    case TrackPartType.Pad:
-                        GeneratePadParameters(parameters, track);
-                        break;
+                        case TrackPartType.Pad:
+                            GeneratePadSynthParameters(parameters, track);
+                            break;
                     
-                    case TrackPartType.Lead:
-                        GenerateLeadParameters(parameters, track);
-                        break;
+                        case TrackPartType.Lead:
+                            GenerateLeadSynthParameters(parameters);
+                            break;
                     
-                    case TrackPartType.GlitchFx:
-                        GenerateGlitchParameters(parameters, track);
-                        break;
+                        case TrackPartType.GlitchFx:
+                            GenerateGlitchSynthParameters(parameters);
+                            break;
+                    }
                 }
                 
                 part.SynthParams = parameters;
             }
         }
 
-        private static void GenerateBassParameters(SynthParameters parameters, MusicTrack track)
+        // TODO: more slow and continuous waves + synthesizer
+        private static void GenerateSynthwaveParameters(TrackPart part, SynthParameters parameters, MusicTrack track)
+        {
+            switch (part.Type)
+            {
+                case TrackPartType.Bass:
+                    parameters.Oscillators.Add(new WaveParameters
+                    {
+                        WaveType = WaveType.Sine,
+                        Amplitude = 0.9f,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 0.1f,
+                            DecayTime = 1.5f,
+                            SustainLevel = 0.8f,
+                            ReleaseTime = 2f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Type = FilterType.LowPass,
+                            Cutoff = 300f
+                        }
+                    });
+                    break;
+                case TrackPartType.Percussion:
+                    parameters.Oscillators.Add(new WaveParameters
+                    {
+                        WaveType = WaveType.Sine,
+                        Amplitude = 0.7f,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 0.005f,
+                            DecayTime = 0.2f,
+                            SustainLevel = 0f,
+                            ReleaseTime = 0.1f
+                        }
+                    });
+                    break;
+                case TrackPartType.Arpeggio:
+                    parameters.Oscillators.Add(new WaveParameters
+                    {
+                        WaveType = WaveType.Square,
+                        Amplitude = 0.6f,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 0.05f,
+                            DecayTime = 0.2f,
+                            SustainLevel = 0.7f,
+                            ReleaseTime = 1.5f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Type = FilterType.BandPass,
+                            Cutoff = 2500f,
+                            Resonance = 0.5f
+                        }
+                    });
+                    break;
+                case TrackPartType.Lead:
+                    parameters.Oscillators.Add(new WaveParameters
+                    {
+                        WaveType = WaveType.Square,
+                        Amplitude = 0.7f,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 0.05f,
+                            DecayTime = 0.3f,
+                            SustainLevel = 0.6f,
+                            ReleaseTime = 2.5f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Type = FilterType.LowPass,
+                            Cutoff = 3200f,
+                            Resonance = 0.4f
+                        }
+                    });
+                    break;
+                case TrackPartType.Pad:
+                    parameters.Oscillators.Add(new WaveParameters
+                    {
+                        WaveType = WaveType.Sawtooth,
+                        Amplitude = 0.5f,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 0.8f,
+                            DecayTime = 1f,
+                            SustainLevel = 0.7f,
+                            ReleaseTime = 4f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Type = FilterType.LowPass,
+                            Cutoff = 400f,
+                            Resonance = 0.2f
+                        }
+                    });
+                    break;
+                case TrackPartType.GlitchFx:
+                    parameters.Oscillators.Add(new WaveParameters
+                    {
+                        WaveType = WaveType.Triangle,
+                        Amplitude = 0.6f,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 0.001f,
+                            DecayTime = 0.1f,
+                            SustainLevel = 0.3f,
+                            ReleaseTime = 0.1f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Type = FilterType.BandPass,
+                            Cutoff = 2000f,
+                            Resonance = 0.8f
+                        }
+                    });
+                    break;
+            }
+        }
+
+        private static void GenerateBassSynthParameters(SynthParameters parameters)
         {
             parameters.Oscillators.Clear();
             
@@ -2875,25 +3038,23 @@ namespace Blastia.Main.Synthesizer
             {
                 WaveType = WaveType.Square,
                 Amplitude = 0.8f,
-                IsEnabled = true
+                IsEnabled = true,
+                Envelope = new EnvelopeParameters
+                {
+                    AttackTime = 0.01f,
+                    DecayTime = 0.2f,
+                    SustainLevel = 0.6f,
+                    ReleaseTime = 0.3f
+                },
+                // Filter
+                Filter = new FilterParameters
+                {
+                    Type = FilterType.LowPass,
+                    Cutoff = 200 + _intensity * 800, // deeper cutoff
+                    Resonance = 0.3f
+                }
             };
-            
-            main.Envelope = new EnvelopeParameters
-            {
-                AttackTime = 0.01f,
-                DecayTime = 0.2f,
-                SustainLevel = 0.6f,
-                ReleaseTime = 0.3f
-            };
-            
-            // Filter
-            main.Filter = new FilterParameters
-            {
-                Type = FilterType.LowPass,
-                Cutoff = 200 + _intensity * 800, // deeper cutoff
-                Resonance = 0.3f
-            };
-            
+
             parameters.Effects.Add(new EffectParameters
             {
                 Type = EffectType.BitCrusher,
@@ -2903,7 +3064,7 @@ namespace Blastia.Main.Synthesizer
             parameters.Oscillators.Add(main);
         }
 
-        private static void GeneratePercussionParameters(SynthParameters parameters, MusicTrack track)
+        private static void GeneratePercussionSynthParameters(SynthParameters parameters)
         {
             // Percussion uses samples, so minimal synth parameters needed
             parameters.Oscillators.Clear();
@@ -2913,18 +3074,17 @@ namespace Blastia.Main.Synthesizer
             {
                 WaveType = WaveType.Triangle,
                 Amplitude = 0.9f,
-                IsEnabled = true
+                IsEnabled = true,
+                // Short, punchy envelope
+                Envelope = new EnvelopeParameters
+                {
+                    AttackTime = 0.001f,
+                    DecayTime = 0.2f,
+                    SustainLevel = 0.0f,
+                    ReleaseTime = 0.1f
+                }
             };
-            
-            // Short, punchy envelope
-            perc.Envelope = new EnvelopeParameters
-            {
-                AttackTime = 0.001f,
-                DecayTime = 0.2f,
-                SustainLevel = 0.0f,
-                ReleaseTime = 0.1f
-            };
-            
+
             parameters.Oscillators.Add(perc);
             
             // Effects
@@ -2947,7 +3107,7 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
-        private static void GenerateArpeggioParameters(SynthParameters parameters, MusicTrack track)
+        private static void GenerateArpeggioSynthParameters(SynthParameters parameters)
         {
             parameters.Oscillators.Clear();
             
@@ -2956,20 +3116,20 @@ namespace Blastia.Main.Synthesizer
             {
                 WaveType = WaveType.Square,
                 Amplitude = 0.6f,
-                IsEnabled = true
-            };
-            main.Envelope = new EnvelopeParameters
-            {
-                AttackTime = 0.01f,
-                DecayTime = 0.1f,
-                SustainLevel = 0.4f,
-                ReleaseTime = 0.1f
-            };
-            main.Filter = new FilterParameters
-            {
-                Type = FilterType.BandPass,
-                Cutoff = 3000,
-                Resonance = 0.5f
+                IsEnabled = true,
+                Envelope = new EnvelopeParameters
+                {
+                    AttackTime = 0.01f,
+                    DecayTime = 0.1f,
+                    SustainLevel = 0.4f,
+                    ReleaseTime = 0.1f
+                },
+                Filter = new FilterParameters
+                {
+                    Type = FilterType.BandPass,
+                    Cutoff = 3000,
+                    Resonance = 0.5f
+                }
             };
             parameters.Oscillators.Add(main);
             
@@ -3016,7 +3176,7 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
-        private static void GeneratePadParameters(SynthParameters parameters, MusicTrack track)
+        private static void GeneratePadSynthParameters(SynthParameters parameters, MusicTrack track)
         {
             parameters.Oscillators.Clear();
             
@@ -3025,26 +3185,24 @@ namespace Blastia.Main.Synthesizer
             {
                 WaveType = WaveType.Sawtooth,
                 Amplitude = 0.5f,
-                IsEnabled = true
+                IsEnabled = true,
+                // ADSR - slow attack and release for pads
+                Envelope = new EnvelopeParameters
+                {
+                    AttackTime = 0.5f + (1 - _intensity) * 0.5f,
+                    DecayTime = 0.3f,
+                    SustainLevel = 0.7f,
+                    ReleaseTime = 1.0f + (1 - _intensity) * 1.0f
+                },
+                // Filter - darker for pads
+                Filter = new FilterParameters
+                {
+                    Type = FilterType.LowPass,
+                    Cutoff = 400 + _complexity * 1200,
+                    Resonance = 0.2f
+                }
             };
-            
-            // ADSR - slow attack and release for pads
-            main.Envelope = new EnvelopeParameters
-            {
-                AttackTime = 0.5f + (1 - _intensity) * 0.5f,
-                DecayTime = 0.3f,
-                SustainLevel = 0.7f,
-                ReleaseTime = 1.0f + (1 - _intensity) * 1.0f
-            };
-            
-            // Filter - darker for pads
-            main.Filter = new FilterParameters
-            {
-                Type = FilterType.LowPass,
-                Cutoff = 400 + _complexity * 1200,
-                Resonance = 0.2f
-            };
-            
+
             parameters.Oscillators.Add(main);
             
             // Secondary oscillator for richness
@@ -3053,18 +3211,17 @@ namespace Blastia.Main.Synthesizer
                 WaveType = WaveType.Sine,
                 Amplitude = 0.4f,
                 FrequencyOffset = track.IsMinor ? 3 : 4, // Third
-                IsEnabled = true
+                IsEnabled = true,
+                // ADSR - slower attack than main
+                Envelope = new EnvelopeParameters
+                {
+                    AttackTime = 0.8f,
+                    DecayTime = 0.4f,
+                    SustainLevel = 0.6f,
+                    ReleaseTime = 1.2f
+                }
             };
-            
-            // ADSR - slower attack than main
-            second.Envelope = new EnvelopeParameters
-            {
-                AttackTime = 0.8f,
-                DecayTime = 0.4f,
-                SustainLevel = 0.6f,
-                ReleaseTime = 1.2f
-            };
-            
+
             parameters.Oscillators.Add(second);
             
             // Effects - pads need reverb and chorus
@@ -3084,7 +3241,7 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
-        private static void GenerateLeadParameters(SynthParameters parameters, MusicTrack track)
+        private static void GenerateLeadSynthParameters(SynthParameters parameters)
         {
             parameters.Oscillators.Clear();
             
@@ -3128,18 +3285,17 @@ namespace Blastia.Main.Synthesizer
                     WaveType = WaveType.Square,
                     Amplitude = 0.3f,
                     FrequencyOffset = 12, // Octave
-                    IsEnabled = true
+                    IsEnabled = true,
+                    // ADSR - similar to main
+                    Envelope = new EnvelopeParameters
+                    {
+                        AttackTime = 0.08f,
+                        DecayTime = 0.3f,
+                        SustainLevel = 0.5f,
+                        ReleaseTime = 0.3f
+                    }
                 };
-                
-                // ADSR - similar to main
-                second.Envelope = new EnvelopeParameters
-                {
-                    AttackTime = 0.08f,
-                    DecayTime = 0.3f,
-                    SustainLevel = 0.5f,
-                    ReleaseTime = 0.3f
-                };
-                
+
                 parameters.Oscillators.Add(second);
             }
             
@@ -3173,7 +3329,7 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
-        private static void GenerateGlitchParameters(SynthParameters parameters, MusicTrack track)
+        private static void GenerateGlitchSynthParameters(SynthParameters parameters)
         {
             parameters.Oscillators.Clear();
             
@@ -3182,26 +3338,24 @@ namespace Blastia.Main.Synthesizer
             {
                 WaveType = _rng.NextDouble() < 0.5 ? WaveType.Triangle : WaveType.Square,
                 Amplitude = 0.6f,
-                IsEnabled = true
+                IsEnabled = true,
+                // ADSR - very quick for glitches
+                Envelope = new EnvelopeParameters
+                {
+                    AttackTime = 0.001f,
+                    DecayTime = 0.1f,
+                    SustainLevel = 0.3f,
+                    ReleaseTime = 0.1f
+                },
+                // Filter - varies based on effect type
+                Filter = new FilterParameters
+                {
+                    Type = FilterType.BandPass,
+                    Cutoff = 2000,
+                    Resonance = 0.8f
+                }
             };
-            
-            // ADSR - very quick for glitches
-            main.Envelope = new EnvelopeParameters
-            {
-                AttackTime = 0.001f,
-                DecayTime = 0.1f,
-                SustainLevel = 0.3f,
-                ReleaseTime = 0.1f
-            };
-            
-            // Filter - varies based on effect type
-            main.Filter = new FilterParameters
-            {
-                Type = FilterType.BandPass,
-                Cutoff = 2000,
-                Resonance = 0.8f
-            };
-            
+
             parameters.Oscillators.Add(main);
             
             // Effects - heavy processing
@@ -3548,7 +3702,7 @@ namespace Blastia.Main.Synthesizer
         public int Program { get; set; }
         public List<Pattern> Patterns { get; set; } = [];
         public List<MusicNote> Notes { get; set; } = [];
-        public SynthParameters SynthParams { get; set; }
+        public SynthParameters SynthParams { get; set; } = new();
     }
 
     public class MusicNote
@@ -3566,27 +3720,27 @@ namespace Blastia.Main.Synthesizer
 
     public class BassPattern : Pattern
     {
-        public int[] Steps { get; set; }
-        public int[] Velocities { get; set; }
-        public int[] Durations { get; set; }
+        public int[] Steps { get; set; } = [];
+        public int[] Velocities { get; set; } = [];
+        public int[] Durations { get; set; } = [];
     }
 
     public class PercussionPattern : Pattern
     {
-        public bool[] KickSteps { get; set; }
-        public bool[] SnareSteps { get; set; }
-        public bool[] HihatSteps { get; set; }
-        public bool[] CrashSteps { get; set; }
-        public bool[] TomSteps { get; set; }
-        public bool[] PercussionSteps { get; set; }
+        public bool[] KickSteps { get; set; } = [];
+        public bool[] SnareSteps { get; set; } = [];
+        public bool[] HihatSteps { get; set; } = [];
+        public bool[] CrashSteps { get; set; } = [];
+        public bool[] TomSteps { get; set; } = [];
+        public bool[] PercussionSteps { get; set; } = [];
         public int[,] Velocities { get; set; } // [step, instrument]
     }
 
     public class ArpeggioPattern : Pattern
     {
-        public int[] Notes { get; set; }
-        public int[] Velocities { get; set; }
-        public int[] Durations { get; set; }
+        public int[] Notes { get; set; } = [];
+        public int[] Velocities { get; set; } = [];
+        public int[] Durations { get; set; } = [];
     }
 
     public class PadPattern : Pattern
@@ -3599,17 +3753,17 @@ namespace Blastia.Main.Synthesizer
 
     public class LeadPattern : Pattern
     {
-        public int[] Notes { get; set; }
-        public int[] Velocities { get; set; }
-        public int[] Durations { get; set; }
+        public int[] Notes { get; set; } = [];
+        public int[] Velocities { get; set; } = [];
+        public int[] Durations { get; set; } = [];
     }
 
     public class GlitchPattern : Pattern
     {
-        public int[] Notes { get; set; }
-        public int[] Velocities { get; set; }
-        public int[] Durations { get; set; }
-        public GlitchEffect[] Effects { get; set; }
+        public int[] Notes { get; set; } = [];
+        public int[] Velocities { get; set; } = [];
+        public int[] Durations { get; set; } = [];
+        public GlitchEffect[] Effects { get; set; } = [];
     }
 
     // Synth parameters
@@ -3617,8 +3771,18 @@ namespace Blastia.Main.Synthesizer
     {
         public List<WaveParameters> Oscillators { get; set; } = [];
         public List<EffectParameters> Effects { get; set; } = [];
+        
+        // synthwave-specific
+        public float PadTailDuration { get; set; } = 4f; // seconds
+        public bool UseTapeSaturation { get; set; }
+        public float AnalogDriftAmount { get; set; } = 0.1f;
     }
 
+    public enum WaveType
+    {
+        Sine, Square, Triangle, Sawtooth
+    }
+    
     public class WaveParameters
     {
         public WaveType WaveType { get; set; } = WaveType.Sine;

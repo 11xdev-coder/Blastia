@@ -1,7 +1,5 @@
 ﻿namespace Blastia.Main.Synthesizer;
 
-public enum WaveType { Sine, Square, Triangle, Sawtooth }
-
 public class WaveData(float frequency, float amplitude, WaveType waveType, EnvelopeGenerator envelope, Filter filter)
 {
     public EnvelopeGenerator Envelope { get; set; } = envelope;
