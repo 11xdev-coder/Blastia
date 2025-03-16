@@ -33,13 +33,17 @@ namespace Blastia.Main.Synthesizer
         private static bool _includePercussion = true;
         private static bool _includeLead = true;
         private static bool _includeGlitch = true;
-        private static bool _includeReverb = true;
-        private static bool _includeDelay = true;
+        private static bool _includeDelay;
         private static bool _isGeneratingTrack;
         private static string _currentStatusMessage = "";
         private static string _exportStatus = "Not exporting";
         private static bool _showExportMenu;
         private static int _selectedTrackIndex;
+        
+        // reverb
+        private static bool _includeReverb;
+        private static float _reverbMix;
+        private static float _reverbTime;
         
         // Synth provider
         private static int _selectedSynthStyle;
@@ -163,11 +167,29 @@ namespace Blastia.Main.Synthesizer
                     ImGui.Text("Generate Effects:");
                     if (ImGui.IsItemHovered())
                     {
-                        ImGui.SetTooltip("Effects are generated automatically at track creation and cannot be modified later.");
+                        ImGui.SetTooltip("Effects are generated at track creation and cannot be modified later. Effect settings can be edited post-generating");
                     }
 
                     ImGui.Checkbox("Reverb", ref _includeReverb); ImGui.SameLine();
                     ImGui.Checkbox("Delay", ref _includeDelay);
+
+                    if (_includeReverb)
+                    {
+                        ImGui.Text("Reverb Settings:");
+                        
+                        _reverbMix = _synth?.ReverbMix ?? 0.4f;
+                        if (ImGui.SliderFloat("Reverb Mix", ref _reverbMix, 0.1f, 2f))
+                        {
+                            if (_synth == null) return;
+                            _synth.ReverbMix = _reverbMix;
+                        }
+                        _reverbTime = _synth?.ReverbTime ?? 0.5f;
+                        if (ImGui.SliderFloat("Reverb Time", ref _reverbTime, 0f, 7f))
+                        {
+                            if (_synth == null) return;
+                            _synth.ReverbTime = _reverbTime;
+                        }
+                    }
                     
                     // synthesizer
                     if (ImGui.Combo("Synthesizer Style", ref _selectedSynthStyle, SynthStyles, SynthStyles.Length))
@@ -3402,7 +3424,7 @@ namespace Blastia.Main.Synthesizer
             try
             {
                 _synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
-                _synth.LoadTrack(_currentTrack, _isLooping);
+                _synth.LoadTrack(_currentTrack, _reverbMix, _reverbTime, _isLooping);
                 
                 _waveOut = new WaveOutEvent();
                 _waveOut.Init(_synth);
@@ -3631,7 +3653,7 @@ namespace Blastia.Main.Synthesizer
             using (var writer = new WaveFileWriter(fileStream, waveFormat))
             {
                 var synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
-                synth.LoadTrack(track);
+                synth.LoadTrack(track, _reverbMix, _reverbTime);
         
                 // Calculate SAMPLES PER STEP (not frames)
                 double secondsPerStep = (60000.0 / track.Tempo / 4.0) / 1000.0;

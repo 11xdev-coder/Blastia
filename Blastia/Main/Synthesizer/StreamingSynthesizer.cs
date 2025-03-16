@@ -54,15 +54,16 @@ public class StreamingSynthesizer : ISampleProvider
     private int _delayBufferSize;
     private int _delayWriteIndex;
     private int _delayReadIndex;
-    private float _delayMix = 0.3f; // how much of the delayed signal mixed in
-    private float _delayFeedback = 0.5f; // how much of the delayed signal is fed back
+    public float DelayMix = 0.3f; // how much of the delayed signal mixed in
+    public float DelayFeedback = 0.5f; // how much of the delayed signal is fed back
     private int _delaySamples; // delay time (in samples)
     
     // reverb
     private float[] _reverbBuffer = [];
     private int _reverbBufferSize;
     private int _reverbWriteIndex;
-    private float _reverbMix = 0.4f; // reverb wet/dry mix
+    public float ReverbMix = 0.4f; // reverb wet/dry mix
+    public float ReverbTime = 0.5f;
 
     public StreamingSynthesizer(Style style)
     {
@@ -79,12 +80,12 @@ public class StreamingSynthesizer : ISampleProvider
         _delayReadIndex = 0;
         
         // reverb time of 0.5 seconds
-        _reverbBufferSize = (int)(0.5f * WaveFormat.SampleRate);
+        _reverbBufferSize = (int)(ReverbTime * WaveFormat.SampleRate);
         _reverbBuffer = new float[_reverbBufferSize];
         _reverbWriteIndex = 0;
     }
     
-    public void LoadTrack(MusicTrack track, bool looping = false)
+    public void LoadTrack(MusicTrack track, float reverbMix, float reverbTime, bool looping = false)
     {
         lock (_noteLock)
         {
@@ -135,6 +136,8 @@ public class StreamingSynthesizer : ISampleProvider
             
             _totalSamples = (int)(_totalBars * _stepsPerBar * _samplesPerStep);
             
+            ReverbMix = reverbMix;
+            ReverbTime = reverbTime;
             InitializeEffects();
         }
     }
@@ -236,10 +239,12 @@ public class StreamingSynthesizer : ISampleProvider
             switch (effect.Type)
             {
                 case EffectType.Reverb:
-                    sample = ProcessReverb(sample);
+                    float reverbSample = ProcessReverb(sample);
+                    sample = (1 - effect.Amount) * sample + effect.Amount * reverbSample;
                     break;
                 case EffectType.Delay:
-                    sample = ProcessDelay(sample);
+                    float delaySample = ProcessDelay(sample);
+                    sample = (1 - effect.Amount) * sample + effect.Amount * delaySample;
                     break;
                 // TODO: implement more
             }
@@ -376,8 +381,8 @@ public class StreamingSynthesizer : ISampleProvider
     {
         float delayedSample = _delayBuffer[_delayReadIndex];
         
-        float output = input + _delayMix * delayedSample;
-        _delayBuffer[_delayWriteIndex] = input + _delayFeedback * delayedSample;
+        float output = input + DelayMix * delayedSample;
+        _delayBuffer[_delayWriteIndex] = input + DelayFeedback * delayedSample;
         
         _delayWriteIndex = (_delayWriteIndex + 1) % _delayBufferSize;
         _delayReadIndex = (_delayReadIndex + 1) % _delayBufferSize;
@@ -391,7 +396,7 @@ public class StreamingSynthesizer : ISampleProvider
         // use several taps from reverb buffer
         float reverbOutput = 0;
         // taps
-        int[] tapDelays = [500, 1000, 1500];
+        int[] tapDelays = [(int) (500 * ReverbTime), (int) (1000 * ReverbTime), (int) (1500 * ReverbTime)];
         float[] tapGains = [0.3f, 0.2f, 0.1f];
 
         for (int i = 0; i < tapDelays.Length; i++)
@@ -404,7 +409,7 @@ public class StreamingSynthesizer : ISampleProvider
         _reverbBuffer[_reverbWriteIndex] = input + reverbOutput * 0.5f;
         _reverbWriteIndex = (_reverbWriteIndex + 1) % _reverbBufferSize;
 
-        return input + reverbOutput * _reverbMix;
+        return input + reverbOutput * ReverbMix;
     }
     
     private static float MidiNoteToFrequency(int midiNote)
