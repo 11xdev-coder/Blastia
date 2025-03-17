@@ -50,20 +50,32 @@ public class StreamingSynthesizer : ISampleProvider
     }
     
     // delay
+    public const float DelayMixDefault = 0.3f;
+    public const float DelayFeedbackDefault = 0.5f;
+    public const float DelayTimeDefault = 0.3f;
     private float[] _delayBuffer = [];
     private int _delayBufferSize;
     private int _delayWriteIndex;
     private int _delayReadIndex;
-    public float DelayMix = 0.3f; // how much of the delayed signal mixed in
-    public float DelayFeedback = 0.5f; // how much of the delayed signal is fed back
+    public float DelayMix = DelayMixDefault; // how much of the delayed signal mixed in
+    public float DelayFeedback = DelayFeedbackDefault; // how much of the delayed signal is fed back
+    public float DelayTime = DelayTimeDefault;
     private int _delaySamples; // delay time (in samples)
     
     // reverb
+    public const float ReverbMixDefault = 0.4f;
+    public const float ReverbTimeDefault = 0.5f;
     private float[] _reverbBuffer = [];
     private int _reverbBufferSize;
     private int _reverbWriteIndex;
-    public float ReverbMix = 0.4f; // reverb wet/dry mix
-    public float ReverbTime = 0.5f;
+    public float ReverbMix = ReverbMixDefault; // reverb wet/dry mix
+    public float ReverbTime = ReverbTimeDefault;
+    
+    // bit crusher
+    public const int BitCrusherReductionFactorDefault = 2;
+    public int BitCrusherReductionFactor = BitCrusherReductionFactorDefault;
+    private int _bitCrusherCounter;
+    private float _bitCrusherStoredSample;
 
     public StreamingSynthesizer(Style style)
     {
@@ -73,7 +85,7 @@ public class StreamingSynthesizer : ISampleProvider
     private void InitializeEffects()
     {
         // delay time of 0.3 seconds
-        _delaySamples = (int) (0.3f * WaveFormat.SampleRate);
+        _delaySamples = (int) (DelayTime * WaveFormat.SampleRate);
         _delayBufferSize = _delaySamples;
         _delayBuffer = new float[_delayBufferSize];
         _delayWriteIndex = 0;
@@ -85,7 +97,8 @@ public class StreamingSynthesizer : ISampleProvider
         _reverbWriteIndex = 0;
     }
     
-    public void LoadTrack(MusicTrack track, float reverbMix, float reverbTime, bool looping = false)
+    public void LoadTrack(MusicTrack track, float reverbMix, float reverbTime, float delayMix, float delayFeedback, float delayTime, 
+        int bitCrusherReduction, bool looping = false)
     {
         lock (_noteLock)
         {
@@ -138,6 +151,10 @@ public class StreamingSynthesizer : ISampleProvider
             
             ReverbMix = reverbMix;
             ReverbTime = reverbTime;
+            DelayMix = delayMix;
+            DelayFeedback = delayFeedback;
+            DelayTime = delayTime;
+            BitCrusherReductionFactor = bitCrusherReduction;
             InitializeEffects();
         }
     }
@@ -246,7 +263,9 @@ public class StreamingSynthesizer : ISampleProvider
                     float delaySample = ProcessDelay(sample);
                     sample = (1 - effect.Amount) * sample + effect.Amount * delaySample;
                     break;
-                // TODO: implement more
+                case EffectType.BitCrusher:
+                    sample = ProcessBitCrusher(sample, effect.Amount);
+                    break;
             }
         }
 
@@ -410,6 +429,22 @@ public class StreamingSynthesizer : ISampleProvider
         _reverbWriteIndex = (_reverbWriteIndex + 1) % _reverbBufferSize;
 
         return input + reverbOutput * ReverbMix;
+    }
+
+    private float ProcessBitCrusher(float input, float amount)
+    {
+        // reduce max to 4 bits
+        int targetBits = (int)(16 - amount * 12); 
+        int levels = 1 << targetBits; // 2^targetBits
+        float quantized = (float)Math.Round(input * levels) / levels;
+    
+        // sample rate reduction
+        _bitCrusherCounter++;
+        if (_bitCrusherCounter >= BitCrusherReductionFactor)
+            _bitCrusherStoredSample = quantized;
+        _bitCrusherCounter %= BitCrusherReductionFactor;
+    
+        return _bitCrusherStoredSample;
     }
     
     private static float MidiNoteToFrequency(int midiNote)

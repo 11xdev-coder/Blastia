@@ -33,7 +33,6 @@ namespace Blastia.Main.Synthesizer
         private static bool _includePercussion = true;
         private static bool _includeLead = true;
         private static bool _includeGlitch = true;
-        private static bool _includeDelay;
         private static bool _isGeneratingTrack;
         private static string _currentStatusMessage = "";
         private static string _exportStatus = "Not exporting";
@@ -42,8 +41,18 @@ namespace Blastia.Main.Synthesizer
         
         // reverb
         private static bool _includeReverb;
-        private static float _reverbMix;
-        private static float _reverbTime;
+        private static float _reverbMix = StreamingSynthesizer.ReverbMixDefault;
+        private static float _reverbTime = StreamingSynthesizer.ReverbTimeDefault;
+        
+        // delay
+        private static bool _includeDelay;
+        private static float _delayMix = StreamingSynthesizer.DelayMixDefault;
+        private static float _delayFeedback = StreamingSynthesizer.DelayFeedbackDefault;
+        private static float _delayTime = StreamingSynthesizer.DelayTimeDefault;
+        
+        // bit crusher
+        private static bool _includeBitCrusher;
+        private static int _bitCrusherReduction = StreamingSynthesizer.BitCrusherReductionFactorDefault;
         
         // Synth provider
         private static int _selectedSynthStyle;
@@ -130,8 +139,6 @@ namespace Blastia.Main.Synthesizer
                                 _includeGlitch = false;
                                 _includeBass = true;
                                 _includeLead = true;
-                                _includeDelay = true;
-                                _includeReverb = true;
                                 _selectedSynthStyle = 2;
                                 break;
                         }
@@ -171,23 +178,63 @@ namespace Blastia.Main.Synthesizer
                     }
 
                     ImGui.Checkbox("Reverb", ref _includeReverb); ImGui.SameLine();
-                    ImGui.Checkbox("Delay", ref _includeDelay);
+                    ImGui.Checkbox("Delay", ref _includeDelay); ImGui.SameLine();
+                    ImGui.Checkbox("Bit crusher", ref _includeBitCrusher);
 
                     if (_includeReverb)
                     {
-                        ImGui.Text("Reverb Settings:");
-                        
-                        _reverbMix = _synth?.ReverbMix ?? 0.4f;
-                        if (ImGui.SliderFloat("Reverb Mix", ref _reverbMix, 0.1f, 2f))
+                        if (ImGui.CollapsingHeader("Reverb Settings"))
                         {
-                            if (_synth == null) return;
-                            _synth.ReverbMix = _reverbMix;
+                            _reverbMix = _synth?.ReverbMix ?? StreamingSynthesizer.ReverbMixDefault;
+                            if (ImGui.SliderFloat("Reverb Mix", ref _reverbMix, 0.1f, 2f))
+                            {
+                                if (_synth == null) return;
+                                _synth.ReverbMix = _reverbMix;
+                            }
+                            _reverbTime = _synth?.ReverbTime ?? StreamingSynthesizer.ReverbTimeDefault;
+                            if (ImGui.SliderFloat("Reverb Time", ref _reverbTime, 0f, 7f))
+                            {
+                                if (_synth == null) return;
+                                _synth.ReverbTime = _reverbTime;
+                            }
                         }
-                        _reverbTime = _synth?.ReverbTime ?? 0.5f;
-                        if (ImGui.SliderFloat("Reverb Time", ref _reverbTime, 0f, 7f))
+                    }
+                    
+                    if (_includeDelay)
+                    {
+                        if (ImGui.CollapsingHeader("Delay Settings"))
                         {
-                            if (_synth == null) return;
-                            _synth.ReverbTime = _reverbTime;
+                            _delayMix = _synth?.DelayMix ?? StreamingSynthesizer.DelayMixDefault;
+                            if (ImGui.SliderFloat("Delay Mix", ref _delayMix, 0.1f, 2f))
+                            {
+                                if (_synth == null) return;
+                                _synth.DelayMix = _delayMix;
+                            }
+                            _delayFeedback = _synth?.DelayFeedback ?? StreamingSynthesizer.DelayFeedbackDefault;
+                            if (ImGui.SliderFloat("Delay Feedback", ref _delayFeedback, 0f, 1f))
+                            {
+                                if (_synth == null) return;
+                                _synth.DelayFeedback = _delayFeedback;
+                            }
+                            _delayTime = _synth?.DelayTime ?? StreamingSynthesizer.DelayTimeDefault;
+                            if (ImGui.SliderFloat("Delay Time", ref _delayTime, 0f, 7f))
+                            {
+                                if (_synth == null) return;
+                                _synth.DelayTime = _delayTime;
+                            }
+                        }
+                    }
+
+                    if (_includeBitCrusher)
+                    {
+                        if (ImGui.CollapsingHeader("Bit Crusher Settings"))
+                        {
+                            _bitCrusherReduction = _synth?.BitCrusherReductionFactor ?? StreamingSynthesizer.BitCrusherReductionFactorDefault;
+                            if (ImGui.SliderInt("Sample Reduction", ref _bitCrusherReduction, 0, 8))
+                            {
+                                if (_synth == null) return;
+                                _synth.BitCrusherReductionFactor = _bitCrusherReduction;
+                            }
                         }
                     }
                     
@@ -3077,11 +3124,14 @@ namespace Blastia.Main.Synthesizer
                 }
             };
 
-            parameters.Effects.Add(new EffectParameters
+            if (_includeBitCrusher)
             {
-                Type = EffectType.BitCrusher,
-                Amount = 0.15f
-            });
+                parameters.Effects.Add(new EffectParameters
+                {
+                    Type = EffectType.BitCrusher,
+                    Amount = 0.15f
+                });
+            }
             
             parameters.Oscillators.Add(main);
         }
@@ -3381,11 +3431,14 @@ namespace Blastia.Main.Synthesizer
             parameters.Oscillators.Add(main);
             
             // Effects - heavy processing
-            parameters.Effects.Add(new EffectParameters
+            if (_includeBitCrusher)
             {
-                Type = EffectType.BitCrusher,
-                Amount = 0.7f
-            });
+                parameters.Effects.Add(new EffectParameters
+                {
+                    Type = EffectType.BitCrusher,
+                    Amount = 0.7f
+                });
+            }
             
             parameters.Effects.Add(new EffectParameters
             {
@@ -3424,7 +3477,8 @@ namespace Blastia.Main.Synthesizer
             try
             {
                 _synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
-                _synth.LoadTrack(_currentTrack, _reverbMix, _reverbTime, _isLooping);
+                _synth.LoadTrack(_currentTrack, _reverbMix, _reverbTime, _delayMix, _delayFeedback, _delayTime, 
+                    _bitCrusherReduction, _isLooping);
                 
                 _waveOut = new WaveOutEvent();
                 _waveOut.Init(_synth);
@@ -3653,7 +3707,7 @@ namespace Blastia.Main.Synthesizer
             using (var writer = new WaveFileWriter(fileStream, waveFormat))
             {
                 var synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
-                synth.LoadTrack(track, _reverbMix, _reverbTime);
+                synth.LoadTrack(track, _reverbMix, _reverbTime, _delayMix, _delayFeedback, _delayTime, _bitCrusherReduction);
         
                 // Calculate SAMPLES PER STEP (not frames)
                 double secondsPerStep = (60000.0 / track.Tempo / 4.0) / 1000.0;
