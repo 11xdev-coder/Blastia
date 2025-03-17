@@ -74,8 +74,6 @@ public class StreamingSynthesizer : ISampleProvider
     // bit crusher
     public const int BitCrusherReductionFactorDefault = 2;
     public int BitCrusherReductionFactor = BitCrusherReductionFactorDefault;
-    private int _bitCrusherCounter;
-    private float _bitCrusherStoredSample;
 
     public StreamingSynthesizer(Style style)
     {
@@ -264,7 +262,7 @@ public class StreamingSynthesizer : ISampleProvider
                     sample = (1 - effect.Amount) * sample + effect.Amount * delaySample;
                     break;
                 case EffectType.BitCrusher:
-                    sample = ProcessBitCrusher(sample, effect.Amount);
+                    sample = ProcessBitCrusher(sample, effect.Amount, note);
                     break;
             }
         }
@@ -431,7 +429,7 @@ public class StreamingSynthesizer : ISampleProvider
         return input + reverbOutput * ReverbMix;
     }
 
-    private float ProcessBitCrusher(float input, float amount)
+    private float ProcessBitCrusher(float input, float amount, ActiveNote note)
     {
         // reduce max to 4 bits
         int targetBits = (int)(16 - amount * 12); 
@@ -439,12 +437,14 @@ public class StreamingSynthesizer : ISampleProvider
         float quantized = (float)Math.Round(input * levels) / levels;
     
         // sample rate reduction
-        _bitCrusherCounter++;
-        if (_bitCrusherCounter >= BitCrusherReductionFactor)
-            _bitCrusherStoredSample = quantized;
-        _bitCrusherCounter %= BitCrusherReductionFactor;
+        note.BitCrusherCounter += 1;
+        if (note.BitCrusherCounter >= BitCrusherReductionFactor)
+        {
+            note.BitCrusherStoredSample = quantized;
+            note.BitCrusherCounter = 0;
+        }
     
-        return _bitCrusherStoredSample;
+        return note.BitCrusherStoredSample;
     }
     
     private static float MidiNoteToFrequency(int midiNote)
@@ -479,5 +479,9 @@ public class StreamingSynthesizer : ISampleProvider
         public int Program;
         public List<OscillatorData> Oscillators = [];
         public SynthParameters SynthParams = new();
+        
+        // bitcrusher
+        public int BitCrusherCounter;
+        public float BitCrusherStoredSample;
     }
 }

@@ -230,7 +230,7 @@ namespace Blastia.Main.Synthesizer
                         if (ImGui.CollapsingHeader("Bit Crusher Settings"))
                         {
                             _bitCrusherReduction = _synth?.BitCrusherReductionFactor ?? StreamingSynthesizer.BitCrusherReductionFactorDefault;
-                            if (ImGui.SliderInt("Sample Reduction", ref _bitCrusherReduction, 0, 8))
+                            if (ImGui.SliderInt("Sample Reduction", ref _bitCrusherReduction, 0, 14))
                             {
                                 if (_synth == null) return;
                                 _synth.BitCrusherReductionFactor = _bitCrusherReduction;
