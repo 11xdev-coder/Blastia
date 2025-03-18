@@ -54,6 +54,11 @@ namespace Blastia.Main.Synthesizer
         private static bool _includeBitCrusher;
         private static int _bitCrusherReduction = StreamingSynthesizer.BitCrusherReductionFactorDefault;
         
+        // distortion
+        private static bool _includeDistortion;
+        private static float _distortionDrive;
+        private static float _distortionPostGain;
+        
         // Synth provider
         private static int _selectedSynthStyle;
         private static readonly string[] SynthStyles = ["Default", "Electronic - uses synth", "Synthwave - uses synth"];
@@ -177,9 +182,23 @@ namespace Blastia.Main.Synthesizer
                         ImGui.SetTooltip("Effects are generated at track creation and cannot be modified later. Effect settings can be edited post-generating");
                     }
 
-                    ImGui.Checkbox("Reverb", ref _includeReverb); ImGui.SameLine();
+                    ImGui.Checkbox("Reverb", ref _includeReverb);
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip("Generated for -> Percussion, Arpeggio, Pad, Lead");
+                    } ImGui.SameLine();
                     ImGui.Checkbox("Delay", ref _includeDelay); ImGui.SameLine();
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip("Generated for -> Arpeggio, Lead, Glitch");
+                    } ImGui.SameLine();
                     ImGui.Checkbox("Bit crusher", ref _includeBitCrusher);
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip("Generated for -> Bass, Glitch");
+                    }
+                    
+                    ImGui.Checkbox("Distortion", ref _includeDistortion);
 
                     if (_includeReverb)
                     {
@@ -235,6 +254,14 @@ namespace Blastia.Main.Synthesizer
                                 if (_synth == null) return;
                                 _synth.BitCrusherReductionFactor = _bitCrusherReduction;
                             }
+                        }
+                    }
+
+                    if (_includeDistortion)
+                    {
+                        if (ImGui.CollapsingHeader("Distortion Settings"))
+                        {
+                            
                         }
                     }
                     
@@ -3478,7 +3505,7 @@ namespace Blastia.Main.Synthesizer
             {
                 _synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
                 _synth.LoadTrack(_currentTrack, _reverbMix, _reverbTime, _delayMix, _delayFeedback, _delayTime, 
-                    _bitCrusherReduction, _isLooping);
+                    _bitCrusherReduction, _distortionDrive, _distortionPostGain, _isLooping);
                 
                 _waveOut = new WaveOutEvent();
                 _waveOut.Init(_synth);
@@ -3707,7 +3734,8 @@ namespace Blastia.Main.Synthesizer
             using (var writer = new WaveFileWriter(fileStream, waveFormat))
             {
                 var synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
-                synth.LoadTrack(track, _reverbMix, _reverbTime, _delayMix, _delayFeedback, _delayTime, _bitCrusherReduction);
+                synth.LoadTrack(track, _reverbMix, _reverbTime, _delayMix, _delayFeedback, _delayTime, 
+                    _bitCrusherReduction, _distortionDrive, _distortionPostGain);
         
                 // Calculate SAMPLES PER STEP (not frames)
                 double secondsPerStep = (60000.0 / track.Tempo / 4.0) / 1000.0;

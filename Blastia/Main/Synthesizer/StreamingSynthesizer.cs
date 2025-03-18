@@ -74,6 +74,12 @@ public class StreamingSynthesizer : ISampleProvider
     // bit crusher
     public const int BitCrusherReductionFactorDefault = 2;
     public int BitCrusherReductionFactor = BitCrusherReductionFactorDefault;
+    
+    // distortion
+    public const float DistortionDriveDefault = 2;
+    public const float DistortionPostGainDefault = 1;
+    public float DistortionDrive = DistortionDriveDefault;
+    public float DistortionPostGain = DistortionPostGainDefault;
 
     public StreamingSynthesizer(Style style)
     {
@@ -96,7 +102,7 @@ public class StreamingSynthesizer : ISampleProvider
     }
     
     public void LoadTrack(MusicTrack track, float reverbMix, float reverbTime, float delayMix, float delayFeedback, float delayTime, 
-        int bitCrusherReduction, bool looping = false)
+        int bitCrusherReduction, float distortionDrive, float distortionPostGain, bool looping = false)
     {
         lock (_noteLock)
         {
@@ -153,6 +159,8 @@ public class StreamingSynthesizer : ISampleProvider
             DelayFeedback = delayFeedback;
             DelayTime = delayTime;
             BitCrusherReductionFactor = bitCrusherReduction;
+            DistortionDrive = distortionDrive;
+            DistortionPostGain = distortionPostGain;
             InitializeEffects();
         }
     }
@@ -255,19 +263,28 @@ public class StreamingSynthesizer : ISampleProvider
             {
                 case EffectType.Reverb:
                     float reverbSample = ProcessReverb(sample);
-                    sample = (1 - effect.Amount) * sample + effect.Amount * reverbSample;
+                    sample = MixDryAndWetSignals(sample, reverbSample, effect.Amount);
                     break;
                 case EffectType.Delay:
                     float delaySample = ProcessDelay(sample);
-                    sample = (1 - effect.Amount) * sample + effect.Amount * delaySample;
+                    sample = MixDryAndWetSignals(sample, delaySample, effect.Amount);
                     break;
                 case EffectType.BitCrusher:
                     sample = ProcessBitCrusher(sample, effect.Amount, note);
+                    break;
+                case EffectType.Distortion:
+                    float distortedSample = ProcessDistortion(sample);
+                    sample = MixDryAndWetSignals(sample, distortedSample, effect.Amount);
                     break;
             }
         }
 
         return sample;
+    }
+
+    private float MixDryAndWetSignals(float sample, float affectedSample, float effectAmount)
+    {
+        return (1 - effectAmount) * sample + effectAmount * affectedSample;
     }
     
     private float GenerateElectronicSound(ActiveNote note)
@@ -445,6 +462,19 @@ public class StreamingSynthesizer : ISampleProvider
         }
     
         return note.BitCrusherStoredSample;
+    }
+
+    private float ProcessDistortion(float input)
+    {
+        // pre-gain: drive input
+        float drivenSample = input * DistortionDrive;
+        
+        // waveshape using soft-clipping
+        float distortedSample = (float)Math.Tanh(drivenSample);
+        
+        // post-gain
+        float outputSample = distortedSample * DistortionPostGain;
+        return outputSample;
     }
     
     private static float MidiNoteToFrequency(int midiNote)
