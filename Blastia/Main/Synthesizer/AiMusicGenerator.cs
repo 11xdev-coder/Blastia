@@ -56,8 +56,8 @@ namespace Blastia.Main.Synthesizer
         
         // distortion
         private static bool _includeDistortion;
-        private static float _distortionDrive;
-        private static float _distortionPostGain;
+        private static float _distortionDrive = StreamingSynthesizer.DistortionDriveDefault;
+        private static float _distortionPostGain = StreamingSynthesizer.DistortionPostGainDefault;
         
         // Synth provider
         private static int _selectedSynthStyle;
@@ -199,6 +199,10 @@ namespace Blastia.Main.Synthesizer
                     }
                     
                     ImGui.Checkbox("Distortion", ref _includeDistortion);
+                    if (ImGui.IsItemHovered())
+                    {
+                        ImGui.SetTooltip("Generated for -> Percussion (intensity > 0.7), Lead (intensity > 0.6), Glitch");
+                    }
 
                     if (_includeReverb)
                     {
@@ -261,7 +265,18 @@ namespace Blastia.Main.Synthesizer
                     {
                         if (ImGui.CollapsingHeader("Distortion Settings"))
                         {
-                            
+                            _distortionDrive = _synth?.DistortionDrive ?? StreamingSynthesizer.DistortionDriveDefault;
+                            if (ImGui.SliderFloat("Drive", ref _distortionDrive, 0f, 10f))
+                            {
+                                if (_synth == null) return;
+                                _synth.DistortionDrive = _distortionDrive;
+                            }
+                            _distortionPostGain = _synth?.DistortionPostGain ?? StreamingSynthesizer.DistortionPostGainDefault;
+                            if (ImGui.SliderFloat("Post Gain", ref _distortionPostGain, 0f, 3f))
+                            {
+                                if (_synth == null) return;
+                                _synth.DistortionPostGain = _distortionPostGain;
+                            }
                         }
                     }
                     
@@ -3196,7 +3211,7 @@ namespace Blastia.Main.Synthesizer
                 });
             }
             
-            if (_intensity > 0.7)
+            if (_intensity > 0.7 && _includeDistortion)
             {
                 parameters.Effects.Add(new EffectParameters
                 {
@@ -3418,7 +3433,7 @@ namespace Blastia.Main.Synthesizer
             }
             
             // Distortion for more aggressive leads
-            if (_intensity > 0.6)
+            if (_intensity > 0.6 && _includeDistortion)
             {
                 parameters.Effects.Add(new EffectParameters
                 {
@@ -3466,12 +3481,15 @@ namespace Blastia.Main.Synthesizer
                     Amount = 0.7f
                 });
             }
-            
-            parameters.Effects.Add(new EffectParameters
+
+            if (_includeDistortion)
             {
-                Type = EffectType.Distortion,
-                Amount = 0.5f + _intensity * 0.3f
-            });
+                parameters.Effects.Add(new EffectParameters
+                {
+                    Type = EffectType.Distortion,
+                    Amount = 0.5f + _intensity * 0.3f
+                });
+            }
             
             if (_includeDelay)
             {

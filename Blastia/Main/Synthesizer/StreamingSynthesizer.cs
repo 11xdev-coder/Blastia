@@ -469,8 +469,15 @@ public class StreamingSynthesizer : ISampleProvider
         // pre-gain: drive input
         float drivenSample = input * DistortionDrive;
         
-        // waveshape using soft-clipping
-        float distortedSample = (float)Math.Tanh(drivenSample);
+        // waveshape using hard-clipping
+        float distortedSample;
+        float threshold = 0.5f;
+        if (drivenSample > threshold)
+            distortedSample = threshold;
+        else if (drivenSample < -threshold)
+            distortedSample = -threshold;
+        else
+            distortedSample = drivenSample;
         
         // post-gain
         float outputSample = distortedSample * DistortionPostGain;
