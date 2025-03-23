@@ -184,7 +184,7 @@
       <workItem from="1742298941553" duration="4306000" />
       <workItem from="1742404729695" duration="870000" />
       <workItem from="1742496581043" duration="1198000" />
-      <workItem from="1742641967159" duration="2219000" />
+      <workItem from="1742641967159" duration="6149000" />
     </task>
     <task id="LOCAL-00001" summary="tab buttons and images">
       <option name="closed" value="true" />
@@ -546,7 +546,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742328117211</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="improved distortion + setting sliders">
+      <option name="closed" value="true" />
+      <created>1742667613539</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1742667613539</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -556,7 +564,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="lots of refactoring + handler button sync" />
     <MESSAGE value="tab group visual improvements" />
     <MESSAGE value="world unloading" />
     <MESSAGE value="fixed camera world rendering issue" />
@@ -581,6 +588,7 @@
     <MESSAGE value="simple bit crusher and more customization" />
     <MESSAGE value="improved bit crusher" />
     <MESSAGE value="tooltips + distortion" />
-    <option name="LAST_COMMIT_MESSAGE" value="tooltips + distortion" />
+    <MESSAGE value="improved distortion + setting sliders" />
+    <option name="LAST_COMMIT_MESSAGE" value="improved distortion + setting sliders" />
   </component>
 </project>

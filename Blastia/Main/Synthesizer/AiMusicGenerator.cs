@@ -72,6 +72,34 @@ namespace Blastia.Main.Synthesizer
             InitializeAudioSystem();
         }
 
+        private static void RenderCheckboxWithTooltip(string label, ref bool value, string tooltip, bool sameLine = false)
+        {
+            ImGui.Checkbox(label, ref value);
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(tooltip);
+            }
+            if (sameLine) ImGui.SameLine();
+        }
+
+        private static void RenderSliderFloatWithFallback(string label, ref float value, float min, float max,
+            Action<float> onValueChanged)
+        {
+            if (ImGui.SliderFloat(label, ref value, min, max))
+            {
+                onValueChanged(value);
+            }
+        }
+        
+        private static void RenderSliderIntWithFallback(string label, ref int value, int min, int max,
+            Action<int> onValueChanged)
+        {
+            if (ImGui.SliderInt(label, ref value, min, max))
+            {
+                onValueChanged(value);
+            }
+        }
+
         public static void RenderUi(ref bool show)
         {
             if (!show) return;
@@ -182,44 +210,26 @@ namespace Blastia.Main.Synthesizer
                         ImGui.SetTooltip("Effects are generated at track creation and cannot be modified later. Effect settings can be edited post-generating");
                     }
 
-                    ImGui.Checkbox("Reverb", ref _includeReverb);
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.SetTooltip("Generated for -> Percussion, Arpeggio, Pad, Lead");
-                    } ImGui.SameLine();
-                    ImGui.Checkbox("Delay", ref _includeDelay); ImGui.SameLine();
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.SetTooltip("Generated for -> Arpeggio, Lead, Glitch");
-                    } ImGui.SameLine();
-                    ImGui.Checkbox("Bit crusher", ref _includeBitCrusher);
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.SetTooltip("Generated for -> Bass, Glitch");
-                    }
-                    
-                    ImGui.Checkbox("Distortion", ref _includeDistortion);
-                    if (ImGui.IsItemHovered())
-                    {
-                        ImGui.SetTooltip("Generated for -> Percussion (intensity > 0.7), Lead (intensity > 0.6), Glitch");
-                    }
+                    RenderCheckboxWithTooltip("Reverb", ref _includeReverb, "Generated for -> Percussion, Arpeggio, Pad, Lead", true);
+                    RenderCheckboxWithTooltip("Delay", ref _includeDelay, "Generated for -> Arpeggio, Lead, Glitch", true);
+                    RenderCheckboxWithTooltip("Bit crusher", ref _includeBitCrusher, "Generated for -> Bass, Glitch");
+                    RenderCheckboxWithTooltip("Distortion", ref _includeDistortion, "Generated for -> Percussion (intensity > 0.7), Lead (intensity > 0.6), Glitch");
 
                     if (_includeReverb)
                     {
                         if (ImGui.CollapsingHeader("Reverb Settings"))
                         {
                             _reverbMix = _synth?.ReverbMix ?? StreamingSynthesizer.ReverbMixDefault;
-                            if (ImGui.SliderFloat("Reverb Mix", ref _reverbMix, 0.1f, 2f))
+                            RenderSliderFloatWithFallback("Reverb Mix", ref _reverbMix, 0.1f, 2f, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.ReverbMix = _reverbMix;
-                            }
+                                if (_synth != null) _synth.ReverbMix = val;
+                            });
+                            
                             _reverbTime = _synth?.ReverbTime ?? StreamingSynthesizer.ReverbTimeDefault;
-                            if (ImGui.SliderFloat("Reverb Time", ref _reverbTime, 0f, 7f))
+                            RenderSliderFloatWithFallback("Reverb Time", ref _reverbTime, 0f, 7f, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.ReverbTime = _reverbTime;
-                            }
+                                if (_synth != null) _synth.ReverbTime = val;
+                            });
                         }
                     }
                     
@@ -228,23 +238,20 @@ namespace Blastia.Main.Synthesizer
                         if (ImGui.CollapsingHeader("Delay Settings"))
                         {
                             _delayMix = _synth?.DelayMix ?? StreamingSynthesizer.DelayMixDefault;
-                            if (ImGui.SliderFloat("Delay Mix", ref _delayMix, 0.1f, 2f))
+                            RenderSliderFloatWithFallback("Delay Mix", ref _delayMix, 0.1f, 2f, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.DelayMix = _delayMix;
-                            }
+                                if (_synth != null) _synth.DelayMix = val;
+                            });
                             _delayFeedback = _synth?.DelayFeedback ?? StreamingSynthesizer.DelayFeedbackDefault;
-                            if (ImGui.SliderFloat("Delay Feedback", ref _delayFeedback, 0f, 1f))
+                            RenderSliderFloatWithFallback("Delay Feedback", ref _delayFeedback, 0f, 1f, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.DelayFeedback = _delayFeedback;
-                            }
+                                if (_synth != null) _synth.DelayFeedback = val;
+                            });
                             _delayTime = _synth?.DelayTime ?? StreamingSynthesizer.DelayTimeDefault;
-                            if (ImGui.SliderFloat("Delay Time", ref _delayTime, 0f, 7f))
+                            RenderSliderFloatWithFallback("Delay Time", ref _delayTime, 0f, 7f, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.DelayTime = _delayTime;
-                            }
+                                if (_synth != null) _synth.DelayTime = val;
+                            });
                         }
                     }
 
@@ -253,11 +260,10 @@ namespace Blastia.Main.Synthesizer
                         if (ImGui.CollapsingHeader("Bit Crusher Settings"))
                         {
                             _bitCrusherReduction = _synth?.BitCrusherReductionFactor ?? StreamingSynthesizer.BitCrusherReductionFactorDefault;
-                            if (ImGui.SliderInt("Sample Reduction", ref _bitCrusherReduction, 0, 14))
+                            RenderSliderIntWithFallback("Sample Reduction", ref _bitCrusherReduction, 0, 14, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.BitCrusherReductionFactor = _bitCrusherReduction;
-                            }
+                                if (_synth != null) _synth.BitCrusherReductionFactor = val;
+                            });
                         }
                     }
 
@@ -266,17 +272,15 @@ namespace Blastia.Main.Synthesizer
                         if (ImGui.CollapsingHeader("Distortion Settings"))
                         {
                             _distortionDrive = _synth?.DistortionDrive ?? StreamingSynthesizer.DistortionDriveDefault;
-                            if (ImGui.SliderFloat("Drive", ref _distortionDrive, 0f, 10f))
+                            RenderSliderFloatWithFallback("Drive", ref _distortionDrive, 0f, 10f, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.DistortionDrive = _distortionDrive;
-                            }
+                                if (_synth != null) _synth.DistortionDrive = val;
+                            });
                             _distortionPostGain = _synth?.DistortionPostGain ?? StreamingSynthesizer.DistortionPostGainDefault;
-                            if (ImGui.SliderFloat("Post Gain", ref _distortionPostGain, 0f, 3f))
+                            RenderSliderFloatWithFallback("Post Gain", ref _distortionPostGain, 0f, 3f, val =>
                             {
-                                if (_synth == null) return;
-                                _synth.DistortionPostGain = _distortionPostGain;
-                            }
+                                if (_synth != null) _synth.DistortionPostGain = val;
+                            });
                         }
                     }
                     
