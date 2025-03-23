@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Text;
 using NAudio.Midi;
 using ImGuiNET;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
@@ -23,6 +24,8 @@ namespace Blastia.Main.Synthesizer
         private static int _selectedStyle;
         private static readonly string[] SynthGenerationStyles = ["Default", "Synthwave"];
         private static int _selectedSynthGeneration;
+        private static readonly string[] SynthwaveGenerationPrefabs = ["No prefab", "Into The Abyss"];
+        private static int _selectedSynthwaveGenerationPrefab;
         private static int _tempo = 110;
         private static int _trackLength = 16; // bars
         private static float _complexity = 0.7f;
@@ -182,106 +185,131 @@ namespace Blastia.Main.Synthesizer
                     {
                         switch (_selectedSynthGeneration)
                         {
+                            case 0: // default
+                                _selectedSynthwaveGenerationPrefab = 0; // remove prefab
+                                break;
                             case 1: // synthwave
                                 _selectedSynthStyle = 2;
                                 break;
                         }
                     }
 
-                    // Generation parameters
-                    ImGui.SliderInt("Tempo", ref _tempo, 40, 140);
-                    ImGui.SliderInt("Length (bars)", ref _trackLength, 8, 32);
-                    ImGui.SliderFloat("Complexity", ref _complexity, 0.1f, 1.0f);
-                    ImGui.SliderFloat("Intensity", ref _intensity, 0.1f, 1.0f);
-
-                    // Track element toggles
-                    ImGui.Text("Track Elements:");
-                    ImGui.Checkbox("Bass", ref _includeBass); ImGui.SameLine();
-                    ImGui.Checkbox("Percussion", ref _includePercussion); ImGui.SameLine();
-                    ImGui.Checkbox("Arpeggios", ref _includeArpeggios);
-                    ImGui.Checkbox("Pads", ref _includePads); ImGui.SameLine();
-                    ImGui.Checkbox("Lead", ref _includeLead); ImGui.SameLine();
-                    ImGui.Checkbox("Glitch Effects", ref _includeGlitch);
-
-                    // Effects
-                    ImGui.Text("Generate Effects:");
-                    if (ImGui.IsItemHovered())
+                    if (_selectedSynthGeneration == 1) // synthwave
                     {
-                        ImGui.SetTooltip("Effects are generated at track creation and cannot be modified later. Effect settings can be edited post-generating");
-                    }
-
-                    RenderCheckboxWithTooltip("Reverb", ref _includeReverb, "Generated for -> Percussion, Arpeggio, Pad, Lead", true);
-                    RenderCheckboxWithTooltip("Delay", ref _includeDelay, "Generated for -> Arpeggio, Lead, Glitch", true);
-                    RenderCheckboxWithTooltip("Bit crusher", ref _includeBitCrusher, "Generated for -> Bass, Glitch");
-                    RenderCheckboxWithTooltip("Distortion", ref _includeDistortion, "Generated for -> Percussion (intensity > 0.7), Lead (intensity > 0.6), Glitch");
-
-                    if (_includeReverb)
-                    {
-                        if (ImGui.CollapsingHeader("Reverb Settings"))
+                        if (ImGui.Combo("Synthwave Track Generation Prefab", ref _selectedSynthwaveGenerationPrefab,
+                                SynthwaveGenerationPrefabs, SynthwaveGenerationPrefabs.Length))
                         {
-                            _reverbMix = _synth?.ReverbMix ?? StreamingSynthesizer.ReverbMixDefault;
-                            RenderSliderFloatWithFallback("Reverb Mix", ref _reverbMix, 0.1f, 2f, val =>
+                            switch (_selectedSynthwaveGenerationPrefab)
                             {
-                                if (_synth != null) _synth.ReverbMix = val;
-                            });
-                            
-                            _reverbTime = _synth?.ReverbTime ?? StreamingSynthesizer.ReverbTimeDefault;
-                            RenderSliderFloatWithFallback("Reverb Time", ref _reverbTime, 0f, 7f, val =>
-                            {
-                                if (_synth != null) _synth.ReverbTime = val;
-                            });
+                                case 1: // Into The Abyss
+                                    _selectedSynthStyle = 0; // default synth style
+                                    break;
+                            }
                         }
                     }
                     
-                    if (_includeDelay)
-                    {
-                        if (ImGui.CollapsingHeader("Delay Settings"))
-                        {
-                            _delayMix = _synth?.DelayMix ?? StreamingSynthesizer.DelayMixDefault;
-                            RenderSliderFloatWithFallback("Delay Mix", ref _delayMix, 0.1f, 2f, val =>
-                            {
-                                if (_synth != null) _synth.DelayMix = val;
-                            });
-                            _delayFeedback = _synth?.DelayFeedback ?? StreamingSynthesizer.DelayFeedbackDefault;
-                            RenderSliderFloatWithFallback("Delay Feedback", ref _delayFeedback, 0f, 1f, val =>
-                            {
-                                if (_synth != null) _synth.DelayFeedback = val;
-                            });
-                            _delayTime = _synth?.DelayTime ?? StreamingSynthesizer.DelayTimeDefault;
-                            RenderSliderFloatWithFallback("Delay Time", ref _delayTime, 0f, 7f, val =>
-                            {
-                                if (_synth != null) _synth.DelayTime = val;
-                            });
-                        }
-                    }
+                    ImGui.Separator();
 
-                    if (_includeBitCrusher)
-                    {
-                        if (ImGui.CollapsingHeader("Bit Crusher Settings"))
-                        {
-                            _bitCrusherReduction = _synth?.BitCrusherReductionFactor ?? StreamingSynthesizer.BitCrusherReductionFactorDefault;
-                            RenderSliderIntWithFallback("Sample Reduction", ref _bitCrusherReduction, 0, 14, val =>
-                            {
-                                if (_synth != null) _synth.BitCrusherReductionFactor = val;
-                            });
-                        }
-                    }
+                    // Generation parameters
+                    ImGui.SliderInt("Tempo", ref _tempo, 40, 140);
+                    ImGui.SliderInt("Length (bars)", ref _trackLength, 8, 32);
 
-                    if (_includeDistortion)
+                    if (_selectedSynthwaveGenerationPrefab == 0) // no prefab
                     {
-                        if (ImGui.CollapsingHeader("Distortion Settings"))
+                        ImGui.SliderFloat("Complexity", ref _complexity, 0.1f, 1.0f);
+                        ImGui.SliderFloat("Intensity", ref _intensity, 0.1f, 1.0f);
+
+                        // Track element toggles
+                        ImGui.Text("Track Elements:");
+                        ImGui.Checkbox("Bass", ref _includeBass); ImGui.SameLine();
+                        ImGui.Checkbox("Percussion", ref _includePercussion); ImGui.SameLine();
+                        ImGui.Checkbox("Arpeggios", ref _includeArpeggios);
+                        ImGui.Checkbox("Pads", ref _includePads); ImGui.SameLine();
+                        ImGui.Checkbox("Lead", ref _includeLead); ImGui.SameLine();
+                        ImGui.Checkbox("Glitch Effects", ref _includeGlitch);
+
+                        // Effects
+                        ImGui.Text("Generate Effects:");
+                        if (ImGui.IsItemHovered())
                         {
-                            _distortionDrive = _synth?.DistortionDrive ?? StreamingSynthesizer.DistortionDriveDefault;
-                            RenderSliderFloatWithFallback("Drive", ref _distortionDrive, 0f, 10f, val =>
-                            {
-                                if (_synth != null) _synth.DistortionDrive = val;
-                            });
-                            _distortionPostGain = _synth?.DistortionPostGain ?? StreamingSynthesizer.DistortionPostGainDefault;
-                            RenderSliderFloatWithFallback("Post Gain", ref _distortionPostGain, 0f, 3f, val =>
-                            {
-                                if (_synth != null) _synth.DistortionPostGain = val;
-                            });
+                            ImGui.SetTooltip("Effects are generated at track creation and cannot be modified later. Effect settings can be edited post-generating");
                         }
+
+                        RenderCheckboxWithTooltip("Reverb", ref _includeReverb, "Generated for -> Percussion, Arpeggio, Pad, Lead", true);
+                        RenderCheckboxWithTooltip("Delay", ref _includeDelay, "Generated for -> Arpeggio, Lead, Glitch", true);
+                        RenderCheckboxWithTooltip("Bit crusher", ref _includeBitCrusher, "Generated for -> Bass, Glitch");
+                        RenderCheckboxWithTooltip("Distortion", ref _includeDistortion, "Generated for -> Percussion (intensity > 0.7), Lead (intensity > 0.6), Glitch");
+
+                        if (_includeReverb)
+                        {
+                            if (ImGui.CollapsingHeader("Reverb Settings"))
+                            {
+                                _reverbMix = _synth?.ReverbMix ?? StreamingSynthesizer.ReverbMixDefault;
+                                RenderSliderFloatWithFallback("Reverb Mix", ref _reverbMix, 0.1f, 2f, val =>
+                                {
+                                    if (_synth != null) _synth.ReverbMix = val;
+                                });
+                                
+                                _reverbTime = _synth?.ReverbTime ?? StreamingSynthesizer.ReverbTimeDefault;
+                                RenderSliderFloatWithFallback("Reverb Time", ref _reverbTime, 0f, 7f, val =>
+                                {
+                                    if (_synth != null) _synth.ReverbTime = val;
+                                });
+                            }
+                        }
+                        
+                        if (_includeDelay)
+                        {
+                            if (ImGui.CollapsingHeader("Delay Settings"))
+                            {
+                                _delayMix = _synth?.DelayMix ?? StreamingSynthesizer.DelayMixDefault;
+                                RenderSliderFloatWithFallback("Delay Mix", ref _delayMix, 0.1f, 2f, val =>
+                                {
+                                    if (_synth != null) _synth.DelayMix = val;
+                                });
+                                _delayFeedback = _synth?.DelayFeedback ?? StreamingSynthesizer.DelayFeedbackDefault;
+                                RenderSliderFloatWithFallback("Delay Feedback", ref _delayFeedback, 0f, 1f, val =>
+                                {
+                                    if (_synth != null) _synth.DelayFeedback = val;
+                                });
+                                _delayTime = _synth?.DelayTime ?? StreamingSynthesizer.DelayTimeDefault;
+                                RenderSliderFloatWithFallback("Delay Time", ref _delayTime, 0f, 7f, val =>
+                                {
+                                    if (_synth != null) _synth.DelayTime = val;
+                                });
+                            }
+                        }
+
+                        if (_includeBitCrusher)
+                        {
+                            if (ImGui.CollapsingHeader("Bit Crusher Settings"))
+                            {
+                                _bitCrusherReduction = _synth?.BitCrusherReductionFactor ?? StreamingSynthesizer.BitCrusherReductionFactorDefault;
+                                RenderSliderIntWithFallback("Sample Reduction", ref _bitCrusherReduction, 0, 14, val =>
+                                {
+                                    if (_synth != null) _synth.BitCrusherReductionFactor = val;
+                                });
+                            }
+                        }
+
+                        if (_includeDistortion)
+                        {
+                            if (ImGui.CollapsingHeader("Distortion Settings"))
+                            {
+                                _distortionDrive = _synth?.DistortionDrive ?? StreamingSynthesizer.DistortionDriveDefault;
+                                RenderSliderFloatWithFallback("Drive", ref _distortionDrive, 0f, 10f, val =>
+                                {
+                                    if (_synth != null) _synth.DistortionDrive = val;
+                                });
+                                _distortionPostGain = _synth?.DistortionPostGain ?? StreamingSynthesizer.DistortionPostGainDefault;
+                                RenderSliderFloatWithFallback("Post Gain", ref _distortionPostGain, 0f, 3f, val =>
+                                {
+                                    if (_synth != null) _synth.DistortionPostGain = val;
+                                });
+                            }
+                        }
+                        
+                        ImGui.Separator();
                     }
                     
                     // synthesizer
@@ -467,69 +495,8 @@ namespace Blastia.Main.Synthesizer
             });
         }
 
-        private static void GenerateTrack()
+        private static void FinishTrackGeneration(MusicTrack track)
         {
-            UpdateStatus("Creating new track...", 0.05f);
-
-            // Create new track
-            MusicTrack track = new MusicTrack
-            {
-                Name = $"{TrackStyles[_selectedStyle]} Track {DateTime.Now.ToString("yyyyMMdd-HHmmss")}",
-                Style = _selectedStyle,
-                Tempo = _tempo,
-                BarCount = _trackLength
-            };
-
-            UpdateStatus("Selecting musical key...", 0.1f);
-            track.Key = _rng.Next(12); // 0 = C, 1 = C#, etc.
-            track.IsMinor = _rng.NextDouble() < 0.8;
-
-            // Generate chord progression
-            UpdateStatus("Generating chord progression...", 0.15f);
-            GenerateChordProgression(track);
-
-            // Generate parts
-            if (_includeBass)
-            {
-                UpdateStatus("Generating bass part...", 0.2f);
-                track.Parts.Add(GenerateBassLine(track));
-            }
-
-            if (_includePercussion)
-            {
-                UpdateStatus("Generating percussion...", 0.3f);
-                track.Parts.Add(GeneratePercussion(track));
-            }
-
-            if (_includeArpeggios)
-            {
-                UpdateStatus("Generating arpeggios...", 0.45f);
-                track.Parts.Add(GenerateArpeggio(track));
-            }
-
-            if (_includePads)
-            {
-                UpdateStatus("Generating pads...", 0.6f);
-                track.Parts.Add(GeneratePads(track));
-            }
-
-            if (_includeLead)
-            {
-                UpdateStatus("Generating lead...", 0.75f);
-                track.Parts.Add(GenerateLead(track));
-            }
-
-            if (_includeGlitch)
-            {
-                UpdateStatus("Adding glitch effects...", 0.85f);
-                AddGlitchEffects(track);
-            }
-
-            // Generate synth parameters for each part
-            UpdateStatus("Creating synth parameters...", 0.9f);
-            GenerateSynthParameters(track);
-
-            // Add to saved tracks
             _savedTracks.Insert(0, track);
             if (_savedTracks.Count > 10)
             {
@@ -537,7 +504,110 @@ namespace Blastia.Main.Synthesizer
             }
 
             _currentTrack = track;
-            UpdateStatus("Track generation complete!", 1.0f);
+        }
+        
+        private static void GenerateTrack()
+        {
+            UpdateStatus("Creating new track...", 0.05f);
+
+            if (_selectedSynthwaveGenerationPrefab == 1) // Into The Abyss
+            {
+                Console.WriteLine("Into The Abyss");
+                MusicTrack track = new MusicTrack
+                {
+                    Name = $"Synthwave Into The Abyss track {DateTime.Now:yyyyMMdd-HHmmss}",
+                    Style = _selectedStyle,
+                    Tempo = _tempo,
+                    BarCount = _trackLength
+                };
+
+                UpdateStatus("Selecting musical key...", 0.2f);
+                track.Key = _rng.Next(12);
+                track.IsMinor = _rng.NextDouble() < 0.8;
+
+                double secondsPerBar = 60.0 / _tempo * 4;
+                double trackDurationSec = track.BarCount * secondsPerBar;
+                
+                // TODO: generate parts
+                UpdateStatus("Generating bass beat...", 0.3f);
+                var bassPart = SynthwaveMusicGenerator.IntoTheAbyssBassBeat(track, _tempo, 0, 20);
+                track.Parts.Add(bassPart);
+                
+                UpdateStatus("Generating reverb...", 0.5f);
+                
+                UpdateStatus("Generating arpeggio...", 0.7f);
+                
+                UpdateStatus("Generating arpeggio drop...", 0.85f);
+                
+                UpdateStatus("Generating synth parameters...", 0.95f);
+                GenerateSynthParameters(track);
+                
+                UpdateStatus("Track generation complete!", 1.0f);
+
+                FinishTrackGeneration(track);
+            }
+            else // No prefab
+            {
+                MusicTrack track = new MusicTrack
+                {
+                    Name = $"{TrackStyles[_selectedStyle]} Track {DateTime.Now:yyyyMMdd-HHmmss}",
+                    Style = _selectedStyle,
+                    Tempo = _tempo,
+                    BarCount = _trackLength
+                };
+
+                UpdateStatus("Selecting musical key...", 0.1f);
+                track.Key = _rng.Next(12); // 0 = C, 1 = C#, etc.
+                track.IsMinor = _rng.NextDouble() < 0.8;
+
+                // Generate chord progression
+                UpdateStatus("Generating chord progression...", 0.15f);
+                GenerateChordProgression(track);
+
+                // Generate parts
+                if (_includeBass)
+                {
+                    UpdateStatus("Generating bass part...", 0.2f);
+                    track.Parts.Add(GenerateBassLine(track));
+                }
+
+                if (_includePercussion)
+                {
+                    UpdateStatus("Generating percussion...", 0.3f);
+                    track.Parts.Add(GeneratePercussion(track));
+                }
+
+                if (_includeArpeggios)
+                {
+                    UpdateStatus("Generating arpeggios...", 0.45f);
+                    track.Parts.Add(GenerateArpeggio(track));
+                }
+
+                if (_includePads)
+                {
+                    UpdateStatus("Generating pads...", 0.6f);
+                    track.Parts.Add(GeneratePads(track));
+                }
+
+                if (_includeLead)
+                {
+                    UpdateStatus("Generating lead...", 0.75f);
+                    track.Parts.Add(GenerateLead(track));
+                }
+
+                if (_includeGlitch)
+                {
+                    UpdateStatus("Adding glitch effects...", 0.85f);
+                    AddGlitchEffects(track);
+                }
+
+                // Generate synth parameters for each part
+                UpdateStatus("Creating synth parameters...", 0.9f);
+                GenerateSynthParameters(track);
+
+                FinishTrackGeneration(track);
+                UpdateStatus("Track generation complete!", 1.0f);
+            }
         }
 
         private static void UpdateStatus(string message, float progress)
@@ -2986,7 +3056,15 @@ namespace Blastia.Main.Synthesizer
 
                 if (_selectedSynthGeneration == 1) // synthwave
                 {
-                    Console.WriteLine("Generating Synthwave parameters");
+                    if (part.Type != TrackPartType.Bass && part.Type != TrackPartType.Percussion &&
+                        part.Type != TrackPartType.GlitchFx)
+                    {
+                        foreach (var note in part.Notes)
+                        {
+                            note.Duration = track.BarCount * 16;
+                        }
+                    }
+                    
                     GenerateSynthwaveParameters(part, parameters, track);
                 }
                 else // default
@@ -3023,7 +3101,6 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
-        // TODO: more slow and continuous waves + synthesizer
         private static void GenerateSynthwaveParameters(TrackPart part, SynthParameters parameters, MusicTrack track)
         {
             switch (part.Type)
@@ -3038,12 +3115,7 @@ namespace Blastia.Main.Synthesizer
                             AttackTime = 0.1f,
                             DecayTime = 1.5f,
                             SustainLevel = 0.8f,
-                            ReleaseTime = 2f
-                        },
-                        Filter = new FilterParameters
-                        {
-                            Type = FilterType.LowPass,
-                            Cutoff = 300f
+                            ReleaseTime = 2.5f // slightly longer release for smooth fade-out
                         }
                     });
                     break;
@@ -3062,66 +3134,52 @@ namespace Blastia.Main.Synthesizer
                     });
                     break;
                 case TrackPartType.Arpeggio:
+                    // Use a sine wave for a smoother sound instead of a square wave.
                     parameters.Oscillators.Add(new WaveParameters
                     {
-                        WaveType = WaveType.Square,
+                        WaveType = WaveType.Sine,
                         Amplitude = 0.6f,
                         Envelope = new EnvelopeParameters
                         {
                             AttackTime = 0.05f,
-                            DecayTime = 0.2f,
-                            SustainLevel = 0.7f,
-                            ReleaseTime = 1.5f
-                        },
-                        Filter = new FilterParameters
-                        {
-                            Type = FilterType.BandPass,
-                            Cutoff = 2500f,
-                            Resonance = 0.5f
+                            DecayTime = 0.3f,
+                            SustainLevel = 0.8f,
+                            ReleaseTime = 2f
                         }
                     });
                     break;
                 case TrackPartType.Lead:
+                    // Use a smooth sine wave with long, evolving envelopes
                     parameters.Oscillators.Add(new WaveParameters
                     {
-                        WaveType = WaveType.Square,
+                        WaveType = WaveType.Triangle,
                         Amplitude = 0.7f,
                         Envelope = new EnvelopeParameters
                         {
-                            AttackTime = 0.05f,
-                            DecayTime = 0.3f,
-                            SustainLevel = 0.6f,
-                            ReleaseTime = 2.5f
-                        },
-                        Filter = new FilterParameters
-                        {
-                            Type = FilterType.LowPass,
-                            Cutoff = 3200f,
-                            Resonance = 0.4f
+                            AttackTime = 0.1f,
+                            DecayTime = 0.4f,
+                            SustainLevel = 0.7f,
+                            ReleaseTime = 3f // longer release for a lingering effect
                         }
                     });
                     break;
                 case TrackPartType.Pad:
+                    // pads -> very long attacks and releases
                     parameters.Oscillators.Add(new WaveParameters
                     {
                         WaveType = WaveType.Sawtooth,
                         Amplitude = 0.5f,
                         Envelope = new EnvelopeParameters
                         {
-                            AttackTime = 0.8f,
+                            AttackTime = 1f,  // long attack for gradual onset
                             DecayTime = 1f,
-                            SustainLevel = 0.7f,
-                            ReleaseTime = 4f
-                        },
-                        Filter = new FilterParameters
-                        {
-                            Type = FilterType.LowPass,
-                            Cutoff = 400f,
-                            Resonance = 0.2f
+                            SustainLevel = 0.8f,
+                            ReleaseTime = 5f   // long release to maintain a continuous ambience
                         }
                     });
                     break;
                 case TrackPartType.GlitchFx:
+                    // glitch -> short and percussive
                     parameters.Oscillators.Add(new WaveParameters
                     {
                         WaveType = WaveType.Triangle,
@@ -3132,12 +3190,6 @@ namespace Blastia.Main.Synthesizer
                             DecayTime = 0.1f,
                             SustainLevel = 0.3f,
                             ReleaseTime = 0.1f
-                        },
-                        Filter = new FilterParameters
-                        {
-                            Type = FilterType.BandPass,
-                            Cutoff = 2000f,
-                            Resonance = 0.8f
                         }
                     });
                     break;

@@ -1,4 +1,4 @@
-﻿﻿using NAudio.Wave;
+﻿using NAudio.Wave;
 
 namespace Blastia.Main.Synthesizer;
 
@@ -26,6 +26,7 @@ public class StreamingSynthesizer : ISampleProvider
     private int _totalBars;
     private double _samplesPerStep;
     private readonly int _stepsPerBar = 16;
+    private double _globalTime;
 
     private int _currentStep;
     public int CurrentStep
@@ -116,6 +117,7 @@ public class StreamingSynthesizer : ISampleProvider
             // Reset state
             _currentSample = 0;
             _currentStep = 0;
+            _globalTime = 0;
             _noteEvents.Clear();
             _activeNotes.Clear();
             
@@ -174,6 +176,20 @@ public class StreamingSynthesizer : ISampleProvider
             _activeNotes.Clear();
         }
     }
+
+    private void AddNote(NoteEvent n)
+    {
+        _activeNotes.Add(new ActiveNote
+        {
+            Frequency = MidiNoteToFrequency(n.Note),
+            Amplitude = n.Velocity,
+            Duration = n.Duration,
+            SamplesPlayed = 0,
+            Program = n.Program,
+            Oscillators = n.Oscillators,
+            SynthParams = n.SynthParams
+        });
+    }
     
     public int Read(float[] buffer, int offset, int count)
     {
@@ -188,21 +204,29 @@ public class StreamingSynthesizer : ISampleProvider
 
             while (framesProcessed < frameCount && _currentSample < _totalSamples)
             {
+                double deltaTime = 1.0 / WaveFormat.SampleRate;
+                _globalTime += deltaTime;
+                
                 int absoluteSample = _currentSample + framesProcessed;
 
                 // Add new notes
                 if (_noteEvents.TryGetValue(absoluteSample, out var events))
                 {
-                    _activeNotes.AddRange(events.Select(n => new ActiveNote
+                    foreach (var n in events)
                     {
-                        Frequency = MidiNoteToFrequency(n.Note),
-                        Amplitude = n.Velocity,
-                        Duration = n.Duration,
-                        SamplesPlayed = 0,
-                        Program = n.Program,
-                        Oscillators = n.Oscillators,
-                        SynthParams = n.SynthParams
-                    }));
+                        if (CurrentStyle == Style.Synthwave)
+                        {
+                            var existing = _activeNotes.FirstOrDefault(note => note.Program == n.Program);
+                            if (existing == null)
+                            {
+                                AddNote(n);
+                            }
+                        }
+                        else
+                        {
+                            AddNote(n);
+                        }
+                    }
                 }
 
                 // Process active notes
@@ -253,6 +277,7 @@ public class StreamingSynthesizer : ISampleProvider
         {
             Style.Default => GenerateDefaultSound(note),
             Style.Electronic => GenerateElectronicSound(note),
+            Style.Synthwave => GenerateSynthwaveSound(note),
             _ => GenerateDefaultSound(note)
         };
         
@@ -352,6 +377,26 @@ public class StreamingSynthesizer : ISampleProvider
         return (float)(1 - 4 * Math.Abs(t - Math.Floor(t + 0.5)));
     }
 
+    private float GenerateSynthwaveSound(ActiveNote note)
+    {
+        // Calculate the oscillator phase for the current sample.
+        double phase = (_globalTime * note.Frequency) % 1.0;
+        float primary = BalancedSawtoothWave(phase);
+    
+        // Secondary oscillator: slight detune for richness.
+        double detuneFactor = Math.Pow(2, 5.0 / 1200.0); // 5 cents detune
+        double phase2 = ((_globalTime * note.Frequency * detuneFactor)) % 1.0;
+        float secondary = BalancedSawtoothWave(phase2);
+    
+        // Mix both oscillators.
+        float mixedWave = (primary + secondary) * 0.5f;
+    
+        // Apply a slow LFO for amplitude modulation.
+        float lfo = (float)(0.8 + 0.2 * Math.Sin(2 * Math.PI * 0.2 * _globalTime));
+    
+        return mixedWave * lfo;
+    }
+
     private float GenerateDefaultSound(ActiveNote note)
     {
         // Calculate phase based on frequency and samples played
@@ -377,27 +422,37 @@ public class StreamingSynthesizer : ISampleProvider
 
     private float CalculateEnvelope(ActiveNote note)
     {
-        // Get parameters based on program
+        // Get envelope parameters based on program
         (float attackTime, float decayTime, float sustainLevel, float releaseTime) = GetEnvelopeParams(note.Program);
     
         int attackSamples = (int)(attackTime * WaveFormat.SampleRate);
         int decaySamples = (int)(decayTime * WaveFormat.SampleRate);
         int releaseSamples = (int)(releaseTime * WaveFormat.SampleRate);
-        int totalDuration = attackSamples + decaySamples + releaseSamples;
-
+    
+        // Calculate sustain phase duration from note.Duration
+        int sustainSamples = Math.Max(0, note.Duration - (attackSamples + decaySamples));
+        int totalDuration = attackSamples + decaySamples + sustainSamples + releaseSamples;
+    
         if (note.SamplesPlayed >= totalDuration)
             return 0f;
-
+    
         if (note.SamplesPlayed < attackSamples)
             return (float)note.SamplesPlayed / attackSamples;
-
+    
         if (note.SamplesPlayed < attackSamples + decaySamples)
         {
             float decayPos = (float)(note.SamplesPlayed - attackSamples) / decaySamples;
             return 1.0f - ((1.0f - sustainLevel) * decayPos);
         }
-
-        float releasePos = (float)(note.SamplesPlayed - (attackSamples + decaySamples)) / releaseSamples;
+    
+        if (note.SamplesPlayed < attackSamples + decaySamples + sustainSamples)
+        {
+            // Sustain phase: hold the sustain level
+            return sustainLevel;
+        }
+    
+        // Release phase: ramp down from sustain level to 0
+        float releasePos = (float)(note.SamplesPlayed - (attackSamples + decaySamples + sustainSamples)) / releaseSamples;
         return Math.Max(0, sustainLevel * (1.0f - releasePos));
     }
 
