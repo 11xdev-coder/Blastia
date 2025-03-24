@@ -201,35 +201,35 @@ public class BlastiaGame : Game
 
 	private void LoadTextures()
 	{		
-		CursorTexture = LoadingUtilities.LoadTexture(GraphicsDevice, 
+		CursorTexture = Util.LoadTexture(GraphicsDevice, 
 			Paths.CursorTexturePath);
 		
-		LogoTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+		LogoTexture = Util.LoadTexture(GraphicsDevice,
 			Paths.Logo5XTexturePath);
 		
-		SliderTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+		SliderTexture = Util.LoadTexture(GraphicsDevice,
 			Paths.SliderBackgroundPath);
 		
-		RulerBlockHighlight = LoadingUtilities.LoadTexture(GraphicsDevice,
+		RulerBlockHighlight = Util.LoadTexture(GraphicsDevice,
 			Paths.RulerBlockHighlightPath);
 			
-		ProgressBarBackground = LoadingUtilities.LoadTexture(GraphicsDevice,
+		ProgressBarBackground = Util.LoadTexture(GraphicsDevice,
 			Paths.ProgressbarBackgroundPath);
 		
-		WhitePixel = LoadingUtilities.LoadTexture(GraphicsDevice,
+		WhitePixel = Util.LoadTexture(GraphicsDevice,
 			Paths.WhitePixelPath);
 		
-		InvisibleTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+		InvisibleTexture = Util.LoadTexture(GraphicsDevice,
 			Paths.InvisibleTexturePath);
 		
-		MonitorTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+		MonitorTexture = Util.LoadTexture(GraphicsDevice,
 			Paths.MonitorTexturePath);
 		
-		AudioTexture = LoadingUtilities.LoadTexture(GraphicsDevice,
+		AudioTexture = Util.LoadTexture(GraphicsDevice,
 			Paths.AudioTexturePath);
 
-		RedCrossTexture = LoadingUtilities.LoadTexture(GraphicsDevice, Paths.RedCrossPath);
-		ExitTexture = LoadingUtilities.LoadTexture(GraphicsDevice, Paths.ExitPath);
+		RedCrossTexture = Util.LoadTexture(GraphicsDevice, Paths.RedCrossPath);
+		ExitTexture = Util.LoadTexture(GraphicsDevice, Paths.ExitPath);
 	}
 	
 	protected override void LoadContent()

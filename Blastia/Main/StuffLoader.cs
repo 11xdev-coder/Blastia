@@ -35,7 +35,7 @@ public static class StuffLoader
 					}
 					
 					// register
-					var texture = LoadingUtilities.LoadTexture(graphicsDevice, texturePath);					
+					var texture = Util.LoadTexture(graphicsDevice, texturePath);					
 					StuffRegistry.RegisterBlock(block, texture);
 				}
 			}
@@ -61,11 +61,11 @@ public static class StuffLoader
 				
 			string texturesFolder = $"{Paths.HumanTextures}/{humanType.Name}";
 			
-			var headTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Head.png"));
-			var bodyTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Body.png"));
-			var leftArmTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "LeftArm.png"));
-			var rightArmTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "RightArm.png"));
-			var legTexture = LoadingUtilities.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Leg.png"));
+			var headTexture = Util.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Head.png"));
+			var bodyTexture = Util.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Body.png"));
+			var leftArmTexture = Util.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "LeftArm.png"));
+			var rightArmTexture = Util.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "RightArm.png"));
+			var legTexture = Util.LoadTexture(graphicsDevice, Path.Combine(texturesFolder, "Leg.png"));
 
 			var textures = new HumanTextures(headTexture, bodyTexture, leftArmTexture,
 				rightArmTexture, legTexture);

@@ -2,7 +2,7 @@
 
 namespace Blastia.Main.Utilities;
 
-public static class LoadingUtilities
+public static class Util
 {
     /// <summary>
     /// Loads .png texture from stream
@@ -14,5 +14,16 @@ public static class LoadingUtilities
     {
         using FileStream fs = new FileStream(texturePath, FileMode.Open);
         return Texture2D.FromStream(graphicsDevice, fs);
+    }
+
+    public static void Shuffle<T>(List<T> list, Random rng)
+    {
+        int n = list.Count;
+        while (n > 1)
+        {
+            n -= 1;
+            int k = rng.Next(n + 1);
+            (list[k], list[n]) = (list[n], list[k]); // swap
+        }
     }
 }

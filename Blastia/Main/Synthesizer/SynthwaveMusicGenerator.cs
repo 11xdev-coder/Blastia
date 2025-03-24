@@ -1,4 +1,6 @@
-﻿namespace Blastia.Main.Synthesizer;
+﻿using Blastia.Main.Utilities;
+
+namespace Blastia.Main.Synthesizer;
 
 public class SynthwaveMusicGenerator
 {
@@ -163,12 +165,13 @@ public class SynthwaveMusicGenerator
         
         while (currentStep < sectionEndStep)
         {
-            int[] scale = [0, 2, 4, 5, 7, 9, 11];
+            List<int> scale = [0, 2, 4, 5, 7, 9, 11];
+            Util.Shuffle(scale, rng);
             int baseNote = 60; // c4
 
             for (int pairIndex = 0; pairIndex < pairCount; pairIndex++)
             {
-                int scaleDegree = scale[rng.Next(scale.Length)];
+                int scaleDegree = scale[pairIndex % scale.Count];
                 int pitch = baseNote + scaleDegree;
 
                 if (rng.NextDouble() < 0.3)
