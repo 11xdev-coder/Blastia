@@ -64,7 +64,7 @@ public class StreamingSynthesizer : ISampleProvider
     private int _delaySamples; // delay time (in samples)
     
     // reverb
-    public const float ReverbMixDefault = 0.4f;
+    public const float ReverbMixDefault = 0.6f;
     public const float ReverbTimeDefault = 0.5f;
     private float[] _reverbBuffer = [];
     private int _reverbBufferSize;
@@ -96,8 +96,8 @@ public class StreamingSynthesizer : ISampleProvider
         _delayWriteIndex = 0;
         _delayReadIndex = 0;
         
-        // reverb time of 0.5 seconds
-        _reverbBufferSize = (int)(ReverbTime * WaveFormat.SampleRate);
+        // reverb time of 3 seconds
+        _reverbBufferSize = 3 * WaveFormat.SampleRate;
         _reverbBuffer = new float[_reverbBufferSize];
         _reverbWriteIndex = 0;
     }
@@ -287,12 +287,18 @@ public class StreamingSynthesizer : ISampleProvider
             switch (effect.Type)
             {
                 case EffectType.Reverb:
-                    float reverbSample = ProcessReverb(sample);
-                    sample = MixDryAndWetSignals(sample, reverbSample, effect.Amount);
+                    if (note.SynthParams.Automation.ReverbCurve == null)
+                    {
+                        float reverbSample = ProcessReverb(sample);
+                        sample = MixDryAndWetSignals(sample, reverbSample, effect.Amount);
+                    }
                     break;
                 case EffectType.Delay:
-                    float delaySample = ProcessDelay(sample);
-                    sample = MixDryAndWetSignals(sample, delaySample, effect.Amount);
+                    if (note.SynthParams.Automation.DelayCurve == null)
+                    {
+                        float delaySample = ProcessDelay(sample);
+                        sample = MixDryAndWetSignals(sample, delaySample, effect.Amount);
+                    }
                     break;
                 case EffectType.BitCrusher:
                     sample = ProcessBitCrusher(sample, effect.Amount, note);
@@ -302,6 +308,21 @@ public class StreamingSynthesizer : ISampleProvider
                     sample = MixDryAndWetSignals(sample, distortedSample, effect.Amount);
                     break;
             }
+        }
+
+        // check if an automation curve is present
+        if (note.SynthParams.Automation.ReverbCurve != null)
+        {
+            var effectiveReverbAmount = note.SynthParams.Automation.ReverbCurve.Evaluate(_globalTime);
+            float reverbSample = ProcessReverb(sample);
+            sample = MixDryAndWetSignals(sample, reverbSample, effectiveReverbAmount);
+        }
+        
+        if (note.SynthParams.Automation.DelayCurve != null)
+        {
+            var effectiveDelayAmount = note.SynthParams.Automation.DelayCurve.Evaluate(_globalTime);
+            float delaySample = ProcessDelay(sample);
+            sample = MixDryAndWetSignals(sample, delaySample, effectiveDelayAmount);
         }
 
         return sample;
@@ -379,22 +400,51 @@ public class StreamingSynthesizer : ISampleProvider
 
     private float GenerateSynthwaveSound(ActiveNote note)
     {
-        // Calculate the oscillator phase for the current sample.
-        double phase = (_globalTime * note.Frequency) % 1.0;
-        float primary = BalancedSawtoothWave(phase);
+        // We'll accumulate samples from each oscillator defined in the SynthParams.
+        float sampleSum = 0f;
+        double baseFrequency = note.Frequency;
+        int count = note.SynthParams.Oscillators.Count;
     
-        // Secondary oscillator: slight detune for richness.
-        double detuneFactor = Math.Pow(2, 5.0 / 1200.0); // 5 cents detune
-        double phase2 = ((_globalTime * note.Frequency * detuneFactor)) % 1.0;
-        float secondary = BalancedSawtoothWave(phase2);
+        // Use _globalTime to drive a continuously evolving phase.
+        // This makes the sound continuous even if note.SamplesPlayed is reset
+        foreach (var osc in note.SynthParams.Oscillators)
+        {
+            // Calculate effective frequency including detuning (in semitones)
+            double frequency = baseFrequency * Math.Pow(2, osc.FrequencyOffset / 12.0);
+        
+            // Use global time to generate a continuous phase.
+            double phase = (_globalTime * frequency) % 1.0;
+            float oscSample;
+        
+            switch (osc.WaveType)
+            {
+                case WaveType.Sawtooth:
+                    oscSample = BalancedSawtoothWave(phase);
+                    break;
+                case WaveType.Square:
+                    oscSample = ImprovedSquareWave(phase);
+                    break;
+                case WaveType.Triangle:
+                    oscSample = CrispTriangleWave(phase);
+                    break;
+                default:
+                    oscSample = (float)Math.Sin(2 * Math.PI * phase);
+                    break;
+            }
+        
+            // Multiply by the oscillator's amplitude.
+            sampleSum += oscSample * osc.Amplitude;
+        }
     
-        // Mix both oscillators.
-        float mixedWave = (primary + secondary) * 0.5f;
+        // Average the output if there are multiple oscillators.
+        if (count > 0)
+            sampleSum /= count;
     
-        // Apply a slow LFO for amplitude modulation.
+        // Apply a slow LFO for gentle amplitude modulation.
         float lfo = (float)(0.8 + 0.2 * Math.Sin(2 * Math.PI * 0.2 * _globalTime));
     
-        return mixedWave * lfo;
+        float output = sampleSum * lfo;
+        return Math.Clamp(output, -1f, 1f);
     }
 
     private float GenerateDefaultSound(ActiveNote note)
@@ -485,8 +535,15 @@ public class StreamingSynthesizer : ISampleProvider
         // use several taps from reverb buffer
         float reverbOutput = 0;
         // taps
-        int[] tapDelays = [(int) (500 * ReverbTime), (int) (1000 * ReverbTime), (int) (1500 * ReverbTime)];
-        float[] tapGains = [0.3f, 0.2f, 0.1f];
+        int[] tapDelays =
+        [
+            (int)(0.3 * WaveFormat.SampleRate * ReverbTime),  // ~300ms delay
+            (int)(0.6 * WaveFormat.SampleRate * ReverbTime),  // ~600ms delay
+            (int)(0.9 * WaveFormat.SampleRate * ReverbTime),  // ~900ms delay
+            (int)(1.2 * WaveFormat.SampleRate * ReverbTime)   // ~1200ms delay
+        ];
+        
+        float[] tapGains = [0.9f, 0.7f, 0.5f, 0.35f];
 
         for (int i = 0; i < tapDelays.Length; i++)
         {
@@ -495,9 +552,10 @@ public class StreamingSynthesizer : ISampleProvider
         }
 
         // write input + a bit of output
-        _reverbBuffer[_reverbWriteIndex] = input + reverbOutput * 0.5f;
+        float feedback = 0.5f;
+        _reverbBuffer[_reverbWriteIndex] = input + reverbOutput * feedback;
         _reverbWriteIndex = (_reverbWriteIndex + 1) % _reverbBufferSize;
-
+    
         return input + reverbOutput * ReverbMix;
     }
 

@@ -196,16 +196,8 @@ namespace Blastia.Main.Synthesizer
 
                     if (_selectedSynthGeneration == 1) // synthwave
                     {
-                        if (ImGui.Combo("Synthwave Track Generation Prefab", ref _selectedSynthwaveGenerationPrefab,
-                                SynthwaveGenerationPrefabs, SynthwaveGenerationPrefabs.Length))
-                        {
-                            switch (_selectedSynthwaveGenerationPrefab)
-                            {
-                                case 1: // Into The Abyss
-                                    _selectedSynthStyle = 0; // default synth style
-                                    break;
-                            }
-                        }
+                        ImGui.Combo("Synthwave Track Generation Prefab", ref _selectedSynthwaveGenerationPrefab,
+                                SynthwaveGenerationPrefabs, SynthwaveGenerationPrefabs.Length);
                     }
                     
                     ImGui.Separator();
@@ -512,35 +504,41 @@ namespace Blastia.Main.Synthesizer
 
             if (_selectedSynthwaveGenerationPrefab == 1) // Into The Abyss
             {
-                Console.WriteLine("Into The Abyss");
+                double secondsPerBar = 60.0 / _tempo * 4;
                 MusicTrack track = new MusicTrack
                 {
                     Name = $"Synthwave Into The Abyss track {DateTime.Now:yyyyMMdd-HHmmss}",
                     Style = _selectedStyle,
                     Tempo = _tempo,
-                    BarCount = _trackLength
+                    BarCount = (int) (300 / secondsPerBar)
                 };
 
                 UpdateStatus("Selecting musical key...", 0.2f);
                 track.Key = _rng.Next(12);
                 track.IsMinor = _rng.NextDouble() < 0.8;
-
-                double secondsPerBar = 60.0 / _tempo * 4;
                 double trackDurationSec = track.BarCount * secondsPerBar;
                 
-                // TODO: generate parts
                 UpdateStatus("Generating bass beat...", 0.3f);
-                var bassPart = SynthwaveMusicGenerator.IntoTheAbyssBassBeat(track, _tempo, 0, 20);
+                var bassPart = SynthwaveMusicGenerator.IntoTheAbyssBassBeat(track, _tempo, 0, trackDurationSec);
+                
+                // add reverb 20 seconds in
+                // AutomationCurve delayCurve = new AutomationCurve();
+                // delayCurve.Keyframes.Add((0f, 0f));
+                // delayCurve.Keyframes.Add((2f, 0f));
+                // delayCurve.Keyframes.Add((5f, 1f));
+                // bassPart.SynthParams.Automation.DelayCurve = delayCurve;
+                //
+                // _delayMix = 1.6f;
+                // _delayFeedback = 0.7f;
+                // _delayTime = 0.4f;
+                
                 track.Parts.Add(bassPart);
                 
-                UpdateStatus("Generating reverb...", 0.5f);
+                UpdateStatus("Generating arpeggio...", 0.5f);
+                var arpeggioPart = SynthwaveMusicGenerator.IntoTheAbyssSmallArpeggio(track, _tempo, 15, trackDurationSec, 30);
+                track.Parts.Add(arpeggioPart);
                 
-                UpdateStatus("Generating arpeggio...", 0.7f);
-                
-                UpdateStatus("Generating arpeggio drop...", 0.85f);
-                
-                UpdateStatus("Generating synth parameters...", 0.95f);
-                GenerateSynthParameters(track);
+                UpdateStatus("Generating arpeggio drop...", 0.7f);
                 
                 UpdateStatus("Track generation complete!", 1.0f);
 
@@ -603,7 +601,7 @@ namespace Blastia.Main.Synthesizer
 
                 // Generate synth parameters for each part
                 UpdateStatus("Creating synth parameters...", 0.9f);
-                GenerateSynthParameters(track);
+                GenerateSynthParameters(track, true);
 
                 FinishTrackGeneration(track);
                 UpdateStatus("Track generation complete!", 1.0f);
@@ -3047,7 +3045,7 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
-        private static void GenerateSynthParameters(MusicTrack track)
+        private static void GenerateSynthParameters(MusicTrack track, bool overrideAutomationCurves)
         {
             // Generate synth parameters for each part
             foreach (var part in track.Parts)
@@ -3096,8 +3094,17 @@ namespace Blastia.Main.Synthesizer
                             break;
                     }
                 }
-                
-                part.SynthParams = parameters;
+
+                if (overrideAutomationCurves)
+                {
+                    part.SynthParams = parameters;
+                }
+                else
+                {
+                    // everything except automation
+                    part.SynthParams.Oscillators = parameters.Oscillators;
+                    part.SynthParams.Effects = parameters.Effects;
+                }
             }
         }
 
@@ -3944,16 +3951,18 @@ namespace Blastia.Main.Synthesizer
         public GlitchEffect[] Effects { get; set; } = [];
     }
 
+    public class Automation
+    {
+        public AutomationCurve? ReverbCurve { get; set; }
+        public AutomationCurve? DelayCurve { get; set; }
+    }
+
     // Synth parameters
     public class SynthParameters
     {
         public List<WaveParameters> Oscillators { get; set; } = [];
         public List<EffectParameters> Effects { get; set; } = [];
-        
-        // synthwave-specific
-        public float PadTailDuration { get; set; } = 4f; // seconds
-        public bool UseTapeSaturation { get; set; }
-        public float AnalogDriftAmount { get; set; } = 0.1f;
+        public Automation Automation { get; set; } = new();
     }
 
     public enum WaveType
