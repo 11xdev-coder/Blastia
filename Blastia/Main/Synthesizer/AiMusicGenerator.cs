@@ -18,6 +18,7 @@ namespace Blastia.Main.Synthesizer
         private static bool _isLooping;
         private static DateTime _generationStart;
         private static float _generationProgress;
+        private static bool _showAnalyzerWindow;
 
         // Generation parameters
         private static readonly string[] TrackStyles = ["Industrial", "Ambient", "Combat", "Exploration", "Tense"];
@@ -115,6 +116,11 @@ namespace Blastia.Main.Synthesizer
                 if (ImGui.CollapsingHeader("AI Music Generator"))
                 {
                     ImGui.Text("Generate complete music tracks");
+                    ImGui.SameLine();
+                    if (ImGui.Button("Analyzer"))
+                    {
+                        _showAnalyzerWindow = !_showAnalyzerWindow;
+                    }
                     ImGui.Separator();
 
                     // Style selection
@@ -459,6 +465,8 @@ namespace Blastia.Main.Synthesizer
                 
                 ImGui.End();
             }
+            
+            AudioAnalyzer.RenderUi(ref _showAnalyzerWindow);
         }
 
         private static void StartTrackGeneration()
@@ -510,7 +518,7 @@ namespace Blastia.Main.Synthesizer
                     Name = $"Synthwave Into The Abyss track {DateTime.Now:yyyyMMdd-HHmmss}",
                     Style = _selectedStyle,
                     Tempo = _tempo,
-                    BarCount = (int) (300 / secondsPerBar)
+                    BarCount = (int) (180 / secondsPerBar)
                 };
 
                 UpdateStatus("Selecting musical key...", 0.2f);
@@ -539,6 +547,12 @@ namespace Blastia.Main.Synthesizer
                 track.Parts.Add(arpeggioPart);
                 
                 UpdateStatus("Generating arpeggio drop...", 0.7f);
+                var dropPart = SynthwaveMusicGenerator.IntoTheAbyssDropArpeggio(track, _tempo, 60, trackDurationSec);
+                track.Parts.Add(dropPart);
+                
+                UpdateStatus("Generating hum...", 0.85f);
+                var humPart = SynthwaveMusicGenerator.IntoTheAbyssHum(track, _tempo, 35, trackDurationSec);
+                track.Parts.Add(humPart);
                 
                 UpdateStatus("Track generation complete!", 1.0f);
 

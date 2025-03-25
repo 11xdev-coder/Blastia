@@ -121,6 +121,19 @@
           }
         }
       },
+      "MathNet.Numerics/6.0.0-beta2": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/MathNet.Numerics.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/MathNet.Numerics.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
         "dependencies": {
@@ -1500,6 +1513,26 @@
         "runtimes/win-arm64/native/cimgui.dll",
         "runtimes/win-x64/native/cimgui.dll",
         "runtimes/win-x86/native/cimgui.dll"
+      ]
+    },
+    "MathNet.Numerics/6.0.0-beta2": {
+      "sha512": "ew55vr5MqCEokG0jRsndoRSPNxdDvSgGwhWyxEFhzc8EuGn3TNtSGKRppCcpHnwXtjFiUvFBN+BBo75yrdKOrQ==",
+      "type": "package",
+      "path": "mathnet.numerics/6.0.0-beta2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "icon.png",
+        "lib/net48/MathNet.Numerics.dll",
+        "lib/net48/MathNet.Numerics.xml",
+        "lib/net6.0/MathNet.Numerics.dll",
+        "lib/net6.0/MathNet.Numerics.xml",
+        "lib/net8.0/MathNet.Numerics.dll",
+        "lib/net8.0/MathNet.Numerics.xml",
+        "lib/netstandard2.0/MathNet.Numerics.dll",
+        "lib/netstandard2.0/MathNet.Numerics.xml",
+        "mathnet.numerics.6.0.0-beta2.nupkg.sha512",
+        "mathnet.numerics.nuspec"
       ]
     },
     "Microsoft.CSharp/4.0.1": {
@@ -4499,6 +4532,7 @@
     "net8.0": [
       "FNA.NET >= 1.0.15.2403",
       "ImGui.NET >= 1.91.6.1",
+      "MathNet.Numerics >= 6.0.0-beta2",
       "NAudio >= 2.2.1",
       "System.Drawing.Common >= 9.0.1",
       "Veldrid >= 4.9.0",
@@ -4564,6 +4598,10 @@
           "ImGui.NET": {
             "target": "Package",
             "version": "[1.91.6.1, )"
+          },
+          "MathNet.Numerics": {
+            "target": "Package",
+            "version": "[6.0.0-beta2, )"
           },
           "NAudio": {
             "target": "Package",

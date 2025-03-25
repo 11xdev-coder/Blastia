@@ -2,6 +2,9 @@
 
 namespace Blastia.Main.Synthesizer;
 
+/// <summary>
+/// Simple <c>TrackPart</c> generator for <c>Synthwave</c> music
+/// </summary>
 public class SynthwaveMusicGenerator
 {
     /// <summary>
@@ -221,6 +224,150 @@ public class SynthwaveMusicGenerator
         
         return arpPart;
     }
+
+    public static TrackPart IntoTheAbyssDropArpeggio(MusicTrack track, float tempo, double sectionStartSec,
+        double sectionEndSec)
+    {
+        TrackPart dropPart = new TrackPart
+        {
+            Type = TrackPartType.Arpeggio,
+            Channel = 1,
+            Program = 82
+        };
+        
+        SynthParameters synthParams = new SynthParameters();
+        
+        var envelope = new EnvelopeParameters
+        {
+            AttackTime = 0.5f,
+            DecayTime = 0.5f,
+            SustainLevel = 0.8f,
+            ReleaseTime = 4f
+        };
+        WaveParameters osc = new WaveParameters
+        {
+            WaveType = WaveType.Sine,
+            Amplitude = 0.7f,
+            IsEnabled = true,
+            Envelope = envelope
+        };
+        WaveParameters osc2 = new WaveParameters
+        {
+            WaveType = WaveType.Triangle,
+            Amplitude = 0.5f,
+            IsEnabled = true,
+            Envelope = envelope
+        };
+        WaveParameters osc3 = new WaveParameters
+        {
+            WaveType = WaveType.Sawtooth,
+            Amplitude = 0.3f,
+            IsEnabled = true,
+            Envelope = envelope
+        };
+        synthParams.Oscillators.AddRange([osc, osc2, osc3]);
+        dropPart.SynthParams = synthParams;
+        
+        double stepDur = StepDuration(tempo);
+        int sectionStartStep = (int) (sectionStartSec / stepDur);
+        int sectionEndStep = (int) (sectionEndSec / stepDur);
+        Random rng = new Random();
+
+        int noteIntervalSteps = (int) (3 / stepDur);
+        int noteDurationSteps = (int) (2 / stepDur);
+        
+        int[] scale = [0, 2, 4, 5, 7, 9, 11];
+        int baseNote = 60;
+        
+        for (int currentStep = sectionStartStep; currentStep < sectionEndStep; currentStep += noteIntervalSteps)
+        {
+            int scaleDegree = scale[rng.Next(scale.Length)];
+            int pitch = baseNote + scaleDegree;
+
+            if (rng.NextDouble() < 0.3)
+            {
+                pitch += rng.Next(-1, 2);
+            }
+
+            MusicNote dropNote = new MusicNote
+            {
+                Note = pitch,
+                Velocity = 90,
+                StartStep = currentStep,
+                Duration = noteDurationSteps,
+                Channel = dropPart.Channel
+            };
+            dropPart.Notes.Add(dropNote);
+        }
+        
+        return dropPart;
+    }
+
+    public static TrackPart IntoTheAbyssHum(MusicTrack track, float tempo, double sectionStartSec,
+        double sectionEndSec)
+    {
+        TrackPart humPart = new TrackPart
+        {
+            Type = TrackPartType.Arpeggio,
+            Channel = 1,
+            Program = 83
+        };
+
+        SynthParameters synthParams = new SynthParameters();
+        WaveParameters osc = new WaveParameters
+        {
+            WaveType = WaveType.Triangle,
+            Amplitude = 0.8f,
+            IsEnabled = true,
+            Envelope = new EnvelopeParameters
+            {
+                AttackTime = 0.5f,
+                DecayTime = 0.5f,
+                SustainLevel = 0.8f,
+                ReleaseTime = 4f
+            }
+        };
+        synthParams.Oscillators.Add(osc);
+        humPart.SynthParams = synthParams;
+
+        double stepDur = StepDuration(tempo);
+        int sectionStartStep = (int) (sectionStartSec / stepDur);
+        int sectionEndStep = (int) (sectionEndSec / stepDur);
+        
+        int segmentSteps = 4; // Each segment lasts one bar (for example)
+        int baseNote = 40;
+        
+        // Loop through the section, subdividing a long note into segments.
+        for (int segStart = sectionStartStep; segStart < sectionEndStep; segStart += segmentSteps)
+        {
+            double segmentTime = segStart * stepDur;
+            // Evaluate the automation curve for pitch offset (in semitones).
+            float pitchOffset = GetPitchAutomation(segmentTime);
+            // Calculate the effective MIDI note value.
+            int effectiveNote = baseNote + (int)Math.Round(pitchOffset);
+        
+            // Create a note event for this segment.
+            MusicNote note = new MusicNote
+            {
+                Note = effectiveNote,
+                Velocity = 90,
+                StartStep = segStart,
+                Duration = segmentSteps, // lasts one bar
+                Channel = humPart.Channel
+            };
+            humPart.Notes.Add(note);
+        }
+        
+        return humPart;
+    }
     
     #endregion
+    
+    // This helper function returns a pitch offset (in semitones) at time t (in seconds).
+    // For instance, you could have a slow sinusoidal modulation.
+    private static float GetPitchAutomation(double t)
+    {
+        // Modulate between -0.5 and +0.5 semitones at 0.1Hz.
+        return (float)(2 * Math.Sin(2 * Math.PI * 0.1 * t));
+    }
 }

@@ -84,6 +84,8 @@ public class Synthesizer
         SDL.SDL_GetWindowSize(_window, out windowWidth, out windowHeight);
         io.DisplaySize = new Vector2(windowWidth, windowHeight);
         
+        SDL.SDL_StartTextInput();
+        
         // Create font texture
         CreateFontTexture();
         
@@ -178,26 +180,20 @@ public class Synthesizer
         io.Fonts.ClearTexData();
     }
     
-   private static void ProcessEvent(SDL.SDL_Event e)
+    private static void ProcessEvent(SDL.SDL_Event e)
     {
         ImGuiIOPtr io = ImGui.GetIO();
-        
         switch (e.type)
         {
             case SDL.SDL_EventType.SDL_MOUSEWHEEL:
-                if (e.wheel.y > 0)
-                    io.MouseWheel = 1;
-                if (e.wheel.y < 0)
-                    io.MouseWheel = -1;
+                io.MouseWheel = e.wheel.y;
                 break;
-                
             case SDL.SDL_EventType.SDL_MOUSEMOTION:
                 io.MousePos = new Vector2(e.motion.x, e.motion.y);
                 break;
-                
             case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
             case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
-                bool pressed = e.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN;
+                bool pressed = (e.type == SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN);
                 if (e.button.button == SDL.SDL_BUTTON_LEFT)
                     io.MouseDown[0] = pressed;
                 if (e.button.button == SDL.SDL_BUTTON_RIGHT)
@@ -205,24 +201,24 @@ public class Synthesizer
                 if (e.button.button == SDL.SDL_BUTTON_MIDDLE)
                     io.MouseDown[2] = pressed;
                 break;
-                
             case SDL.SDL_EventType.SDL_KEYDOWN:
             case SDL.SDL_EventType.SDL_KEYUP:
-                bool down = e.type == SDL.SDL_EventType.SDL_KEYDOWN;
-                
+                bool down = (e.type == SDL.SDL_EventType.SDL_KEYDOWN);
                 // Update modifier states
                 io.KeyShift = (SDL.SDL_GetModState() & SDL.SDL_Keymod.KMOD_SHIFT) != 0;
                 io.KeyCtrl = (SDL.SDL_GetModState() & SDL.SDL_Keymod.KMOD_CTRL) != 0;
                 io.KeyAlt = (SDL.SDL_GetModState() & SDL.SDL_Keymod.KMOD_ALT) != 0;
-                
-                // Map keys using the modern ImGui.NET API
-                // Convert SDL key code to ImGui key code
-                ImGuiKey imguiKey = SDLKeyToImGuiKey(e.key.keysym.sym);
-                if (imguiKey != ImGuiKey.None)
-                {
-                    io.AddKeyEvent(imguiKey, down);
-                }
+                // Convert SDL key to ImGui key and add event (if desired, using your own mapping)
+                // For this example we assume text input is handled via SDL_TEXTINPUT.
                 break;
+            case SDL.SDL_EventType.SDL_TEXTINPUT:
+                unsafe
+                {
+                    // convert byte* to string
+                    string? input = System.Runtime.InteropServices.Marshal.PtrToStringUTF8((IntPtr)e.text.text); 
+                    ImGui.GetIO().AddInputCharactersUTF8(input);
+                    break;
+                }
         }
     }
 
