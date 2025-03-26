@@ -1,7 +1,9 @@
 ﻿using System.Numerics;
+using Blastia.Main.Synthesizer.AiGenerator;
 using ImGuiNET;
 using NAudio.Wave;
 using SDL2;
+using Veldrid;
 
 namespace Blastia.Main.Synthesizer;
 
@@ -208,8 +210,31 @@ public class Synthesizer
                 io.KeyShift = (SDL.SDL_GetModState() & SDL.SDL_Keymod.KMOD_SHIFT) != 0;
                 io.KeyCtrl = (SDL.SDL_GetModState() & SDL.SDL_Keymod.KMOD_CTRL) != 0;
                 io.KeyAlt = (SDL.SDL_GetModState() & SDL.SDL_Keymod.KMOD_ALT) != 0;
-                // Convert SDL key to ImGui key and add event (if desired, using your own mapping)
-                // For this example we assume text input is handled via SDL_TEXTINPUT.
+
+                // ctrl+v
+                if (down && io.KeyCtrl && e.key.keysym.sym == SDL.SDL_Keycode.SDLK_v)
+                {
+                    string clipText = SDL.SDL_GetClipboardText();
+                    if (!string.IsNullOrEmpty(clipText))
+                    {
+                        ImGui.GetIO().AddInputCharactersUTF8(clipText);
+                    }
+                }
+
+                // backspace
+                switch (e.key.keysym.sym)
+                {
+                    case SDL.SDL_Keycode.SDLK_BACKSPACE:
+                        ImGui.GetIO().AddKeyEvent(ImGuiKey.Backspace, down);
+                        break;
+                    case SDL.SDL_Keycode.SDLK_LEFT:
+                        ImGui.GetIO().AddKeyEvent(ImGuiKey.LeftArrow, down);
+                        break;
+                    case SDL.SDL_Keycode.SDLK_RIGHT:
+                        ImGui.GetIO().AddKeyEvent(ImGuiKey.RightArrow, down);
+                        break;
+                }
+                
                 break;
             case SDL.SDL_EventType.SDL_TEXTINPUT:
                 unsafe

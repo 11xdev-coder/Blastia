@@ -1,4 +1,6 @@
-﻿namespace Blastia.Main.Synthesizer;
+﻿using Blastia.Main.Synthesizer.AiGenerator;
+
+namespace Blastia.Main.Synthesizer;
 
 public class WaveData(float frequency, float amplitude, WaveType waveType, EnvelopeGenerator envelope, Filter filter)
 {

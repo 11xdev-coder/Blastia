@@ -1,13 +1,14 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
 using System.Text;
+using Blastia.Main.Synthesizer.Analyzer;
 using NAudio.Midi;
 using ImGuiNET;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 
-namespace Blastia.Main.Synthesizer
+namespace Blastia.Main.Synthesizer.AiGenerator
 {
     public class AiMusicGenerator
     {
@@ -468,7 +469,7 @@ namespace Blastia.Main.Synthesizer
             
             AudioAnalyzer.RenderUi(ref _showAnalyzerWindow);
         }
-
+        
         private static void StartTrackGeneration()
         {
             _isGeneratingTrack = true;
@@ -495,7 +496,7 @@ namespace Blastia.Main.Synthesizer
             });
         }
 
-        private static void FinishTrackGeneration(MusicTrack track)
+        public static void FinishTrackGeneration(MusicTrack track)
         {
             _savedTracks.Insert(0, track);
             if (_savedTracks.Count > 10)
@@ -3059,7 +3060,7 @@ namespace Blastia.Main.Synthesizer
             }
         }
 
-        private static void GenerateSynthParameters(MusicTrack track, bool overrideAutomationCurves)
+        public static void GenerateSynthParameters(MusicTrack track, bool overrideAutomationCurves)
         {
             // Generate synth parameters for each part
             foreach (var part in track.Parts)
@@ -3068,15 +3069,6 @@ namespace Blastia.Main.Synthesizer
 
                 if (_selectedSynthGeneration == 1) // synthwave
                 {
-                    if (part.Type != TrackPartType.Bass && part.Type != TrackPartType.Percussion &&
-                        part.Type != TrackPartType.GlitchFx)
-                    {
-                        foreach (var note in part.Notes)
-                        {
-                            note.Duration = track.BarCount * 16;
-                        }
-                    }
-                    
                     GenerateSynthwaveParameters(part, parameters, track);
                 }
                 else // default

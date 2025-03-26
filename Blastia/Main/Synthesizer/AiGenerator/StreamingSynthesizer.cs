@@ -1,6 +1,6 @@
 ﻿using NAudio.Wave;
 
-namespace Blastia.Main.Synthesizer;
+namespace Blastia.Main.Synthesizer.AiGenerator;
 
 public enum Style
 {
@@ -236,15 +236,16 @@ public class StreamingSynthesizer : ISampleProvider
                     var note = _activeNotes[noteIndex];
                     note.SamplesPlayed++;
 
-                    float env = CalculateEnvelope(note);
-                    
-                    if (env <= 0.001f)
+                    bool removeNote = false;
+                    var synthesized = SynthesizeNote(note, ref removeNote) * note.Amplitude;
+
+                    if (removeNote)
                     {
                         _activeNotes.RemoveAt(noteIndex);
                         continue;
                     }
                     
-                    sampleSum += SynthesizeNote(note) * env * note.Amplitude;
+                    sampleSum += synthesized;
                 }
                 
                 // Write stereo frame
@@ -271,15 +272,21 @@ public class StreamingSynthesizer : ISampleProvider
         }
     }
 
-    private float SynthesizeNote(ActiveNote note)
+    private float SynthesizeNote(ActiveNote note, ref bool removeNote)
     {
         float sample = CurrentStyle switch
         {
-            Style.Default => GenerateDefaultSound(note),
-            Style.Electronic => GenerateElectronicSound(note),
-            Style.Synthwave => GenerateSynthwaveSound(note),
-            _ => GenerateDefaultSound(note)
+            Style.Default => GenerateDefaultSound(note, ref removeNote),
+            Style.Electronic => GenerateElectronicSound(note, ref removeNote),
+            Style.Synthwave => GenerateSynthwaveSound(note, ref removeNote),
+            _ => GenerateDefaultSound(note, ref removeNote)
         };
+
+        // exit early if we need to remove the note
+        if (removeNote)
+        {
+            return 0f;
+        }
         
         // process effects
         foreach (var effect in note.SynthParams.Effects)
@@ -333,15 +340,19 @@ public class StreamingSynthesizer : ISampleProvider
         return (1 - effectAmount) * sample + effectAmount * affectedSample;
     }
     
-    private float GenerateElectronicSound(ActiveNote note)
+    private float GenerateElectronicSound(ActiveNote note, ref bool removeNote)
     {
+        // Calculate envelope once using the first oscillator's envelope (if available)
+        var oscForEnv = note.SynthParams.Oscillators.FirstOrDefault();
+        float env = CalculateEnvelope(note, oscForEnv);
+        if (env <= 0.001f)
+        {
+            removeNote = true;
+            return 0;
+        }
+        
         float sampleSum = 0f;
         double baseFrequency = note.Frequency;
-        
-        // More subtle filtering parameters
-        float filterState = 0f;
-        const float filterCutoff = 0.5f; // Higher cutoff (0.0-1.0)
-        const float resonance = 0.1f; // Reduced resonance
 
         foreach (var osc in note.Oscillators)
         {
@@ -357,13 +368,11 @@ public class StreamingSynthesizer : ISampleProvider
                 WaveType.Triangle => CrispTriangleWave(t),
                 _ => (float)Math.Sin(2 * Math.PI * t)
             };
-
-            // Gentler filter with resonance control
-            float filterInput = sample - filterState * resonance;
-            filterState += filterCutoff * filterInput;
             
-            sampleSum += filterState * osc.Amplitude;
+            sampleSum += sample * osc.Amplitude;
         }
+
+        sampleSum *= env;
 
         // Add subtle saturation instead of heavy filtering
         float saturated = sampleSum / (1 + Math.Abs(sampleSum)); // Soft clipping
@@ -398,17 +407,21 @@ public class StreamingSynthesizer : ISampleProvider
         return (float)(1 - 4 * Math.Abs(t - Math.Floor(t + 0.5)));
     }
 
-    private float GenerateSynthwaveSound(ActiveNote note)
+    private float GenerateSynthwaveSound(ActiveNote note, ref bool removeNote)
     {
         // We'll accumulate samples from each oscillator defined in the SynthParams.
         float sampleSum = 0f;
         double baseFrequency = note.Frequency;
         int count = note.SynthParams.Oscillators.Count;
+        float totalEnvelope = 0f;
     
         // Use _globalTime to drive a continuously evolving phase.
         // This makes the sound continuous even if note.SamplesPlayed is reset
         foreach (var osc in note.SynthParams.Oscillators)
         {
+            var env = CalculateEnvelope(note, osc);
+            totalEnvelope += env;
+            
             // Calculate effective frequency including detuning (in semitones)
             double frequency = baseFrequency * Math.Pow(2, osc.FrequencyOffset / 12.0);
         
@@ -433,12 +446,15 @@ public class StreamingSynthesizer : ISampleProvider
             }
         
             // Multiply by the oscillator's amplitude.
-            sampleSum += oscSample * osc.Amplitude;
+            sampleSum += oscSample * osc.Amplitude * env;
         }
-    
-        // Average the output if there are multiple oscillators.
-        if (count > 0)
-            sampleSum /= count;
+
+        if (totalEnvelope <= 0.000001f)
+        {
+            removeNote = true;
+            return 0f;
+        }
+        
     
         // Apply a slow LFO for gentle amplitude modulation.
         float lfo = (float)(0.8 + 0.2 * Math.Sin(2 * Math.PI * 0.2 * _globalTime));
@@ -447,33 +463,34 @@ public class StreamingSynthesizer : ISampleProvider
         return Math.Clamp(output, -1f, 1f);
     }
 
-    private float GenerateDefaultSound(ActiveNote note)
+    private float GenerateDefaultSound(ActiveNote note, ref bool removeNote)
     {
+        var env = CalculateEnvelope(note, null);
+
+        if (env <= 0.001f)
+        {
+            removeNote = true;
+            return 0;
+        }
+        
         // Calculate phase based on frequency and samples played
         double phase = (note.SamplesPlayed * note.Frequency) / WaveFormat.SampleRate;
         double t = phase % 1.0;
         
-        // Select waveform based on program number
+        float waveform = (float)Math.Sin(2 * Math.PI * t);
         if (note.Program >= 80 && note.Program < 88) // Lead sounds
-            return (float)(Math.Sin(2 * Math.PI * t) * 0.5 + Math.Sin(4 * Math.PI * t) * 0.5);
-        
-        if (note.Program >= 88 && note.Program < 96) // Pad sounds
-            return (float)(Math.Sin(2 * Math.PI * t));
-        
-        if (note.Program >= 32 && note.Program < 40) // Bass sounds
-            return (float)(
-                Math.Sin(2 * Math.PI * t) * 0.5 + 
-                Math.Sign(Math.Sin(2 * Math.PI * t)) * 0.5
-            );
-        
-        // Default
-        return (float)Math.Sin(2 * Math.PI * t);
+            waveform = (float)(Math.Sin(2 * Math.PI * t) * 0.5 + Math.Sin(4 * Math.PI * t) * 0.5);
+        else if (note.Program >= 88 && note.Program < 96) // Pad sounds
+            waveform = (float)Math.Sin(2 * Math.PI * t);
+        else if (note.Program >= 32 && note.Program < 40) // Bass sounds
+            waveform = (float)(Math.Sin(2 * Math.PI * t) * 0.5 + Math.Sign(Math.Sin(2 * Math.PI * t)) * 0.5);
+        return waveform * env;
     }
 
-    private float CalculateEnvelope(ActiveNote note)
+    private float CalculateEnvelope(ActiveNote note, WaveParameters? oscillator)
     {
         // Get envelope parameters based on program
-        (float attackTime, float decayTime, float sustainLevel, float releaseTime) = GetEnvelopeParams(note.Program);
+        (float attackTime, float decayTime, float sustainLevel, float releaseTime) = GetEnvelopeParams(note.Program, oscillator);
     
         int attackSamples = (int)(attackTime * WaveFormat.SampleRate);
         int decaySamples = (int)(decayTime * WaveFormat.SampleRate);
@@ -505,15 +522,19 @@ public class StreamingSynthesizer : ISampleProvider
         float releasePos = (float)(note.SamplesPlayed - (attackSamples + decaySamples + sustainSamples)) / releaseSamples;
         return Math.Max(0, sustainLevel * (1.0f - releasePos));
     }
-
-    private (float attack, float decay, float sustain, float release) GetEnvelopeParams(int program)
+    
+    private (float attack, float decay, float sustain, float release) GetEnvelopeParams(int program, WaveParameters? oscillator)
     {
-        return program switch
+        if (oscillator == null)
         {
-            >= 88 and < 96 => (0.4f, 0.2f, 0.7f, 0.8f), // Pads
-            >= 32 and < 40 => (0.005f, 0.2f, 0.7f, 0.3f), // Bass
-            _ => (0.01f, 0.1f, 0.7f, 0.3f) // Default
-        };
+            return program switch
+            {
+                >= 88 and < 96 => (0.4f, 0.2f, 0.7f, 0.8f), // Pads
+                >= 32 and < 40 => (0.005f, 0.2f, 0.7f, 0.3f), // Bass
+                _ => (0.01f, 0.1f, 0.7f, 0.3f) // Default
+            };
+        }
+        return (oscillator.Envelope.AttackTime, oscillator.Envelope.DecayTime, oscillator.Envelope.SustainLevel, oscillator.Envelope.ReleaseTime);
     }
 
     private float ProcessDelay(float input)

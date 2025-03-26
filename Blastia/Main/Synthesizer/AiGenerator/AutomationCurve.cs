@@ -1,4 +1,4 @@
-﻿namespace Blastia.Main.Synthesizer;
+﻿namespace Blastia.Main.Synthesizer.AiGenerator;
 
 public class AutomationCurve
 {

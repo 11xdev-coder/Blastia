@@ -8,21 +8,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Analyzer/PitchDetector.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiMusicGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiMusicGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiMusicGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AudioAnalyzer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Analyzer/AudioAnalyzer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AutomationCurve.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AutomationCurve.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/MultipleWaveSynth.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/MultipleWaveSynth.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/StreamingSynthesizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/StreamingSynthesizer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Synthesizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/Synthesizer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/SynthwaveMusicGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/SynthwaveMusicGenerator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/WaveData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/WaveData.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +65,7 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/0ec2af36095b4d52be85bd1f02e9f1c8c7400/25/47206e70/SDL.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8243060d9bfb43bd93c81caad5fecadf4d800/cb/2132c05c/ImGui.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/8a03fcac5714437e83949a44ecf2e771c90920/da/d8e1b033/Func`1.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ee3c9d264411441f56a12bac52a58ad25b495ef52e59b4a86f8478158f7d/Array.CoreCLR.cs" root0="FORCE_HIGHLIGHTING" />
@@ -87,7 +98,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Color Scheme Font&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -188,14 +199,8 @@
       <workItem from="1742641967159" duration="6149000" />
       <workItem from="1742727300876" duration="22877000" />
       <workItem from="1742807221703" duration="19777000" />
-    </task>
-    <task id="LOCAL-00002" summary="tab group improvements">
-      <option name="closed" value="true" />
-      <created>1737143124702</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1737143124702</updated>
+      <workItem from="1742896505182" duration="19632000" />
+      <workItem from="1742979196572" duration="6566000" />
     </task>
     <task id="LOCAL-00003" summary="slider rework">
       <option name="closed" value="true" />
@@ -581,7 +586,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742851517156</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="fixed ImGui text input + AudioAnalyzer">
+      <option name="closed" value="true" />
+      <created>1742922348930</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1742922348931</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -591,7 +604,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="simple collision test" />
     <MESSAGE value="corner collision tests + fixed player camera centering" />
     <MESSAGE value="basic collision structure" />
     <MESSAGE value="ImGui + SDL simple synthesizer" />
@@ -616,6 +628,7 @@
     <MESSAGE value="simple beat generation" />
     <MESSAGE value="arpeggio generation" />
     <MESSAGE value="different note pitches" />
-    <option name="LAST_COMMIT_MESSAGE" value="different note pitches" />
+    <MESSAGE value="fixed ImGui text input + AudioAnalyzer" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed ImGui text input + AudioAnalyzer" />
   </component>
 </project>

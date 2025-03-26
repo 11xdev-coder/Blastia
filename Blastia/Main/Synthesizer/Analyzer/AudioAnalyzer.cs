@@ -1,11 +1,12 @@
 ﻿using System.Numerics;
+using Blastia.Main.Synthesizer.AiGenerator;
 using ImGuiNET;
 using NAudio.Dsp;
 using NAudio.Wave;
 using Complex = System.Numerics.Complex;
 using MathNet.Numerics.IntegralTransforms;
 
-namespace Blastia.Main.Synthesizer;
+namespace Blastia.Main.Synthesizer.Analyzer;
 
 /// <summary>
 /// Analyzes an audio file and returns basic MusicTrack
@@ -21,12 +22,24 @@ public static class AudioAnalyzer
     {
         if (!show) return;
         
-        ImGui.SetNextWindowSize(new Vector2(1000, 800));
+        ImGui.SetNextWindowSize(new Vector2(900, 200));
         ImGui.SetNextWindowPos(new Vector2(0, 0), ImGuiCond.Appearing);
 
         if (ImGui.Begin("Analyzer", ref show, ImGuiWindowFlags.NoCollapse))
         {
             ImGui.InputText("File path", ref _filePath, 256);
+            ImGui.SameLine();
+            if (ImGui.Button("Clear all"))
+            {
+                _filePath = "";
+            }
+            
+            if (ImGui.Button("Analyze"))
+            {
+                var track = Analyze(_filePath);
+                AiMusicGenerator.GenerateSynthParameters(track, true);
+                AiMusicGenerator.FinishTrackGeneration(track);
+            }
             
             ImGui.End();
         }
@@ -69,35 +82,20 @@ public static class AudioAnalyzer
         int windowSize = 1024;
         int hopSize = 512; // 50% overlap
         int numWindows = (samples.Count - windowSize) / hopSize;
+        int trackTempo = 110;
 
         List<int> midiNotes = [];
         for (int i = 0; i < numWindows; i++)
         {
             int start = i * hopSize;
-            Complex[] fftBuffer = new Complex[windowSize];
+            float[] windowSamples = new float[windowSize];
             for (int j = 0; j < windowSize; j++)
             {
-                float sampleValue = samples[start + j];
-                fftBuffer[j] = new Complex(sampleValue, 0);
+                windowSamples[j] = samples[start + j];
             }
             
-            Fourier.Forward(fftBuffer, FourierOptions.Matlab);
-
-            double maxMagnitude = 0;
-            int maxIndex = 0;
-            for (int k = 0; k < windowSize / 2; k++)
-            {
-                double mag = fftBuffer[k].Magnitude;
-                if (mag > maxMagnitude)
-                {
-                    maxMagnitude = mag;
-                    maxIndex = k;
-                }
-            }
-
-            double freqResolution = sampleRate / (double)windowSize;
-            double dominantFrequency = maxIndex * freqResolution;
-            int midi = FrequencyToMidi(dominantFrequency);
+            double pitchHz = PitchDetector.DetectPitchConsensus(windowSamples, sampleRate);
+            int midi = FrequencyToMidi(pitchHz);
             midiNotes.Add(midi);
         }
         
@@ -110,23 +108,41 @@ public static class AudioAnalyzer
 
         int currentNote = midiNotes[0];
         int startWindow = 0;
+        // convert to musical time
+        float windowDuration = (float)hopSize / sampleRate;
+        float stepDuration = (60f / trackTempo) / 4f; // 16th note duration
+        float stepsPerWindow = windowDuration / stepDuration;
+        int minDurationSteps = 1;
         for (int i = 1; i < midiNotes.Count; i++)
         {
-            // 1 semitone difference
+            // group notes within 1 semitone difference
             if (Math.Abs(midiNotes[i] - currentNote) > 1)
             {
-                int durationWindow = i - startWindow;
-                // assume each window = 1 step
-                int durationSteps = durationWindow;
-                MusicNote noteEvent = new MusicNote
+                // start time in musical steps
+                int startStep = (int) Math.Round(startWindow * stepsPerWindow);
+                int durationSteps = (int) Math.Round((i - startWindow) * stepsPerWindow);
+
+                if (durationSteps >= minDurationSteps)
                 {
-                    Note = currentNote,
-                    Velocity = 100,
-                    StartStep = startWindow,
-                    Duration = durationSteps,
-                    Channel = 0
-                };
-                notes.Add(noteEvent);
+                    // if the last note added has the same pitch -> merge
+                    if (notes.Count > 0 && notes.Last().Note == currentNote &&
+                        startStep - (notes.Last().StartStep + notes.Last().Duration) <= minDurationSteps)
+                    {
+                        notes.Last().Duration = (startStep + durationSteps) - notes.Last().StartStep;
+                    }
+                    else
+                    {
+                        MusicNote noteEvent = new MusicNote
+                        {
+                            Note = currentNote,
+                            Velocity = 100,
+                            StartStep = startStep,
+                            Duration = durationSteps,
+                            Channel = 0
+                        };
+                        notes.Add(noteEvent);
+                    }
+                }
                 
                 currentNote = midiNotes[i];
                 startWindow = i;
@@ -134,21 +150,33 @@ public static class AudioAnalyzer
         }
         
         // add final note
-        int lastDuration = midiNotes.Count - startWindow;
-        MusicNote lastNote = new MusicNote
+        int lastStartStep = (int) Math.Round(startWindow * stepsPerWindow);
+        int lastDuration = (int) Math.Round((midiNotes.Count - startWindow) * stepsPerWindow);
+        if (lastDuration >= minDurationSteps)
         {
-            Note = currentNote,
-            Velocity = 100,
-            StartStep = startWindow,
-            Duration = lastDuration,
-            Channel = 0
-        };
-        notes.Add(lastNote);
+            if (notes.Count > 0 && notes.Last().Note == currentNote &&
+                lastStartStep - (notes.Last().StartStep + notes.Last().Duration) <= minDurationSteps)
+            {
+                notes.Last().Duration = (lastStartStep + lastDuration) - notes.Last().StartStep;
+            }
+            else
+            {
+                MusicNote lastNote = new MusicNote
+                {
+                    Note = currentNote,
+                    Velocity = 100,
+                    StartStep = lastStartStep,
+                    Duration = lastDuration,
+                    Channel = 0
+                };
+                notes.Add(lastNote);
+            }
+        }
 
         MusicTrack track = new MusicTrack
         {
-            Name = $"Analyzed {filePath}",
-            Tempo = 100,
+            Name = $"Analyzed track",
+            Tempo = trackTempo,
             BarCount = Math.Max(1, notes.Last().StartStep + notes.Last().Duration) / 16, // assuming 1 bar = 16 steps
             Key = notes[0].Note % 12,
             IsMinor = false,

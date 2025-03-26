@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Utilities;
+﻿using Blastia.Main.Synthesizer.AiGenerator;
+using Blastia.Main.Utilities;
 
 namespace Blastia.Main.Synthesizer;
 
@@ -47,9 +48,9 @@ public class SynthwaveMusicGenerator
             Envelope = new EnvelopeParameters
             {
                 AttackTime = 0.1f,
-                DecayTime = 1.5f,
+                DecayTime = 0.1f,
                 SustainLevel = 1f,
-                ReleaseTime = 1.5f
+                ReleaseTime = 0.1f
             }
         };
         WaveParameters oscillator2 = new WaveParameters
@@ -60,9 +61,9 @@ public class SynthwaveMusicGenerator
             Envelope = new EnvelopeParameters
             {
                 AttackTime = 0.1f,
-                DecayTime = 1.5f,
+                DecayTime = 0.1f,
                 SustainLevel = 1f,
-                ReleaseTime = 1.5f
+                ReleaseTime = 0.1f
             }
         };
         synthParams.Oscillators.AddRange([oscillator, oscillator2]);

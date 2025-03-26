@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using Blastia.Main.Synthesizer.AiGenerator;
+using NAudio.Wave;
 
 namespace Blastia.Main.Synthesizer;
 
