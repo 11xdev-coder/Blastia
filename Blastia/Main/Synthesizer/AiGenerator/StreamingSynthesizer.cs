@@ -419,6 +419,14 @@ public class StreamingSynthesizer : ISampleProvider
         // This makes the sound continuous even if note.SamplesPlayed is reset
         foreach (var osc in note.SynthParams.Oscillators)
         {
+            // instantiate filter
+            osc.InstantiatedFilter ??= new Filter
+            {
+                Cutoff = osc.Filter.Cutoff,
+                Type = osc.Filter.Type,
+                Resonance = osc.Filter.Resonance
+            };
+            
             var env = CalculateEnvelope(note, osc);
             totalEnvelope += env;
             
@@ -446,7 +454,10 @@ public class StreamingSynthesizer : ISampleProvider
             }
         
             // Multiply by the oscillator's amplitude.
-            sampleSum += oscSample * osc.Amplitude * env;
+            var sample = oscSample * osc.Amplitude * env;
+            if (osc.InstantiatedFilter != null) sample = osc.InstantiatedFilter.Process(sample);
+
+            sampleSum += sample;
         }
 
         if (totalEnvelope <= 0.000001f)

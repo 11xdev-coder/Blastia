@@ -3150,14 +3150,20 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     // Use a sine wave for a smoother sound instead of a square wave.
                     parameters.Oscillators.Add(new WaveParameters
                     {
-                        WaveType = WaveType.Sine,
+                        WaveType = WaveType.Triangle,
                         Amplitude = 0.6f,
                         Envelope = new EnvelopeParameters
                         {
                             AttackTime = 0.05f,
                             DecayTime = 0.3f,
                             SustainLevel = 0.8f,
-                            ReleaseTime = 2f
+                            ReleaseTime = 1f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Cutoff = 1200,
+                            Resonance = 0.2f,
+                            Type = FilterType.LowPass
                         }
                     });
                     break;
@@ -3984,6 +3990,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
         public bool IsEnabled { get; set; } = true;
         public EnvelopeParameters Envelope { get; set; } = new();
         public FilterParameters Filter { get; set; } = new();
+        public Filter? InstantiatedFilter;
     }
 
     public class EnvelopeParameters
