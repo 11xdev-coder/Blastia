@@ -49,6 +49,13 @@ public class StreamingSynthesizer : ISampleProvider
         get => _currentStyle;
         set => _currentStyle = value;
     }
+
+    private volatile float _volumeModifier = 1f;
+    public float VolumeModifier
+    {
+        get => _volumeModifier;
+        set => _volumeModifier = value;
+    }
     
     // delay
     public const float DelayMixDefault = 0.3f;
@@ -82,9 +89,10 @@ public class StreamingSynthesizer : ISampleProvider
     public float DistortionDrive = DistortionDriveDefault;
     public float DistortionPostGain = DistortionPostGainDefault;
 
-    public StreamingSynthesizer(Style style)
+    public StreamingSynthesizer(Style style, float volume)
     {
         CurrentStyle = style;
+        VolumeModifier = volume;
     }
 
     private void InitializeEffects()
@@ -249,7 +257,7 @@ public class StreamingSynthesizer : ISampleProvider
                 }
                 
                 // Write stereo frame
-                float sample = Math.Clamp(sampleSum * 0.2f, -1, 1);
+                float sample = Math.Clamp(sampleSum * VolumeModifier * 0.2f, -1, 1);
                 buffer[offset + framesProcessed * 2] = sample;
                 buffer[offset + framesProcessed * 2 + 1] = sample;
 

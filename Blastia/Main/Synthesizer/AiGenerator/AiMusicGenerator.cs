@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Text;
 using Blastia.Main.Synthesizer.Analyzer;
+using Blastia.Main.Utilities;
 using NAudio.Midi;
 using ImGuiNET;
 using NAudio.CoreAudioApi;
@@ -67,6 +68,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
         // Synth provider
         private static int _selectedSynthStyle;
         private static readonly string[] SynthStyles = ["Default", "Electronic - uses synth", "Synthwave - uses synth"];
+        private static float _volumeModifier = 1f;
         
         private static WaveOutEvent? _waveOut;
         private static StreamingSynthesizer? _synth;
@@ -317,6 +319,13 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                         if (_synth == null) return;
                         
                         _synth.CurrentStyle = (Style) _selectedSynthStyle;
+                    }
+                    
+                    if (ImGui.SliderFloat("Volume Modifier", ref _volumeModifier, 0f, 1f))
+                    {
+                        if (_synth == null) return;
+                        
+                        _synth.VolumeModifier = _volumeModifier;
                     }
 
                     ImGui.Separator();
@@ -2811,6 +2820,10 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                 
                 int previousNote = -1;
                 int step = 0;
+                List<int> pitchPool = [0, 2, 4, 5, 7];
+                Util.Shuffle(pitchPool, _rng);
+                int pitchIndex = 0;
+                
                 while (step < stepsPerBar)
                 {
                     int patternStep = patternOffset + step;
@@ -2832,7 +2845,15 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                         if (_selectedSynthGeneration == 1) // synthwave
                         {
                             // scale pitch one octave down
-                            int newNote = note - 12;
+                            int newNote = note - 24;
+                            int pitchScalar = pitchPool[pitchIndex];
+                            pitchIndex += 1;
+                            if (pitchIndex >= pitchPool.Count)
+                            {
+                                Util.Shuffle(pitchPool, _rng);
+                                pitchIndex = 0;
+                            }
+                            newNote -= pitchScalar;
                             
                             // randomize pitch
                             if (newNote == previousNote)
@@ -2841,11 +2862,11 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                             }
                             
                             // randomize duration
-                            int variableOffset = _rng.Next(-1, 7);
+                            int variableOffset = _rng.Next(-1, 5);
                             int newDuration = duration + variableOffset;
                             
-                            // 60% to rest
-                            if (_rng.NextDouble() < 0.6)
+                            // 80% to rest
+                            if (_rng.NextDouble() < 0.8)
                             {
                                 newDuration = 0;
                             }
@@ -3170,14 +3191,14 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                 case TrackPartType.Bass:
                     parameters.Oscillators.Add(new WaveParameters
                     {
-                        WaveType = WaveType.Sine,
-                        Amplitude = 0.9f,
+                        WaveType = WaveType.Sawtooth,
+                        Amplitude = 0.6f,
                         Envelope = new EnvelopeParameters
                         {
                             AttackTime = 0.1f,
-                            DecayTime = 1.5f,
+                            DecayTime = 0.1f,
                             SustainLevel = 0.8f,
-                            ReleaseTime = 2.5f // slightly longer release for smooth fade-out
+                            ReleaseTime = 0.1f
                         }
                     });
                     break;
@@ -3673,7 +3694,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
             if (_isInitialized) return;
 
             _waveOut = new WaveOutEvent();
-            _synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
+            _synth = new StreamingSynthesizer((Style) _selectedSynthStyle, _volumeModifier);
             _waveOut.Init(_synth);
 
             _isInitialized = true;
@@ -3688,7 +3709,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
 
             try
             {
-                _synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
+                _synth = new StreamingSynthesizer((Style) _selectedSynthStyle, _volumeModifier);
                 _synth.LoadTrack(_currentTrack, _reverbMix, _reverbTime, _delayMix, _delayFeedback, _delayTime, 
                     _bitCrusherReduction, _distortionDrive, _distortionPostGain, _isLooping);
                 
@@ -3918,7 +3939,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
         {
             using (var writer = new WaveFileWriter(fileStream, waveFormat))
             {
-                var synth = new StreamingSynthesizer((Style) _selectedSynthStyle);
+                var synth = new StreamingSynthesizer((Style) _selectedSynthStyle, _volumeModifier);
                 synth.LoadTrack(track, _reverbMix, _reverbTime, _delayMix, _delayFeedback, _delayTime, 
                     _bitCrusherReduction, _distortionDrive, _distortionPostGain);
         
