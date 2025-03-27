@@ -7,7 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="fixed envelopes">
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/StreamingSynthesizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/StreamingSynthesizer.cs" afterDir="false" />
@@ -190,15 +190,8 @@
       <workItem from="1742727300876" duration="22877000" />
       <workItem from="1742807221703" duration="19777000" />
       <workItem from="1742896505182" duration="19632000" />
-      <workItem from="1742979196572" duration="9525000" />
-    </task>
-    <task id="LOCAL-00004" summary="bug fix: SliderHandle on first frame played Tick sound">
-      <option name="closed" value="true" />
-      <created>1737284184105</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1737284184105</updated>
+      <workItem from="1742979196572" duration="14010000" />
+      <workItem from="1743065519488" duration="6349000" />
     </task>
     <task id="LOCAL-00005" summary="bug fix: SliderHandle being in incorrect position for one frame">
       <option name="closed" value="true" />
@@ -584,7 +577,15 @@
       <option name="project" value="LOCAL" />
       <updated>1742997744740</updated>
     </task>
-    <option name="localTasksCounter" value="53" />
+    <task id="LOCAL-00053" summary="filters">
+      <option name="closed" value="true" />
+      <created>1743020548294</created>
+      <option name="number" value="00053" />
+      <option name="presentableId" value="LOCAL-00053" />
+      <option name="project" value="LOCAL" />
+      <updated>1743020548294</updated>
+    </task>
+    <option name="localTasksCounter" value="54" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -594,7 +595,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="basic collision structure" />
     <MESSAGE value="ImGui + SDL simple synthesizer" />
     <MESSAGE value="text renders properly" />
     <MESSAGE value="multiple waves" />
@@ -619,6 +619,7 @@
     <MESSAGE value="different note pitches" />
     <MESSAGE value="fixed ImGui text input + AudioAnalyzer" />
     <MESSAGE value="fixed envelopes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed envelopes" />
+    <MESSAGE value="filters" />
+    <option name="LAST_COMMIT_MESSAGE" value="filters" />
   </component>
 </project>

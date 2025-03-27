@@ -420,12 +420,15 @@ public class StreamingSynthesizer : ISampleProvider
         foreach (var osc in note.SynthParams.Oscillators)
         {
             // instantiate filter
-            osc.InstantiatedFilter ??= new Filter
+            if (osc.Filter != null)
             {
-                Cutoff = osc.Filter.Cutoff,
-                Type = osc.Filter.Type,
-                Resonance = osc.Filter.Resonance
-            };
+                osc.InstantiatedFilter ??= new Filter
+                {
+                    Cutoff = osc.Filter.Cutoff,
+                    Type = osc.Filter.Type,
+                    Resonance = osc.Filter.Resonance
+                };
+            }
             
             var env = CalculateEnvelope(note, osc);
             totalEnvelope += env;
@@ -466,7 +469,6 @@ public class StreamingSynthesizer : ISampleProvider
             return 0f;
         }
         
-    
         // Apply a slow LFO for gentle amplitude modulation.
         float lfo = (float)(0.8 + 0.2 * Math.Sin(2 * Math.PI * 0.2 * _globalTime));
     

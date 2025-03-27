@@ -2809,10 +2809,16 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                 ArpeggioPattern selectedPattern = patterns[patternIndex];
                 int patternOffset = (bar % patternBars) * stepsPerBar;
                 
-                for (int step = 0; step < stepsPerBar; step++)
+                int previousNote = -1;
+                int step = 0;
+                while (step < stepsPerBar)
                 {
                     int patternStep = patternOffset + step;
-                    if (patternStep >= selectedPattern.Notes.Length) continue;
+                    if (patternStep >= selectedPattern.Notes.Length)
+                    {
+                        step += 1;
+                        continue;
+                    }
                     
                     if (selectedPattern.Notes[patternStep] != -1)
                     {
@@ -2822,6 +2828,39 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                         
                         // Calculate absolute position
                         int absoluteStep = bar * stepsPerBar + step;
+
+                        if (_selectedSynthGeneration == 1) // synthwave
+                        {
+                            // scale pitch one octave down
+                            int newNote = note - 12;
+                            
+                            // randomize pitch
+                            if (newNote == previousNote)
+                            {
+                                newNote += _rng.Next(-2, 3);
+                            }
+                            
+                            // randomize duration
+                            int variableOffset = _rng.Next(-1, 7);
+                            int newDuration = duration + variableOffset;
+                            
+                            // 60% to rest
+                            if (_rng.NextDouble() < 0.6)
+                            {
+                                newDuration = 0;
+                            }
+                            
+                            duration = newDuration;
+                            note = newNote;
+
+                            // if duration > 0, advance by note duration, otherwise by 1
+                            step += (duration > 0) ? duration : 1;
+                        }
+                        else
+                        {
+                            // continue as normal
+                            step += 1;
+                        }
                         
                         // Add the note
                         MusicNote musicNote = new MusicNote
@@ -2832,8 +2871,18 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                             Duration = duration,
                             Channel = part.Channel
                         };
-                        
-                        part.Notes.Add(musicNote);
+
+                        if (duration > 0)
+                        {
+                            part.Notes.Add(musicNote);
+                        }
+
+                        previousNote = note;
+                    }
+                    else
+                    {
+                        // no note found, continue
+                        step += 1;
                     }
                 }
             }
@@ -3147,25 +3196,68 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     });
                     break;
                 case TrackPartType.Arpeggio:
-                    // Use a sine wave for a smoother sound instead of a square wave.
-                    parameters.Oscillators.Add(new WaveParameters
+                    WaveParameters main = new WaveParameters
                     {
-                        WaveType = WaveType.Triangle,
+                        WaveType = WaveType.Sine,
                         Amplitude = 0.6f,
+                        IsEnabled = true,
                         Envelope = new EnvelopeParameters
                         {
-                            AttackTime = 0.05f,
-                            DecayTime = 0.3f,
-                            SustainLevel = 0.8f,
-                            ReleaseTime = 1f
+                            AttackTime = 1.5f,
+                            DecayTime = 1.5f,
+                            SustainLevel = 1f,
+                            ReleaseTime = 3f
                         },
                         Filter = new FilterParameters
                         {
-                            Cutoff = 1200,
+                            Cutoff = 800,
                             Resonance = 0.2f,
                             Type = FilterType.LowPass
                         }
-                    });
+                    };
+                    parameters.Oscillators.Add(main);
+    
+                    WaveParameters second = new WaveParameters
+                    {
+                        WaveType = WaveType.Triangle,
+                        Amplitude = 0.4f,
+                        IsEnabled = true,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 1.5f,
+                            DecayTime = 1.5f,
+                            SustainLevel = 1f,
+                            ReleaseTime = 3f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Cutoff = 800,
+                            Resonance = 0.2f,
+                            Type = FilterType.LowPass
+                        }
+                    };
+                    parameters.Oscillators.Add(second);
+    
+                    WaveParameters third = new WaveParameters
+                    {
+                        WaveType = WaveType.Sawtooth,
+                        Amplitude = 0.2f,
+                        IsEnabled = true,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 1.5f,
+                            DecayTime = 1.5f,
+                            SustainLevel = 1f,
+                            ReleaseTime = 3f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Cutoff = 800,
+                            Resonance = 0.2f,
+                            Type = FilterType.LowPass
+                        }
+                    };
+                    parameters.Oscillators.Add(third);
                     break;
                 case TrackPartType.Lead:
                     // Use a smooth sine wave with long, evolving envelopes
@@ -3989,7 +4081,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
         public float FrequencyOffset { get; set; } // In semitones
         public bool IsEnabled { get; set; } = true;
         public EnvelopeParameters Envelope { get; set; } = new();
-        public FilterParameters Filter { get; set; } = new();
+        public FilterParameters? Filter { get; set; } = new();
         public Filter? InstantiatedFilter;
     }
 
