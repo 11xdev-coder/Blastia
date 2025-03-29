@@ -57,6 +57,20 @@ public class StreamingSynthesizer : ISampleProvider
         set => _volumeModifier = value;
     }
     
+    private volatile float _vibratoRate;
+    public float VibratoRate
+    {
+        get => _vibratoRate;
+        set => _vibratoRate = value;
+    }
+    
+    private volatile float _vibratoDepth = 1f;
+    public float VibratoDepth
+    {
+        get => _vibratoDepth;
+        set => _vibratoDepth = value;
+    }
+    
     // delay
     public const float DelayMixDefault = 0.3f;
     public const float DelayFeedbackDefault = 0.5f;
@@ -89,10 +103,12 @@ public class StreamingSynthesizer : ISampleProvider
     public float DistortionDrive = DistortionDriveDefault;
     public float DistortionPostGain = DistortionPostGainDefault;
 
-    public StreamingSynthesizer(Style style, float volume)
+    public StreamingSynthesizer(Style style, float volume, float vibratoRate = 0.5f, float vibratoDepth = 0.1f)
     {
         CurrentStyle = style;
         VolumeModifier = volume;
+        VibratoRate = vibratoRate;
+        VibratoDepth = vibratoDepth;
     }
 
     private void InitializeEffects()
@@ -353,7 +369,7 @@ public class StreamingSynthesizer : ISampleProvider
         // Calculate envelope once using the first oscillator's envelope (if available)
         var oscForEnv = note.SynthParams.Oscillators.FirstOrDefault();
         float env = CalculateEnvelope(note, oscForEnv);
-        if (env <= 0.001f)
+        if (env <= 0.000001f)
         {
             removeNote = true;
             return 0;
@@ -420,7 +436,6 @@ public class StreamingSynthesizer : ISampleProvider
         // We'll accumulate samples from each oscillator defined in the SynthParams.
         float sampleSum = 0f;
         double baseFrequency = note.Frequency;
-        int count = note.SynthParams.Oscillators.Count;
         float totalEnvelope = 0f;
     
         // Use _globalTime to drive a continuously evolving phase.
@@ -444,8 +459,12 @@ public class StreamingSynthesizer : ISampleProvider
             // Calculate effective frequency including detuning (in semitones)
             double frequency = baseFrequency * Math.Pow(2, osc.FrequencyOffset / 12.0);
         
+            // apply vibrato
+            double pitchModulation = VibratoDepth * Math.Sin(Math.PI * 2 * VibratoRate * note.SamplesPlayed / WaveFormat.SampleRate);
+            double modulatedFrequency = frequency * Math.Pow(2, pitchModulation / 12);
+            
             // Use global time to generate a continuous phase.
-            double phase = (_globalTime * frequency) % 1.0;
+            double phase = (note.SamplesPlayed * modulatedFrequency) / WaveFormat.SampleRate % 1.0;
             float oscSample;
         
             switch (osc.WaveType)

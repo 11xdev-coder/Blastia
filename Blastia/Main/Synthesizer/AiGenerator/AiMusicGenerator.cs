@@ -11,7 +11,7 @@ using NAudio.Wave.SampleProviders;
 
 namespace Blastia.Main.Synthesizer.AiGenerator
 {
-    public class AiMusicGenerator
+    public static class AiMusicGenerator
     {
         private static Random _rng = new();
         private static MusicTrack? _currentTrack;
@@ -2603,6 +2603,11 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     int note = pattern.Steps[patternStep];
                     int velocity = pattern.Velocities[patternStep];
                     int duration = pattern.Durations[patternStep];
+
+                    if (_selectedSynthGeneration == 1)
+                    {
+                        note -= 12;
+                    }
                     
                     // Calculate absolute position
                     int absoluteStep = currentBar * stepsPerBar + step;
@@ -2844,7 +2849,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
 
                         if (_selectedSynthGeneration == 1) // synthwave
                         {
-                            // scale pitch one octave down
+                            // scale pitch two octave down
                             int newNote = note - 24;
                             int pitchScalar = pitchPool[pitchIndex];
                             pitchIndex += 1;
@@ -3192,7 +3197,25 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     parameters.Oscillators.Add(new WaveParameters
                     {
                         WaveType = WaveType.Sawtooth,
-                        Amplitude = 0.6f,
+                        Amplitude = 0.4f,
+                        Envelope = new EnvelopeParameters
+                        {
+                            AttackTime = 0.1f,
+                            DecayTime = 0.1f,
+                            SustainLevel = 0.8f,
+                            ReleaseTime = 0.1f
+                        },
+                        Filter = new FilterParameters
+                        {
+                            Type = FilterType.LowPass,
+                            Cutoff = 300,
+                            Resonance = 0.2f
+                        }
+                    });
+                    parameters.Oscillators.Add(new WaveParameters
+                    {
+                        WaveType = WaveType.Sine,
+                        Amplitude = 0.7f,
                         Envelope = new EnvelopeParameters
                         {
                             AttackTime = 0.1f,
@@ -3220,7 +3243,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     WaveParameters main = new WaveParameters
                     {
                         WaveType = WaveType.Sine,
-                        Amplitude = 0.6f,
+                        Amplitude = 0.7f,
                         IsEnabled = true,
                         Envelope = new EnvelopeParameters
                         {
@@ -3241,7 +3264,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     WaveParameters second = new WaveParameters
                     {
                         WaveType = WaveType.Triangle,
-                        Amplitude = 0.4f,
+                        Amplitude = 0.5f,
                         IsEnabled = true,
                         Envelope = new EnvelopeParameters
                         {
@@ -3262,7 +3285,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     WaveParameters third = new WaveParameters
                     {
                         WaveType = WaveType.Sawtooth,
-                        Amplitude = 0.2f,
+                        Amplitude = 0.3f,
                         IsEnabled = true,
                         Envelope = new EnvelopeParameters
                         {
@@ -3551,7 +3574,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
             WaveParameters main = new WaveParameters
             {
                 WaveType = _intensity > 0.6 ? WaveType.Sawtooth : WaveType.Square,
-                Amplitude = 0.7f,
+                Amplitude = 0.4f,
                 IsEnabled = true,
                 Envelope = new EnvelopeParameters
                 {
@@ -3573,7 +3596,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
             WaveParameters modulator = new WaveParameters
             {
                 WaveType = WaveType.Square,
-                Amplitude = 0.4f,
+                Amplitude = 0.1f,
                 FrequencyOffset = 7,
                 IsEnabled = true
             };
@@ -3585,7 +3608,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                 WaveParameters second = new WaveParameters
                 {
                     WaveType = WaveType.Square,
-                    Amplitude = 0.3f,
+                    Amplitude = 0.1f,
                     FrequencyOffset = 12, // Octave
                     IsEnabled = true,
                     // ADSR - similar to main

@@ -7,7 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="synthwave arpeggio changes">
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/StreamingSynthesizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/StreamingSynthesizer.cs" afterDir="false" />
@@ -191,15 +191,9 @@
       <workItem from="1742807221703" duration="19777000" />
       <workItem from="1742896505182" duration="19632000" />
       <workItem from="1742979196572" duration="14010000" />
-      <workItem from="1743065519488" duration="9703000" />
-    </task>
-    <task id="LOCAL-00006" summary="common methods for video and audio menus">
-      <option name="closed" value="true" />
-      <created>1737314587082</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1737314587082</updated>
+      <workItem from="1743065519488" duration="10613000" />
+      <workItem from="1743157648064" duration="10478000" />
+      <workItem from="1743248663702" duration="1796000" />
     </task>
     <task id="LOCAL-00007" summary="tab group now works with alignment">
       <option name="closed" value="true" />
@@ -585,7 +579,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743108477616</updated>
     </task>
-    <option name="localTasksCounter" value="55" />
+    <task id="LOCAL-00055" summary="volume modifier">
+      <option name="closed" value="true" />
+      <created>1743113349100</created>
+      <option name="number" value="00055" />
+      <option name="presentableId" value="LOCAL-00055" />
+      <option name="project" value="LOCAL" />
+      <updated>1743113349100</updated>
+    </task>
+    <option name="localTasksCounter" value="56" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -595,7 +597,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="text renders properly" />
     <MESSAGE value="multiple waves" />
     <MESSAGE value="ADSR" />
     <MESSAGE value="ADSR bug fix" />
@@ -620,6 +621,7 @@
     <MESSAGE value="fixed envelopes" />
     <MESSAGE value="filters" />
     <MESSAGE value="synthwave arpeggio changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="synthwave arpeggio changes" />
+    <MESSAGE value="volume modifier" />
+    <option name="LAST_COMMIT_MESSAGE" value="volume modifier" />
   </component>
 </project>
