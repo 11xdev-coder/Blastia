@@ -52,6 +52,14 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Concentus": {
+              "target": "Package",
+              "version": "[2.2.2, )"
+            },
+            "Concentus.Oggfile": {
+              "target": "Package",
+              "version": "[1.0.6, )"
+            },
             "FNA.NET": {
               "target": "Package",
               "version": "[1.0.15.2403, )"

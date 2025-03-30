@@ -12,7 +12,7 @@ public enum Style
 public class StreamingSynthesizer : ISampleProvider
 {
     // Audio format definition
-    public WaveFormat WaveFormat => WaveFormat.CreateIeeeFloatWaveFormat(44100, 2);
+    public WaveFormat WaveFormat => WaveFormat.CreateIeeeFloatWaveFormat(48000, 2);
 
     // Track and note management
     private Dictionary<int, List<NoteEvent>> _noteEvents = new();

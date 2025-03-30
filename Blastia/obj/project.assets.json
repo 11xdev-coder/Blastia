@@ -2,6 +2,35 @@
   "version": 3,
   "targets": {
     "net8.0": {
+      "Concentus/2.2.2": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.4",
+          "System.Numerics.Vectors": "4.5.0"
+        },
+        "compile": {
+          "lib/net8.0/Concentus.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Concentus.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Concentus.Oggfile/1.0.6": {
+        "type": "package",
+        "dependencies": {
+          "Concentus": "2.2.1"
+        },
+        "compile": {
+          "lib/net8.0/Concentus.Oggfile.dll": {}
+        },
+        "runtime": {
+          "lib/net8.0/Concentus.Oggfile.dll": {}
+        }
+      },
       "FNA.NET/1.0.15.2403": {
         "type": "package",
         "dependencies": {
@@ -713,7 +742,7 @@
           "lib/netstandard1.6/System.Linq.Expressions.dll": {}
         }
       },
-      "System.Memory/4.5.3": {
+      "System.Memory/4.5.4": {
         "type": "package",
         "compile": {
           "ref/netcoreapp2.1/_._": {}
@@ -1405,6 +1434,43 @@
     }
   },
   "libraries": {
+    "Concentus/2.2.2": {
+      "sha512": "2B9YmHPKO+k7YpAAnqmiXwiMJnfjfj1C868RszOll2iZWLnGTAiC1q21L/d7CvTan7T+hyqU8dR0Dcy3cpjVfQ==",
+      "type": "package",
+      "path": "concentus/2.2.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "concentus.2.2.2.nupkg.sha512",
+        "concentus.nuspec",
+        "icon.png",
+        "lib/net452/Concentus.dll",
+        "lib/net452/Concentus.xml",
+        "lib/net8.0/Concentus.dll",
+        "lib/net8.0/Concentus.xml",
+        "lib/netstandard1.1/Concentus.dll",
+        "lib/netstandard1.1/Concentus.xml",
+        "lib/netstandard2.0/Concentus.dll",
+        "lib/netstandard2.0/Concentus.xml"
+      ]
+    },
+    "Concentus.Oggfile/1.0.6": {
+      "sha512": "bDd8vP5+cmXR7D93w3LP75sJTClTb8GLOnSaLGtjb9z+wTQ//6UfNo0mtGU5Vtpgf9nYYgn7pFbPAC6isaewyw==",
+      "type": "package",
+      "path": "concentus.oggfile/1.0.6",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "concentus.oggfile.1.0.6.nupkg.sha512",
+        "concentus.oggfile.nuspec",
+        "icon.png",
+        "lib/net452/Concentus.Oggfile.dll",
+        "lib/net8.0/Concentus.Oggfile.dll",
+        "lib/netstandard1.1/Concentus.Oggfile.dll",
+        "lib/netstandard2.0/Concentus.Oggfile.dll"
+      ]
+    },
     "FNA.NET/1.0.15.2403": {
       "sha512": "cB0C9hsZQxH27BztcciGK2y5zVwj2Bmu7EJ95dQzrV/d6bdqnz+PqdVAjhuYngkKt6JVP7I1utV7JiNusfa38w==",
       "type": "package",
@@ -2721,22 +2787,24 @@
         "system.linq.expressions.nuspec"
       ]
     },
-    "System.Memory/4.5.3": {
-      "sha512": "3oDzvc/zzetpTKWMShs1AADwZjQ/36HnsufHRPcOjyRAAMLDlu2iD33MBI2opxnezcVUtXyqDXXjoFMOU9c7SA==",
+    "System.Memory/4.5.4": {
+      "sha512": "1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw==",
       "type": "package",
-      "path": "system.memory/4.5.3",
+      "path": "system.memory/4.5.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
+        "lib/net461/System.Memory.dll",
+        "lib/net461/System.Memory.xml",
         "lib/netcoreapp2.1/_._",
         "lib/netstandard1.1/System.Memory.dll",
         "lib/netstandard1.1/System.Memory.xml",
         "lib/netstandard2.0/System.Memory.dll",
         "lib/netstandard2.0/System.Memory.xml",
         "ref/netcoreapp2.1/_._",
-        "system.memory.4.5.3.nupkg.sha512",
+        "system.memory.4.5.4.nupkg.sha512",
         "system.memory.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -4530,6 +4598,8 @@
   },
   "projectFileDependencyGroups": {
     "net8.0": [
+      "Concentus >= 2.2.2",
+      "Concentus.Oggfile >= 1.0.6",
       "FNA.NET >= 1.0.15.2403",
       "ImGui.NET >= 1.91.6.1",
       "MathNet.Numerics >= 6.0.0-beta2",
@@ -4591,6 +4661,14 @@
       "net8.0": {
         "targetAlias": "net8.0",
         "dependencies": {
+          "Concentus": {
+            "target": "Package",
+            "version": "[2.2.2, )"
+          },
+          "Concentus.Oggfile": {
+            "target": "Package",
+            "version": "[1.0.6, )"
+          },
           "FNA.NET": {
             "target": "Package",
             "version": "[1.0.15.2403, )"

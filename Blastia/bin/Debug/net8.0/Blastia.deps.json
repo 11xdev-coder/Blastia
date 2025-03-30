@@ -8,6 +8,8 @@
     ".NETCoreApp,Version=v8.0": {
       "Blastia/1.0.0": {
         "dependencies": {
+          "Concentus": "2.2.2",
+          "Concentus.Oggfile": "1.0.6",
           "FNA.NET": "1.0.15.2403",
           "ImGui.NET": "1.91.6.1",
           "MathNet.Numerics": "6.0.0-beta2",
@@ -18,6 +20,29 @@
         },
         "runtime": {
           "Blastia.dll": {}
+        }
+      },
+      "Concentus/2.2.2": {
+        "dependencies": {
+          "System.Memory": "4.5.4",
+          "System.Numerics.Vectors": "4.5.0"
+        },
+        "runtime": {
+          "lib/net8.0/Concentus.dll": {
+            "assemblyVersion": "2.2.2.0",
+            "fileVersion": "2.2.2.0"
+          }
+        }
+      },
+      "Concentus.Oggfile/1.0.6": {
+        "dependencies": {
+          "Concentus": "2.2.2"
+        },
+        "runtime": {
+          "lib/net8.0/Concentus.Oggfile.dll": {
+            "assemblyVersion": "1.0.6.0",
+            "fileVersion": "1.0.6.0"
+          }
         }
       },
       "FNA.NET/1.0.15.2403": {
@@ -341,7 +366,7 @@
       },
       "NVorbis/0.10.5": {
         "dependencies": {
-          "System.Memory": "4.5.3",
+          "System.Memory": "4.5.4",
           "System.ValueTuple": "4.5.0"
         },
         "runtime": {
@@ -505,7 +530,7 @@
           "System.Threading": "4.0.11"
         }
       },
-      "System.Memory/4.5.3": {},
+      "System.Memory/4.5.4": {},
       "System.Numerics.Vectors/4.5.0": {},
       "System.ObjectModel/4.0.12": {
         "dependencies": {
@@ -866,6 +891,20 @@
       "serviceable": false,
       "sha512": ""
     },
+    "Concentus/2.2.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-2B9YmHPKO+k7YpAAnqmiXwiMJnfjfj1C868RszOll2iZWLnGTAiC1q21L/d7CvTan7T+hyqU8dR0Dcy3cpjVfQ==",
+      "path": "concentus/2.2.2",
+      "hashPath": "concentus.2.2.2.nupkg.sha512"
+    },
+    "Concentus.Oggfile/1.0.6": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bDd8vP5+cmXR7D93w3LP75sJTClTb8GLOnSaLGtjb9z+wTQ//6UfNo0mtGU5Vtpgf9nYYgn7pFbPAC6isaewyw==",
+      "path": "concentus.oggfile/1.0.6",
+      "hashPath": "concentus.oggfile.1.0.6.nupkg.sha512"
+    },
     "FNA.NET/1.0.15.2403": {
       "type": "package",
       "serviceable": true,
@@ -1125,12 +1164,12 @@
       "path": "system.linq.expressions/4.1.0",
       "hashPath": "system.linq.expressions.4.1.0.nupkg.sha512"
     },
-    "System.Memory/4.5.3": {
+    "System.Memory/4.5.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-3oDzvc/zzetpTKWMShs1AADwZjQ/36HnsufHRPcOjyRAAMLDlu2iD33MBI2opxnezcVUtXyqDXXjoFMOU9c7SA==",
-      "path": "system.memory/4.5.3",
-      "hashPath": "system.memory.4.5.3.nupkg.sha512"
+      "sha512": "sha512-1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw==",
+      "path": "system.memory/4.5.4",
+      "hashPath": "system.memory.4.5.4.nupkg.sha512"
     },
     "System.Numerics.Vectors/4.5.0": {
       "type": "package",

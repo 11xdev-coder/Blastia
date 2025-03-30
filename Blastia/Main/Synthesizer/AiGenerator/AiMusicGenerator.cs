@@ -3,6 +3,9 @@ using System.Numerics;
 using System.Text;
 using Blastia.Main.Synthesizer.Analyzer;
 using Blastia.Main.Utilities;
+using Concentus.Enums;
+using Concentus.Oggfile;
+using Concentus.Structs;
 using NAudio.Midi;
 using ImGuiNET;
 using NAudio.CoreAudioApi;
@@ -213,7 +216,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
 
                     // Generation parameters
                     ImGui.SliderInt("Tempo", ref _tempo, 40, 140);
-                    ImGui.SliderInt("Length (bars)", ref _trackLength, 8, 32);
+                    ImGui.SliderInt("Length (bars)", ref _trackLength, 8, 64);
 
                     if (_selectedSynthwaveGenerationPrefab == 0) // no prefab
                     {
@@ -467,6 +470,11 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                             if (ImGui.Button("WAV##wav", new Vector2(40, 20)))
                             {
                                 ExportTrackToAudio(_savedTracks[_selectedTrackIndex], "wav");
+                            }
+                            ImGui.SameLine();
+                            if (ImGui.Button("OGG##ogg", new Vector2(40, 20)))
+                            {
+                                ExportTrackToAudio(_savedTracks[_selectedTrackIndex], "ogg");
                             }
                         }
                         ImGui.End();
@@ -3924,7 +3932,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
             Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
             
             // Create an in-memory audio renderer
-            WaveFormat waveFormat = new WaveFormat(44100, 16, 2);
+            WaveFormat waveFormat = new WaveFormat(48000, 16, 2);
             string tempWavPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".wav");
             _exportStatus = "Exporting Temp .wav file";
             
@@ -3947,11 +3955,27 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                     {
                         MediaFoundationEncoder.EncodeToMp3(reader, outputPath);
                     }
-                    // OGG doesnt work
-                    // else if (format.ToLower() == "ogg")
-                    // {
-                    //     MediaFoundationEncoder.EncodeToWma(reader, outputPath);
-                    // }
+                    else if (format.ToLower() == "ogg")
+                    {
+                        int frameSize = 960;
+                        OpusEncoder encoder = new OpusEncoder(reader.WaveFormat.SampleRate,
+                            reader.WaveFormat.Channels, OpusApplication.OPUS_APPLICATION_AUDIO);
+                        encoder.Bitrate = 64000;
+
+                        using (var outStream = new FileStream(outputPath, FileMode.Create))
+                        {
+                            var oggOut = new OpusOggWriteStream(encoder, outStream);
+
+                            float[] buffer = new float[frameSize * reader.WaveFormat.Channels];
+                            int samplesRead;
+                            while ((samplesRead = reader.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                oggOut.WriteSamples(buffer, 0, samplesRead);
+                            }
+                            
+                            oggOut.Finish();
+                        }
+                    }
                 }
             }
             

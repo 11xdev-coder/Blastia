@@ -27,6 +27,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Concentus" Version="2.2.2" />
+      <PackageReference Include="Concentus.Oggfile" Version="1.0.6" />
       <PackageReference Include="FNA.NET" Version="1.0.15.2403" />
       <PackageReference Include="ImGui.NET" Version="1.91.6.1" />
       <PackageReference Include="MathNet.Numerics" Version="6.0.0-beta2" />

@@ -168,3 +168,5 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\osx-x64\native\libsdl2.dyl
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\win-x86\native\SDL2.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Roboto_Condensed-Thin.ttf
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\MathNet.Numerics.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Concentus.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Concentus.Oggfile.dll
