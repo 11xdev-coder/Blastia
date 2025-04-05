@@ -9,33 +9,19 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Blastia.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Blastia.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/StreamingSynthesizer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Synthesizer/AiGenerator/StreamingSynthesizer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.deps.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Blastia.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Blastia.csproj.nuget.dgspec.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.AssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.AssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,6 +61,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/b24682de1ce64b8a804018f42de151fb2bc00/59/8608d781/MediaFoundationEncoder.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/ea8d254b86c84d4f8e0fbc30479d7a70daa00/9b/dcbdf2f7/OggStream.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ee3c9d264411441f56a12bac52a58ad25b495ef52e59b4a86f8478158f7d/Array.CoreCLR.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="mock://D:/Projects/Blastia/Blastia/Main/Synthesizer/AiGenerator/AiMusicGenerator.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProblemsViewState">
@@ -209,15 +196,8 @@
       <workItem from="1743065519488" duration="10613000" />
       <workItem from="1743157648064" duration="10478000" />
       <workItem from="1743248663702" duration="6812000" />
-      <workItem from="1743335799436" duration="3056000" />
-    </task>
-    <task id="LOCAL-00008" summary="TabGroup now updates tabs itself">
-      <option name="closed" value="true" />
-      <created>1737486327182</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1737486327182</updated>
+      <workItem from="1743335799436" duration="4959000" />
+      <workItem from="1743784801873" duration="3328000" />
     </task>
     <task id="LOCAL-00009" summary="button caching">
       <option name="closed" value="true" />
@@ -603,7 +583,15 @@
       <option name="project" value="LOCAL" />
       <updated>1743259022064</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="ogg exporting">
+      <option name="closed" value="true" />
+      <created>1743353086649</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1743353086649</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -613,7 +601,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="ADSR" />
     <MESSAGE value="ADSR bug fix" />
     <MESSAGE value="anti-aliasing + filters" />
     <MESSAGE value="filter presets" />
@@ -638,6 +625,7 @@
     <MESSAGE value="synthwave arpeggio changes" />
     <MESSAGE value="volume modifier" />
     <MESSAGE value="lead &amp; arpeggio tweaks" />
-    <option name="LAST_COMMIT_MESSAGE" value="lead &amp; arpeggio tweaks" />
+    <MESSAGE value="ogg exporting" />
+    <option name="LAST_COMMIT_MESSAGE" value="ogg exporting" />
   </component>
 </project>

@@ -112,26 +112,43 @@ public abstract class Entity : Object
         BlastiaGame.RequestDebugPointDraw(topRight, 2);
         BlastiaGame.RequestDebugPointDraw(bottomRight, 2);
         
-        // moving right
-        if (MovementVector.X > 0)
+        // horizontal
+        if (MovementVector.X > 0) // moving right
         {
-            for (float y = top; y < bottom; y++)
+            // tile to the right edge
+            int tileX = (int)Math.Floor(right / Block.Size);
+            // Y in tiles
+            int tileYStart = (int)Math.Floor(top / Block.Size);
+            int tileYEnd = (int)Math.Floor((bottom - 1) / Block.Size);
+
+            for (int ty = tileYStart; ty <= tileYEnd; ty++)
             {
-                if (currentWorld.HasTile((int) right, (int) y))
+                // tile top-left
+                int tileWorldX = tileX * Block.Size;
+                int tileWorldY = ty * Block.Size;
+                if (currentWorld.HasTile(tileWorldX, tileWorldY))
                 {
+                    newPosition.X = tileWorldX - (widthPixels * 0.5f);
                     MovementVector.X = 0;
-                    newPosition.X = Position.X;
+                    break;
                 }
             }
         }
-        else if (MovementVector.X < 0) // left
+        else if (MovementVector.X < 0) // moving left
         {
-            for (float y = top; y < bottom; y++)
+            int tileX = (int)Math.Floor(left / Block.Size);
+            int tileYStart = (int)Math.Floor(top / Block.Size);
+            int tileYEnd = (int)Math.Floor((bottom - 1) / Block.Size);
+
+            for (int ty = tileYStart; ty <= tileYEnd; ty++)
             {
-                if (currentWorld.HasTile((int) left, (int) y))
+                int tileWorldX = tileX * Block.Size;
+                int tileWorldY = ty * Block.Size;
+                if (currentWorld.HasTile(tileWorldX, tileWorldY))
                 {
+                    newPosition.X = tileWorldX + Block.Size + (widthPixels * 0.5f);
                     MovementVector.X = 0;
-                    newPosition.X = Position.X;
+                    break;
                 }
             }
         }
@@ -139,111 +156,36 @@ public abstract class Entity : Object
         // down
         if (MovementVector.Y > 0)
         {
-            for (float x = left; x < right; x++)
-            {
-                if (currentWorld.HasTile((int) x, (int) bottom))
-                {
-                    MovementVector.Y = 0;
-                    newPosition.Y = Position.Y;
-                }
-            }
-        }
-        else if (MovementVector.Y < 0) // moving up
-        {
-            for (float x = left; x < right; x++)
-            {
-                if (currentWorld.HasTile((int) x, (int) top))
-                {
-                    MovementVector.Y = 0;
-                    newPosition.Y = Position.Y;
-                }
-            }
-        }
-    }
+            int tileY = (int)Math.Floor(bottom / Block.Size);
+            int tileXStart = (int)Math.Floor(left / Block.Size);
+            int tileXEnd = (int)Math.Floor((right - 1) / Block.Size);
 
-    private void HandleVerticalCollision(ref Vector2 newPosition, WorldState currentWorld)
-    {
-        // Convert to tile coordinates
-        int tileY = (int)Math.Floor(newPosition.Y / Block.Size);
-    
-        // Get horizontal range
-        int leftTileX = (int)Math.Floor(newPosition.X / Block.Size);
-        int rightTileX = (int)Math.Floor((newPosition.X + Width * Block.Size) / Block.Size);
-
-        // Clamp coordinates
-        leftTileX = Math.Max(0, leftTileX);
-        rightTileX = Math.Min(currentWorld.WorldWidth - 1, rightTileX);
-        tileY = Math.Clamp(tileY, 0, currentWorld.WorldHeight - 1);
-
-        IsGrounded = false;
-
-        // Moving down (positive Y)
-        if (MovementVector.Y >= 0)
-        {
-            for (int x = leftTileX; x <= rightTileX; x++)
+            for (int tx = tileXStart; tx <= tileXEnd; tx++)
             {
-                if (currentWorld.HasTile(x, tileY - Height))
+                int tileWorldX = tx * Block.Size;
+                int tileWorldY = tileY * Block.Size;
+                if (currentWorld.HasTile(tileWorldX, tileWorldY))
                 {
-                    // Position should be tile position minus entity height
-                    newPosition.Y = tileY * Block.Size;
-                    MovementVector.Y = 0;
-                    IsGrounded = true;
-                    break;
-                }
-            }
-        }
-        // Moving up (negative Y)
-        else if (MovementVector.Y < 0)
-        {
-            // For upward movement, check the tile at the top of the entity
-            int topTileY = (int)Math.Floor(newPosition.Y / Block.Size);
-            for (int x = leftTileX; x <= rightTileX; x++)
-            {
-                if (currentWorld.HasTile(x, topTileY))
-                {
-                    newPosition.Y = (topTileY + 1) * Block.Size;
+                    newPosition.Y = tileWorldY - heightPixels * 0.5f;
                     MovementVector.Y = 0;
                     break;
                 }
             }
         }
-    }
-
-    private void HandleHorizontalCollision(ref Vector2 newPosition, WorldState currentWorld)
-    {
-        int startTileX = (int)Math.Floor(newPosition.X / Block.Size);
-        
-        // vertical range
-        int topTileY = (int)Math.Floor(newPosition.Y / Block.Size);
-        int bottomTileY = (int)Math.Floor((newPosition.Y + Height * Block.Size) / Block.Size);
-        
-        // clamp
-        topTileY = Math.Max(0, topTileY);
-        bottomTileY = Math.Min(currentWorld.WorldHeight - 1, bottomTileY);
-        startTileX = Math.Clamp(startTileX, 0, currentWorld.WorldWidth - 1);
-
-        // right
-        if (MovementVector.X > 0)
+        else if (MovementVector.Y < 0) // up
         {
-            for (int y = topTileY; y <= bottomTileY; y++)
+            int tileY = (int)Math.Floor(top / Block.Size);
+            int tileXStart = (int)Math.Floor(left / Block.Size);
+            int tileXEnd = (int)Math.Floor((right - 1) / Block.Size);
+
+            for (int tx = tileXStart; tx <= tileXEnd; tx++)
             {
-                if (currentWorld.HasTile(startTileX + Width, y))
+                int tileWorldX = tx * Block.Size;
+                int tileWorldY = tileY * Block.Size;
+                if (currentWorld.HasTile(tileWorldX, tileWorldY))
                 {
-                    newPosition.X = startTileX * Block.Size;
-                    MovementVector.X = 0;
-                    break;
-                }
-            }
-        }
-        // left
-        else if (MovementVector.X < 0)
-        {
-            for (int y = topTileY; y <= bottomTileY; y++)
-            {
-                if (currentWorld.HasTile(startTileX, y))
-                {
-                    newPosition.X = startTileX * Block.Size + Width * Block.Size;
-                    MovementVector.X = 0;
+                    newPosition.Y = tileWorldY + Block.Size - heightPixels * 0.5f;
+                    MovementVector.Y = 0;
                     break;
                 }
             }

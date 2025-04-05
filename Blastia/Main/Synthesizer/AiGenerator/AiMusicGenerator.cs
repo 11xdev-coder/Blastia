@@ -4041,7 +4041,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
     // Music data structures
     public class MusicTrack
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         public int Style { get; set; }
         public int Tempo { get; set; } = 120;
         public int BarCount { get; set; } = 16;
