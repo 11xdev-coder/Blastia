@@ -4,6 +4,7 @@ using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Vulkan;
 using Object = Blastia.Main.GameState.Object;
 
 namespace Blastia.Main.Entities.Common;
@@ -78,26 +79,185 @@ public abstract class Entity : Object
         // UpdateImpulse();
         UpdatePosition();
     }
+    
+    Rectangle GetPlayerRect(Vector2 pos)
+    {
+        int widthPixels = Width * Block.Size;
+        int heightPixels = Height * Block.Size;
+        return new Rectangle(
+            (int)(pos.X - widthPixels * 0.5f),
+            (int)(pos.Y - heightPixels * 0.5f),
+            widthPixels,
+            heightPixels
+        );
+    }
 
-    /// <summary>
-    /// Newton's law of inertia
-    /// </summary>
+    private (float toi, Vector2 normal) SweptAABB(Rectangle movingRect, Vector2 velocity, Rectangle staticRect)
+    {
+        // Expand static rect by 1px to prevent tunneling
+        staticRect = new Rectangle(
+            staticRect.X - 1,
+            staticRect.Y - 1,
+            staticRect.Width + 2,
+            staticRect.Height + 2
+        );
+
+        Vector2 entryDist = new Vector2();
+        Vector2 exitDist = new Vector2();
+
+        // X-axis calculations
+        if (velocity.X > 0)
+        {
+            entryDist.X = staticRect.Left - movingRect.Right;
+            exitDist.X = staticRect.Right - movingRect.Left;
+        }
+        else
+        {
+            entryDist.X = staticRect.Right - movingRect.Left;
+            exitDist.X = staticRect.Left - movingRect.Right;
+        }
+
+        // Y-axis calculations
+        if (velocity.Y > 0)
+        {
+            entryDist.Y = staticRect.Top - movingRect.Bottom;
+            exitDist.Y = staticRect.Bottom - movingRect.Top;
+        }
+        else
+        {
+            entryDist.Y = staticRect.Bottom - movingRect.Top;
+            exitDist.Y = staticRect.Top - movingRect.Bottom;
+        }
+
+        Vector2 entryTime = new Vector2();
+        Vector2 exitTime = new Vector2();
+
+        if (velocity.X == 0)
+        {
+            entryTime.X = float.NegativeInfinity;
+            exitTime.X = float.PositiveInfinity;
+        }
+        else
+        {
+            entryTime.X = entryDist.X / velocity.X;
+            exitTime.X = exitDist.X / velocity.X;
+        }
+
+        if (velocity.Y == 0)
+        {
+            entryTime.Y = float.NegativeInfinity;
+            exitTime.Y = float.PositiveInfinity;
+        }
+        else
+        {
+            entryTime.Y = entryDist.Y / velocity.Y;
+            exitTime.Y = exitDist.Y / velocity.Y;
+        }
+
+        float entry = Math.Max(entryTime.X, entryTime.Y);
+        float exit = Math.Min(exitTime.X, exitTime.Y);
+
+        // No collision conditions
+        if (entry > exit || entry < 0 || entry > 1)
+            return (1f, Vector2.Zero);
+
+        Vector2 normal = Vector2.Zero;
+        if (entryTime.X > entryTime.Y)
+        {
+            normal.X = velocity.X < 0 ? 1 : -1;
+        }
+        else
+        {
+            normal.Y = velocity.Y < 0 ? 1 : -1;
+        }
+
+        return (entry, normal);
+    }
+
     private void UpdatePosition()
     {
-        // use steps
-        var totalMovement = MovementVector * (float) BlastiaGame.GameTimeElapsedSeconds;
-        var totalSteps = (int) Math.Floor(totalMovement.Length() / _distancePerCollisionStep) + 1;
-        var stepVector = totalMovement / totalSteps;
+        Vector2 originalPosition = Position;
+        Vector2 movement = MovementVector * (float)BlastiaGame.GameTimeElapsedSeconds;
+        Vector2 remaining = movement;
         
-        Vector2 currentNewPosition = Position;
-        for (int i = 0; i < totalSteps; i++)
+        int iterations = 0;
+        const int maxIterations = 5;
+        bool collisionOccurred = false;
+
+        while (iterations < maxIterations && remaining.LengthSquared() > float.Epsilon)
         {
-            Vector2 tempNewPosition = currentNewPosition + stepVector;
-            HandleCollision(ref tempNewPosition);
-            currentNewPosition = tempNewPosition;
+            float shortestTime = 1f;
+            Vector2 collisionNormal = Vector2.Zero;
+            Rectangle playerRect = GetPlayerRect(Position);
+            
+            // Expand search area for edge cases
+            Rectangle searchArea = Rectangle.Union(
+                playerRect,
+                new Rectangle(
+                    (int)(playerRect.X + remaining.X),
+                    (int)(playerRect.Y + remaining.Y),
+                    playerRect.Width,
+                    playerRect.Height
+                )
+            );
+
+            int tileStartX = (int)Math.Floor(searchArea.Left / (float)Block.Size) - 1;
+            int tileEndX = (int)Math.Floor(searchArea.Right / (float)Block.Size) + 1;
+            int tileStartY = (int)Math.Floor(searchArea.Top / (float)Block.Size) - 1;
+            int tileEndY = (int)Math.Floor(searchArea.Bottom / (float)Block.Size) + 1;
+
+            // Check all tiles in expanded area
+            for (int tx = tileStartX; tx <= tileEndX; tx++)
+            {
+                for (int ty = tileStartY; ty <= tileEndY; ty++)
+                {
+                    int tileWorldX = tx * Block.Size;
+                    int tileWorldY = ty * Block.Size;
+                    
+                    if (!PlayerManager.Instance.SelectedWorld.HasTile(tileWorldX, tileWorldY))
+                        continue;
+
+                    Rectangle tileRect = new Rectangle(tileWorldX, tileWorldY, Block.Size, Block.Size);
+                    var (toi, normal) = SweptAABB(playerRect, remaining, tileRect);
+
+                    if (toi < shortestTime)
+                    {
+                        shortestTime = toi;
+                        collisionNormal = normal;
+                        collisionOccurred = true;
+                    }
+                }
+            }
+
+            if (!collisionOccurred)
+            {
+                Position += remaining;
+                break;
+            }
+
+            // Apply partial movement
+            Position += remaining * shortestTime;
+            
+            // Calculate remaining movement after collision
+            Vector2 projection = Vector2.Dot(remaining, collisionNormal) * collisionNormal;
+            remaining -= projection * (1 - shortestTime);
+            
+            // Apply overlap correction
+            const float skinWidth = 0.1f;
+            Position += collisionNormal * skinWidth;
+
+            // Adjust velocity based on collision normal
+            if (collisionNormal.X != 0) MovementVector = new Vector2(0, MovementVector.Y);
+            if (collisionNormal.Y != 0) MovementVector = new Vector2(MovementVector.X, 0);
+
+            iterations++;
         }
-        
-        Position = currentNewPosition;
+
+        // Final position validation
+        if (iterations >= maxIterations)
+        {
+            Console.WriteLine("Collision resolution reached max iterations");
+        }
     }
 
     private void HandleCollision(ref Vector2 newPosition)
@@ -108,69 +268,84 @@ public abstract class Entity : Object
         int heightPixels = Height * Block.Size;
         int widthPixels = Width * Block.Size;
 
-        // calculate entity hitbox
         float left = newPosition.X - widthPixels * 0.5f;
         float top = newPosition.Y - heightPixels * 0.5f;
         float right = newPosition.X + widthPixels * 0.5f;
         float bottom = newPosition.Y + heightPixels * 0.5f;
-        Rectangle hitboxRect = new Rectangle((int)left, (int)top, widthPixels, heightPixels);
         
         int tileXStart = (int) Math.Floor(left / Block.Size);
         int tileXEnd = (int) Math.Floor((right - 1) / Block.Size);
         int tileYStart = (int) Math.Floor(top / Block.Size);
         int tileYEnd = (int) Math.Floor((bottom - 1) / Block.Size);
-        
-        // for each tile in hitbox
-        for (int tx = tileXStart; tx <= tileXEnd; tx++)
+
+        // horizontal
+        if (MovementVector.X != 0) 
         {
+            // right and left
+            int direction = MovementVector.X > 0 ? 1 : -1;
+            int tileX = direction > 0 ? tileXEnd : tileXStart;
+            int tileWorldX = tileX * Block.Size;
+
             for (int ty = tileYStart; ty <= tileYEnd; ty++)
             {
-                // get tile world pos
-                int tileWorldX = tx * Block.Size;
                 int tileWorldY = ty * Block.Size;
-                Rectangle blockRect = new Rectangle(tileWorldX, tileWorldY, Block.Size, Block.Size);
-
-                // if hitbox hit a solid tile
                 if (currentWorld.HasTile(tileWorldX, tileWorldY))
                 {
-                    // calculate intersection
-                    Rectangle intersection = Rectangle.Intersect(hitboxRect, blockRect);
-                    if (intersection != Rectangle.Empty)
-                    {
-                        // resolve collision for smaller axis
-                        if (intersection.Width < intersection.Height)
-                        {
-                            // horizontal
-                            if (right > blockRect.Left && left < blockRect.Center.X)
-                            {
-                                newPosition.X = blockRect.Left - (widthPixels * 0.5f);
-                                MovementVector.X = 0;
-                            }
-                            else if (left < blockRect.Right && right > blockRect.Left)
-                            {
-                                newPosition.X = blockRect.Right + (widthPixels * 0.5f);
-                                MovementVector.X = 0;
-                            }
-                        }
-                        else
-                        {
-                            // vertical
-                            if (bottom > blockRect.Top && top < blockRect.Top)
-                            {
-                                newPosition.Y = blockRect.Top - (heightPixels * 0.5f);
-                                MovementVector.Y = 0;
-                            }
-                            else if (top < blockRect.Bottom && bottom > blockRect.Bottom)
-                            {
-                                newPosition.Y = blockRect.Bottom + (heightPixels * 0.5f);
-                                MovementVector.Y = 0;
-                            }
-                        }
-                        
-                        left = newPosition.X - widthPixels * 0.5f;
-                        top = newPosition.Y - heightPixels * 0.5f;
-                        hitboxRect = new Rectangle((int)left, (int)top, widthPixels, heightPixels);
-                    }
+                    newPosition.X = direction > 0 
+                        ? tileWorldX - widthPixels * 0.5f // right
+                        : tileWorldX + Block.Size + widthPixels * 0.5f; // left
+                    MovementVector.X = 0;
+                    break;
+                }
+            }
+        }
+        
+        // vertical
+        if (MovementVector.Y != 0)
+        {
+            int direction = MovementVector.Y > 0 ? 1 : -1; // down and up
+            int tileY = direction > 0 ? tileYEnd : tileYStart;
+            int tileWorldY = tileY * Block.Size;
+
+            for (int tx = tileXStart; tx <= tileXEnd; tx++)
+            {
+                int tileWorldX = tx * Block.Size;
+                if (currentWorld.HasTile(tileWorldX, tileWorldY))
+                {
+                    newPosition.Y = direction > 0
+                        ? tileWorldY - heightPixels * 0.5f // bottom
+                        : tileWorldY + Block.Size + heightPixels * 0.5f; // top
+                    MovementVector.Y = 0;
+                    break;
+                }
+            }
+        }
+        
+        if (MovementVector.Y < 0) // up
+        {
+            var tileWorldY = tileYStart * Block.Size;
+            for (var tx = tileXStart; tx <= tileXEnd; tx++)
+            {
+                var tileWorldX = tx * Block.Size;
+                if (currentWorld.HasTile(tileWorldX, tileWorldY))
+                {
+                    newPosition.Y = tileWorldY + Block.Size + heightPixels * 0.5f;
+                    MovementVector.Y = 0;
+                    break;
+                }
+            }
+        }
+        else if (MovementVector.Y > 0) // down
+        {
+            var tileWorldY = tileYEnd * Block.Size;
+            for (var tx = tileXStart; tx <= tileXEnd; tx++)
+            {
+                var tileWorldX = tx * Block.Size;
+                if (currentWorld.HasTile(tileWorldX, tileWorldY))
+                {
+                    newPosition.Y = tileWorldY - heightPixels * 0.5f;
+                    MovementVector.Y = 0;
+                    break;
                 }
             }
         }
