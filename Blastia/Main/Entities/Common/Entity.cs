@@ -1,5 +1,6 @@
 ﻿using Blastia.Main.Blocks.Common;
 using Blastia.Main.GameState;
+using Blastia.Main.Physics;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -79,185 +80,23 @@ public abstract class Entity : Object
         // UpdateImpulse();
         UpdatePosition();
     }
-    
-    Rectangle GetPlayerRect(Vector2 pos)
-    {
-        int widthPixels = Width * Block.Size;
-        int heightPixels = Height * Block.Size;
-        return new Rectangle(
-            (int)(pos.X - widthPixels * 0.5f),
-            (int)(pos.Y - heightPixels * 0.5f),
-            widthPixels,
-            heightPixels
-        );
-    }
-
-    private (float toi, Vector2 normal) SweptAABB(Rectangle movingRect, Vector2 velocity, Rectangle staticRect)
-    {
-        // Expand static rect by 1px to prevent tunneling
-        staticRect = new Rectangle(
-            staticRect.X - 1,
-            staticRect.Y - 1,
-            staticRect.Width + 2,
-            staticRect.Height + 2
-        );
-
-        Vector2 entryDist = new Vector2();
-        Vector2 exitDist = new Vector2();
-
-        // X-axis calculations
-        if (velocity.X > 0)
-        {
-            entryDist.X = staticRect.Left - movingRect.Right;
-            exitDist.X = staticRect.Right - movingRect.Left;
-        }
-        else
-        {
-            entryDist.X = staticRect.Right - movingRect.Left;
-            exitDist.X = staticRect.Left - movingRect.Right;
-        }
-
-        // Y-axis calculations
-        if (velocity.Y > 0)
-        {
-            entryDist.Y = staticRect.Top - movingRect.Bottom;
-            exitDist.Y = staticRect.Bottom - movingRect.Top;
-        }
-        else
-        {
-            entryDist.Y = staticRect.Bottom - movingRect.Top;
-            exitDist.Y = staticRect.Top - movingRect.Bottom;
-        }
-
-        Vector2 entryTime = new Vector2();
-        Vector2 exitTime = new Vector2();
-
-        if (velocity.X == 0)
-        {
-            entryTime.X = float.NegativeInfinity;
-            exitTime.X = float.PositiveInfinity;
-        }
-        else
-        {
-            entryTime.X = entryDist.X / velocity.X;
-            exitTime.X = exitDist.X / velocity.X;
-        }
-
-        if (velocity.Y == 0)
-        {
-            entryTime.Y = float.NegativeInfinity;
-            exitTime.Y = float.PositiveInfinity;
-        }
-        else
-        {
-            entryTime.Y = entryDist.Y / velocity.Y;
-            exitTime.Y = exitDist.Y / velocity.Y;
-        }
-
-        float entry = Math.Max(entryTime.X, entryTime.Y);
-        float exit = Math.Min(exitTime.X, exitTime.Y);
-
-        // No collision conditions
-        if (entry > exit || entry < 0 || entry > 1)
-            return (1f, Vector2.Zero);
-
-        Vector2 normal = Vector2.Zero;
-        if (entryTime.X > entryTime.Y)
-        {
-            normal.X = velocity.X < 0 ? 1 : -1;
-        }
-        else
-        {
-            normal.Y = velocity.Y < 0 ? 1 : -1;
-        }
-
-        return (entry, normal);
-    }
 
     private void UpdatePosition()
     {
-        Vector2 originalPosition = Position;
-        Vector2 movement = MovementVector * (float)BlastiaGame.GameTimeElapsedSeconds;
-        Vector2 remaining = movement;
+        // use steps
+        var totalMovement = MovementVector * (float) BlastiaGame.GameTimeElapsedSeconds;
+        var totalSteps = (int) Math.Floor(totalMovement.Length() / _distancePerCollisionStep) + 1;
+        var stepVector = totalMovement / totalSteps;
         
-        int iterations = 0;
-        const int maxIterations = 5;
-        bool collisionOccurred = false;
-
-        while (iterations < maxIterations && remaining.LengthSquared() > float.Epsilon)
+        Vector2 currentNewPosition = Position;
+        for (int i = 0; i < totalSteps; i++)
         {
-            float shortestTime = 1f;
-            Vector2 collisionNormal = Vector2.Zero;
-            Rectangle playerRect = GetPlayerRect(Position);
-            
-            // Expand search area for edge cases
-            Rectangle searchArea = Rectangle.Union(
-                playerRect,
-                new Rectangle(
-                    (int)(playerRect.X + remaining.X),
-                    (int)(playerRect.Y + remaining.Y),
-                    playerRect.Width,
-                    playerRect.Height
-                )
-            );
-
-            int tileStartX = (int)Math.Floor(searchArea.Left / (float)Block.Size) - 1;
-            int tileEndX = (int)Math.Floor(searchArea.Right / (float)Block.Size) + 1;
-            int tileStartY = (int)Math.Floor(searchArea.Top / (float)Block.Size) - 1;
-            int tileEndY = (int)Math.Floor(searchArea.Bottom / (float)Block.Size) + 1;
-
-            // Check all tiles in expanded area
-            for (int tx = tileStartX; tx <= tileEndX; tx++)
-            {
-                for (int ty = tileStartY; ty <= tileEndY; ty++)
-                {
-                    int tileWorldX = tx * Block.Size;
-                    int tileWorldY = ty * Block.Size;
-                    
-                    if (!PlayerManager.Instance.SelectedWorld.HasTile(tileWorldX, tileWorldY))
-                        continue;
-
-                    Rectangle tileRect = new Rectangle(tileWorldX, tileWorldY, Block.Size, Block.Size);
-                    var (toi, normal) = SweptAABB(playerRect, remaining, tileRect);
-
-                    if (toi < shortestTime)
-                    {
-                        shortestTime = toi;
-                        collisionNormal = normal;
-                        collisionOccurred = true;
-                    }
-                }
-            }
-
-            if (!collisionOccurred)
-            {
-                Position += remaining;
-                break;
-            }
-
-            // Apply partial movement
-            Position += remaining * shortestTime;
-            
-            // Calculate remaining movement after collision
-            Vector2 projection = Vector2.Dot(remaining, collisionNormal) * collisionNormal;
-            remaining -= projection * (1 - shortestTime);
-            
-            // Apply overlap correction
-            const float skinWidth = 0.1f;
-            Position += collisionNormal * skinWidth;
-
-            // Adjust velocity based on collision normal
-            if (collisionNormal.X != 0) MovementVector = new Vector2(0, MovementVector.Y);
-            if (collisionNormal.Y != 0) MovementVector = new Vector2(MovementVector.X, 0);
-
-            iterations++;
+            Vector2 tempNewPosition = currentNewPosition + stepVector;
+            HandleCollision(ref tempNewPosition);
+            currentNewPosition = tempNewPosition;
         }
-
-        // Final position validation
-        if (iterations >= maxIterations)
-        {
-            Console.WriteLine("Collision resolution reached max iterations");
-        }
+        
+        Position = currentNewPosition;
     }
 
     private void HandleCollision(ref Vector2 newPosition)
