@@ -81,22 +81,99 @@ public abstract class Entity : Object
         UpdatePosition();
     }
 
+    private Rectangle GetBounds()
+    {
+        var widthPixels = Width * Block.Size;
+        var heightPixels = Height * Block.Size;
+        return new Rectangle(
+            (int) (Position.X - widthPixels * 0.5f), 
+            (int) (Position.Y - heightPixels * 0.5f), 
+            widthPixels, heightPixels);
+    }
+    
     private void UpdatePosition()
     {
-        // use steps
-        var totalMovement = MovementVector * (float) BlastiaGame.GameTimeElapsedSeconds;
-        var totalSteps = (int) Math.Floor(totalMovement.Length() / _distancePerCollisionStep) + 1;
-        var stepVector = totalMovement / totalSteps;
-        
-        Vector2 currentNewPosition = Position;
-        for (int i = 0; i < totalSteps; i++)
+        var currentWorld = PlayerManager.Instance.SelectedWorld;
+        var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
+        if (currentWorld == null || deltaTime < 0)
         {
-            Vector2 tempNewPosition = currentNewPosition + stepVector;
-            HandleCollision(ref tempNewPosition);
-            currentNewPosition = tempNewPosition;
+            Position += MovementVector * deltaTime;
+            return;
         }
         
-        Position = currentNewPosition;
+        // total movement player wants to move this frame
+        var totalMovement = MovementVector * deltaTime;
+        // how much of frame movement time is left
+        var timeRemaining = 1f;
+
+        // safety
+        var collisionIterations = 0;
+        const int MaxIterations = 5;
+
+        // keep processing while there is still time in the frame and movement planned
+        while (timeRemaining > 0f && collisionIterations < MaxIterations && totalMovement.Length() > 0.0001f)
+        {
+            collisionIterations++;
+
+            // assume no collision
+            float minTimeOfImpact = 1f;
+            Vector2 firstHitNormal = Vector2.Zero;
+
+            // how far we want to move in this iteration
+            var currentIterationDisplacement = totalMovement * timeRemaining;
+            var entityBounds = GetBounds();
+            
+            // broadphase
+            // only check tiles that are possibly in the way
+            var sweptBounds = Collision.GetSweptBounds(entityBounds, currentIterationDisplacement);
+            var potentialColliders = Collision.GetTilesInRectangle(currentWorld, sweptBounds);
+            
+            // narrow phase
+            foreach (var collider in potentialColliders)
+            {
+                if (Collision.SweptAabb(collider, entityBounds, currentIterationDisplacement,
+                        out var timeOfImpact, out var normal))
+                {
+                    // check if collision earlier than any other collision
+                    if (timeOfImpact < minTimeOfImpact)
+                    {
+                        // mark it as first
+                        minTimeOfImpact = timeOfImpact;
+                        firstHitNormal = normal;
+                    }
+                }
+            }
+            
+            // move the player
+            // move full distance (minTimeOfImpact == 1)
+            // or move a part of it (minTimeOfImpact < 1)
+            var movementThisIteration = currentIterationDisplacement * minTimeOfImpact;
+            Position += movementThisIteration;
+            
+            // consume `minTimeOfImpact` time from the whole frame
+            timeRemaining *= 1 - minTimeOfImpact;
+            
+            // collision respond
+            if (minTimeOfImpact < 1)
+            {
+                // sliding
+                
+                // calculate how much of the total displacement points into the collider
+                var projection = Vector2.Dot(totalMovement, firstHitNormal);
+                
+                // projection < 0: component pushes towards the collider
+                if (projection < 0)
+                {
+                    totalMovement -= firstHitNormal * projection;
+                }
+
+                // stuck handling
+                if (minTimeOfImpact < 0.001f)
+                {
+                    break;
+                }
+            }
+        }
     }
 
     private void HandleCollision(ref Vector2 newPosition)

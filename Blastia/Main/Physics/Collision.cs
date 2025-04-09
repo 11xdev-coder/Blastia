@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Blastia.Main.Blocks.Common;
+using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.Physics;
 
@@ -134,5 +135,61 @@ public static class Collision
 
         // detected collision
         return true;
+    }
+
+    /// <summary>
+    /// Calculates bounding box that includes starting & ending position. (Broad-phase collision)
+    /// </summary>
+    /// <param name="box">Bounding box of the entity</param>
+    /// <param name="displacement">Intended movement for this iteration</param>
+    /// <returns>Enlarged rectangle covering swept area</returns>
+    public static Rectangle GetSweptBounds(Rectangle box, Vector2 displacement)
+    {
+        Rectangle swept = box;
+        
+        // left movement
+        if (displacement.X < 0)
+        {
+            swept.X += (int) Math.Floor(displacement.X);
+        }
+        // right movement
+        swept.Width += (int) Math.Ceiling(Math.Abs(displacement.X));
+        
+        // up movement
+        if (displacement.Y < 0)
+        {
+            swept.Y += (int) Math.Floor(displacement.Y);
+        }
+        // down
+        swept.Height += (int) Math.Ceiling(Math.Abs(displacement.Y));
+
+        return swept;
+    }
+
+    public static List<Rectangle> GetTilesInRectangle(WorldState world, Rectangle rect)
+    {
+        List<Rectangle> tiles = [];
+
+        var tileX = (int) Math.Floor((float) rect.Left / Block.Size);
+        var tileY = (int) Math.Floor((float) rect.Top / Block.Size);
+        var tileXEnd = (int) Math.Floor((float) (rect.Right - 1) / Block.Size);
+        var tileYEnd = (int) Math.Floor((float) (rect.Bottom - 1) / Block.Size);
+
+        for (var tx = tileX; tx <= tileXEnd; tx++)
+        {
+            for (var ty = tileY; ty <= tileYEnd; ty++)
+            {
+                var tileWorldX = tx * Block.Size;
+                var tileWorldY = ty * Block.Size;
+
+                if (world.HasTile(tileWorldX, tileWorldY))
+                {
+                    Rectangle tileRect = new Rectangle(tileWorldX, tileWorldY, Block.Size, Block.Size);
+                    tiles.Add(tileRect);
+                }
+            }
+        }
+
+        return tiles;
     }
 }
