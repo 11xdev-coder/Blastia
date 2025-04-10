@@ -50,10 +50,10 @@ public class Player : HumanLikeEntity
 
 	public override void Update()
 	{
-		base.Update();
-		
 		if (IsPreview) PreviewUpdate();
 		else RegularUpdate();
+		
+		base.Update();
 	}
 
 	/// <summary>

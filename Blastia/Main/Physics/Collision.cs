@@ -95,7 +95,7 @@ public static class Collision
         // latest (object overlaps when both axes overlap)
         float entryTime = Math.Max(xEntryTime, yEntryTime);
         // object doesn't overlap when at least one axis doesn't overlap
-        float exitTime = Math.Min(yExitTime, yExitTime);
+        float exitTime = Math.Min(xExitTime, yExitTime);
         
         // no collision if:
         // entryTime > exitTime: collision interval is invalid

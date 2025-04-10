@@ -72,7 +72,7 @@ public abstract class Entity : Object
     protected ushort GetId() => ID;
 
     /// <summary>
-    /// Updates position and adds all natural forces
+    /// Updates position and adds all natural forces. Must be called AFTER all velocity changes.
     /// </summary>
     public override void Update()
     {
@@ -93,6 +93,7 @@ public abstract class Entity : Object
     
     private void UpdatePosition()
     {
+        GetBounds();
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
         if (currentWorld == null || deltaTime < 0)
@@ -154,24 +155,21 @@ public abstract class Entity : Object
             timeRemaining *= 1 - minTimeOfImpact;
             
             // collision respond
-            if (minTimeOfImpact < 1)
+            if (minTimeOfImpact < 1f)
             {
-                // sliding
-                
-                // calculate how much of the total displacement points into the collider
-                var projection = Vector2.Dot(totalMovement, firstHitNormal);
-                
-                // projection < 0: component pushes towards the collider
-                if (projection < 0)
+                Position += firstHitNormal * 0.0001f;
+
+                if (Math.Abs(firstHitNormal.X) > 0.001f)
                 {
-                    totalMovement -= firstHitNormal * projection;
+                    MovementVector.X = 0f;
                 }
 
-                // stuck handling
-                if (minTimeOfImpact < 0.001f)
+                if (Math.Abs(firstHitNormal.Y) > 0.001f)
                 {
-                    break;
+                    MovementVector.Y = 0f;
                 }
+
+                totalMovement = MovementVector * deltaTime;
             }
         }
     }
