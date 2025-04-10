@@ -54,6 +54,8 @@ public class Player : HumanLikeEntity
 		else RegularUpdate();
 		
 		base.Update();
+		
+		if (!IsPreview) UpdateCamera();
 	}
 
 	/// <summary>
@@ -64,10 +66,13 @@ public class Player : HumanLikeEntity
 		if (LocallyControlled)
 		{
 			HandleMovement();
-			
-			Camera?.Update();
-			MakeCameraFollow();
 		}
+	}
+
+	private void UpdateCamera()
+	{
+		Camera?.Update();
+		MakeCameraFollow();
 	}
 
 	private void HandleMovement()
