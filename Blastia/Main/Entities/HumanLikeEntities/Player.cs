@@ -80,7 +80,7 @@ public class Player : HumanLikeEntity
 		_walkingVector = Vector2.Zero;
 		
 		Vector2 directionVector = Vector2.Zero;
-		KeyboardHelper.AccumulateValueFromMap(MovementMap, ref directionVector);
+		KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref directionVector);
 		
 		if (directionVector != Vector2.Zero)
 			directionVector = Vector2Extensions.Normalize(directionVector);

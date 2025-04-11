@@ -55,7 +55,7 @@ public static class WorldGen
                     if (spawnPointSet) return;
                     
                     // five blocks above current height
-                    worldState.SetSpawnPoint(x, finalHeight - 5);
+                    worldState.SetSpawnPoint(x, finalHeight - Block.Size * 3);
                     spawnPointSet = true;
                 }
             }
