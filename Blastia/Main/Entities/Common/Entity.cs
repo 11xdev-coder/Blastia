@@ -93,7 +93,6 @@ public abstract class Entity : Object
     
     private void UpdatePosition()
     {
-        GetBounds();
         var currentWorld = PlayerManager.Instance.SelectedWorld;
         var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
         if (currentWorld == null || deltaTime < 0)
@@ -110,6 +109,8 @@ public abstract class Entity : Object
         // safety
         var collisionIterations = 0;
         const int MaxIterations = 5;
+
+        IsGrounded = false;
 
         // keep processing while there is still time in the frame and movement planned
         while (timeRemaining > 0f && collisionIterations < MaxIterations && totalMovement.Length() > 0.0001f)
@@ -167,11 +168,18 @@ public abstract class Entity : Object
                 if (Math.Abs(firstHitNormal.Y) > 0.001f)
                 {
                     MovementVector.Y = 0f;
+
+                    if (firstHitNormal.Y < -0.9f)
+                    {
+                        IsGrounded = true;
+                    }
                 }
 
                 totalMovement = MovementVector * deltaTime;
             }
         }
+        
+        ApplyGravityForce();
     }
 
     /// <summary>
@@ -229,27 +237,27 @@ public abstract class Entity : Object
     /// </summary>
     private void ApplyGravityForce()
     {
-        //if (!ApplyGravity) return;
-        //ApplyForce(new Vector2(0, 0));
-        // var currentWorld = PlayerManager.Instance.SelectedWorld;
-        // if (currentWorld == null) return;
-        //
-        // var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
-        // // m1 * m2
-        // var totalMass = worldMass * Mass;
-        //
-        // // find distance between Entity position and center of Hell
-        // // some variables
-        // var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
-        // var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
-        // // distance squared
-        // var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
-        //
-        // // find gravity force
-        // var gravityForce = Gravity * (totalMass / r);
-        //
-        // if (!IsGrounded) ApplyForce(new Vector2(0, (float) gravityForce));
-        //
-        // Console.WriteLine($"Applied gravity: {gravityForce}");
+         if (!ApplyGravity || IsGrounded) return;
+         ApplyForce(new Vector2(0, 0));
+         var currentWorld = PlayerManager.Instance.SelectedWorld;
+         if (currentWorld == null) return;
+        
+         var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
+         // m1 * m2
+         var totalMass = worldMass * Mass;
+        
+         // find distance between Entity position and center of Hell
+         // some variables
+         var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
+         var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
+         // distance squared
+         var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
+        
+         // find gravity force
+         var gravityForce = Gravity * (totalMass / r);
+        
+         ApplyForce(new Vector2(0, (float) gravityForce));
+        
+         Console.WriteLine($"Applied gravity: {gravityForce}");
     }
 }
