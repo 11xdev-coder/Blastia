@@ -255,4 +255,25 @@ public class WorldState
 			Console.WriteLine($"Tile at (X: {kvp.Key.X}; Y: {kvp.Key.Y}), ID: {kvp.Value}");
 		}
 	}
+
+	/// <summary>
+	/// Using bottom hitbox coordinates returns <c>DragCoefficient</c> of the tile below 1 block
+	/// </summary>
+	/// <param name="x">Bottom X</param>
+	/// <param name="y">Bottom Y</param>
+	/// <returns></returns>
+	public float GetDragCoefficientTileBelow(float x, float y)
+	{
+		int tileX = (int)Math.Round(x / Block.Size);
+		int tileY = (int)Math.Round(y / Block.Size) + 1; // get tile below
+		int tileWorldX = tileX * Block.Size;
+		int tileWorldY = tileY * Block.Size;
+		
+		var block = StuffRegistry.GetBlock(GetTile(tileWorldX, tileWorldY));
+		if (block != null)
+		{
+			return block.DragCoefficient;
+		} 
+		return 0;
+	}
 }

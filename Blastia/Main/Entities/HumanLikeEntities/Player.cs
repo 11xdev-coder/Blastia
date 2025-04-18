@@ -20,6 +20,7 @@ public class Player : HumanLikeEntity
 	private const float ArmMaxAngle = 20;
 	private const float LegMaxAngle = 25;
 	private const float WalkingAnimationDuration = 0.4f;
+	private const float JumpHeight = 200f;
 
 	public Camera? Camera { get; set; }
 
@@ -81,22 +82,18 @@ public class Player : HumanLikeEntity
 		
 		Vector2 directionVector = Vector2.Zero;
 		KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref directionVector);
-		
+
 		if (directionVector != Vector2.Zero)
+		{
 			directionVector = Vector2Extensions.Normalize(directionVector);
-		
-		_walkingVector = directionVector * MovementSpeed;
-		MovementVector += _walkingVector;
+			_walkingVector = directionVector * MovementSpeed;
+			MovementVector += _walkingVector;
+		}
 
 		// jump
 		if (KeyboardHelper.IsKeyJustPressed(Keys.Space))
 		{
-			MovementVector.Y = -200;
-		}
-
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Down))
-		{
-			Position = new Vector2(Position.X, Position.Y + 1);
+			MovementVector.Y = -JumpHeight;
 		}
 	}
 

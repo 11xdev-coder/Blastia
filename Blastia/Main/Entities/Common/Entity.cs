@@ -105,6 +105,7 @@ public abstract class Entity : Object
         var totalMovement = MovementVector * deltaTime;
         // how much of frame movement time is left
         var timeRemaining = 1f;
+        var entityBounds = GetBounds();
 
         // safety
         var collisionIterations = 0;
@@ -123,7 +124,6 @@ public abstract class Entity : Object
 
             // how far we want to move in this iteration
             var currentIterationDisplacement = totalMovement * timeRemaining;
-            var entityBounds = GetBounds();
             
             // broadphase
             // only check tiles that are possibly in the way
@@ -177,8 +177,10 @@ public abstract class Entity : Object
 
                 totalMovement = MovementVector * deltaTime;
             }
-        }
+        }   
         
+        var dragCoefficient = currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom);
+        ApplyGroundDrag(dragCoefficient);
         ApplyGravityForce();
     }
 
@@ -229,6 +231,15 @@ public abstract class Entity : Object
             MovementVector += impulseThisFrame;
             _currentImpulse += impulseThisFrame;
             Console.WriteLine($"Remaining impulse: {remainingImpulse.Length()}");
+        }
+    }
+
+    private void ApplyGroundDrag(float dragCoefficient)
+    {
+        if (dragCoefficient > 0 && MovementVector.LengthSquared() > 0.001f)
+        {
+            Vector2 dragForce = -dragCoefficient * MovementVector;
+            ApplyForce(dragForce);
         }
     }
     
