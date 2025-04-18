@@ -91,7 +91,7 @@ public class Player : HumanLikeEntity
 		// jump
 		if (KeyboardHelper.IsKeyJustPressed(Keys.Space))
 		{
-			AddImpulse(new Vector2(0, -5), 0.2f);
+			MovementVector.Y = -200;
 		}
 
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Down))
