@@ -179,8 +179,11 @@ public abstract class Entity : Object
             }
         }   
         
-        var dragCoefficient = currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom);
+        var dragCoefficient = IsGrounded 
+            ? Block.AirDragCoefficient 
+            : currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom);
         ApplyGroundDrag(dragCoefficient);
+        
         ApplyGravityForce();
     }
 
@@ -249,7 +252,7 @@ public abstract class Entity : Object
     private void ApplyGravityForce()
     {
          if (!ApplyGravity || IsGrounded) return;
-         ApplyForce(new Vector2(0, 0));
+         
          var currentWorld = PlayerManager.Instance.SelectedWorld;
          if (currentWorld == null) return;
         
@@ -268,7 +271,5 @@ public abstract class Entity : Object
          var gravityForce = Gravity * (totalMass / r);
         
          ApplyForce(new Vector2(0, (float) gravityForce));
-        
-         Console.WriteLine($"Applied gravity: {gravityForce}");
     }
 }

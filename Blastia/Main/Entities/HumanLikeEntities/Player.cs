@@ -20,7 +20,7 @@ public class Player : HumanLikeEntity
 	private const float ArmMaxAngle = 20;
 	private const float LegMaxAngle = 25;
 	private const float WalkingAnimationDuration = 0.4f;
-	private const float JumpHeight = 200f;
+	private const float JumpHeight = 350f;
 
 	public Camera? Camera { get; set; }
 
@@ -46,7 +46,7 @@ public class Player : HumanLikeEntity
 				DrawHeight = 135 * Block.Size
 			};
 		}
-		MovementSpeed = 20f;
+		MovementSpeed = 30f;
 	}
 
 	public override void Update()
@@ -83,10 +83,14 @@ public class Player : HumanLikeEntity
 		Vector2 directionVector = Vector2.Zero;
 		KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref directionVector);
 
+		// less speed when in air
+		var airMultiplier = 1f;
+		if (!IsGrounded) airMultiplier = 0.3f;
+		
 		if (directionVector != Vector2.Zero)
 		{
 			directionVector = Vector2Extensions.Normalize(directionVector);
-			_walkingVector = directionVector * MovementSpeed;
+			_walkingVector = directionVector * MovementSpeed * airMultiplier;
 			MovementVector += _walkingVector;
 		}
 

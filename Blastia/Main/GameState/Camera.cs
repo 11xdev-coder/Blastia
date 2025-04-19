@@ -67,6 +67,7 @@ public class Camera : Object
 		
 	}
 	
+	// TODO: Lag when a lot of tiles
 	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState) 
 	{
 		// get corners in tiles
