@@ -221,23 +221,106 @@ public class WorldState
 	}
 
 	/// <summary>
-	/// Gets tile at position and returns its ID
+	/// 
 	/// </summary>
-	/// <param name="x"></param>
-	/// <param name="y"></param>
-	/// <returns>If tile with such position exists -> returns its ID. Otherwise, returns 0</returns>
-	public ushort GetTile(int x, int y)
+	/// <param name="alignedX">X aligned to Block.Size</param>
+	/// <param name="alignedY">Y aligned to Block.Size</param>
+	/// <returns></returns>
+	public ushort GetTile(int alignedX, int alignedY)
 	{
-		Vector2 pos = new(x, y);
+		Vector2 pos = new(alignedX, alignedY);
 		if (Tiles.TryGetValue(pos, out ushort id))
 		{
 			return id;
 		}
-
-		return 0;
+		return 0; // Air
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="worldX">World (not aligned) X</param>
+	/// <param name="worldY">World (not aligned) Y</param>
+	/// <returns></returns>
+	private ushort GetTileAtWorldCoord(int worldX, int worldY)
+	{
+		int tileWorldX = (int)Math.Floor((float)worldX / Block.Size) * Block.Size;
+		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;
+		return GetTile(tileWorldX, tileWorldY);
 	}
 
-	public bool HasTile(int x, int y) => GetTile(x, y) >= 1;
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="worldX">World (not aligned) X</param>
+	/// <param name="worldY">World (not aligned) Y</param>
+	/// <returns><c>True</c> if tile at coordinates is not air</returns>
+	public bool HasTile(int worldX, int worldY)
+	{
+		int tileWorldX = (int)Math.Floor((float)worldX / Block.Size) * Block.Size;
+		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;
+
+		ushort tileId = GetTile(tileWorldX, tileWorldY);
+		return tileId >= 1;
+	}
+
+	/// <summary>
+	/// Return tile ID of the tile below the entity's feet
+	/// </summary>
+	/// <param name="entityLeftX">Entity left edge world X</param>
+	/// <param name="entityBottomY">Entity bottom edge world Y</param>
+	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
+	/// <param name="checkDistance">Distance to check for tile below</param>
+	/// <returns>If tile was found returns its ID, otherwise returns <c>BlockID.Air</c></returns>
+	public ushort GetTileIdBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, float checkDistance)
+	{
+		int checkWorldY = (int)(entityBottomY + checkDistance);
+
+		int checkWorldXLeft = (int)(entityLeftX + 1);
+		int checkWorldXCenter = (int)(entityLeftX + entityWidthPixels * 0.5f);
+		int checkWorldXRight = (int)(entityLeftX + entityWidthPixels - 1);
+
+		// Get the Tile IDs at the check locations using the corrected HasTile logic
+		ushort tileIdLeft = GetTileAtWorldCoord(checkWorldXLeft, checkWorldY);
+		ushort tileIdCenter = GetTileAtWorldCoord(checkWorldXCenter, checkWorldY);
+		ushort tileIdRight = GetTileAtWorldCoord(checkWorldXRight, checkWorldY);
+
+		ushort finalTileId = BlockID.Air; 
+		if (tileIdCenter != BlockID.Air)
+		{
+			finalTileId = tileIdCenter;
+		}
+		else if (tileIdLeft != BlockID.Air)
+		{
+			finalTileId = tileIdLeft;
+		}
+		else if (tileIdRight != BlockID.Air)
+		{
+			finalTileId = tileIdRight;
+		}
+		
+		return finalTileId;
+	}
+
+	/// <summary>
+	/// Gets the drag coefficient of the tile directly beneath the entity's feet
+	/// by checking multiple points along its bottom edge
+	/// </summary>
+	/// <param name="entityLeftX">Entity left edge world X</param>
+	/// <param name="entityBottomY">Entity bottom edge world Y</param>
+	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
+	/// <returns>If tile was found returns its drag, otherwise returns <c>Block.AirDragCoefficient</c></returns>
+	public float GetDragCoefficientTileBelow(float entityLeftX, float entityBottomY, float entityWidthPixels)
+	{
+	    var tileId = GetTileIdBelow(entityLeftX, entityBottomY, entityWidthPixels, 1f);
+	    var block = StuffRegistry.GetBlock(tileId);
+	    if (block != null)
+	    {
+	        return block.DragCoefficient;
+	    }
+
+	    return Block.AirDragCoefficient;
+	}
 
 	public void SetSpawnPoint(float x, float y)
 	{
@@ -254,26 +337,5 @@ public class WorldState
 		{
 			Console.WriteLine($"Tile at (X: {kvp.Key.X}; Y: {kvp.Key.Y}), ID: {kvp.Value}");
 		}
-	}
-
-	/// <summary>
-	/// Using bottom hitbox coordinates returns <c>DragCoefficient</c> of the tile below 1 block
-	/// </summary>
-	/// <param name="x">Bottom X</param>
-	/// <param name="y">Bottom Y</param>
-	/// <returns></returns>
-	public float GetDragCoefficientTileBelow(float x, float y)
-	{
-		int tileX = (int)Math.Round(x / Block.Size);
-		int tileY = (int)Math.Round(y / Block.Size) + 1; // get tile below
-		int tileWorldX = tileX * Block.Size;
-		int tileWorldY = tileY * Block.Size;
-		
-		var block = StuffRegistry.GetBlock(GetTile(tileWorldX, tileWorldY));
-		if (block != null)
-		{
-			return block.DragCoefficient;
-		} 
-		return 0;
 	}
 }

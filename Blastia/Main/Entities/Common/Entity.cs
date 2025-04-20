@@ -98,6 +98,7 @@ public abstract class Entity : Object
         if (currentWorld == null || deltaTime < 0)
         {
             Position += MovementVector * deltaTime;
+            IsGrounded = false;
             return;
         }
         
@@ -109,12 +110,10 @@ public abstract class Entity : Object
 
         // safety
         var collisionIterations = 0;
-        const int MaxIterations = 5;
-
-        IsGrounded = false;
+        const int maxIterations = 5;
 
         // keep processing while there is still time in the frame and movement planned
-        while (timeRemaining > 0f && collisionIterations < MaxIterations && totalMovement.Length() > 0.0001f)
+        while (timeRemaining > 0f && collisionIterations < maxIterations && totalMovement.Length() > 0.0001f)
         {
             collisionIterations++;
 
@@ -168,20 +167,20 @@ public abstract class Entity : Object
                 if (Math.Abs(firstHitNormal.Y) > 0.001f)
                 {
                     MovementVector.Y = 0f;
-
-                    if (firstHitNormal.Y < -0.9f)
-                    {
-                        IsGrounded = true;
-                    }
                 }
 
                 totalMovement = MovementVector * deltaTime;
             }
-        }   
-        
-        var dragCoefficient = IsGrounded 
-            ? Block.AirDragCoefficient 
-            : currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom);
+        }
+
+        // is on ground check
+        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
+        IsGrounded = tileIdBelow >= 1;
+
+        var dragCoefficient = IsGrounded
+            ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width)
+            : Block.AirDragCoefficient;
+        Console.WriteLine(dragCoefficient);
         ApplyGroundDrag(dragCoefficient);
         
         ApplyGravityForce();

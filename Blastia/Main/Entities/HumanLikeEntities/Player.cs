@@ -85,7 +85,7 @@ public class Player : HumanLikeEntity
 
 		// less speed when in air
 		var airMultiplier = 1f;
-		if (!IsGrounded) airMultiplier = 0.3f;
+		if (!IsGrounded) airMultiplier = 0.1f;
 		
 		if (directionVector != Vector2.Zero)
 		{

@@ -12,7 +12,7 @@
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/PlayerManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -214,15 +214,8 @@
       <workItem from="1744820878982" duration="844000" />
       <workItem from="1744894045292" duration="4735000" />
       <workItem from="1744971374062" duration="12684000" />
-      <workItem from="1745060436974" duration="4423000" />
-    </task>
-    <task id="LOCAL-00018" summary="Exit from game to menu">
-      <option name="closed" value="true" />
-      <created>1738697589415</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1738697589415</updated>
+      <workItem from="1745060436974" duration="8738000" />
+      <workItem from="1745139423709" duration="6863000" />
     </task>
     <task id="LOCAL-00019" summary="BoolSwitchButton updated when property is changed">
       <option name="closed" value="true" />
@@ -608,7 +601,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745004138686</updated>
     </task>
-    <option name="localTasksCounter" value="67" />
+    <task id="LOCAL-00067" summary="movement tweaks">
+      <option name="closed" value="true" />
+      <created>1745080220146</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1745080220146</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -618,7 +619,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="reverb settings editing" />
     <MESSAGE value="simple bit crusher and more customization" />
     <MESSAGE value="improved bit crusher" />
     <MESSAGE value="tooltips + distortion" />
@@ -643,6 +643,7 @@
     <MESSAGE value="gravity" />
     <MESSAGE value="jumping" />
     <MESSAGE value="somewhat friction" />
-    <option name="LAST_COMMIT_MESSAGE" value="somewhat friction" />
+    <MESSAGE value="movement tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="movement tweaks" />
   </component>
 </project>
