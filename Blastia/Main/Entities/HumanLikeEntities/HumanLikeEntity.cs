@@ -94,14 +94,14 @@ public abstract class HumanLikeEntity : Entity
     {
         var scaledBodyPartScale = bodyPartScale * Scale;
 		
-        Head.Draw(spriteBatch, position, scaledBodyPartScale);
+        Head.Draw(spriteBatch, position, scaledBodyPartScale, SpriteDirection);
 		
-        RightArm.Draw(spriteBatch, position, scaledBodyPartScale); // right arm behind Body
-        Body.Draw(spriteBatch, position, scaledBodyPartScale);
+        RightArm.Draw(spriteBatch, position, scaledBodyPartScale, SpriteDirection); // right arm behind Body
+        Body.Draw(spriteBatch, position, scaledBodyPartScale, SpriteDirection);
 		
-        LeftArm.Draw(spriteBatch, position, scaledBodyPartScale);
-        LeftLeg.Draw(spriteBatch, position, scaledBodyPartScale);
-        RightLeg.Draw(spriteBatch, position, scaledBodyPartScale);
+        LeftArm.Draw(spriteBatch, position, scaledBodyPartScale, SpriteDirection);
+        LeftLeg.Draw(spriteBatch, position, scaledBodyPartScale, SpriteDirection);
+        RightLeg.Draw(spriteBatch, position, scaledBodyPartScale, SpriteDirection);
         
         //base.Draw(spriteBatch);
     }

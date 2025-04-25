@@ -27,6 +27,13 @@ public abstract class Entity : Object
         {Keys.A, new Vector2(-1, 0)}
     };
     
+    // SPRITE
+    /// <summary>
+    /// If <c>A</c> is pressed, entity looks to the left. If <c>D</c>, entity looks to the right
+    /// </summary>
+    public float SpriteDirection { get; set; } = 1;
+    protected virtual bool FlipSpriteHorizontallyOnKeyPress { get; set; }
+    
     // velocity
     protected Vector2 MovementVector;
     protected float MovementSpeed;
@@ -76,9 +83,8 @@ public abstract class Entity : Object
     /// </summary>
     public override void Update()
     {
-        // ApplyGravityForce();
-        // UpdateImpulse();
         UpdatePosition();
+        UpdateSprite();
     }
 
     private Rectangle GetBounds()
@@ -184,6 +190,20 @@ public abstract class Entity : Object
         ApplyGroundDrag(dragCoefficient);
         
         ApplyGravityForce();
+    }
+
+    private void UpdateSprite()
+    {
+        var horizontalDirection = Vector2.Zero;
+        KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref horizontalDirection);
+
+        if (FlipSpriteHorizontallyOnKeyPress)
+        {
+            if (horizontalDirection.X > 0)
+                SpriteDirection = 1;
+            else if (horizontalDirection.X < 0)
+                SpriteDirection = -1;
+        }
     }
 
     /// <summary>

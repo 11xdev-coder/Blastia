@@ -27,12 +27,32 @@ public class BodyPart
         Color = color ?? Color.White;
     }
 
-    public void Draw(SpriteBatch spriteBatch, Vector2 entityPosition, float scale = 1f)
+    public void Draw(SpriteBatch spriteBatch, Vector2 entityPosition, float scale = 1f, float direction = 1f)
     {
-        Vector2 scaledOffset = RelativePosition * scale;
+        Vector2 drawPosition;
+        Vector2 originForDraw = Origin;
+        Vector2 baseScaledOffset = RelativePosition * scale;
+        float effectiveRotation = Rotation;
         
-        Vector2 absolutePosition = entityPosition + scaledOffset;
-        spriteBatch.Draw(Image, absolutePosition, null, Color, 
-            Rotation, Origin, scale, SpriteEffects.None, 0f);
+        var effect = SpriteEffects.None;
+        if (direction < 0) effect = SpriteEffects.FlipHorizontally;
+        
+        if (direction < 0) // Flipping left
+        {
+            effect = SpriteEffects.FlipHorizontally;
+
+            Vector2 mirroredOffset = new Vector2(-baseScaledOffset.X, baseScaledOffset.Y);
+            drawPosition = entityPosition + mirroredOffset;
+
+            originForDraw = new Vector2(Image.Width - Origin.X, Origin.Y);
+            effectiveRotation = -Rotation;
+        }
+        else
+        {
+            drawPosition = entityPosition + baseScaledOffset;
+        }
+        
+        spriteBatch.Draw(Image, drawPosition, null, Color, 
+            effectiveRotation, originForDraw, scale, effect, 0f);
     }
 }

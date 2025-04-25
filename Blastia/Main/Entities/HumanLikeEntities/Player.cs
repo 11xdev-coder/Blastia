@@ -17,6 +17,8 @@ public class Player : HumanLikeEntity
 	public bool IsPreview { get; set; }
 	public bool LocallyControlled { get; private set; }
 
+	protected override bool FlipSpriteHorizontallyOnKeyPress => true;
+
 	private const float ArmMaxAngle = 20;
 	private const float LegMaxAngle = 25;
 	private const float WalkingAnimationDuration = 0.4f;
