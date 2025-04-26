@@ -33,9 +33,7 @@ public class BodyPart
         Vector2 originForDraw = Origin;
         Vector2 baseScaledOffset = RelativePosition * scale;
         float effectiveRotation = Rotation;
-        
         var effect = SpriteEffects.None;
-        if (direction < 0) effect = SpriteEffects.FlipHorizontally;
         
         if (direction < 0) // Flipping left
         {

@@ -75,6 +75,15 @@ public abstract class HumanLikeEntity : Entity
 			(float) _animationTimeElapsed, duration);
 	}
 
+	protected void StopAnimations()
+	{
+		_animationTimeElapsed = 0;
+		LeftArm.Rotation = 0;
+		RightArm.Rotation = 0;
+		LeftLeg.Rotation = 0;
+		RightLeg.Rotation = 0;
+	}
+
     /// <summary>
     /// Draws BodyParts at player position
     /// </summary>

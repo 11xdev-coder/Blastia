@@ -8,7 +8,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/projectSettingsUpdater.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/projectSettingsUpdater.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/BodyPart.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/BodyPart.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
@@ -224,15 +223,8 @@
       <workItem from="1745139423709" duration="7649000" />
       <workItem from="1745414819512" duration="2635000" />
       <workItem from="1745514082697" duration="660000" />
-      <workItem from="1745586808977" duration="7311000" />
-    </task>
-    <task id="LOCAL-00020" summary="refactoring + slider value sync">
-      <option name="closed" value="true" />
-      <created>1738952065593</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1738952065593</updated>
+      <workItem from="1745586808977" duration="10510000" />
+      <workItem from="1745666198233" duration="1216000" />
     </task>
     <task id="LOCAL-00021" summary="lots of refactoring + handler button sync">
       <option name="closed" value="true" />
@@ -618,7 +610,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745153273368</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary="entity horizontal flipping">
+      <option name="closed" value="true" />
+      <created>1745605859993</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1745605859994</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -628,7 +628,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="improved bit crusher" />
     <MESSAGE value="tooltips + distortion" />
     <MESSAGE value="improved distortion + setting sliders" />
     <MESSAGE value="render refactoring" />
@@ -653,7 +652,8 @@
     <MESSAGE value="somewhat friction" />
     <MESSAGE value="movement tweaks" />
     <MESSAGE value="fixed ground detection" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed ground detection" />
+    <MESSAGE value="entity horizontal flipping" />
+    <option name="LAST_COMMIT_MESSAGE" value="entity horizontal flipping" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

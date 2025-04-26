@@ -186,7 +186,6 @@ public abstract class Entity : Object
         var dragCoefficient = IsGrounded
             ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width)
             : Block.AirDragCoefficient;
-        Console.WriteLine(dragCoefficient);
         ApplyGroundDrag(dragCoefficient);
         
         ApplyGravityForce();

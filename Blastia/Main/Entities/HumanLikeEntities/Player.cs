@@ -48,7 +48,7 @@ public class Player : HumanLikeEntity
 				DrawHeight = 135 * Block.Size
 			};
 		}
-		MovementSpeed = 30f;
+		MovementSpeed = 10f;
 	}
 
 	public override void Update()
@@ -91,9 +91,15 @@ public class Player : HumanLikeEntity
 		
 		if (directionVector != Vector2.Zero)
 		{
+			WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
+			
 			directionVector = Vector2Extensions.Normalize(directionVector);
 			_walkingVector = directionVector * MovementSpeed * airMultiplier;
 			MovementVector += _walkingVector;
+		}
+		else
+		{
+			StopAnimations();
 		}
 
 		// jump
