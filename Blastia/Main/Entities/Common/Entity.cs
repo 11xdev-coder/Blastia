@@ -40,7 +40,7 @@ public abstract class Entity : Object
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
-    protected const float Gravity = 1.1383124999999999999999999999998f; // G constant
+    protected const float Gravity = 68.162425f; // G constant
     protected virtual float Mass { get; set; } = 1f; // kg
     protected bool IsGrounded { get; set; }
     
@@ -211,8 +211,9 @@ public abstract class Entity : Object
     /// <param name="force"></param>
     protected void ApplyForce(Vector2 force)
     {
+        var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
         var acceleration = force / Mass;
-        MovementVector += acceleration;
+        MovementVector += acceleration * deltaTime;
     }
 
     /// <summary>
@@ -284,6 +285,8 @@ public abstract class Entity : Object
          var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
          // distance squared
          var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
+         var minDistance = 50f * 50f;
+         r = Math.Max(r, minDistance);
         
          // find gravity force
          var gravityForce = Gravity * (totalMass / r);

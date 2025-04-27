@@ -22,7 +22,7 @@ public class Player : HumanLikeEntity
 	private const float ArmMaxAngle = 20;
 	private const float LegMaxAngle = 25;
 	private const float WalkingAnimationDuration = 0.4f;
-	private const float JumpHeight = 350f;
+	private const float JumpHeight = 200f;
 
 	public Camera? Camera { get; set; }
 
