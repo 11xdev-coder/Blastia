@@ -40,7 +40,7 @@ public abstract class Entity : Object
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
-    protected const float Gravity = 68.162425f; // G constant
+    protected const float Gravity = 68.521488f; // G constant
     protected virtual float Mass { get; set; } = 1f; // kg
     protected bool IsGrounded { get; set; }
     

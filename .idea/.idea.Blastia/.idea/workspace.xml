@@ -10,6 +10,7 @@
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -222,15 +223,7 @@
       <workItem from="1745514082697" duration="660000" />
       <workItem from="1745586808977" duration="10510000" />
       <workItem from="1745666198233" duration="3449000" />
-      <workItem from="1745745150460" duration="6427000" />
-    </task>
-    <task id="LOCAL-00022" summary="tab group visual improvements">
-      <option name="closed" value="true" />
-      <created>1739097063545</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1739097063545</updated>
+      <workItem from="1745745150460" duration="13780000" />
     </task>
     <task id="LOCAL-00023" summary="world unloading">
       <option name="closed" value="true" />
@@ -616,7 +609,15 @@
       <option name="project" value="LOCAL" />
       <updated>1745690133017</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="tuned gravity and jump height">
+      <option name="closed" value="true" />
+      <created>1745766255669</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1745766255670</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -626,7 +627,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="improved distortion + setting sliders" />
     <MESSAGE value="render refactoring" />
     <MESSAGE value="simple beat generation" />
     <MESSAGE value="arpeggio generation" />
@@ -651,7 +651,8 @@
     <MESSAGE value="fixed ground detection" />
     <MESSAGE value="entity horizontal flipping" />
     <MESSAGE value="walking animations" />
-    <option name="LAST_COMMIT_MESSAGE" value="walking animations" />
+    <MESSAGE value="tuned gravity and jump height" />
+    <option name="LAST_COMMIT_MESSAGE" value="tuned gravity and jump height" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

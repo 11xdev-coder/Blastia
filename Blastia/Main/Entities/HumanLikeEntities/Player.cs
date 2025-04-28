@@ -31,7 +31,11 @@ public class Player : HumanLikeEntity
 	protected override int Width => 1;
 	protected override float Mass => 46f;
 	
+	private const float MinJumpVelocity = 150f;
+	private const float MaxJumpVelocity = 375f;
+	private const float MaxChargeTime = 0.6f;
 	private Vector2 _walkingVector;
+	private float _jumpCharge;
 
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
@@ -48,7 +52,7 @@ public class Player : HumanLikeEntity
 				DrawHeight = 135 * Block.Size
 			};
 		}
-		MovementSpeed = 10f;
+		MovementSpeed = 3f;
 	}
 
 	public override void Update()
@@ -87,7 +91,7 @@ public class Player : HumanLikeEntity
 
 		// less speed when in air
 		var airMultiplier = 1f;
-		if (!IsGrounded) airMultiplier = 0.1f;
+		if (!IsGrounded) airMultiplier = 0.4f;
 		
 		if (directionVector != Vector2.Zero)
 		{
@@ -101,11 +105,22 @@ public class Player : HumanLikeEntity
 		{
 			StopAnimations();
 		}
-
-		// jump
-		if (KeyboardHelper.IsKeyJustPressed(Keys.Space))
+		
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && IsGrounded)
 		{
-			MovementVector.Y = -JumpHeight;
+			_jumpCharge += (float) BlastiaGame.GameTimeElapsedSeconds;
+		}
+
+		else if (BlastiaGame.KeyboardState.IsKeyUp(Keys.Space) &&
+		         BlastiaGame.PreviousKeyboardState.IsKeyDown(Keys.Space) && IsGrounded)
+		{
+			_jumpCharge = Math.Min(_jumpCharge, MaxChargeTime);
+			float chargeRatio = _jumpCharge / MaxChargeTime;
+			var boostedJump = MathHelper.Lerp(MinJumpVelocity, MaxJumpVelocity, chargeRatio);
+			
+			var jumpHeight = boostedJump;
+			MovementVector.Y = -jumpHeight;
+			_jumpCharge = 0;
 		}
 	}
 
