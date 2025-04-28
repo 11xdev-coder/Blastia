@@ -106,13 +106,13 @@ public class Player : HumanLikeEntity
 			StopAnimations();
 		}
 		
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && IsGrounded)
+		
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump)
 		{
 			_jumpCharge += (float) BlastiaGame.GameTimeElapsedSeconds;
 		}
-
 		else if (BlastiaGame.KeyboardState.IsKeyUp(Keys.Space) &&
-		         BlastiaGame.PreviousKeyboardState.IsKeyDown(Keys.Space) && IsGrounded)
+		         BlastiaGame.PreviousKeyboardState.IsKeyDown(Keys.Space) && CanJump)
 		{
 			_jumpCharge = Math.Min(_jumpCharge, MaxChargeTime);
 			float chargeRatio = _jumpCharge / MaxChargeTime;

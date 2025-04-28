@@ -42,7 +42,14 @@ public abstract class Entity : Object
     protected virtual bool ApplyGravity { get; set; }
     protected const float Gravity = 68.521488f; // G constant
     protected virtual float Mass { get; set; } = 1f; // kg
+    /// <summary>
+    /// <c>True</c> if player touches the ground (1 pixel above ground)
+    /// </summary>
     protected bool IsGrounded { get; set; }
+    /// <summary>
+    /// <c>True</c> if player is a little above ground (4 pixels above ground)
+    /// </summary>
+    protected bool CanJump { get; set; }
     
     // IMPULSE
     private Vector2 _totalImpulse;
@@ -180,8 +187,11 @@ public abstract class Entity : Object
         }
 
         // is on ground check
-        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
-        IsGrounded = tileIdBelow >= 1;
+        var strictTileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
+        IsGrounded = strictTileIdBelow >= 1;
+        
+        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 8f);
+        CanJump = tileIdBelow >= 1;
 
         var dragCoefficient = IsGrounded
             ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width)
