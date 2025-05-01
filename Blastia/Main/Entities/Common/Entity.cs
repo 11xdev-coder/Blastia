@@ -3,9 +3,7 @@ using Blastia.Main.GameState;
 using Blastia.Main.Physics;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Vulkan;
 using Object = Blastia.Main.GameState.Object;
 
 namespace Blastia.Main.Entities.Common;
@@ -37,6 +35,7 @@ public abstract class Entity : Object
     // velocity
     protected Vector2 MovementVector;
     protected float MovementSpeed;
+    protected float AccelerationFactor;
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
@@ -47,7 +46,7 @@ public abstract class Entity : Object
     /// </summary>
     protected bool IsGrounded { get; set; }
     /// <summary>
-    /// <c>True</c> if player is a little above ground (4 pixels above ground)
+    /// <c>True</c> if player is a little above ground (8 pixels above ground)
     /// </summary>
     protected bool CanJump { get; set; }
     
@@ -64,7 +63,6 @@ public abstract class Entity : Object
     /// Entity width in blocks
     /// </summary>
     protected virtual int Width { get; set; }
-    private int _distancePerCollisionStep = Block.Size;
 
     protected virtual ushort ID { get; set; }
     

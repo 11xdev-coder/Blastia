@@ -6,5 +6,5 @@ public class Dirt : Block
 {
 	public override ushort ID => BlockID.Dirt;
 
-	public override float DragCoefficient => 12f;
+	public override float DragCoefficient => 600f;
 }

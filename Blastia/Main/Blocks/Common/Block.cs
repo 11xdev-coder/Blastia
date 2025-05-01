@@ -7,7 +7,7 @@ namespace Blastia.Main.Blocks.Common;
 public abstract class Block 
 {
 	public static readonly int Size = 8;
-	public static readonly float AirDragCoefficient = 1f;
+	public static readonly float AirDragCoefficient = 50f;
 	
 	public abstract ushort ID { get; }
 	/// <summary>

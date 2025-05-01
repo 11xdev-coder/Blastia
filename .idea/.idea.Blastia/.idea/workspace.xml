@@ -224,22 +224,9 @@
       <workItem from="1745586808977" duration="10510000" />
       <workItem from="1745666198233" duration="3449000" />
       <workItem from="1745745150460" duration="13780000" />
-    </task>
-    <task id="LOCAL-00023" summary="world unloading">
-      <option name="closed" value="true" />
-      <created>1739108196003</created>
-      <option name="number" value="00023" />
-      <option name="presentableId" value="LOCAL-00023" />
-      <option name="project" value="LOCAL" />
-      <updated>1739108196003</updated>
-    </task>
-    <task id="LOCAL-00024" summary="fixed camera world rendering issue">
-      <option name="closed" value="true" />
-      <created>1739473978929</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1739473978929</updated>
+      <workItem from="1745830601080" duration="8855000" />
+      <workItem from="1745927597704" duration="1338000" />
+      <workItem from="1746013898672" duration="5476000" />
     </task>
     <task id="LOCAL-00025" summary="text border">
       <option name="closed" value="true" />
@@ -617,7 +604,23 @@
       <option name="project" value="LOCAL" />
       <updated>1745766255670</updated>
     </task>
-    <option name="localTasksCounter" value="72" />
+    <task id="LOCAL-00072" summary="jump charge">
+      <option name="closed" value="true" />
+      <created>1745832702067</created>
+      <option name="number" value="00072" />
+      <option name="presentableId" value="LOCAL-00072" />
+      <option name="project" value="LOCAL" />
+      <updated>1745832702067</updated>
+    </task>
+    <task id="LOCAL-00073" summary="less strict can jump check">
+      <option name="closed" value="true" />
+      <created>1745833271692</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1745833271692</updated>
+    </task>
+    <option name="localTasksCounter" value="74" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -627,8 +630,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="render refactoring" />
-    <MESSAGE value="simple beat generation" />
     <MESSAGE value="arpeggio generation" />
     <MESSAGE value="different note pitches" />
     <MESSAGE value="fixed ImGui text input + AudioAnalyzer" />
@@ -652,7 +653,9 @@
     <MESSAGE value="entity horizontal flipping" />
     <MESSAGE value="walking animations" />
     <MESSAGE value="tuned gravity and jump height" />
-    <option name="LAST_COMMIT_MESSAGE" value="tuned gravity and jump height" />
+    <MESSAGE value="jump charge" />
+    <MESSAGE value="less strict can jump check" />
+    <option name="LAST_COMMIT_MESSAGE" value="less strict can jump check" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
