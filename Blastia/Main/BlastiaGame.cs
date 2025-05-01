@@ -42,6 +42,7 @@ public class BlastiaGame : Game
 	
 	// MOUSE
 	public static bool HasClickedLeft { get; private set; }
+	public static bool HasClickedRight { get; private set; }
 	public static Vector2 CursorPosition { get; private set; }
 	public static bool IsHoldingLeft { get; private set; }
 	public static float ScrollWheelDelta { get; private set; }
@@ -393,6 +394,9 @@ public class BlastiaGame : Game
 		
 		HasClickedLeft = _currentMouseState.LeftButton == ButtonState.Released 
 						 && _previousMouseState.LeftButton == ButtonState.Pressed;
+		
+		HasClickedRight = _currentMouseState.RightButton == ButtonState.Released 
+		                 && _previousMouseState.RightButton == ButtonState.Pressed;
 
 		IsHoldingLeft = _currentMouseState.LeftButton == ButtonState.Pressed;
 		

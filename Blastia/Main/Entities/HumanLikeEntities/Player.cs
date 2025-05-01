@@ -73,6 +73,7 @@ public class Player : HumanLikeEntity
 		if (LocallyControlled)
 		{
 			HandleMovement();
+			HandleMouseClicks();
 		}
 	}
 
@@ -95,7 +96,6 @@ public class Player : HumanLikeEntity
 		if (directionVector != Vector2.Zero)
 		{
 			WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
-			
 			targetHorizontalSpeed = directionVector.X * MovementSpeed * airMultiplier;
 		}
 		else
@@ -120,6 +120,21 @@ public class Player : HumanLikeEntity
 			var jumpHeight = boostedJump;
 			MovementVector.Y = -jumpHeight;
 			_jumpCharge = 0;
+		}
+	}
+
+	private void HandleMouseClicks()
+	{
+		var currentWorld = PlayerManager.Instance.SelectedWorld;
+		if (currentWorld == null || Camera == null) return;
+			
+		if (BlastiaGame.HasClickedRight)
+		{
+			var worldPos = Camera.ScreenToWorld(BlastiaGame.CursorPosition);
+			var posX = (int) Math.Floor(worldPos.X / Block.Size) * Block.Size;
+			var posY = (int) Math.Floor(worldPos.Y / Block.Size) * Block.Size;
+			
+			currentWorld.SetTile(posX, posY, 1);
 		}
 	}
 
