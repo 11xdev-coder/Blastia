@@ -46,7 +46,7 @@ public abstract class Entity : Object
     /// </summary>
     protected bool IsGrounded { get; set; }
     /// <summary>
-    /// <c>True</c> if player is a little above ground (8 pixels above ground)
+    /// <c>True</c> if player is a little above ground (5 pixels above ground)
     /// </summary>
     protected bool CanJump { get; set; }
     
@@ -188,7 +188,7 @@ public abstract class Entity : Object
         var strictTileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
         IsGrounded = strictTileIdBelow >= 1;
         
-        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 8f);
+        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 5f);
         CanJump = tileIdBelow >= 1;
 
         var dragCoefficient = IsGrounded
