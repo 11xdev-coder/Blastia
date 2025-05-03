@@ -32,8 +32,8 @@ public class Player : HumanLikeEntity
 	protected override float Mass => 46f;
 	
 	private const float MinJumpVelocity = 150f;
-	private const float MaxJumpVelocity = 375f;
-	private const float MaxChargeTime = 0.6f;
+	private const float MaxJumpVelocity = 320f;
+	private const float MaxChargeTime = 0.35f;
 	private float _jumpCharge;
 
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
@@ -90,7 +90,7 @@ public class Player : HumanLikeEntity
 
 		// less speed when in air
 		var airMultiplier = 1f;
-		if (!IsGrounded) airMultiplier = 0.8f;
+		if (!IsGrounded) airMultiplier = 0.4f;
 
 		var targetHorizontalSpeed = 0f;
 		if (directionVector != Vector2.Zero)
@@ -123,18 +123,31 @@ public class Player : HumanLikeEntity
 		}
 	}
 
+	private Vector2 GetCoordsForBlockPlacement()
+	{
+		if (Camera == null) return Vector2.Zero;
+		
+		var worldPos = Camera.ScreenToWorld(BlastiaGame.CursorPosition);
+		var posX = (int) Math.Floor(worldPos.X / Block.Size) * Block.Size;
+		var posY = (int) Math.Floor(worldPos.Y / Block.Size) * Block.Size;
+		
+		return new Vector2(posX, posY);
+	}
+	
 	private void HandleMouseClicks()
 	{
 		var currentWorld = PlayerManager.Instance.SelectedWorld;
-		if (currentWorld == null || Camera == null) return;
+		if (currentWorld == null) return;
 			
 		if (BlastiaGame.HasClickedRight)
 		{
-			var worldPos = Camera.ScreenToWorld(BlastiaGame.CursorPosition);
-			var posX = (int) Math.Floor(worldPos.X / Block.Size) * Block.Size;
-			var posY = (int) Math.Floor(worldPos.Y / Block.Size) * Block.Size;
-			
-			currentWorld.SetTile(posX, posY, 1);
+			var pos = GetCoordsForBlockPlacement();
+			currentWorld.SetTile((int) pos.X, (int) pos.Y, 1);
+		}
+		if (BlastiaGame.HasClickedLeft)
+		{
+			var pos = GetCoordsForBlockPlacement();
+			currentWorld.SetTile((int) pos.X, (int) pos.Y, 0);
 		}
 	}
 
