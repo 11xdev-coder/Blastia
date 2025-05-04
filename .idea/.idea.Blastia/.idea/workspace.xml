@@ -9,7 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -227,15 +228,8 @@
       <workItem from="1745927597704" duration="1338000" />
       <workItem from="1746013898672" duration="5476000" />
       <workItem from="1746094369827" duration="9445000" />
-      <workItem from="1746280139965" duration="2692000" />
-    </task>
-    <task id="LOCAL-00027" summary="corner collision tests + fixed player camera centering">
-      <option name="closed" value="true" />
-      <created>1740260199746</created>
-      <option name="number" value="00027" />
-      <option name="presentableId" value="LOCAL-00027" />
-      <option name="project" value="LOCAL" />
-      <updated>1740260199746</updated>
+      <workItem from="1746280139965" duration="4262000" />
+      <workItem from="1746351830640" duration="1957000" />
     </task>
     <task id="LOCAL-00028" summary="basic collision structure">
       <option name="closed" value="true" />
@@ -621,7 +615,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746118872897</updated>
     </task>
-    <option name="localTasksCounter" value="76" />
+    <task id="LOCAL-00076" summary="block removing">
+      <option name="closed" value="true" />
+      <created>1746302569933</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1746302569933</updated>
+    </task>
+    <option name="localTasksCounter" value="77" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -631,7 +633,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fixed ImGui text input + AudioAnalyzer" />
     <MESSAGE value="fixed envelopes" />
     <MESSAGE value="filters" />
     <MESSAGE value="synthwave arpeggio changes" />
@@ -656,7 +657,8 @@
     <MESSAGE value="less strict can jump check" />
     <MESSAGE value="acceleration and movement fixes" />
     <MESSAGE value="simple block placement" />
-    <option name="LAST_COMMIT_MESSAGE" value="simple block placement" />
+    <MESSAGE value="block removing" />
+    <option name="LAST_COMMIT_MESSAGE" value="block removing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

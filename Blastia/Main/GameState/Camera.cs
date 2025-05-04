@@ -96,7 +96,10 @@ public class Camera : Object
 					MathUtilities.SmoothRound(worldPositionY * CameraScale), 
 					scaledBlockSize, scaledBlockSize);
 						
-				Rectangle sourceRect = BlockRectangles.All;
+				Rectangle sourceRect = block.GetRuleTileSourceRectangle(!worldState.HasTile(x, y - 8), 
+					!worldState.HasTile(x, y + 8), 
+					!worldState.HasTile(x + 8, y), 
+					!worldState.HasTile(x - 8, y));
 				block.Draw(spriteBatch, destRect, sourceRect);				
 			}
 		}

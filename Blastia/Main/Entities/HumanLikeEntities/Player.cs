@@ -31,7 +31,7 @@ public class Player : HumanLikeEntity
 	protected override int Width => 1;
 	protected override float Mass => 46f;
 	
-	private const float MinJumpVelocity = 150f;
+	private const float MinJumpVelocity = 200f;
 	private const float MaxJumpVelocity = 320f;
 	private const float MaxChargeTime = 0.35f;
 	private float _jumpCharge;
