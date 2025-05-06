@@ -67,39 +67,51 @@ public class Camera : Object
 		
 	}
 	
-	// TODO: Lag when a lot of tiles
-	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState) 
+	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState)
 	{
-		// get corners in tiles
-		int startX = Math.Max(0, (int) Position.X);
-		int startY = Math.Max(0, (int) Position.Y);
-		int endX = Math.Min(worldState.WorldWidth, startX + DrawWidth);
-		int endY = Math.Min(worldState.WorldHeight, startY + DrawHeight);
+		int firstTileX = (int) Math.Floor(Position.X / Block.Size);
+		int firstTileY = (int) Math.Floor(Position.Y / Block.Size);
+
+		// num of tiles visible
+		int numTilesX = (int) Math.Ceiling(DrawWidth / CameraScale / Block.Size) + 1;
+		int numTilesY = (int) Math.Ceiling(DrawHeight / CameraScale / Block.Size) + 1;
+
+		int lastTileX = firstTileX + numTilesX;
+		int lastTileY = firstTileY + numTilesY;
+		
+		// clamp
+		firstTileX = Math.Max(0, firstTileX);
+		firstTileY = Math.Max(0, firstTileY);
+		lastTileX = Math.Min(worldState.WorldWidth / Block.Size, lastTileX);
+		lastTileY = Math.Min(worldState.WorldHeight / Block.Size, lastTileY);
 		
 		int scaledBlockSize = MathUtilities.SmoothRound(Block.Size * CameraScale);
 		
 		// go through each tile
-		for (int x = startX; x < endX; x++) 
+		for (int x = firstTileX; x < lastTileX; x++) 
 		{
-			for (int y = startY; y < endY; y++) 
+			for (int y = firstTileY; y < lastTileY; y++)
 			{
-				ushort tileId = worldState.GetTile(x, y);
+				int worldXCoord = x * Block.Size;
+				int worldYCoord = y * Block.Size;
+				
+				ushort tileId = worldState.GetTile(worldXCoord, worldYCoord);
 				if (tileId == 0) continue; // skip empty
 				
 				Block? block = StuffRegistry.GetBlock(tileId);
 				if (block == null) continue;
 				
 				// subtract camera position -> scrolling (camera moves right -> move tile to the left)
-				float worldPositionX = x - Position.X;
-				float worldPositionY = y - Position.Y;
+				float worldPositionX = worldXCoord - Position.X;
+				float worldPositionY = worldYCoord - Position.Y;
 				Rectangle destRect = new Rectangle(MathUtilities.SmoothRound(worldPositionX * CameraScale), 
 					MathUtilities.SmoothRound(worldPositionY * CameraScale), 
 					scaledBlockSize, scaledBlockSize);
 						
-				Rectangle sourceRect = block.GetRuleTileSourceRectangle(!worldState.HasTile(x, y - 8), 
-					!worldState.HasTile(x, y + 8), 
-					!worldState.HasTile(x + 8, y), 
-					!worldState.HasTile(x - 8, y));
+				Rectangle sourceRect = block.GetRuleTileSourceRectangle(!worldState.HasTile(worldXCoord, worldYCoord - 8), 
+					!worldState.HasTile(worldXCoord, worldYCoord + 8), 
+					!worldState.HasTile(worldXCoord + 8, worldYCoord), 
+					!worldState.HasTile(worldXCoord - 8, worldYCoord));
 				block.Draw(spriteBatch, destRect, sourceRect);				
 			}
 		}

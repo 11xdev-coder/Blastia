@@ -229,15 +229,8 @@
       <workItem from="1746013898672" duration="5476000" />
       <workItem from="1746094369827" duration="9445000" />
       <workItem from="1746280139965" duration="4262000" />
-      <workItem from="1746351830640" duration="1957000" />
-    </task>
-    <task id="LOCAL-00028" summary="basic collision structure">
-      <option name="closed" value="true" />
-      <created>1740425696115</created>
-      <option name="number" value="00028" />
-      <option name="presentableId" value="LOCAL-00028" />
-      <option name="project" value="LOCAL" />
-      <updated>1740425696115</updated>
+      <workItem from="1746351830640" duration="6154000" />
+      <workItem from="1746544450248" duration="1497000" />
     </task>
     <task id="LOCAL-00029" summary="ImGui + SDL simple synthesizer">
       <option name="closed" value="true" />
@@ -623,7 +616,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746302569933</updated>
     </task>
-    <option name="localTasksCounter" value="77" />
+    <task id="LOCAL-00077" summary="rule tiles">
+      <option name="closed" value="true" />
+      <created>1746354920092</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1746354920092</updated>
+    </task>
+    <option name="localTasksCounter" value="78" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -633,7 +634,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fixed envelopes" />
     <MESSAGE value="filters" />
     <MESSAGE value="synthwave arpeggio changes" />
     <MESSAGE value="volume modifier" />
@@ -658,7 +658,8 @@
     <MESSAGE value="acceleration and movement fixes" />
     <MESSAGE value="simple block placement" />
     <MESSAGE value="block removing" />
-    <option name="LAST_COMMIT_MESSAGE" value="block removing" />
+    <MESSAGE value="rule tiles" />
+    <option name="LAST_COMMIT_MESSAGE" value="rule tiles" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

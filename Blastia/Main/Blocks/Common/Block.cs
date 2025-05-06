@@ -15,6 +15,14 @@ public abstract class Block
 	/// </summary>
 	public abstract float DragCoefficient { get; }
 
+	/// <summary>
+	/// Returns source rectangle for drawing depending on neighbouring blocks
+	/// </summary>
+	/// <param name="emptyTop">Is block above air</param>
+	/// <param name="emptyBottom">Is block below air</param>
+	/// <param name="emptyRight">Is right block air</param>
+	/// <param name="emptyLeft">Is left block air</param>
+	/// <returns></returns>
 	public Rectangle GetRuleTileSourceRectangle(bool emptyTop, bool emptyBottom, bool emptyRight, bool emptyLeft)
 	{
 		// 4 exposed sides
