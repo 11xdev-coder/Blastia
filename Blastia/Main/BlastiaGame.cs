@@ -246,6 +246,7 @@ public class BlastiaGame : Game
 			MusicEngine.PlayMusicTrack(ChooseRandomMenuMusic());
 			StuffLoader.LoadBlocks(GraphicsDevice);
 			StuffLoader.LoadHumans(GraphicsDevice);
+			StuffLoader.LoadItemsFromJson(GraphicsDevice, Paths.ItemsData);
 
 			MainFont = Content.Load<SpriteFont>("Font/Raleway_24_Regular");
 

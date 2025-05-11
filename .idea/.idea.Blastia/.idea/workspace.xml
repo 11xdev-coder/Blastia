@@ -8,14 +8,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Items/Common/Item.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Items/Common/ItemId.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/Data/DataDefinitions.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Blastia.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Blastia.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/Common/Item.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/Item.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/Common/ItemId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/ItemId.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/StuffRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/StuffRegistry.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/Paths.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/Paths.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
@@ -233,15 +243,8 @@
       <workItem from="1746544450248" duration="2371000" />
       <workItem from="1746702835991" duration="1406000" />
       <workItem from="1746780179374" duration="2942000" />
-      <workItem from="1746867484708" duration="6129000" />
-    </task>
-    <task id="LOCAL-00030" summary="text renders properly">
-      <option name="closed" value="true" />
-      <created>1741382410606</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1741382410606</updated>
+      <workItem from="1746867484708" duration="11165000" />
+      <workItem from="1746952309023" duration="4919000" />
     </task>
     <task id="LOCAL-00031" summary="multiple waves">
       <option name="closed" value="true" />
@@ -627,7 +630,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746553212456</updated>
     </task>
-    <option name="localTasksCounter" value="79" />
+    <task id="LOCAL-00079" summary="base item class">
+      <option name="closed" value="true" />
+      <created>1746888251293</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1746888251293</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -637,7 +648,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="synthwave arpeggio changes" />
     <MESSAGE value="volume modifier" />
     <MESSAGE value="lead &amp; arpeggio tweaks" />
     <MESSAGE value="ogg exporting" />
@@ -662,7 +672,8 @@
     <MESSAGE value="block removing" />
     <MESSAGE value="rule tiles" />
     <MESSAGE value="fixed lag with large worlds" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed lag with large worlds" />
+    <MESSAGE value="base item class" />
+    <option name="LAST_COMMIT_MESSAGE" value="base item class" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

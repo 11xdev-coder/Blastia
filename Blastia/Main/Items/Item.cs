@@ -1,6 +1,20 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 
-namespace Blastia.Main.Items.Common;
+namespace Blastia.Main.Items;
+
+public enum ItemType
+{
+    Generic,
+    WeaponMelee,
+    WeaponRanged,
+    Tool,
+    Consumable,
+    Placeable,
+    Equipment,
+    Armor,
+    Material,
+    Quest
+}
 
 /// <summary>
 /// Base item class, has all generic properties
@@ -12,14 +26,17 @@ public class Item
     public string Tooltip { get; set; }
     public Texture2D Icon { get; set; }
     public int MaxStack { get; set; }
+    public ItemType Type { get; set; }
+    public bool IsStackable => MaxStack > 1;
 
-    public Item(ushort id, string name, string tooltip, Texture2D icon, int maxStack = 1)
+    public Item(ushort id, string name, string tooltip, Texture2D icon, int maxStack = 1, ItemType type = ItemType.Generic)
     {
         Id = id;
         Name = name;
         Tooltip = tooltip;
         Icon = icon;
         MaxStack = maxStack;
+        Type = type;
     }
 
     public virtual ItemInstance CreateInstance(int amount = 1)

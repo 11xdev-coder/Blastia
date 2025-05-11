@@ -56,7 +56,7 @@ public abstract class Block
 	
 	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
 	{
-		var texture = StuffRegistry.GetTexture(ID);
+		var texture = StuffRegistry.GetBlockTexture(ID);
 		spriteBatch.Draw(texture, destRectangle, sourceRectangle, Color.White);
 	}
 }

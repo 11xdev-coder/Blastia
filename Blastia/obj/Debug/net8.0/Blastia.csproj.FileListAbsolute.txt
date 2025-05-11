@@ -170,3 +170,5 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Font\Roboto_Condensed-
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\MathNet.Numerics.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Concentus.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Concentus.Oggfile.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Data\items.json
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\IronSword.png
