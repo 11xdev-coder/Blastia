@@ -8,24 +8,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Data/DataDefinitions.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventorySlot.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Blastia.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Blastia.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/Common/Item.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/Item.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/Common/ItemId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/ItemId.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/StuffRegistry.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/StuffRegistry.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/Paths.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/Paths.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/items.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/items.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
@@ -100,7 +90,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.IDE.editor.colors.Color Scheme Font&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -244,15 +234,8 @@
       <workItem from="1746702835991" duration="1406000" />
       <workItem from="1746780179374" duration="2942000" />
       <workItem from="1746867484708" duration="11165000" />
-      <workItem from="1746952309023" duration="4919000" />
-    </task>
-    <task id="LOCAL-00031" summary="multiple waves">
-      <option name="closed" value="true" />
-      <created>1741444620935</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1741444620935</updated>
+      <workItem from="1746952309023" duration="9885000" />
+      <workItem from="1747055850800" duration="3014000" />
     </task>
     <task id="LOCAL-00032" summary="ADSR">
       <option name="closed" value="true" />
@@ -638,7 +621,15 @@
       <option name="project" value="LOCAL" />
       <updated>1746888251293</updated>
     </task>
-    <option name="localTasksCounter" value="80" />
+    <task id="LOCAL-00080" summary="item json loading">
+      <option name="closed" value="true" />
+      <created>1746958442112</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1746958442112</updated>
+    </task>
+    <option name="localTasksCounter" value="81" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -648,7 +639,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="volume modifier" />
     <MESSAGE value="lead &amp; arpeggio tweaks" />
     <MESSAGE value="ogg exporting" />
     <MESSAGE value="fixed entity collision" />
@@ -673,7 +663,8 @@
     <MESSAGE value="rule tiles" />
     <MESSAGE value="fixed lag with large worlds" />
     <MESSAGE value="base item class" />
-    <option name="LAST_COMMIT_MESSAGE" value="base item class" />
+    <MESSAGE value="item json loading" />
+    <option name="LAST_COMMIT_MESSAGE" value="item json loading" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
