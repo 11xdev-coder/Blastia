@@ -40,4 +40,82 @@ public class InventorySlot : UIElement
             AffectedByAlignOffset = false
         };
     }
+
+    public void SetItem(ItemInstance? item)
+    {
+        Item = item;
+        UpdateVisuals();
+    }
+
+    public void ClearItem()
+    {
+        SetItem(null);
+    }
+
+    private void UpdateVisuals()
+    {
+        // if we have an item
+        if (Item != null && Item.Amount > 0)
+        {
+            if (_itemIcon != null)
+            {
+                _itemIcon.Texture = Item.Icon;
+                _itemIcon.Scale = IconScale;
+            }
+
+            if (_itemAmountText != null)
+            {
+                _itemAmountText.Text = Item.Amount.ToString();
+            }
+        }
+        else // else clear everything
+        {
+            if (_itemIcon != null)
+            {
+                _itemIcon.Texture = BlastiaGame.InvisibleTexture;
+            }
+
+            if (_itemAmountText != null)
+            {
+                _itemAmountText.Text = "";
+            }
+        }
+        
+        UpdateBounds();
+    }
+
+    public override void UpdateBounds()
+    {
+        base.UpdateBounds();
+
+        if (_itemIcon != null)
+        {
+            _itemIcon.Position = new Vector2(Bounds.Center.X, Bounds.Center.Y);
+            _itemIcon.UpdateBounds();
+        }
+
+        if (_itemAmountText != null && Font != null)
+        {
+            Vector2 textSize = Font.MeasureString(_itemAmountText.Text) * _itemAmountText.Scale;
+            _itemAmountText.Position = new Vector2(Bounds.Right - textSize.X - 5, Bounds.Bottom - textSize.Y - 5); // 5px padding
+            _itemAmountText.UpdateBounds();
+        }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        
+        _itemIcon?.Update();
+        _itemAmountText?.Update();
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        // draw slot bg
+        base.Draw(spriteBatch);
+        
+        _itemIcon?.Draw(spriteBatch);
+        _itemAmountText?.Draw(spriteBatch);
+    }
 }
