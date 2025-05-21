@@ -16,7 +16,7 @@ public class InventorySlot : UIElement
     public Texture2D BackgroundTexture { get; private set; }
     public Texture2D HighlightTexture { get; private set; }
     public Color AmountColor { get; private set; }
-    public Vector2 IconScale { get; private set; }
+    public Vector2 IconScale { get; set; }
     
     public InventorySlot(Vector2 position, SpriteFont font, Texture2D backgroundTexture, Texture2D? highlightTexture = null, int slotIndex = -1) 
         : base(position, backgroundTexture)

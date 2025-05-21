@@ -8,7 +8,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Items/Inventory.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventorySlot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventorySlot.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
@@ -227,15 +227,12 @@
       <workItem from="1746867484708" duration="11165000" />
       <workItem from="1746952309023" duration="9885000" />
       <workItem from="1747055850800" duration="3470000" />
-      <workItem from="1747137150801" duration="6393000" />
-    </task>
-    <task id="LOCAL-00033" summary="ADSR bug fix">
-      <option name="closed" value="true" />
-      <created>1741456714778</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1741456714778</updated>
+      <workItem from="1747137150801" duration="7034000" />
+      <workItem from="1747246653851" duration="602000" />
+      <workItem from="1747409639199" duration="1857000" />
+      <workItem from="1747481159342" duration="3284000" />
+      <workItem from="1747658932246" duration="1593000" />
+      <workItem from="1747831479706" duration="3080000" />
     </task>
     <task id="LOCAL-00034" summary="anti-aliasing + filters">
       <option name="closed" value="true" />
@@ -621,7 +618,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747078977303</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="basic inventory class">
+      <option name="closed" value="true" />
+      <created>1747162543643</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1747162543644</updated>
+    </task>
+    <option name="localTasksCounter" value="83" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -631,7 +636,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="ogg exporting" />
     <MESSAGE value="fixed entity collision" />
     <MESSAGE value="swept aabb refactor" />
     <MESSAGE value="collision refactor" />
@@ -656,7 +660,8 @@
     <MESSAGE value="base item class" />
     <MESSAGE value="item json loading" />
     <MESSAGE value="inventory slot constructor" />
-    <option name="LAST_COMMIT_MESSAGE" value="inventory slot constructor" />
+    <MESSAGE value="basic inventory class" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic inventory class" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
