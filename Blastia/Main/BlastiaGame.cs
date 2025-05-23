@@ -63,6 +63,7 @@ public class BlastiaGame : Game
 	public static Texture2D AudioTexture { get; private set; } = null!;
 	public static Texture2D RedCrossTexture { get; private set; } = null!;
 	public static Texture2D ExitTexture { get; private set; } = null!;
+	public static Texture2D SlotBackgroundTexture { get; private set; } = null!;
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -85,7 +86,9 @@ public class BlastiaGame : Game
 	public static InGameSettingsMenu? InGameSettingsMenu { get; private set; }
 	public static InGameVideoSettingsMenu? InGameVideoSettingsMenu { get; private set; }
 	public static InGameAudioSettingsMenu? InGameAudioSettingsMenu { get; private set; }
-	private readonly List<Menu> _menus;
+	public static InventoryUi? PlayerInventoryUiMenu { get; private set; }
+	private readonly List<Menu> _menus = [];
+	private readonly List<Menu> _menusToAdd = [];
 
 	/// <summary>
 	/// Event triggered when a request to exit the game is made.
@@ -139,7 +142,6 @@ public class BlastiaGame : Game
 		InitializeConsole();
 		
 		_graphics = new GraphicsDeviceManager(this);
-		_menus = new List<Menu>();
 		_entities = new List<Entity>();
 		_entitiesToRemove = new List<Entity>();
 		Players = new List<Player>();
@@ -231,6 +233,7 @@ public class BlastiaGame : Game
 
 		RedCrossTexture = Util.LoadTexture(GraphicsDevice, Paths.RedCrossPath);
 		ExitTexture = Util.LoadTexture(GraphicsDevice, Paths.ExitPath);
+		SlotBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotBackgroundTexturePath);
 	}
 	
 	protected override void LoadContent()
@@ -364,6 +367,12 @@ public class BlastiaGame : Game
 						break;
 					}
 				}
+			}
+
+			if (_menusToAdd.Count > 0)
+			{
+				_menus.AddRange(_menusToAdd);
+				_menusToAdd.Clear();
 			}
 
 			// update previous states in the end
@@ -519,6 +528,25 @@ public class BlastiaGame : Game
 				}
 			}
 		}
+		
+		InitializePlayerInventory();
+	}
+
+	/// <summary>
+	/// Called during world initialization to create UI for player inventory
+	/// </summary>
+	private void InitializePlayerInventory()
+	{
+		var gridStartPosition = new Vector2(
+			ScreenWidth / 2f - (Player.HotbarSlotsCount * (SlotBackgroundTexture.Width * 0.5f + 5f)) / 2f,
+			ScreenHeight - (SlotBackgroundTexture.Height * 0.5f) - 20f
+		);
+		var slotSize = new Vector2(1f);
+		var slotSpacing = new Vector2(5f, 5f);
+		
+		PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, gridStartPosition, Player.InventoryRows, 
+			Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, null, false, true);
+		AddMenu(PlayerInventoryUiMenu);
 	}
 
 	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
@@ -570,7 +598,7 @@ public class BlastiaGame : Game
 
 	private void AddMenu(Menu? menu)
 	{
-		if (menu != null) _menus.Add(menu);
+		if (menu != null) _menusToAdd.Add(menu);
 	}
 
 	/// <summary>

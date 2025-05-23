@@ -6,13 +6,5 @@
     "IconPath": "Textures/Items/IronSword.png",
     "MaxStack": 1,
     "ItemType": "WeaponMelee"
-  },
-  {
-    "Id": 2,
-    "Name": "Iron Sword",
-    "Tooltip": "Test tooltip",
-    "IconPath": "Textures/Items/IronSword.png",
-    "MaxStack": 1,
-    "ItemType": "WeaponMelee"
   }
 ]

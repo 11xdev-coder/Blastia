@@ -7,7 +7,7 @@ namespace Blastia.Main.UI;
 public class InventoryUi : Menu
 {
     private Inventory _playerInventory;
-    private List<InventorySlot> _inventorySlotsUi;
+    private List<InventorySlot> _inventorySlotsUi = [];
     
     // layout
     private int _rows;
@@ -16,28 +16,66 @@ public class InventoryUi : Menu
     private Vector2 _slotSpacing;
     private Vector2 _gridStartPosition;
     
-    public bool IsHotbar { get; private set; }
+    // hotbar
+    public int HotbarSlotsCount { get; private set; }
+    private int _selectedHotbarSlotIndex = -1;
+    
+    /// <summary>
+    /// True, if the full inventory (extra rows below the hotbar) is open.
+    /// <c>Menu.IsActive</c> will hide the whole inventory including the hotbar
+    /// </summary>
+    public bool IsFullInventoryOpen { get; private set; }
 
     private Texture2D _slotBackgroundTexture;
     
-    protected InventoryUi(SpriteFont font, Inventory playerInventory, Vector2 gridStartPosition, int rows, int columns,
-        Vector2 slotSize, Vector2 slotSpacing, Texture2D slotBackgroundTexture, bool isHotbar = false, bool isActive = false) : base(font, isActive)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="font"></param>
+    /// <param name="playerInventory">Player's full inventory</param>
+    /// <param name="hotbarStartPosition">Position for hotbar (first row)</param>
+    /// <param name="rows">Total rows</param>
+    /// <param name="columns">Total columns</param>
+    /// <param name="slotSize">Visual slot size</param>
+    /// <param name="slotSpacing"></param>
+    /// <param name="slotBackgroundTexture"></param>
+    /// <param name="slotHighlightTexture"></param>
+    /// <param name="isFullyOpened"></param>
+    /// <param name="isActive"></param>
+    public InventoryUi(SpriteFont font, Inventory playerInventory, Vector2 hotbarStartPosition, int rows, int columns,
+        Vector2 slotSize, Vector2 slotSpacing, Texture2D slotBackgroundTexture, Texture2D? slotHighlightTexture = null, 
+        bool isFullyOpened = false, bool isActive = false) : base(font, isActive)
     {
         _playerInventory = playerInventory;
-        _gridStartPosition = gridStartPosition;
+        _gridStartPosition = hotbarStartPosition;
         _rows = rows;
         _columns = columns;
+        HotbarSlotsCount = columns;
+        
         _slotSize = slotSize;
         _slotSpacing = slotSpacing;
         _slotBackgroundTexture = slotBackgroundTexture;
-        IsHotbar = isHotbar;
         
-        _inventorySlotsUi = [];
         _playerInventory.OnSlotChanged += OnInventorySlotUpdated;
+        IsFullInventoryOpen = isFullyOpened;
         
         InitializeSlots();
     }
 
+    public void SetSelectedHotbarSlotIndex(int index)
+    {
+        _selectedHotbarSlotIndex = Math.Clamp(index, 0, HotbarSlotsCount - 1);
+    }
+
+    public void ToggleFullInventoryDisplay(bool open)
+    {
+        IsFullInventoryOpen = open;
+        // ensure whole inventory is active
+        Active = true;
+        
+        Console.WriteLine($"[InventoryUi] Full inventory display: {IsFullInventoryOpen}");
+    }
+    
     protected override void AddElements()
     {
         foreach (var slotUi in _inventorySlotsUi)
@@ -51,19 +89,16 @@ public class InventoryUi : Menu
         // remove old inventory slots
         _inventorySlotsUi.Clear();
         Elements.RemoveAll(element => element is InventorySlot);
-
-        int slotIndex = 0;
+        
         for (int row = 0; row < _rows; row++)
         {
             for (int column = 0; column < _columns; column++)
             {
-                // for main inventory dont create slots exceeding capacity
-                if (slotIndex >= _playerInventory.Capacity && !IsHotbar)
+                var slotIndex = row * _columns + column;
+                // dont create slots exceeding capacity
+                if (slotIndex >= _playerInventory.Capacity)
                 {
-                    // fixed slots for hotbar
-                    if (IsHotbar && slotIndex >= _columns) break;
-
-                    if (!IsHotbar) break;
+                    continue;
                 }
                 
                 // use sprite width for spacing
@@ -89,23 +124,63 @@ public class InventoryUi : Menu
                 
                 _inventorySlotsUi.Add(inventorySlotUi);
                 Elements.Add(inventorySlotUi);
-                
-                slotIndex++;
-                if (IsHotbar && slotIndex >= _columns) break; // only one row if hotbar
             }
-            
-            if (IsHotbar && slotIndex >= _columns) break;
-            if (!IsHotbar && slotIndex >= _playerInventory.Capacity) break;
         }
     }
 
     private void HandleSlotClick(int slotIndex)
     {
-        // TODO
+        // TODO: drag and drop
+        
     }
 
     private void OnInventorySlotUpdated(int slotIndex, ItemInstance? newItem)
     {
-        // TODO
+        if (slotIndex >= 0 && slotIndex < _inventorySlotsUi.Count)
+        {
+            _inventorySlotsUi[slotIndex].SetItem(newItem);
+        }
+    }
+
+    protected override void OnMenuActive()
+    {
+        base.OnMenuActive();
+        RefreshAllSlots();
+    }
+
+    private void RefreshAllSlots()
+    {
+        for (int i = 0; i < _inventorySlotsUi.Count; i++)
+        {
+            if (i < _playerInventory.Capacity)
+            {
+                _inventorySlotsUi[i].SetItem(_playerInventory.GetItemAt(i));
+            }
+            else
+            {
+                _inventorySlotsUi[i].ClearItem();
+            }
+        }
+    }
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        if (!Active) return;
+
+        for (int i = 0; i < _inventorySlotsUi.Count; i++)
+        {
+            var isHotbarSlot = i < HotbarSlotsCount;
+            InventorySlot slotToDraw = _inventorySlotsUi[i];
+            
+            // always draw hotbar slots
+            if (isHotbarSlot)
+            {
+                slotToDraw.Draw(spriteBatch);
+            }
+            else if (IsFullInventoryOpen) // main inv slots only if inv is opened
+            {
+                slotToDraw.Draw(spriteBatch);
+            }
+        }
     }
 }

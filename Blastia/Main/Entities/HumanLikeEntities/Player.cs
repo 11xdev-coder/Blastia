@@ -1,6 +1,7 @@
 ﻿using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
+using Blastia.Main.Items;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -35,12 +36,20 @@ public class Player : HumanLikeEntity
 	private const float MaxJumpVelocity = 320f;
 	private const float MaxChargeTime = 0.35f;
 	private float _jumpCharge;
+	
+	// inventory
+	public Inventory PlayerInventory { get; private set; }
+	public const int InventoryRows = 4;
+	public const int InventoryColumns = 9;
+	public const int HotbarSlotsCount = 9;
+	private const int InventoryCapacity = InventoryRows * InventoryColumns;
 
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
 			new Vector2(10, 21))
 	{
+		PlayerInventory = new Inventory(InventoryCapacity);
 		LocallyControlled = myPlayer;
 		
 		if (myPlayer)
