@@ -44,7 +44,7 @@ public class InventoryUi : Menu
     /// <param name="isActive"></param>
     public InventoryUi(SpriteFont font, Inventory playerInventory, Vector2 hotbarStartPosition, int rows, int columns,
         Vector2 slotSize, Vector2 slotSpacing, Texture2D slotBackgroundTexture, Texture2D? slotHighlightTexture = null, 
-        bool isFullyOpened = false, bool isActive = false) : base(font, isActive)
+        bool isFullyOpened = false, bool isActive = false) : base(font, isActive, false)
     {
         _playerInventory = playerInventory;
         _gridStartPosition = hotbarStartPosition;
@@ -78,10 +78,7 @@ public class InventoryUi : Menu
     
     protected override void AddElements()
     {
-        foreach (var slotUi in _inventorySlotsUi)
-        {
-            Elements.Add(slotUi);
-        }
+        InitializeSlots();
     }
 
     private void InitializeSlots()
@@ -89,12 +86,12 @@ public class InventoryUi : Menu
         // remove old inventory slots
         _inventorySlotsUi.Clear();
         Elements.RemoveAll(element => element is InventorySlot);
-        
+
+        var slotIndex = 0;
         for (int row = 0; row < _rows; row++)
         {
             for (int column = 0; column < _columns; column++)
             {
-                var slotIndex = row * _columns + column;
                 // dont create slots exceeding capacity
                 if (slotIndex >= _playerInventory.Capacity)
                 {
@@ -124,8 +121,13 @@ public class InventoryUi : Menu
                 
                 _inventorySlotsUi.Add(inventorySlotUi);
                 Elements.Add(inventorySlotUi);
+
+                slotIndex += 1;
             }
         }
+        
+        Console.WriteLine($"[InventoryUi] Initialized {_inventorySlotsUi.Count} slots. Inventory capacity: {_playerInventory.Capacity}, " +
+                          $"rows: {_rows}, columns: {_columns} at {_gridStartPosition}");
     }
 
     private void HandleSlotClick(int slotIndex)

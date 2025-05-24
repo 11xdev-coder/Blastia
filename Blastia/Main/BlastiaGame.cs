@@ -537,9 +537,11 @@ public class BlastiaGame : Game
 	/// </summary>
 	private void InitializePlayerInventory()
 	{
+		if (MainFont == null || _myPlayer == null) return;
+		
 		var gridStartPosition = new Vector2(
-			ScreenWidth / 2f - (Player.HotbarSlotsCount * (SlotBackgroundTexture.Width * 0.5f + 5f)) / 2f,
-			ScreenHeight - (SlotBackgroundTexture.Height * 0.5f) - 20f
+			ScreenWidth / 2f,
+			ScreenHeight / 2f
 		);
 		var slotSize = new Vector2(1f);
 		var slotSpacing = new Vector2(5f, 5f);

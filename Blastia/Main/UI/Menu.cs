@@ -36,17 +36,26 @@ public class Menu
 
     private bool _menuSwitched;
 
-    protected Menu(SpriteFont font, bool isActive = false)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="font">Font that will be used by elements in this menu</param>
+    /// <param name="isActive">Is menu active when the game just started?</param>
+    /// <param name="initializeElementsImmediately">Should we run <c>AddElements</c> right away in the constructor?</param>
+    protected Menu(SpriteFont font, bool isActive = false, bool initializeElementsImmediately = true)
     {
         Font = font;
         Active = isActive;
         
-        Initialize();
+        Initialize(initializeElementsImmediately);
     }
     
-    private void Initialize()
+    private void Initialize(bool initializeElementsImmediately)
     {
-        AddElements();
+        if (initializeElementsImmediately)
+        {
+            AddElements();
+        }
     }
     
     protected virtual void AddElements()
