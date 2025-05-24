@@ -86,7 +86,8 @@ public class InventorySlot : UIElement
 
     public override void UpdateBounds()
     {
-        base.UpdateBounds();
+        if (Texture == null) return;
+        UpdateBoundsBase(Texture.Width, Texture.Height);
 
         if (_itemIcon != null)
         {

@@ -99,7 +99,7 @@ public class InventoryUi : Menu
                 }
                 
                 // use sprite width for spacing
-                Vector2 slotPosition = _gridStartPosition + new Vector2(
+                var slotPosition = _gridStartPosition + new Vector2(
                     column * (_slotBackgroundTexture.Width * _slotSize.X + _slotSpacing.X),
                     row * (_slotBackgroundTexture.Height * _slotSize.Y + _slotSpacing.Y)
                 );
@@ -172,7 +172,7 @@ public class InventoryUi : Menu
         for (int i = 0; i < _inventorySlotsUi.Count; i++)
         {
             var isHotbarSlot = i < HotbarSlotsCount;
-            InventorySlot slotToDraw = _inventorySlotsUi[i];
+            var slotToDraw = _inventorySlotsUi[i];
             
             // always draw hotbar slots
             if (isHotbarSlot)
