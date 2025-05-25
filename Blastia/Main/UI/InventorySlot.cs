@@ -15,29 +15,24 @@ public class InventorySlot : UIElement
     // styling
     public Texture2D BackgroundTexture { get; private set; }
     public Texture2D HighlightTexture { get; private set; }
-    public Color AmountColor { get; private set; }
+    public Color AmountColor { get; private set; } = Color.White;
     public Vector2 IconScale { get; set; }
     
     public InventorySlot(Vector2 position, SpriteFont font, Texture2D backgroundTexture, Texture2D? highlightTexture = null, int slotIndex = -1) 
         : base(position, backgroundTexture)
     {
+        Font = font;
         SlotIndex = slotIndex;
         BackgroundTexture = backgroundTexture;
         HighlightTexture = highlightTexture ?? backgroundTexture;
 
-        _itemIcon = new Image(Vector2.Zero, BlastiaGame.InvisibleTexture)
-        {
-            HAlign = 0.5f,
-            VAlign = 0.5f,
-        };
+        _itemIcon = new Image(Vector2.Zero, BlastiaGame.InvisibleTexture);
 
         _itemAmountText = new Text(Vector2.Zero, "", font)
         {
+            BorderColor = new Color(0, 0, 0, 0),
             DrawColor = AmountColor,
-            HAlign = 0.95f,
-            VAlign = 0.95f,
-            Scale = new Vector2(0.7f),
-            AffectedByAlignOffset = false
+            Scale = new Vector2(0.7f, 0.7f)
         };
     }
 
@@ -89,16 +84,24 @@ public class InventorySlot : UIElement
         if (Texture == null) return;
         UpdateBoundsBase(Texture.Width, Texture.Height);
 
-        if (_itemIcon != null)
+        if (_itemIcon != null && _itemIcon.Texture != null)
         {
-            _itemIcon.Position = new Vector2(Bounds.Center.X, Bounds.Center.Y);
+            var halfIconWidth = _itemIcon.Texture.Width * 0.5f;
+            var halfIconHeight = _itemIcon.Texture.Height * 0.5f;
+            
+            _itemIcon.Position = new Vector2(Bounds.Center.X - halfIconWidth, Bounds.Center.Y - halfIconHeight);
+            _itemIcon.Scale = IconScale;
             _itemIcon.UpdateBounds();
         }
 
         if (_itemAmountText != null && Font != null)
         {
-            Vector2 textSize = Font.MeasureString(_itemAmountText.Text) * _itemAmountText.Scale;
-            _itemAmountText.Position = new Vector2(Bounds.Right - textSize.X - 5, Bounds.Bottom - textSize.Y - 5); // 5px padding
+            var textSize = Font.MeasureString(_itemAmountText.Text) * _itemAmountText.Scale;
+            _itemAmountText.Position = new Vector2(
+                Bounds.Right - textSize.X,
+                Bounds.Bottom - textSize.Y
+            );
+            
             _itemAmountText.UpdateBounds();
         }
     }

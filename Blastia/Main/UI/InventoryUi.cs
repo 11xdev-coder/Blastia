@@ -109,7 +109,7 @@ public class InventoryUi : Menu
                     new InventorySlot(slotPosition, Font, _slotBackgroundTexture, slotIndex: slotIndex)
                     {
                         Scale = _slotSize,
-                        IconScale = Vector2.One
+                        IconScale = new Vector2(1.9f, 1.9f)
                     };
                 
                 // set initial item

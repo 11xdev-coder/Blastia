@@ -3,6 +3,7 @@ using Blastia.Main.Entities;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.Items;
 using Blastia.Main.Sounds;
 using Blastia.Main.UI;
 using Blastia.Main.UI.Menus;
@@ -540,7 +541,7 @@ public class BlastiaGame : Game
 		if (MainFont == null || _myPlayer == null) return;
 		
 		var gridStartPosition = new Vector2(15, 30);
-		var slotSize = new Vector2(1.2f);
+		var slotSize = new Vector2(1.5f);
 		var slotSpacing = new Vector2(5f, 5f);
 
 		if (PlayerInventoryUiMenu == null)
@@ -553,6 +554,8 @@ public class BlastiaGame : Game
 		{
 			PlayerInventoryUiMenu.Active = true;
 		}
+
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 2);
 	}
 
 	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
