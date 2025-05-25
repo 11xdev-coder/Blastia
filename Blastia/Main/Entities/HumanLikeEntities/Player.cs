@@ -81,6 +81,10 @@ public class Player : HumanLikeEntity
 	{
 		if (LocallyControlled)
 		{
+			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null)
+			{
+				BlastiaGame.PlayerInventoryUiMenu.ToggleFullInventoryDisplay();
+			}
 			HandleMovement();
 			HandleMouseClicks();
 		}

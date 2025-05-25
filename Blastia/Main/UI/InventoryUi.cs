@@ -67,13 +67,11 @@ public class InventoryUi : Menu
         _selectedHotbarSlotIndex = Math.Clamp(index, 0, HotbarSlotsCount - 1);
     }
 
-    public void ToggleFullInventoryDisplay(bool open)
+    public void ToggleFullInventoryDisplay()
     {
-        IsFullInventoryOpen = open;
+        IsFullInventoryOpen = !IsFullInventoryOpen;
         // ensure whole inventory is active
         Active = true;
-        
-        Console.WriteLine($"[InventoryUi] Full inventory display: {IsFullInventoryOpen}");
     }
     
     protected override void AddElements()
