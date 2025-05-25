@@ -65,6 +65,7 @@ public class BlastiaGame : Game
 	public static Texture2D RedCrossTexture { get; private set; } = null!;
 	public static Texture2D ExitTexture { get; private set; } = null!;
 	public static Texture2D SlotBackgroundTexture { get; private set; } = null!;
+	public static Texture2D SlotHighlightedTexture { get; private set; } = null!;
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -235,6 +236,7 @@ public class BlastiaGame : Game
 		RedCrossTexture = Util.LoadTexture(GraphicsDevice, Paths.RedCrossPath);
 		ExitTexture = Util.LoadTexture(GraphicsDevice, Paths.ExitPath);
 		SlotBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotBackgroundTexturePath);
+		SlotHighlightedTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotHighlightedTexturePath);
 	}
 	
 	protected override void LoadContent()
@@ -547,7 +549,7 @@ public class BlastiaGame : Game
 		if (PlayerInventoryUiMenu == null)
 		{
 			PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, gridStartPosition, Player.InventoryRows, 
-				Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, null, false, true);
+				Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, SlotHighlightedTexture, false, true);
 			AddMenu(PlayerInventoryUiMenu);
 		}
 		else

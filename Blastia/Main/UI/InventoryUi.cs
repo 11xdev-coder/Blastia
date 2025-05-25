@@ -18,7 +18,7 @@ public class InventoryUi : Menu
     
     // hotbar
     public int HotbarSlotsCount { get; private set; }
-    private int _selectedHotbarSlotIndex = -1;
+    private int _selectedHotbarSlotIndex = 3;
     
     /// <summary>
     /// True, if the full inventory (extra rows below the hotbar) is open.
@@ -27,6 +27,7 @@ public class InventoryUi : Menu
     public bool IsFullInventoryOpen { get; private set; }
 
     private Texture2D _slotBackgroundTexture;
+    private Texture2D? _slotHighlightedTexture;
     
     /// <summary>
     /// 
@@ -55,6 +56,7 @@ public class InventoryUi : Menu
         _slotSize = slotSize;
         _slotSpacing = slotSpacing;
         _slotBackgroundTexture = slotBackgroundTexture;
+        _slotHighlightedTexture = slotHighlightTexture;
         
         _playerInventory.OnSlotChanged += OnInventorySlotUpdated;
         IsFullInventoryOpen = isFullyOpened;
@@ -104,7 +106,7 @@ public class InventoryUi : Menu
                 
                 // no highlight texture
                 var inventorySlotUi =
-                    new InventorySlot(slotPosition, Font, _slotBackgroundTexture, slotIndex: slotIndex)
+                    new InventorySlot(slotPosition, Font, _slotBackgroundTexture, _slotHighlightedTexture, slotIndex)
                     {
                         Scale = _slotSize,
                         IconScale = new Vector2(1.9f, 1.9f)
@@ -175,6 +177,7 @@ public class InventoryUi : Menu
             // always draw hotbar slots
             if (isHotbarSlot)
             {
+                slotToDraw.IsSelected = i+1 == _selectedHotbarSlotIndex;
                 slotToDraw.Draw(spriteBatch);
             }
             else if (IsFullInventoryOpen) // main inv slots only if inv is opened

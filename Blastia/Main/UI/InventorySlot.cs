@@ -17,6 +17,7 @@ public class InventorySlot : UIElement
     public Texture2D HighlightTexture { get; private set; }
     public Color AmountColor { get; private set; } = Color.White;
     public Vector2 IconScale { get; set; }
+    public bool IsSelected { get; set; }
     
     public InventorySlot(Vector2 position, SpriteFont font, Texture2D backgroundTexture, Texture2D? highlightTexture = null, int slotIndex = -1) 
         : base(position, backgroundTexture)
@@ -116,6 +117,8 @@ public class InventorySlot : UIElement
 
     public override void Draw(SpriteBatch spriteBatch)
     {
+        Texture = IsSelected ? HighlightTexture : BackgroundTexture;
+        
         // draw slot bg
         base.Draw(spriteBatch);
         

@@ -27,6 +27,7 @@ public static class Paths
 	public static string RedCrossPath { get; private set; } = "";
 	public static string ExitPath { get; private set; } = "";
 	public static string SlotBackgroundTexturePath { get; private set; } = "";
+	public static string SlotHighlightedTexturePath { get; private set; } = "";
 	
 	// sounds
 	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
@@ -58,6 +59,7 @@ public static class Paths
 		RedCrossPath = Path.Combine(ContentRoot, "Textures/UI/RedCross.png");
 		ExitPath = Path.Combine(ContentRoot, "Textures/UI/Exit.png");
 		SlotBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotBackground.png");
+		SlotHighlightedTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotHighlighted.png");
 		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";
