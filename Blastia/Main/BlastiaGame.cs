@@ -539,16 +539,20 @@ public class BlastiaGame : Game
 	{
 		if (MainFont == null || _myPlayer == null) return;
 		
-		var gridStartPosition = new Vector2(
-			ScreenWidth / 2f,
-			ScreenHeight / 2f
-		);
-		var slotSize = new Vector2(1f);
+		var gridStartPosition = new Vector2(15, 30);
+		var slotSize = new Vector2(1.2f);
 		var slotSpacing = new Vector2(5f, 5f);
-		
-		PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, gridStartPosition, Player.InventoryRows, 
-			Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, null, false, true);
-		AddMenu(PlayerInventoryUiMenu);
+
+		if (PlayerInventoryUiMenu == null)
+		{
+			PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, gridStartPosition, Player.InventoryRows, 
+				Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, null, false, true);
+			AddMenu(PlayerInventoryUiMenu);
+		}
+		else
+		{
+			PlayerInventoryUiMenu.Active = true;
+		}
 	}
 
 	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
@@ -561,6 +565,8 @@ public class BlastiaGame : Game
 		IsWorldInitialized = false;
 		World?.Unload();
 		World = null;
+		
+		if (PlayerInventoryUiMenu != null) PlayerInventoryUiMenu.Active = false;
 		_myPlayer = null;
 		_entities.Clear();
 	}

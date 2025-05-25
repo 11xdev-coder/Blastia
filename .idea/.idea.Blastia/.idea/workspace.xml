@@ -9,8 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventorySlot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventorySlot.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -244,15 +243,8 @@
       <workItem from="1747831479706" duration="3080000" />
       <workItem from="1748005956000" duration="11034000" />
       <workItem from="1748073744255" duration="2663000" />
-      <workItem from="1748085839254" duration="9574000" />
-    </task>
-    <task id="LOCAL-00036" summary="AI music">
-      <option name="closed" value="true" />
-      <created>1741636850029</created>
-      <option name="number" value="00036" />
-      <option name="presentableId" value="LOCAL-00036" />
-      <option name="project" value="LOCAL" />
-      <updated>1741636850029</updated>
+      <workItem from="1748085839254" duration="9898000" />
+      <workItem from="1748163150830" duration="711000" />
     </task>
     <task id="LOCAL-00037" summary="synthesizer + track playing">
       <option name="closed" value="true" />
@@ -638,7 +630,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748106508649</updated>
     </task>
-    <option name="localTasksCounter" value="85" />
+    <task id="LOCAL-00085" summary="inventory slot bug fix">
+      <option name="closed" value="true" />
+      <created>1748120008723</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1748120008723</updated>
+    </task>
+    <option name="localTasksCounter" value="86" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -648,7 +648,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="collision refactor" />
     <MESSAGE value="smooth collision" />
     <MESSAGE value="little camera fix" />
     <MESSAGE value="spawn point Y fix" />
@@ -673,7 +672,8 @@
     <MESSAGE value="basic inventory class" />
     <MESSAGE value="basic inventory UI and error fixes" />
     <MESSAGE value="some menu initialization tweaks" />
-    <option name="LAST_COMMIT_MESSAGE" value="some menu initialization tweaks" />
+    <MESSAGE value="inventory slot bug fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="inventory slot bug fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
