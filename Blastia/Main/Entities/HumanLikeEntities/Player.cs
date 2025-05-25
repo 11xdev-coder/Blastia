@@ -43,6 +43,7 @@ public class Player : HumanLikeEntity
 	public const int InventoryColumns = 9;
 	public const int HotbarSlotsCount = 9;
 	private const int InventoryCapacity = InventoryRows * InventoryColumns;
+	private int _selectedHotbarSlot = -1;
 
 	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
@@ -81,12 +82,14 @@ public class Player : HumanLikeEntity
 	{
 		if (LocallyControlled)
 		{
+			HandleMovement();
+			HandleMouseClicks();
+			
 			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null)
 			{
 				BlastiaGame.PlayerInventoryUiMenu.ToggleFullInventoryDisplay();
 			}
-			HandleMovement();
-			HandleMouseClicks();
+			UpdateHotbarSelection();
 		}
 	}
 
@@ -176,6 +179,54 @@ public class Player : HumanLikeEntity
 			Position.X - effectiveViewWidth * 0.5f,
 			Position.Y - effectiveViewHeight * 0.5f
 		);
+	}
+
+	private void UpdateHotbarSelection()
+	{
+		if (BlastiaGame.PlayerInventoryUiMenu == null) return;
+		
+		Keys[] hotbarKeys = 
+		{
+			Keys.D1, Keys.D2, Keys.D3,
+			Keys.D4, Keys.D5, Keys.D6,
+			Keys.D7, Keys.D8, Keys.D9
+		};
+
+		for (int i = 0; i < hotbarKeys.Length; i++)
+		{
+			if (KeyboardHelper.IsKeyJustPressed(hotbarKeys[i]))
+			{
+				_selectedHotbarSlot = i;
+				return;
+			}
+		}
+		
+		// scroll wheel
+		var scrollDelta = BlastiaGame.ScrollWheelDelta;
+
+		if (scrollDelta != 0)
+		{
+			var hotbarSlots = BlastiaGame.PlayerInventoryUiMenu.HotbarSlotsCount;
+
+			if (scrollDelta < 0)
+			{
+				_selectedHotbarSlot += 1;
+				if (_selectedHotbarSlot >= hotbarSlots)
+				{
+					_selectedHotbarSlot = 0;
+				}
+			}
+			else if (scrollDelta > 0)
+			{
+				_selectedHotbarSlot -= 1;
+				if (_selectedHotbarSlot <= -1)
+				{
+					_selectedHotbarSlot = hotbarSlots - 1;
+				}
+			}
+		}
+		
+		BlastiaGame.PlayerInventoryUiMenu.SetSelectedHotbarSlotIndex(_selectedHotbarSlot);
 	}
 
 	/// <summary>

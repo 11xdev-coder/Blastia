@@ -18,7 +18,7 @@ public class InventoryUi : Menu
     
     // hotbar
     public int HotbarSlotsCount { get; private set; }
-    private int _selectedHotbarSlotIndex = 3;
+    private int _selectedHotbarSlotIndex = -1;
     
     /// <summary>
     /// True, if the full inventory (extra rows below the hotbar) is open.
@@ -177,7 +177,7 @@ public class InventoryUi : Menu
             // always draw hotbar slots
             if (isHotbarSlot)
             {
-                slotToDraw.IsSelected = i+1 == _selectedHotbarSlotIndex;
+                slotToDraw.IsSelected = i == _selectedHotbarSlotIndex;
                 slotToDraw.Draw(spriteBatch);
             }
             else if (IsFullInventoryOpen) // main inv slots only if inv is opened
