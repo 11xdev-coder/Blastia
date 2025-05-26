@@ -4,6 +4,7 @@ public class Inventory
 {
     public List<ItemInstance?> Items { get; private set; }
     public int Capacity { get; private set; }
+    public ItemInstance? CursorItem { get; private set; }
 
     public Inventory(int capacity)
     {
@@ -15,6 +16,10 @@ public class Inventory
     /// <c>int:</c> slot index; <c>ItemInstance:</c> new item (or null)
     /// </summary>
     public Action<int, ItemInstance?>? OnSlotChanged;
+    /// <summary>
+    ///  <c>ItemInstance:</c> new item (or null). Called whenever <c>CursorItem</c> is changed
+    /// </summary>
+    public Action<ItemInstance?>? OnCursorItemChanged;
 
     /// <summary>
     /// 
@@ -99,6 +104,15 @@ public class Inventory
         OnSlotChanged?.Invoke(slotIndex, item);
     }
 
+    public void SetCursorItem(ItemInstance? item)
+    {
+        if (CursorItem != item)
+        {
+            CursorItem = item;
+            OnCursorItemChanged?.Invoke(item);
+        }    
+    }
+    
     public void SwapItems(int slotIndexA, int slotIndexB)
     {
         if (slotIndexA < 0 || slotIndexA >= Capacity || slotIndexB < 0 || slotIndexB >= Capacity) return;

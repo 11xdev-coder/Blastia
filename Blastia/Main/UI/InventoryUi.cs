@@ -15,6 +15,7 @@ public class InventoryUi : Menu
     private Vector2 _slotSize;
     private Vector2 _slotSpacing;
     private Vector2 _gridStartPosition;
+    private readonly Vector2 _slotIconScale = new(1.9f, 1.9f);
     
     // hotbar
     public int HotbarSlotsCount { get; private set; }
@@ -28,6 +29,9 @@ public class InventoryUi : Menu
 
     private Texture2D _slotBackgroundTexture;
     private Texture2D? _slotHighlightedTexture;
+    
+    // cursor item
+    private Image _cursorItemImage;
     
     /// <summary>
     /// 
@@ -59,7 +63,10 @@ public class InventoryUi : Menu
         _slotHighlightedTexture = slotHighlightTexture;
         
         _playerInventory.OnSlotChanged += OnInventorySlotUpdated;
+        _playerInventory.OnCursorItemChanged += OnCursorItemChanged;
         IsFullInventoryOpen = isFullyOpened;
+
+        _cursorItemImage = new Image(Vector2.Zero, BlastiaGame.InvisibleTexture);
         
         InitializeSlots();
     }
@@ -74,6 +81,18 @@ public class InventoryUi : Menu
         IsFullInventoryOpen = !IsFullInventoryOpen;
         // ensure whole inventory is active
         Active = true;
+    }
+
+    public void OnCursorItemChanged(ItemInstance? item)
+    {
+        if (item != null && item.Amount > 0)
+        {
+            _cursorItemImage.Texture = item.Icon;
+        }
+        else
+        {
+            _cursorItemImage.Texture = BlastiaGame.InvisibleTexture;
+        }
     }
     
     protected override void AddElements()
@@ -109,7 +128,7 @@ public class InventoryUi : Menu
                     new InventorySlot(slotPosition, Font, _slotBackgroundTexture, _slotHighlightedTexture, slotIndex)
                     {
                         Scale = _slotSize,
-                        IconScale = new Vector2(1.9f, 1.9f)
+                        IconScale = _slotIconScale
                     };
                 
                 // set initial item
@@ -132,8 +151,8 @@ public class InventoryUi : Menu
 
     private void HandleSlotClick(int slotIndex)
     {
-        // TODO: drag and drop
-        
+        var itemInClickedSlot = _playerInventory.GetItemAt(slotIndex);
+        _playerInventory.SetCursorItem(itemInClickedSlot);
     }
 
     private void OnInventorySlotUpdated(int slotIndex, ItemInstance? newItem)
@@ -148,6 +167,17 @@ public class InventoryUi : Menu
     {
         base.OnMenuActive();
         RefreshAllSlots();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (_playerInventory.CursorItem != null)
+        {
+            _cursorItemImage.Position = BlastiaGame.CursorPosition;
+            _cursorItemImage.Scale = _slotIconScale;
+            _cursorItemImage.Update();
+        }
     }
 
     private void RefreshAllSlots()
@@ -184,6 +214,11 @@ public class InventoryUi : Menu
             {
                 slotToDraw.Draw(spriteBatch);
             }
+        }
+
+        if (_playerInventory.CursorItem != null)
+        {
+            _cursorItemImage.Draw(spriteBatch);
         }
     }
 }
