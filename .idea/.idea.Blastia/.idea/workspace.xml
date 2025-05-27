@@ -8,20 +8,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Items/Apple.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/ItemId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/ItemId.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/UIElement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/items.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/items.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
@@ -246,15 +239,7 @@
       <workItem from="1748085839254" duration="9898000" />
       <workItem from="1748163150830" duration="16605000" />
       <workItem from="1748259174332" duration="5684000" />
-      <workItem from="1748345184967" duration="4881000" />
-    </task>
-    <task id="LOCAL-00043" summary="simple bit crusher and more customization">
-      <option name="closed" value="true" />
-      <created>1742232731926</created>
-      <option name="number" value="00043" />
-      <option name="presentableId" value="LOCAL-00043" />
-      <option name="project" value="LOCAL" />
-      <updated>1742232731926</updated>
+      <workItem from="1748345184967" duration="7609000" />
     </task>
     <task id="LOCAL-00044" summary="improved bit crusher">
       <option name="closed" value="true" />
@@ -640,7 +625,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748288497587</updated>
     </task>
-    <option name="localTasksCounter" value="92" />
+    <task id="LOCAL-00092" summary="basic left click functionality">
+      <option name="closed" value="true" />
+      <created>1748366042061</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1748366042061</updated>
+    </task>
+    <option name="localTasksCounter" value="93" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -650,7 +643,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="movement tweaks" />
     <MESSAGE value="fixed ground detection" />
     <MESSAGE value="entity horizontal flipping" />
     <MESSAGE value="walking animations" />
@@ -675,7 +667,8 @@
     <MESSAGE value="slot highlighted texture" />
     <MESSAGE value="hotbar slot selection" />
     <MESSAGE value="cursor item" />
-    <option name="LAST_COMMIT_MESSAGE" value="cursor item" />
+    <MESSAGE value="basic left click functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic left click functionality" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

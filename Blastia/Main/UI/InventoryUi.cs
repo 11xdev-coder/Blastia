@@ -32,6 +32,7 @@ public class InventoryUi : Menu
     
     // cursor item
     private Image _cursorItemImage;
+    private Text _cursorItemAmountText;
     
     /// <summary>
     /// 
@@ -67,6 +68,7 @@ public class InventoryUi : Menu
         IsFullInventoryOpen = isFullyOpened;
 
         _cursorItemImage = new Image(Vector2.Zero, BlastiaGame.InvisibleTexture);
+        _cursorItemAmountText = new Text(Vector2.Zero, "", font);
         
         InitializeSlots();
     }
@@ -88,10 +90,12 @@ public class InventoryUi : Menu
         if (item != null && item.Amount > 0)
         {
             _cursorItemImage.Texture = item.Icon;
+            _cursorItemAmountText.Text = item.Amount.ToString();
         }
         else
         {
             _cursorItemImage.Texture = BlastiaGame.InvisibleTexture;
+            _cursorItemAmountText.Text = "";
         }
     }
     
@@ -206,6 +210,10 @@ public class InventoryUi : Menu
             _cursorItemImage.Position = BlastiaGame.CursorPosition + new Vector2(35, 20);
             _cursorItemImage.Scale = _slotIconScale;
             _cursorItemImage.Update();
+            
+            _cursorItemAmountText.Position = BlastiaGame.CursorPosition + new Vector2(35, 20) + _slotIconScale + new Vector2(10, 5);
+            _cursorItemAmountText.Text = _playerInventory.CursorItem.Amount.ToString();
+            _cursorItemAmountText.Update();
         }
     }
 
@@ -248,6 +256,7 @@ public class InventoryUi : Menu
         if (_playerInventory.CursorItem != null)
         {
             _cursorItemImage.Draw(spriteBatch);
+            _cursorItemAmountText.Draw(spriteBatch);
         }
     }
 }
