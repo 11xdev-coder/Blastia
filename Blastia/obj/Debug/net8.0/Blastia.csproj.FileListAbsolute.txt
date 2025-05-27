@@ -174,3 +174,4 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Data\items.json
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\IronSword.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SlotBackground.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SlotHighlighted.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\Apple.png

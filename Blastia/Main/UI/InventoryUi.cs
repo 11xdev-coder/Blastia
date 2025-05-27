@@ -137,6 +137,7 @@ public class InventoryUi : Menu
                 // handle slot clicks
                 var currentSlotId = slotIndex;
                 inventorySlotUi.OnClick = () => HandleSlotClick(currentSlotId);
+                inventorySlotUi.OnRightClick = () => HandleSlotRightClick(currentSlotId);
                 
                 _inventorySlotsUi.Add(inventorySlotUi);
                 Elements.Add(inventorySlotUi);
@@ -151,8 +152,36 @@ public class InventoryUi : Menu
 
     private void HandleSlotClick(int slotIndex)
     {
+        if (!IsFullInventoryOpen) return;
+        
         var itemInClickedSlot = _playerInventory.GetItemAt(slotIndex);
         _playerInventory.SetCursorItem(itemInClickedSlot);
+    }
+
+    private void HandleSlotRightClick(int slotIndex)
+    {
+        if (!IsFullInventoryOpen) return;
+        
+        // put 1 item of items in slot to CursorItem
+        var itemInClickedSlot = _playerInventory.GetItemAt(slotIndex);
+        if (itemInClickedSlot == null) return;
+
+        if (_playerInventory.CursorItem == null) // if cursor item empty
+        {
+            // remove 1 and set item
+            _playerInventory.RemoveItem(slotIndex);
+            _playerInventory.SetCursorItem(new ItemInstance(itemInClickedSlot.BaseItem));
+        }
+        else if (itemInClickedSlot.BaseItem == _playerInventory.CursorItem.BaseItem) // if same item is in cursor
+        {
+            if (_playerInventory.CursorItem.Amount < _playerInventory.CursorItem.MaxStack)
+            {
+                // remove 1
+                _playerInventory.RemoveItem(slotIndex);
+                // add 1 to cursor slot
+                _playerInventory.CursorItem.Amount += 1;
+            }
+        }
     }
 
     private void OnInventorySlotUpdated(int slotIndex, ItemInstance? newItem)
@@ -174,7 +203,7 @@ public class InventoryUi : Menu
         base.Update();
         if (_playerInventory.CursorItem != null)
         {
-            _cursorItemImage.Position = BlastiaGame.CursorPosition;
+            _cursorItemImage.Position = BlastiaGame.CursorPosition + new Vector2(35, 20);
             _cursorItemImage.Scale = _slotIconScale;
             _cursorItemImage.Update();
         }

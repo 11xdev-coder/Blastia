@@ -90,6 +90,10 @@ public abstract class UIElement
     /// Called once when LMB is released while hovered
     /// </summary>
     public Action? OnClick { get; set; }
+    /// <summary>
+    /// Called once when RMB is released while hovered
+    /// </summary>
+    public Action? OnRightClick { get; set; }
 
     /// <summary>
     /// If clicked on this element -> focused; otherwise if clicked somewhere else -> unfocused
@@ -231,7 +235,8 @@ public abstract class UIElement
     {
         int cursorX = (int)BlastiaGame.CursorPosition.X;
         int cursorY = (int)BlastiaGame.CursorPosition.Y;
-        bool hasClicked = BlastiaGame.HasClickedLeft;
+        bool hasClickedLeft = BlastiaGame.HasClickedLeft;
+        bool hasClickedRight = BlastiaGame.HasClickedRight;
         bool isHoldingLeft = BlastiaGame.IsHoldingLeft;
         IsHovered = Bounds.Contains(cursorX, cursorY);
     
@@ -247,12 +252,18 @@ public abstract class UIElement
                 break;
         }
 
-        if (IsHovered && hasClicked) // focus + click
+        if (IsHovered && hasClickedLeft) // focus + click
         {
             OnFocus();
             OnClick?.Invoke();
         }
-        if (hasClicked && !IsHovered && IsFocused) OnUnfocus(); // if clicked, not hovered and was focused -> unfocus
+        if (hasClickedLeft && !IsHovered && IsFocused) OnUnfocus(); // if clicked, not hovered and was focused -> unfocus
+
+        if (IsHovered && hasClickedRight) // focus + right click
+        {
+            OnFocus();
+            OnRightClick?.Invoke();
+        }
         
         Drag(isHoldingLeft);
         ProcessAlpha();

@@ -558,6 +558,7 @@ public class BlastiaGame : Game
 		}
 
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 2);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
 	}
 
 	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
