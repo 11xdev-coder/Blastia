@@ -159,7 +159,24 @@ public class InventoryUi : Menu
         if (!IsFullInventoryOpen) return;
         
         var itemInClickedSlot = _playerInventory.GetItemAt(slotIndex);
-        _playerInventory.SetCursorItem(itemInClickedSlot);
+        if (itemInClickedSlot == null && _playerInventory.CursorItem == null) return;
+        
+        if (itemInClickedSlot == null && _playerInventory.CursorItem != null) // put item from cursor to an empty slot
+        {
+            _playerInventory.SetItemAt(slotIndex, _playerInventory.CursorItem);
+            _playerInventory.SetCursorItem(null);
+        }
+        else if (itemInClickedSlot != null && _playerInventory.CursorItem == null) // put item from slot to cursor
+        {
+            _playerInventory.SetCursorItem(itemInClickedSlot);
+            _playerInventory.SetItemAt(slotIndex, null);
+        }
+        else if (itemInClickedSlot != null && _playerInventory.CursorItem != null) // swap items
+        {
+            var tempCursorItem = _playerInventory.CursorItem;
+            _playerInventory.SetCursorItem(itemInClickedSlot);
+            _playerInventory.SetItemAt(slotIndex, tempCursorItem);
+        }
     }
 
     private void HandleSlotRightClick(int slotIndex)

@@ -239,15 +239,8 @@
       <workItem from="1748085839254" duration="9898000" />
       <workItem from="1748163150830" duration="16605000" />
       <workItem from="1748259174332" duration="5684000" />
-      <workItem from="1748345184967" duration="7609000" />
-    </task>
-    <task id="LOCAL-00044" summary="improved bit crusher">
-      <option name="closed" value="true" />
-      <created>1742235717779</created>
-      <option name="number" value="00044" />
-      <option name="presentableId" value="LOCAL-00044" />
-      <option name="project" value="LOCAL" />
-      <updated>1742235717779</updated>
+      <workItem from="1748345184967" duration="7655000" />
+      <workItem from="1748436242681" duration="5540000" />
     </task>
     <task id="LOCAL-00045" summary="tooltips + distortion">
       <option name="closed" value="true" />
@@ -633,7 +626,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748366042061</updated>
     </task>
-    <option name="localTasksCounter" value="93" />
+    <task id="LOCAL-00093" summary="cursor item amount text">
+      <option name="closed" value="true" />
+      <created>1748375001951</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1748375001951</updated>
+    </task>
+    <option name="localTasksCounter" value="94" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -643,7 +644,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fixed ground detection" />
     <MESSAGE value="entity horizontal flipping" />
     <MESSAGE value="walking animations" />
     <MESSAGE value="tuned gravity and jump height" />
@@ -668,7 +668,8 @@
     <MESSAGE value="hotbar slot selection" />
     <MESSAGE value="cursor item" />
     <MESSAGE value="basic left click functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="basic left click functionality" />
+    <MESSAGE value="cursor item amount text" />
+    <option name="LAST_COMMIT_MESSAGE" value="cursor item amount text" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
