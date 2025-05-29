@@ -240,15 +240,9 @@
       <workItem from="1748163150830" duration="16605000" />
       <workItem from="1748259174332" duration="5684000" />
       <workItem from="1748345184967" duration="7655000" />
-      <workItem from="1748436242681" duration="5540000" />
-    </task>
-    <task id="LOCAL-00045" summary="tooltips + distortion">
-      <option name="closed" value="true" />
-      <created>1742328117211</created>
-      <option name="number" value="00045" />
-      <option name="presentableId" value="LOCAL-00045" />
-      <option name="project" value="LOCAL" />
-      <updated>1742328117211</updated>
+      <workItem from="1748436242681" duration="6549000" />
+      <workItem from="1748522406511" duration="840000" />
+      <workItem from="1748538392413" duration="3544000" />
     </task>
     <task id="LOCAL-00046" summary="improved distortion + setting sliders">
       <option name="closed" value="true" />
@@ -634,7 +628,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748375001951</updated>
     </task>
-    <option name="localTasksCounter" value="94" />
+    <task id="LOCAL-00094" summary="taking swapping and putting cursor item">
+      <option name="closed" value="true" />
+      <created>1748457839402</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1748457839403</updated>
+    </task>
+    <option name="localTasksCounter" value="95" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -644,7 +646,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="entity horizontal flipping" />
     <MESSAGE value="walking animations" />
     <MESSAGE value="tuned gravity and jump height" />
     <MESSAGE value="jump charge" />
@@ -669,7 +670,8 @@
     <MESSAGE value="cursor item" />
     <MESSAGE value="basic left click functionality" />
     <MESSAGE value="cursor item amount text" />
-    <option name="LAST_COMMIT_MESSAGE" value="cursor item amount text" />
+    <MESSAGE value="taking swapping and putting cursor item" />
+    <option name="LAST_COMMIT_MESSAGE" value="taking swapping and putting cursor item" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

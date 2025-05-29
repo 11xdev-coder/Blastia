@@ -171,11 +171,35 @@ public class InventoryUi : Menu
             _playerInventory.SetCursorItem(itemInClickedSlot);
             _playerInventory.SetItemAt(slotIndex, null);
         }
-        else if (itemInClickedSlot != null && _playerInventory.CursorItem != null) // swap items
+        else if (itemInClickedSlot != null && _playerInventory.CursorItem != null)
         {
-            var tempCursorItem = _playerInventory.CursorItem;
-            _playerInventory.SetCursorItem(itemInClickedSlot);
-            _playerInventory.SetItemAt(slotIndex, tempCursorItem);
+            if (itemInClickedSlot.BaseItem == _playerInventory.CursorItem.BaseItem) // add items from cursor to max stack
+            {
+                var canAdd = itemInClickedSlot.MaxStack - itemInClickedSlot.Amount;
+                if (canAdd > 0)
+                {
+                    var toAdd = Math.Min(canAdd, _playerInventory.CursorItem.Amount);
+                    
+                    // update item in slot
+                    itemInClickedSlot.Amount += toAdd;
+                    _playerInventory.SetItemAt(slotIndex, new ItemInstance(itemInClickedSlot.BaseItem, itemInClickedSlot.Amount));
+                    // update cursor item
+                    _playerInventory.CursorItem.Amount -= toAdd;
+                    
+                    // remove if empty
+                    if (_playerInventory.CursorItem.Amount <= 0)
+                    {
+                        _playerInventory.SetCursorItem(null);
+                    }
+                }
+            }
+            else  // swap items
+            {
+                var tempCursorItem = _playerInventory.CursorItem;
+                _playerInventory.SetCursorItem(itemInClickedSlot);
+                _playerInventory.SetItemAt(slotIndex, tempCursorItem);
+            }
+            
         }
     }
 
