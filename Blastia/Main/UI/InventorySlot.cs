@@ -87,8 +87,8 @@ public class InventorySlot : UIElement
 
         if (_itemIcon != null && _itemIcon.Texture != null)
         {
-            var halfIconWidth = _itemIcon.Texture.Width * 0.5f;
-            var halfIconHeight = _itemIcon.Texture.Height * 0.5f;
+            var halfIconWidth = _itemIcon.Texture.Width * 0.5f * IconScale.X;
+            var halfIconHeight = _itemIcon.Texture.Height * 0.5f * IconScale.Y;
             
             _itemIcon.Position = new Vector2(Bounds.Center.X - halfIconWidth, Bounds.Center.Y - halfIconHeight);
             _itemIcon.Scale = IconScale;

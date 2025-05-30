@@ -343,6 +343,9 @@ public abstract class UIElement
     /// <param name="height">The height for the bounding rectangle.</param>
     protected void UpdateBoundsBase(float width, float height)
     {
+        var scaledWidth = width * Scale.X;
+        var scaledHeight = height * Scale.Y;
+        
         var hAlign = GetHAlign();
         var vAlign = GetVAlign();
         
@@ -354,15 +357,15 @@ public abstract class UIElement
 
         if (hAlign > 0)
         {
-            positionX += (int)((targetResX * hAlign) - (width * hAlign));
+            positionX += (int)((targetResX * hAlign) - (scaledWidth * hAlign));
         }
 
         if (vAlign > 0)
         {
-            positionY += (int)((targetResY * vAlign) - (height * vAlign));
+            positionY += (int)((targetResY * vAlign) - (scaledHeight * vAlign));
         }
 
-        Bounds = new Rectangle(positionX, positionY, (int)width, (int)height);
+        Bounds = new Rectangle(positionX, positionY, (int)scaledWidth, (int)scaledHeight);
     }
     
     /// <summary>
