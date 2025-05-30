@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Items;
+﻿using Blastia.Main.Entities;
+using Blastia.Main.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -229,6 +230,15 @@ public class InventoryUi : Menu
         }
     }
 
+    private void HandleItemDrop()
+    {
+        var droppedItem = new DroppedItem(new Vector2(100, 100), 1.5f);
+
+        if (_playerInventory.CursorItem == null) return;
+        droppedItem.SetItem(_playerInventory.CursorItem.BaseItem);
+        BlastiaGame.RequestAddEntity(droppedItem);
+    }
+
     private void OnInventorySlotUpdated(int slotIndex, ItemInstance? newItem)
     {
         if (slotIndex >= 0 && slotIndex < _inventorySlotsUi.Count)
@@ -252,9 +262,27 @@ public class InventoryUi : Menu
             _cursorItemImage.Scale = _slotIconScale;
             _cursorItemImage.Update();
             
-            _cursorItemAmountText.Position = BlastiaGame.CursorPosition + new Vector2(35, 20) + _slotIconScale + new Vector2(10, 5);
+            _cursorItemAmountText.Position = BlastiaGame.CursorPosition + new Vector2(35, 20) + _slotIconScale + new Vector2(15, 10);
             _cursorItemAmountText.Text = _playerInventory.CursorItem.Amount.ToString();
             _cursorItemAmountText.Update();
+        }
+
+        if (Active && _playerInventory.CursorItem != null && BlastiaGame.HasClickedLeft)
+        {
+            bool clickedOnSlot = false;
+            foreach (var slot in _inventorySlotsUi)
+            {
+                if (slot.IsHovered)
+                {
+                    clickedOnSlot = true;
+                    break;
+                }
+            }
+
+            if (!clickedOnSlot)
+            {
+                HandleItemDrop();
+            }
         }
     }
 

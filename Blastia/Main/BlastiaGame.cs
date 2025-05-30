@@ -108,6 +108,7 @@ public class BlastiaGame : Game
 	/// Event to request world initialization 
 	/// </summary>
 	private static event Action? RequestWorldInitializationEvent;
+	private static event Action<Entity>? RequestAddEntityEvent;
 	private static event Action? RequestWorldUnloadEvent;
 	/// <summary>
 	/// Event to request creation of DebugPoint entity for one frame
@@ -168,6 +169,7 @@ public class BlastiaGame : Game
 		ResolutionRequestEvent += UpdateResolution;
 		RequestWorldInitializationEvent += InitializeWorld;
 		RequestWorldUnloadEvent += UnloadWorld;
+		RequestAddEntityEvent += AddEntity;
 		RequestDebugPointDrawEvent += DrawDebugPoint;
 		
 		_pixelatedSamplerState = new SamplerState
@@ -560,7 +562,7 @@ public class BlastiaGame : Game
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 2);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
 	}
-
+	
 	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
 	private void UnloadWorld()
 	{
@@ -575,6 +577,12 @@ public class BlastiaGame : Game
 		if (PlayerInventoryUiMenu != null) PlayerInventoryUiMenu.Active = false;
 		_myPlayer = null;
 		_entities.Clear();
+	}
+
+	public static void RequestAddEntity(Entity entity) => RequestAddEntityEvent?.Invoke(entity);
+	private void AddEntity(Entity entity)
+	{
+		_entities.Add(entity);
 	}
 
 	// DRAW DEBUG POINT
