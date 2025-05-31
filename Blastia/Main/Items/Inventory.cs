@@ -1,13 +1,17 @@
-﻿namespace Blastia.Main.Items;
+﻿using Blastia.Main.Entities.HumanLikeEntities;
+
+namespace Blastia.Main.Items;
 
 public class Inventory
 {
+    public Player Player { get; set; }
     public List<ItemInstance?> Items { get; private set; }
     public int Capacity { get; private set; }
     public ItemInstance? CursorItem { get; private set; }
 
-    public Inventory(int capacity)
+    public Inventory(int capacity, Player player)
     {
+        Player = player;
         Capacity = capacity;
         Items = new(new ItemInstance?[Capacity]);
     }

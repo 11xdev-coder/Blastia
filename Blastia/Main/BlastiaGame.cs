@@ -563,6 +563,7 @@ public class BlastiaGame : Game
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
 	}
 	
+	// WORLD UNLOADING
 	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
 	private void UnloadWorld()
 	{
@@ -579,6 +580,7 @@ public class BlastiaGame : Game
 		_entities.Clear();
 	}
 
+	// ADD ENTITY
 	public static void RequestAddEntity(Entity entity) => RequestAddEntityEvent?.Invoke(entity);
 	private void AddEntity(Entity entity)
 	{

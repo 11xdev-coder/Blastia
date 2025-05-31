@@ -28,8 +28,8 @@ public class Player : HumanLikeEntity
 	public Camera? Camera { get; set; }
 
 	protected override bool ApplyGravity => true;
-	protected override int Height => 2;
-	protected override int Width => 1;
+	public override int Height => 2;
+	public override int Width => 1;
 	protected override float Mass => 46f;
 	
 	private const float MinJumpVelocity = 200f;
@@ -50,7 +50,7 @@ public class Player : HumanLikeEntity
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
 			new Vector2(10, 21))
 	{
-		PlayerInventory = new Inventory(InventoryCapacity);
+		PlayerInventory = new Inventory(InventoryCapacity, this);
 		LocallyControlled = myPlayer;
 		
 		if (myPlayer)

@@ -232,9 +232,20 @@ public class InventoryUi : Menu
 
     private void HandleItemDrop()
     {
-        var droppedItem = new DroppedItem(new Vector2(100, 100), 1.5f);
-
         if (_playerInventory.CursorItem == null) return;
+        var iconScale = 0.5f;
+        
+        var playerHalfWidth = _playerInventory.Player.Width * 0.5f;
+        var playerHalfHeight = _playerInventory.Player.Height * 0.5f;
+        
+        var itemIconHalfWidth = _playerInventory.CursorItem.Icon.Width * 0.5f * iconScale;
+        var itemIconHalfHeight = _playerInventory.CursorItem.Icon.Height * 0.5f * iconScale;
+        
+        var posX = _playerInventory.Player.Position.X - playerHalfWidth - itemIconHalfWidth;
+        var posY = _playerInventory.Player.Position.Y - playerHalfHeight - itemIconHalfHeight;
+        var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale);
+
+        
         droppedItem.SetItem(_playerInventory.CursorItem.BaseItem);
         BlastiaGame.RequestAddEntity(droppedItem);
     }
@@ -267,6 +278,7 @@ public class InventoryUi : Menu
             _cursorItemAmountText.Update();
         }
 
+        // check if clicked NOT on a slot
         if (Active && _playerInventory.CursorItem != null && BlastiaGame.HasClickedLeft)
         {
             bool clickedOnSlot = false;

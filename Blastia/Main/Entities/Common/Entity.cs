@@ -58,11 +58,11 @@ public abstract class Entity : Object
     /// <summary>
     /// Entity height in blocks
     /// </summary>
-    protected virtual int Height { get; set; }
+    public virtual int Height { get; set; }
     /// <summary>
     /// Entity width in blocks
     /// </summary>
-    protected virtual int Width { get; set; }
+    public virtual int Width { get; set; }
 
     protected virtual ushort ID { get; set; }
     
