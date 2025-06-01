@@ -237,16 +237,16 @@ public class InventoryUi : Menu
         
         var playerHalfWidth = _playerInventory.Player.Width * 0.5f;
         var playerHalfHeight = _playerInventory.Player.Height * 0.5f;
+        var direction = _playerInventory.Player.SpriteDirection;
         
         var itemIconHalfWidth = _playerInventory.CursorItem.Icon.Width * 0.5f * iconScale;
         var itemIconHalfHeight = _playerInventory.CursorItem.Icon.Height * 0.5f * iconScale;
         
         var posX = _playerInventory.Player.Position.X - playerHalfWidth - itemIconHalfWidth;
         var posY = _playerInventory.Player.Position.Y - playerHalfHeight - itemIconHalfHeight;
-        var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale);
-
         
-        droppedItem.SetItem(_playerInventory.CursorItem.BaseItem);
+        var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale);
+        droppedItem.Launch(_playerInventory.CursorItem.BaseItem, (int) direction);
         BlastiaGame.RequestAddEntity(droppedItem);
     }
 

@@ -9,10 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/Inventory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/Inventory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/DroppedItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/DroppedItem.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
@@ -251,15 +248,9 @@
       <workItem from="1748593779154" duration="7433000" />
       <workItem from="1748621681767" duration="9718000" />
       <workItem from="1748685547585" duration="578000" />
-      <workItem from="1748687699434" duration="3080000" />
-    </task>
-    <task id="LOCAL-00049" summary="arpeggio generation">
-      <option name="closed" value="true" />
-      <created>1742850822649</created>
-      <option name="number" value="00049" />
-      <option name="presentableId" value="LOCAL-00049" />
-      <option name="project" value="LOCAL" />
-      <updated>1742850822649</updated>
+      <workItem from="1748687699434" duration="6114000" />
+      <workItem from="1748701268898" duration="5062000" />
+      <workItem from="1748769151280" duration="7153000" />
     </task>
     <task id="LOCAL-00050" summary="different note pitches">
       <option name="closed" value="true" />
@@ -645,7 +636,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748630435023</updated>
     </task>
-    <option name="localTasksCounter" value="98" />
+    <task id="LOCAL-00098" summary="item drop position fix">
+      <option name="closed" value="true" />
+      <created>1748695666058</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1748695666058</updated>
+    </task>
+    <option name="localTasksCounter" value="99" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -655,7 +654,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="less strict can jump check" />
     <MESSAGE value="acceleration and movement fixes" />
     <MESSAGE value="simple block placement" />
     <MESSAGE value="block removing" />
@@ -680,7 +678,8 @@
     <MESSAGE value="add same item from cursor" />
     <MESSAGE value="ui element bounds scale fix" />
     <MESSAGE value="simple dropped item drawing" />
-    <option name="LAST_COMMIT_MESSAGE" value="simple dropped item drawing" />
+    <MESSAGE value="item drop position fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="item drop position fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
