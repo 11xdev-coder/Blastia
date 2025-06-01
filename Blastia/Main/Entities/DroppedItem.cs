@@ -16,6 +16,7 @@ public class DroppedItem : Entity
     protected override bool ApplyGravity => true;
     protected override float Mass => 6;
     protected override float FrictionMultiplier => 0.3f;
+    protected override float Bounciness => 0.5f;
 
     public DroppedItem(Vector2 position, float initialScaleFactor) : base(position, initialScaleFactor)
     {

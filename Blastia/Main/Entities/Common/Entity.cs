@@ -41,6 +41,10 @@ public abstract class Entity : Object
     /// How much friction entity has with surfaces. <c>1.0</c> is normal friction, <c>&lt; 1.0</c> is more slippery
     /// </summary>
     protected virtual float FrictionMultiplier { get; set; } = 1f;
+    /// <summary>
+    /// Bounciness multiplier. <c>0.0</c> is no bounce, <c>1.0</c> is a perfect bounce.
+    /// </summary>
+    protected virtual float Bounciness { get; set; } = 0f;
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
@@ -179,8 +183,12 @@ public abstract class Entity : Object
                 {
                     MovementVector.X = 0f;
                 }
-
-                if (Math.Abs(firstHitNormal.Y) > 0.001f)
+                
+                // bounce
+                MovementVector.Y *= -Bounciness;
+                
+                // kill bounce if too small
+                if (Math.Abs(firstHitNormal.Y) < 1f)
                 {
                     MovementVector.Y = 0f;
                 }

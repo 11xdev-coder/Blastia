@@ -504,7 +504,7 @@ public class BlastiaGame : Game
 		if (worldState == null) return;
 		
 		World = new World(worldState);
-		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.2f, true);
+		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.15f, true);
 		World.SetPlayer(_myPlayer);
 		
 		if (LogoMenu != null) LogoMenu.Active = false;

@@ -23,13 +23,12 @@ public class Player : HumanLikeEntity
 	private const float ArmMaxAngle = 20;
 	private const float LegMaxAngle = 25;
 	private const float WalkingAnimationDuration = 0.4f;
-	private const float JumpHeight = 200f;
 
 	public Camera? Camera { get; set; }
 
 	protected override bool ApplyGravity => true;
-	public override float Height => 2;
-	public override float Width => 1;
+	public override float Height => 1.8f;
+	public override float Width => 0.9f;
 	protected override float Mass => 46f;
 	
 	private const float MinJumpVelocity = 200f;
