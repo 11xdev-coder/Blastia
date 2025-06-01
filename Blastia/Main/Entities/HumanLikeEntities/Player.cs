@@ -28,8 +28,8 @@ public class Player : HumanLikeEntity
 	public Camera? Camera { get; set; }
 
 	protected override bool ApplyGravity => true;
-	public override int Height => 2;
-	public override int Width => 1;
+	public override float Height => 2;
+	public override float Width => 1;
 	protected override float Mass => 46f;
 	
 	private const float MinJumpVelocity = 200f;

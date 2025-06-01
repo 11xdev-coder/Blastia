@@ -58,11 +58,11 @@ public abstract class Entity : Object
     /// <summary>
     /// Entity height in blocks
     /// </summary>
-    public virtual int Height { get; set; }
+    public virtual float Height { get; set; }
     /// <summary>
     /// Entity width in blocks
     /// </summary>
-    public virtual int Width { get; set; }
+    public virtual float Width { get; set; }
 
     protected virtual ushort ID { get; set; }
     
@@ -92,14 +92,14 @@ public abstract class Entity : Object
         UpdateSprite();
     }
 
-    private Rectangle GetBounds()
+    protected Rectangle GetBounds()
     {
         var widthPixels = Width * Block.Size;
         var heightPixels = Height * Block.Size;
         return new Rectangle(
             (int) (Position.X - widthPixels * 0.5f), 
             (int) (Position.Y - heightPixels * 0.5f), 
-            widthPixels, heightPixels);
+            (int) widthPixels, (int) heightPixels);
     }
     
     private void UpdatePosition()

@@ -11,8 +11,8 @@ public class DroppedItem : Entity
     public Item? Item { get; private set; }
     private BodyPart _itemBodyPart;
 
-    public override int Height => 1;
-    public override int Width => 1;
+    public override float Height => 0.85f;
+    public override float Width => 0.85f;
     protected override bool ApplyGravity => true;
     protected override float Mass => 10;
 
@@ -23,12 +23,17 @@ public class DroppedItem : Entity
         _itemBodyPart = new BodyPart(BlastiaGame.InvisibleTexture, Vector2.Zero);
     }
 
-    public void Launch(Item? item, int launchDirection, float horizontalSpeed = 250f, float verticalSpeed = -150f)
+    public void Launch(Item? item, int launchDirection, float horizontalSpeed = 300f, float verticalSpeed = -100f)
     {
         Item = item;
         if (Item == null) return;
+
+        var halfItemIconWidth = Item.Icon.Width * 0.5f;
+        var halfItemIconHeight = Item.Icon.Height * 0.5f;
         
         _itemBodyPart.Image = Item.Icon;
+        _itemBodyPart.RelativePosition = new Vector2(-halfItemIconWidth, -halfItemIconHeight);
+        
         MovementVector = new Vector2(horizontalSpeed * launchDirection, verticalSpeed);
     }
 
