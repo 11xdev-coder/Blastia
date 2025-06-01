@@ -544,7 +544,7 @@ public class BlastiaGame : Game
 	{
 		if (MainFont == null || _myPlayer == null) return;
 		
-		var gridStartPosition = new Vector2(15, 30);
+		var gridStartPosition = new Vector2(15, 45);
 		var slotSize = new Vector2(1.5f);
 		var slotSpacing = new Vector2(5f, 5f);
 

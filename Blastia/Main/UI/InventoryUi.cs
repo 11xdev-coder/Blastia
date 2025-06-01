@@ -21,6 +21,7 @@ public class InventoryUi : Menu
     // hotbar
     public int HotbarSlotsCount { get; private set; }
     private int _selectedHotbarSlotIndex = -1;
+    private Text _selectedItemText;
     
     /// <summary>
     /// True, if the full inventory (extra rows below the hotbar) is open.
@@ -63,7 +64,9 @@ public class InventoryUi : Menu
         _slotSpacing = slotSpacing;
         _slotBackgroundTexture = slotBackgroundTexture;
         _slotHighlightedTexture = slotHighlightTexture;
-        
+
+        _selectedItemText = new Text(Vector2.Zero, "None", font);
+            
         _playerInventory.OnSlotChanged += OnInventorySlotUpdated;
         _playerInventory.OnCursorItemChanged += OnCursorItemChanged;
         IsFullInventoryOpen = isFullyOpened;
@@ -296,6 +299,22 @@ public class InventoryUi : Menu
                 HandleItemDrop();
             }
         }
+        
+        // update selected item text
+        _selectedItemText.Text = _playerInventory.Items[_selectedHotbarSlotIndex] == null 
+            ? "None" 
+            : _playerInventory.Items[_selectedHotbarSlotIndex]?.Name;
+        
+        var totalSlotsWidth = _columns * _slotBackgroundTexture.Width * _slotSize.X;
+        var totalGapsWidth = Math.Max(0, _columns - 1) * _slotSpacing.X;
+        var totalHotbarWidth = totalSlotsWidth + totalGapsWidth;
+        var hotbarCenterX = _gridStartPosition.X + totalHotbarWidth * 0.5f;
+        
+        var textSize = Font.MeasureString(_selectedItemText.Text) * _selectedItemText.Scale;
+        var textPositionX = hotbarCenterX - textSize.X * 0.5f;
+        var textPositionY = _gridStartPosition.Y - textSize.Y - 5;
+        _selectedItemText.Position = new Vector2(textPositionX, textPositionY);
+        _selectedItemText.Update();
     }
 
     private void RefreshAllSlots()
@@ -339,5 +358,6 @@ public class InventoryUi : Menu
             _cursorItemImage.Draw(spriteBatch);
             _cursorItemAmountText.Draw(spriteBatch);
         }
+        _selectedItemText.Draw(spriteBatch);
     }
 }
