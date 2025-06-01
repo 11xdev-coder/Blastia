@@ -14,7 +14,8 @@ public class DroppedItem : Entity
     public override float Height => 0.85f;
     public override float Width => 0.85f;
     protected override bool ApplyGravity => true;
-    protected override float Mass => 10;
+    protected override float Mass => 6;
+    protected override float FrictionMultiplier => 0.3f;
 
     public DroppedItem(Vector2 position, float initialScaleFactor) : base(position, initialScaleFactor)
     {
@@ -23,7 +24,7 @@ public class DroppedItem : Entity
         _itemBodyPart = new BodyPart(BlastiaGame.InvisibleTexture, Vector2.Zero);
     }
 
-    public void Launch(Item? item, int launchDirection, float horizontalSpeed = 300f, float verticalSpeed = -100f)
+    public void Launch(Item? item, int launchDirection, float horizontalSpeed = 150f, float verticalSpeed = -100f)
     {
         Item = item;
         if (Item == null) return;

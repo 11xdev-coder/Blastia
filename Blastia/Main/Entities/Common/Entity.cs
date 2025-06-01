@@ -36,6 +36,11 @@ public abstract class Entity : Object
     protected Vector2 MovementVector;
     protected float MovementSpeed;
     protected float AccelerationFactor;
+    
+    /// <summary>
+    /// How much friction entity has with surfaces. <c>1.0</c> is normal friction, <c>&lt; 1.0</c> is more slippery
+    /// </summary>
+    protected virtual float FrictionMultiplier { get; set; } = 1f;
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
@@ -194,7 +199,7 @@ public abstract class Entity : Object
         var dragCoefficient = IsGrounded
             ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width)
             : Block.AirDragCoefficient;
-        ApplyGroundDrag(dragCoefficient);
+        ApplyGroundDrag(dragCoefficient * FrictionMultiplier);
         
         ApplyGravityForce();
     }
@@ -268,6 +273,12 @@ public abstract class Entity : Object
     {
         if (dragCoefficient > 0 && MovementVector.LengthSquared() > 0.001f)
         {
+            // stop movement when speed is too low
+            if (IsGrounded && Math.Abs(MovementVector.X) < 0.1f)
+            {
+                MovementVector.X = 0f;
+            }
+            
             Vector2 dragForce = -dragCoefficient * MovementVector;
             ApplyForce(dragForce);
         }
