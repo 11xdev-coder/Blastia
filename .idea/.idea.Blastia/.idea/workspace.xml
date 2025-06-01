@@ -9,10 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/DroppedItem.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/DroppedItem.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -253,15 +250,7 @@
       <workItem from="1748685547585" duration="578000" />
       <workItem from="1748687699434" duration="6114000" />
       <workItem from="1748701268898" duration="5062000" />
-      <workItem from="1748769151280" duration="15826000" />
-    </task>
-    <task id="LOCAL-00053" summary="filters">
-      <option name="closed" value="true" />
-      <created>1743020548294</created>
-      <option name="number" value="00053" />
-      <option name="presentableId" value="LOCAL-00053" />
-      <option name="project" value="LOCAL" />
-      <updated>1743020548294</updated>
+      <workItem from="1748769151280" duration="16715000" />
     </task>
     <task id="LOCAL-00054" summary="synthwave arpeggio changes">
       <option name="closed" value="true" />
@@ -647,7 +636,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748798081827</updated>
     </task>
-    <option name="localTasksCounter" value="102" />
+    <task id="LOCAL-00102" summary="bounciness and player hitbox and scale fix">
+      <option name="closed" value="true" />
+      <created>1748810272422</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1748810272422</updated>
+    </task>
+    <option name="localTasksCounter" value="103" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -657,7 +654,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="rule tiles" />
     <MESSAGE value="fixed lag with large worlds" />
     <MESSAGE value="base item class" />
     <MESSAGE value="item json loading" />
@@ -682,7 +678,8 @@
     <MESSAGE value="dropped item velocity" />
     <MESSAGE value="dropped item icon position tweak" />
     <MESSAGE value="friction tweaks and dropped items are more slippery" />
-    <option name="LAST_COMMIT_MESSAGE" value="friction tweaks and dropped items are more slippery" />
+    <MESSAGE value="bounciness and player hitbox and scale fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="bounciness and player hitbox and scale fix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

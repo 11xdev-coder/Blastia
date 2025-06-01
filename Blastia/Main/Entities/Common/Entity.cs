@@ -179,18 +179,27 @@ public abstract class Entity : Object
             {
                 Position += firstHitNormal * 0.0001f;
 
-                if (Math.Abs(firstHitNormal.X) > 0.001f)
+                // horizontal collision
+                if (Math.Abs(firstHitNormal.X) > Math.Abs(firstHitNormal.Y)) 
                 {
                     MovementVector.X = 0f;
                 }
-                
-                // bounce
-                MovementVector.Y *= -Bounciness;
-                
-                // kill bounce if too small
-                if (Math.Abs(firstHitNormal.Y) < 1f)
+                else // vertical
                 {
-                    MovementVector.Y = 0f;
+                    if (firstHitNormal.Y < -0.1f) // hit ground (normal points up)
+                    {
+                        // bounciness
+                        MovementVector.Y *= -Bounciness;
+                        // kill bounce if too small
+                        if (Math.Abs(MovementVector.Y) < 1f) 
+                        {
+                            MovementVector.Y = 0f;
+                        }
+                    }
+                    else if (firstHitNormal.Y > 0.1f) // hit ceiling (normal points down)
+                    {
+                        MovementVector.Y = 0f;
+                    }
                 }
 
                 totalMovement = MovementVector * deltaTime;
@@ -201,9 +210,9 @@ public abstract class Entity : Object
         var strictTileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
         IsGrounded = strictTileIdBelow >= 1;
         
-        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 5f);
+        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 3f);
         CanJump = tileIdBelow >= 1;
-
+        
         var dragCoefficient = IsGrounded
             ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width)
             : Block.AirDragCoefficient;
