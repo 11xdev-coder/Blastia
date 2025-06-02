@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Entities;
+using Blastia.Main.GameState;
 using Blastia.Main.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,6 +10,7 @@ public class InventoryUi : Menu
 {
     private Inventory _playerInventory;
     private List<InventorySlot> _inventorySlotsUi = [];
+    private World _world;
     
     // layout
     private int _rows;
@@ -41,6 +43,7 @@ public class InventoryUi : Menu
     /// </summary>
     /// <param name="font"></param>
     /// <param name="playerInventory">Player's full inventory</param>
+    /// <param name="world"></param>
     /// <param name="hotbarStartPosition">Position for hotbar (first row)</param>
     /// <param name="rows">Total rows</param>
     /// <param name="columns">Total columns</param>
@@ -50,11 +53,12 @@ public class InventoryUi : Menu
     /// <param name="slotHighlightTexture"></param>
     /// <param name="isFullyOpened"></param>
     /// <param name="isActive"></param>
-    public InventoryUi(SpriteFont font, Inventory playerInventory, Vector2 hotbarStartPosition, int rows, int columns,
+    public InventoryUi(SpriteFont font, Inventory playerInventory, World world, Vector2 hotbarStartPosition, int rows, int columns,
         Vector2 slotSize, Vector2 slotSpacing, Texture2D slotBackgroundTexture, Texture2D? slotHighlightTexture = null, 
         bool isFullyOpened = false, bool isActive = false) : base(font, isActive, false)
     {
         _playerInventory = playerInventory;
+        _world = world;
         _gridStartPosition = hotbarStartPosition;
         _rows = rows;
         _columns = columns;
@@ -248,7 +252,7 @@ public class InventoryUi : Menu
         var posX = _playerInventory.Player.Position.X - playerHalfWidth - itemIconHalfWidth;
         var posY = _playerInventory.Player.Position.Y - playerHalfHeight - itemIconHalfHeight;
         
-        var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale);
+        var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale, _world);
         droppedItem.Launch(_playerInventory.CursorItem.BaseItem, _playerInventory.CursorItem.Amount, (int) direction);
         BlastiaGame.RequestAddEntity(droppedItem);
         

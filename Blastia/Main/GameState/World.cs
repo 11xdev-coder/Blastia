@@ -9,7 +9,7 @@ namespace Blastia.Main.GameState;
 public class World
 {
 	private WorldState _state;
-	private Player? _myPlayer;
+	public Player? MyPlayer;
 
 	private bool _rulerMode;
 	public bool RulerMode
@@ -40,11 +40,11 @@ public class World
 	/// <param name="myPlayer"></param>
 	public void SetPlayer(Player myPlayer)
 	{
-		_myPlayer = myPlayer;
-		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
+		MyPlayer = myPlayer;
+		if (MyPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
 		
-		BlastiaGame.RulerMenu.AddHighlight(_rulerStartHighlight, Vector2.Zero, _myPlayer.Camera);
-		BlastiaGame.RulerMenu.AddHighlight(_rulerEndHighlight, Vector2.Zero, _myPlayer.Camera);
+		BlastiaGame.RulerMenu.AddHighlight(_rulerStartHighlight, Vector2.Zero, MyPlayer.Camera);
+		BlastiaGame.RulerMenu.AddHighlight(_rulerEndHighlight, Vector2.Zero, MyPlayer.Camera);
 	}
 
 	private void OnRulerModeUpdated()
@@ -79,10 +79,10 @@ public class World
 	/// <param name="start"></param>
 	public void SetRulerStart(Vector2 start) 
 	{
-		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
+		if (MyPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
 		
 		_rulerStart = start;
-		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerStartHighlight, start, _myPlayer.Camera);
+		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerStartHighlight, start, MyPlayer.Camera);
 	}
 
 	/// <summary>
@@ -91,10 +91,10 @@ public class World
 	/// <param name="end"></param>
 	public void SetRulerEnd(Vector2 end)
 	{
-		if (_myPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
+		if (MyPlayer?.Camera == null || BlastiaGame.RulerMenu == null) return;
 		
 		_rulerEnd = end;
-		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerEndHighlight, end, _myPlayer.Camera);
+		BlastiaGame.RulerMenu.UpdateHighlightPosition(_rulerEndHighlight, end, MyPlayer.Camera);
 	}
 	
 	/// <summary>
@@ -121,7 +121,7 @@ public class World
 	/// </summary>
 	public void DrawRulerLine()
 	{
-		if (BlastiaGame.RulerMenu == null || _myPlayer?.Camera == null) return;
+		if (BlastiaGame.RulerMenu == null || MyPlayer?.Camera == null) return;
 
 		var startX = GetRulerStartRoundedToBlocks().X;
 		var startY = GetRulerStartRoundedToBlocks().Y;
@@ -144,7 +144,7 @@ public class World
 			lastX = startX + xToAdd;
 			var pos = new Vector2(startX + xToAdd, startY);
 			var rulerHighlight = new RulerHighlight();
-			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, _myPlayer.Camera);
+			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, MyPlayer.Camera);
 		}
 		// Y
 		for (var block = 1; block <= blocksY; block++)
@@ -155,7 +155,7 @@ public class World
 			
 			var pos = new Vector2(lastX, startY + yToAdd);
 			var rulerHighlight = new RulerHighlight();
-			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, _myPlayer.Camera);
+			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, MyPlayer.Camera);
 		}
 	}
 

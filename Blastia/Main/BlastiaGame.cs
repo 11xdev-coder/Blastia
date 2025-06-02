@@ -306,7 +306,7 @@ public class BlastiaGame : Game
 			InGameAudioSettingsMenu = new InGameAudioSettingsMenu(MainFont);
 			AddMenu(InGameAudioSettingsMenu);
 			
-			TooltipDisplay = new TooltipDisplay(MainFont, () => GraphicsDevice.Viewport);
+			TooltipDisplay = new TooltipDisplay(MainFont);
 		}
 		catch (Exception ex)
 		{
@@ -337,7 +337,7 @@ public class BlastiaGame : Game
 
 			UpdateMouseState();
 			UpdateKeyboardState();
-			TooltipDisplay?.Update();
+			TooltipDisplay?.BeginFrame();
 
 			if (IsWorldInitialized)
 			{
@@ -388,6 +388,8 @@ public class BlastiaGame : Game
 				_menusToAdd.Clear();
 			}
 
+			TooltipDisplay?.Update();
+			
 			// update previous states in the end
 			UpdatePreviousStates();
 		}
@@ -551,7 +553,7 @@ public class BlastiaGame : Game
 	/// </summary>
 	private void InitializePlayerInventory()
 	{
-		if (MainFont == null || _myPlayer == null) return;
+		if (MainFont == null || _myPlayer == null || World == null) return;
 		
 		var gridStartPosition = new Vector2(15, 45);
 		var slotSize = new Vector2(1.5f);
@@ -559,7 +561,7 @@ public class BlastiaGame : Game
 
 		if (PlayerInventoryUiMenu == null)
 		{
-			PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, gridStartPosition, Player.InventoryRows, 
+			PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, World, gridStartPosition, Player.InventoryRows, 
 				Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, SlotHighlightedTexture, false, true);
 			AddMenu(PlayerInventoryUiMenu);
 		}
