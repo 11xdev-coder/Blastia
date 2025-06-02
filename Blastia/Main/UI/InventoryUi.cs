@@ -249,8 +249,11 @@ public class InventoryUi : Menu
         var posY = _playerInventory.Player.Position.Y - playerHalfHeight - itemIconHalfHeight;
         
         var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale);
-        droppedItem.Launch(_playerInventory.CursorItem.BaseItem, (int) direction);
+        droppedItem.Launch(_playerInventory.CursorItem.BaseItem, _playerInventory.CursorItem.Amount, (int) direction);
         BlastiaGame.RequestAddEntity(droppedItem);
+        
+        // clear cursor item
+        _playerInventory.SetCursorItem(null);
     }
 
     private void OnInventorySlotUpdated(int slotIndex, ItemInstance? newItem)

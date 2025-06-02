@@ -136,6 +136,11 @@ public class BlastiaGame : Game
 	public ushort PlayerLimit = 128;
 	private bool IsWorldInitialized { get; set; }
 	
+	/// <summary>
+	/// Used for showing tooltips under the cursor
+	/// </summary>
+	public static TooltipDisplay? TooltipDisplay { get; private set; }
+	
 	public BlastiaGame()
 	{
 		_crashLogPath = Path.Combine(Paths.GetSaveGameDirectory(), CrashLogFileName);
@@ -300,6 +305,8 @@ public class BlastiaGame : Game
 			
 			InGameAudioSettingsMenu = new InGameAudioSettingsMenu(MainFont);
 			AddMenu(InGameAudioSettingsMenu);
+			
+			TooltipDisplay = new TooltipDisplay(MainFont, () => GraphicsDevice.Viewport);
 		}
 		catch (Exception ex)
 		{
@@ -330,6 +337,7 @@ public class BlastiaGame : Game
 
 			UpdateMouseState();
 			UpdateKeyboardState();
+			TooltipDisplay?.Update();
 
 			if (IsWorldInitialized)
 			{
@@ -473,6 +481,7 @@ public class BlastiaGame : Game
 		
 		// draw cursor texture last on top of everything
 		SpriteBatch.Draw(CursorTexture, CursorPosition, Color.White);
+		TooltipDisplay?.Draw(SpriteBatch);
 		SpriteBatch.End();
 	}
 

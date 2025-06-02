@@ -9,6 +9,7 @@ namespace Blastia.Main.Entities;
 public class DroppedItem : Entity
 {
     public Item? Item { get; private set; }
+    public int Amount { get; private set; }
     private BodyPart _itemBodyPart;
 
     public override float Height => 0.85f;
@@ -25,9 +26,10 @@ public class DroppedItem : Entity
         _itemBodyPart = new BodyPart(BlastiaGame.InvisibleTexture, Vector2.Zero);
     }
 
-    public void Launch(Item? item, int launchDirection, float horizontalSpeed = 150f, float verticalSpeed = -100f)
+    public void Launch(Item? item, int amount, int launchDirection, float horizontalSpeed = 115f, float verticalSpeed = -100f)
     {
         Item = item;
+        Amount = amount;
         if (Item == null) return;
 
         var halfItemIconWidth = Item.Icon.Width * 0.5f;
