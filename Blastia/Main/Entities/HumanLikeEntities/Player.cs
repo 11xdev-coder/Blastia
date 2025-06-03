@@ -37,6 +37,10 @@ public class Player : HumanLikeEntity
 	private const float MaxChargeTime = 0.35f;
 	private float _jumpCharge;
 	
+	// pulling
+	private const float PickupRadius = 30f;
+	private const float PickupRadiusSquared = PickupRadius * PickupRadius;
+	
 	// inventory
 	public Inventory PlayerInventory { get; private set; }
 	public const int InventoryRows = 4;
@@ -85,7 +89,7 @@ public class Player : HumanLikeEntity
 		{
 			HandleMovement();
 			HandleMouseClicks();
-			HandleItemPickup();
+			HandleItemInteraction();
 			
 			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null)
 			{
@@ -169,22 +173,53 @@ public class Player : HumanLikeEntity
 		}
 	}
 
-	private void HandleItemPickup()
+	private void HandleItemInteraction()
 	{
 		if (_world == null) return;
 		
 		var droppedItems = new List<DroppedItem>(_world.GetDroppedItems());
+
 		foreach (var droppedItem in droppedItems)
 		{
-			// skip null items
-			if (droppedItem.Item == null || droppedItem.Amount <= 0 || !droppedItem.CanBePickedUp()) continue;
-
-			if (GetBounds().Intersects(droppedItem.GetBounds()))
+			if (droppedItem.Item == null || droppedItem.Amount <= 0) continue;
+			
+			// vacuum (pull)
+			var distanceSquared = Vector2.DistanceSquared(Position, droppedItem.Position);
+			if (distanceSquared < PickupRadiusSquared)
 			{
-				var amountPickedUp = PlayerInventory.AddItem(droppedItem.Item, droppedItem.Amount);
-				if (amountPickedUp > 0)
+				// not pulled
+				if (!droppedItem.IsBeingPulled || droppedItem.PullTargetPlayer == null)
 				{
-					droppedItem.ReduceAmount(amountPickedUp);
+					droppedItem.StartPull(this);
+				}
+				else if (droppedItem.IsBeingPulled && droppedItem.PullTargetPlayer != this) // pulled by another player
+				{
+					
+				}
+				else if (droppedItem.IsBeingPulled && droppedItem.PullTargetPlayer == this) // pulled by this player
+				{
+					droppedItem.StartPull(this);
+				}
+			}
+			else
+			{
+				// pulled by this player but out of range
+				if (droppedItem.IsBeingPulled && droppedItem.PullTargetPlayer == this)
+				{
+					droppedItem.StopPull();
+				}
+			}
+
+			// pickup
+			if (droppedItem.CanBePickedUp(this))
+			{
+				if (GetBounds().Intersects(droppedItem.GetBounds()))
+				{
+					var amountPickedUp = PlayerInventory.AddItem(droppedItem.Item, droppedItem.Amount);
+					if (amountPickedUp > 0)
+					{
+						droppedItem.ReduceAmount(amountPickedUp);
+					}
 				}
 			}
 		}
@@ -208,12 +243,12 @@ public class Player : HumanLikeEntity
 	{
 		if (BlastiaGame.PlayerInventoryUiMenu == null) return;
 		
-		Keys[] hotbarKeys = 
-		{
+		Keys[] hotbarKeys =
+		[
 			Keys.D1, Keys.D2, Keys.D3,
 			Keys.D4, Keys.D5, Keys.D6,
 			Keys.D7, Keys.D8, Keys.D9
-		};
+		];
 
 		for (int i = 0; i < hotbarKeys.Length; i++)
 		{
