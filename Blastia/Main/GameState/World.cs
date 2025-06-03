@@ -1,4 +1,6 @@
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.UI;
 using Blastia.Main.Utilities;
@@ -6,10 +8,17 @@ using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.GameState;
 
+/// <summary>
+/// Helper class, manages some in game UI and Entities
+/// </summary>
 public class World
 {
 	private WorldState _state;
 	public Player? MyPlayer;
+	/// <summary>
+	/// Read only list of <c>BlastiaGame._entities</c>, managed by <c>BlastiaGame</c>. <c>World</c> contains public methods to access entities
+	/// </summary>
+	public readonly IReadOnlyList<Entity> Entities;
 
 	private bool _rulerMode;
 	public bool RulerMode
@@ -24,9 +33,10 @@ public class World
 	private readonly RulerHighlight _rulerStartHighlight;
 	private readonly RulerHighlight _rulerEndHighlight;
 
-	public World(WorldState state)
+	public World(WorldState state, IReadOnlyList<Entity> entities)
 	{
 		_state = state;
+		Entities = entities;
 
 		_rulerStartHighlight = new RulerHighlight();
 		_rulerEndHighlight = new RulerHighlight();
@@ -158,6 +168,8 @@ public class World
 			BlastiaGame.RulerMenu.AddHighlight(rulerHighlight, pos, MyPlayer.Camera);
 		}
 	}
+
+	public IEnumerable<DroppedItem> GetDroppedItems() => Entities.OfType<DroppedItem>();
 
 	public void Update()
 	{

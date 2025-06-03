@@ -7,11 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-    </list>
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -243,15 +239,7 @@
       <workItem from="1748701268898" duration="5062000" />
       <workItem from="1748769151280" duration="20781000" />
       <workItem from="1748851522160" duration="11071000" />
-      <workItem from="1748895907845" duration="1383000" />
-    </task>
-    <task id="LOCAL-00058" summary="fixed entity collision">
-      <option name="closed" value="true" />
-      <created>1743887703434</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1743887703434</updated>
+      <workItem from="1748895907845" duration="1607000" />
     </task>
     <task id="LOCAL-00059" summary="swept aabb refactor">
       <option name="closed" value="true" />
@@ -637,7 +625,15 @@
       <option name="project" value="LOCAL" />
       <updated>1748879808145</updated>
     </task>
-    <option name="localTasksCounter" value="107" />
+    <task id="LOCAL-00107" summary="inventory slot image change">
+      <option name="closed" value="true" />
+      <created>1748903406317</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1748903406317</updated>
+    </task>
+    <option name="localTasksCounter" value="108" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -647,7 +643,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="basic inventory class" />
     <MESSAGE value="basic inventory UI and error fixes" />
     <MESSAGE value="some menu initialization tweaks" />
     <MESSAGE value="inventory slot bug fix" />
@@ -672,7 +667,8 @@
     <MESSAGE value="selected item name" />
     <MESSAGE value="hover text screen edge check" />
     <MESSAGE value="item hover text tooltip" />
-    <option name="LAST_COMMIT_MESSAGE" value="item hover text tooltip" />
+    <MESSAGE value="inventory slot image change" />
+    <option name="LAST_COMMIT_MESSAGE" value="inventory slot image change" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

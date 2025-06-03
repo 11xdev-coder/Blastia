@@ -12,6 +12,12 @@ public class DroppedItem : Entity
 {
     public Item? Item { get; private set; }
     public int Amount { get; private set; }
+    private const float MaxPickupTime = 1.6f;
+    /// <summary>
+    /// Time before item can be picked up. If it reaches <c>MaxPickupTime</c> (1.6f by default) then item can be picked up
+    /// </summary>
+    public float PickupTime;
+    
     private BodyPart _itemBodyPart;
     private World _world;
 
@@ -29,6 +35,25 @@ public class DroppedItem : Entity
         _itemBodyPart = new BodyPart(BlastiaGame.InvisibleTexture, Vector2.Zero);
         _world = world;
     }
+
+    /// <summary>
+    /// Removes <c>amountToReduce</c> from item's Amount and if <c>Amount &lt;= 0</c> removes the item.
+    /// </summary>
+    /// <param name="amountToReduce"></param>
+    public void ReduceAmount(int amountToReduce)
+    {
+        if (amountToReduce > 0)
+        {
+            Amount = Math.Max(0, Amount - amountToReduce);
+        }
+
+        if (Amount <= 0)
+        {
+            BlastiaGame.RequestRemoveEntity(this);
+        }
+    }
+
+    public bool CanBePickedUp() => PickupTime >= MaxPickupTime;
 
     public void Launch(Item? item, int amount, int launchDirection, float horizontalSpeed = 115f, float verticalSpeed = -100f)
     {
@@ -48,6 +73,8 @@ public class DroppedItem : Entity
     public override void Update()
     {
         base.Update();
+
+        PickupTime += (float) BlastiaGame.GameTimeElapsedSeconds;
         
         if (_world.MyPlayer?.Camera == null || BlastiaGame.TooltipDisplay == null || Item == null) return;
 

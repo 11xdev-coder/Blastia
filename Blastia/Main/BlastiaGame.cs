@@ -109,6 +109,7 @@ public class BlastiaGame : Game
 	/// </summary>
 	private static event Action? RequestWorldInitializationEvent;
 	private static event Action<Entity>? RequestAddEntityEvent;
+	private static event Action<Entity>? RequestRemoveEntityEvent;
 	private static event Action? RequestWorldUnloadEvent;
 	/// <summary>
 	/// Event to request creation of DebugPoint entity for one frame
@@ -127,6 +128,9 @@ public class BlastiaGame : Game
 	
 	// GAMESTATE
 	public World? World { get; private set; }
+	/// <summary>
+	/// Use <c>World</c> to get public readonly list of entities
+	/// </summary>
 	private readonly List<Entity> _entities;
 	private readonly List<Entity> _entitiesToRemove;
 	private const ushort EntityLimit = 256;
@@ -175,6 +179,7 @@ public class BlastiaGame : Game
 		RequestWorldInitializationEvent += InitializeWorld;
 		RequestWorldUnloadEvent += UnloadWorld;
 		RequestAddEntityEvent += AddEntity;
+		RequestRemoveEntityEvent += RemoveEntity;
 		RequestDebugPointDrawEvent += DrawDebugPoint;
 		
 		_pixelatedSamplerState = new SamplerState
@@ -514,8 +519,8 @@ public class BlastiaGame : Game
 		var worldState = PlayerManager.Instance.SelectedWorld;
 		if (worldState == null) return;
 		
-		World = new World(worldState);
-		_myPlayer = new Player(worldState.GetSpawnPoint(), 0.15f, true);
+		World = new World(worldState, _entities.AsReadOnly());
+		_myPlayer = new Player(worldState.GetSpawnPoint(), World, 0.15f, true);
 		World.SetPlayer(_myPlayer);
 		
 		if (LogoMenu != null) LogoMenu.Active = false;
@@ -596,6 +601,13 @@ public class BlastiaGame : Game
 	private void AddEntity(Entity entity)
 	{
 		_entities.Add(entity);
+	}
+	
+	// REMOVE ENTITY
+	public static void RequestRemoveEntity(Entity entity) => RequestRemoveEntityEvent?.Invoke(entity);
+	private void RemoveEntity(Entity entity)
+	{
+		_entitiesToRemove.Add(entity);
 	}
 
 	// DRAW DEBUG POINT

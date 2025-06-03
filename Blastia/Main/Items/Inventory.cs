@@ -30,48 +30,56 @@ public class Inventory
     /// </summary>
     /// <param name="item"></param>
     /// <param name="amount"></param>
-    /// <returns></returns>
-    public bool AddItem(Item? item, int amount = 1)
+    /// <returns>Amount of items successfully added</returns>
+    public int AddItem(Item? item, int amount = 1)
     {
-        if (item == null || amount <= 0) return false;
+        if (item == null || amount <= 0) return 0;
+
+        var amountSuccessfullyAdded = 0;
+        var amountRemainingToAdd = amount;
         
         // try stacking with existing items of same type
         for (int i = 0; i < Capacity; i++)
         {
+            if (amountRemainingToAdd == 0) break;
+            
             // same ID
             if (Items[i] != null && Items[i]!.BaseItem.Id == item.Id)
             {
                 // how much can we add to this slot: 40 (MaxStack) - 12 (current amount) = 28 (can add to this slot)
-                int canAdd = Items[i]!.MaxStack - Items[i]!.Amount;
-                if (canAdd > 0)
+                int canAddToSlot = Items[i]!.MaxStack - Items[i]!.Amount;
+                if (canAddToSlot > 0)
                 {
-                    int toAdd = Math.Min(amount, canAdd);
+                    var toAdd = Math.Min(amountRemainingToAdd, canAddToSlot);
                     Items[i]!.Amount += toAdd;
-                    amount -= toAdd;
+                    amountRemainingToAdd -= toAdd;
+                    amountSuccessfullyAdded += toAdd;
                     
                     OnSlotChanged?.Invoke(i, Items[i]!);
-                    
-                    if (amount == 0) return true;
                 }
             }
         }
         
         // add items to empty slot
-        for (int i = 0; i < Capacity; i++)
+        if (amountRemainingToAdd > 0)
         {
-            if (Items[i] == null)
+            for (int i = 0; i < Capacity; i++)
             {
-                int toAdd = Math.Min(amount, item.MaxStack);
-                Items[i] = item.CreateInstance(toAdd);
-                amount -= toAdd;
+                if (amountRemainingToAdd == 0) break;
                 
-                OnSlotChanged?.Invoke(i, Items[i]!);
-                    
-                if (amount == 0) return true;
+                if (Items[i] == null)
+                {
+                    int toAdd = Math.Min(amountRemainingToAdd, item.MaxStack);
+                    Items[i] = item.CreateInstance(toAdd);
+                    amountRemainingToAdd -= toAdd;
+                    amountSuccessfullyAdded += toAdd;
+                
+                    OnSlotChanged?.Invoke(i, Items[i]!);
+                }
             }
         }
 
-        return false;
+        return amountSuccessfullyAdded;
     }
 
     public ItemInstance? RemoveItem(int slotIndex, int amount = 1)

@@ -101,7 +101,7 @@ public abstract class Entity : Object
         UpdateSprite();
     }
 
-    protected Rectangle GetBounds()
+    public Rectangle GetBounds()
     {
         var widthPixels = Width * Block.Size;
         var heightPixels = Height * Block.Size;

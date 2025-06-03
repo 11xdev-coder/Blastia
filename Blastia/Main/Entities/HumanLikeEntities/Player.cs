@@ -25,6 +25,7 @@ public class Player : HumanLikeEntity
 	private const float WalkingAnimationDuration = 0.4f;
 
 	public Camera? Camera { get; set; }
+	private World? _world;
 
 	protected override bool ApplyGravity => true;
 	public override float Height => 1.8f;
@@ -44,11 +45,12 @@ public class Player : HumanLikeEntity
 	private const int InventoryCapacity = InventoryRows * InventoryColumns;
 	private int _selectedHotbarSlot = -1;
 
-	public Player(Vector2 position, float initialScaleFactor = 1f, bool myPlayer = false) : 
+	public Player(Vector2 position, World? world, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
 			new Vector2(10, 21))
 	{
+		_world = world;
 		PlayerInventory = new Inventory(InventoryCapacity, this);
 		LocallyControlled = myPlayer;
 		
@@ -83,6 +85,7 @@ public class Player : HumanLikeEntity
 		{
 			HandleMovement();
 			HandleMouseClicks();
+			HandleItemPickup();
 			
 			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null)
 			{
@@ -163,6 +166,27 @@ public class Player : HumanLikeEntity
 		{
 			var pos = GetCoordsForBlockPlacement();
 			currentWorld.SetTile((int) pos.X, (int) pos.Y, 0);
+		}
+	}
+
+	private void HandleItemPickup()
+	{
+		if (_world == null) return;
+		
+		var droppedItems = new List<DroppedItem>(_world.GetDroppedItems());
+		foreach (var droppedItem in droppedItems)
+		{
+			// skip null items
+			if (droppedItem.Item == null || droppedItem.Amount <= 0 || !droppedItem.CanBePickedUp()) continue;
+
+			if (GetBounds().Intersects(droppedItem.GetBounds()))
+			{
+				var amountPickedUp = PlayerInventory.AddItem(droppedItem.Item, droppedItem.Amount);
+				if (amountPickedUp > 0)
+				{
+					droppedItem.ReduceAmount(amountPickedUp);
+				}
+			}
 		}
 	}
 

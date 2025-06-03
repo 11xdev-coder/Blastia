@@ -77,7 +77,7 @@ public static class StuffLoader
 			if (humanType == typeof(Player))
 			{
 				// player has additional bool argument
-				var player = new Player(Vector2.Zero);
+				var player = new Player(Vector2.Zero, null);
 				StuffRegistry.RegisterHuman(id, player);
 			}
 			else if (Activator.CreateInstance(humanType, Vector2.Zero, 1f) is HumanLikeEntity human)

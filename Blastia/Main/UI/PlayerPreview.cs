@@ -15,7 +15,7 @@ public class PlayerPreview : UIElement
     public PlayerPreview(Vector2 position, SpriteFont font, Vector2 scale = default) : 
         base(position, "", font)
     {
-        PlayerInstance = new Player(position)
+        PlayerInstance = new Player(position, null)
         {
             IsPreview = true
         };
