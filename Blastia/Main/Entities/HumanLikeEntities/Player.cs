@@ -211,7 +211,7 @@ public class Player : HumanLikeEntity
 			}
 
 			// pickup
-			if (droppedItem.CanBePickedUp(this))
+			if (droppedItem.CanBePickedUpBy(this))
 			{
 				if (GetBounds().Intersects(droppedItem.GetBounds()))
 				{

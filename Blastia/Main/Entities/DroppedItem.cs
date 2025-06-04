@@ -27,8 +27,15 @@ public class DroppedItem : Entity
     public Player? PullTargetPlayer { get; private set; }
     private const float MaxPullSpeed = 150f;
     private const float PullAccelerationFactor = 9f;
-    
-    private BodyPart _itemBodyPart;
+
+    private List<BodyPart> _stackVisuals = [];
+    private static readonly Vector2[] StackVisualOffsets =
+    [
+        new(-2.5f, -2.5f),
+        new(2.5f, 2.5f),
+        new(2.5f, -2.5f),
+        new(-2.5f, 2.5f)
+    ];
     private World _world;
 
     public override float Height => 0.85f;
@@ -42,7 +49,6 @@ public class DroppedItem : Entity
     {
         SetId(EntityID.DroppedItem);
 
-        _itemBodyPart = new BodyPart(BlastiaGame.InvisibleTexture, Vector2.Zero);
         _world = world;
     }
 
@@ -92,7 +98,7 @@ public class DroppedItem : Entity
     /// </summary>
     /// <param name="attemptingPlayer"></param>
     /// <returns><c>True</c> (if item is not already pulling OR <c>PullTargetPlayer</c> is <c>attemptingPlayer</c>) AND <c>PickupTime</c> is more than max pickup time</returns>
-    public bool CanBePickedUp(Player attemptingPlayer)
+    public bool CanBePickedUpBy(Player attemptingPlayer)
     {
         if (Item == null || Amount <= 0) return false;
         
@@ -105,13 +111,59 @@ public class DroppedItem : Entity
         Amount = amount;
         if (Item == null) return;
 
-        var halfItemIconWidth = Item.Icon.Width * 0.5f;
-        var halfItemIconHeight = Item.Icon.Height * 0.5f;
-        
-        _itemBodyPart.Image = Item.Icon;
-        _itemBodyPart.RelativePosition = new Vector2(-halfItemIconWidth, -halfItemIconHeight);
+        RefreshStackVisuals();
         
         MovementVector = new Vector2(horizontalSpeed * launchDirection, verticalSpeed);
+    }
+
+    private void RefreshStackVisuals()
+    {
+        if (Item == null)
+        {
+            _stackVisuals.Clear();
+            return;
+        }
+
+        var numSpritesToShow = 1; 
+        if (Amount == 2) numSpritesToShow = 2; // 2
+        else if (Amount is >= 3 and <= 10) numSpritesToShow = 3; // 3-10
+        else if (Amount is >= 11 and <= 28) numSpritesToShow = 4; // 11-28
+        else if (Amount >= 29) numSpritesToShow = 5;
+        
+        // add missing visuals
+        while (_stackVisuals.Count < numSpritesToShow)
+        {
+            _stackVisuals.Add(new BodyPart(Item.Icon, Vector2.Zero));
+        }
+        // remove extra visuals
+        while (_stackVisuals.Count > numSpritesToShow)
+        {
+            _stackVisuals.RemoveAt(_stackVisuals.Count - 1);
+        }
+        
+        var relativePos = Vector2.Zero;
+        for (int i = 0; i < _stackVisuals.Count; i++)
+        {
+            var bodyPart = _stackVisuals[i];
+            bodyPart.Image = Item.Icon;
+
+            if (i == 0) // main item
+            {
+                bodyPart.RelativePosition = relativePos;
+            }
+            else // additional
+            {
+                // dont go out of bounds
+                if (i - 1 < StackVisualOffsets.Length)
+                {
+                    bodyPart.RelativePosition = relativePos + StackVisualOffsets[i - 1];
+                }
+                else // fallback
+                {
+                    bodyPart.RelativePosition = relativePos;
+                }
+            }
+        }
     }
 
     public override void Update()
@@ -159,7 +211,10 @@ public class DroppedItem : Entity
     }
 
     public override void Draw(SpriteBatch spriteBatch, Vector2 scaledPosition, float scale = 1)
-    {        
-        _itemBodyPart.Draw(spriteBatch, scaledPosition, scale * Scale);
+    {
+        foreach (var visual in _stackVisuals)
+        {
+            visual.Draw(spriteBatch, scaledPosition, scale * Scale);
+        }
     }
 }
