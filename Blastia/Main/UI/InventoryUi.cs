@@ -1,6 +1,7 @@
 ﻿using Blastia.Main.Entities;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
+using Blastia.Main.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -173,11 +174,15 @@ public class InventoryUi : Menu
         {
             _playerInventory.SetItemAt(slotIndex, _playerInventory.CursorItem);
             _playerInventory.SetCursorItem(null);
+            
+            SoundEngine.PlaySound(SoundID.Grab);
         }
         else if (itemInClickedSlot != null && _playerInventory.CursorItem == null) // put item from slot to cursor
         {
             _playerInventory.SetCursorItem(itemInClickedSlot);
             _playerInventory.SetItemAt(slotIndex, null);
+            
+            SoundEngine.PlaySound(SoundID.Grab);
         }
         else if (itemInClickedSlot != null && _playerInventory.CursorItem != null)
         {
@@ -208,6 +213,7 @@ public class InventoryUi : Menu
                 _playerInventory.SetItemAt(slotIndex, tempCursorItem);
             }
             
+            SoundEngine.PlaySound(SoundID.Grab);
         }
     }
 
@@ -224,6 +230,8 @@ public class InventoryUi : Menu
             // remove 1 and set item
             _playerInventory.RemoveItem(slotIndex);
             _playerInventory.SetCursorItem(new ItemInstance(itemInClickedSlot.BaseItem));
+            
+            SoundEngine.PlaySound(SoundID.Grab);
         }
         else if (itemInClickedSlot.BaseItem == _playerInventory.CursorItem.BaseItem) // if same item is in cursor
         {
@@ -234,6 +242,8 @@ public class InventoryUi : Menu
                 // add 1 to cursor slot
                 _playerInventory.CursorItem.Amount += 1;
             }
+            
+            SoundEngine.PlaySound(SoundID.Grab);
         }
     }
 

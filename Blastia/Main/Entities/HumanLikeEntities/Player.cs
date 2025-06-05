@@ -2,6 +2,7 @@
 using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
+using Blastia.Main.Sounds;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -216,7 +217,10 @@ public class Player : HumanLikeEntity
 				if (GetBounds().Intersects(droppedItem.GetBounds()))
 				{
 					var amountPickedUp = PlayerInventory.AddItem(droppedItem.Item, droppedItem.Amount);
+					
 					BlastiaGame.NotificationDisplay?.AddNotification($"(+) {droppedItem.Amount} {droppedItem.Item.Name}", Color.GreenYellow);
+					SoundEngine.PlaySound(SoundID.Grab);
+					
 					if (amountPickedUp > 0)
 					{
 						droppedItem.ReduceAmount(amountPickedUp);

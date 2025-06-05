@@ -6,7 +6,8 @@ namespace Blastia.Main.Sounds;
 
 public enum SoundID
 {
-    Tick
+    Tick,
+    Grab
 }
 
 public static class SoundEngine
@@ -22,6 +23,7 @@ public static class SoundEngine
     public static void LoadSounds()
     {
         LoadSound(SoundID.Tick, Paths.TickSoundPath);
+        LoadSound(SoundID.Grab, Paths.GrabPath);
     }
 
     private static void LoadSound(SoundID id, string path)

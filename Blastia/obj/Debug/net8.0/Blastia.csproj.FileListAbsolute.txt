@@ -175,3 +175,4 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\IronSwo
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SlotBackground.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SlotHighlighted.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\Apple.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Grab.wav
