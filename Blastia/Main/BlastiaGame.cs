@@ -568,16 +568,9 @@ public class BlastiaGame : Game
 		var slotSize = new Vector2(1.5f);
 		var slotSpacing = new Vector2(5f, 5f);
 
-		if (PlayerInventoryUiMenu == null)
-		{
-			PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, World, gridStartPosition, Player.InventoryRows, 
-				Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, SlotHighlightedTexture, false, true);
-			AddMenu(PlayerInventoryUiMenu);
-		}
-		else
-		{
-			PlayerInventoryUiMenu.Active = true;
-		}
+		PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, World, gridStartPosition, Player.InventoryRows, 
+			Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, SlotHighlightedTexture, false, true);
+		AddMenu(PlayerInventoryUiMenu);
 
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 2);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
@@ -594,8 +587,12 @@ public class BlastiaGame : Game
 		IsWorldInitialized = false;
 		World?.Unload();
 		World = null;
-		
-		if (PlayerInventoryUiMenu != null) PlayerInventoryUiMenu.Active = false;
+
+		if (PlayerInventoryUiMenu != null)
+		{
+			_menus.Remove(PlayerInventoryUiMenu);
+			PlayerInventoryUiMenu = null;
+		}
 		_myPlayer = null;
 		_entities.Clear();
 	}
