@@ -144,6 +144,7 @@ public class BlastiaGame : Game
 	/// Used for showing tooltips under the cursor
 	/// </summary>
 	public static TooltipDisplay? TooltipDisplay { get; private set; }
+	public static NotificationDisplay? NotificationDisplay { get; private set; }
 	
 	public BlastiaGame()
 	{
@@ -312,6 +313,7 @@ public class BlastiaGame : Game
 			AddMenu(InGameAudioSettingsMenu);
 			
 			TooltipDisplay = new TooltipDisplay(MainFont);
+			NotificationDisplay = new NotificationDisplay(MainFont);
 		}
 		catch (Exception ex)
 		{
@@ -394,6 +396,7 @@ public class BlastiaGame : Game
 			}
 
 			TooltipDisplay?.Update();
+			NotificationDisplay?.Update();
 			
 			// update previous states in the end
 			UpdatePreviousStates();
@@ -489,6 +492,7 @@ public class BlastiaGame : Game
 		// draw cursor texture last on top of everything
 		SpriteBatch.Draw(CursorTexture, CursorPosition, Color.White);
 		TooltipDisplay?.Draw(SpriteBatch);
+		NotificationDisplay?.Draw(SpriteBatch);
 		SpriteBatch.End();
 	}
 

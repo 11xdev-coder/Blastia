@@ -127,8 +127,8 @@ public class DroppedItem : Entity
         var numSpritesToShow = 1; 
         if (Amount == 2) numSpritesToShow = 2; // 2
         else if (Amount is >= 3 and <= 10) numSpritesToShow = 3; // 3-10
-        else if (Amount is >= 11 and <= 28) numSpritesToShow = 4; // 11-28
-        else if (Amount >= 29) numSpritesToShow = 5;
+        else if (Amount is >= 11 and <= 19) numSpritesToShow = 4; // 11-19
+        else if (Amount >= 20) numSpritesToShow = 5;
         
         // add missing visuals
         while (_stackVisuals.Count < numSpritesToShow)
