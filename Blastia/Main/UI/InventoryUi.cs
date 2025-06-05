@@ -255,6 +255,7 @@ public class InventoryUi : Menu
         var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale, _world);
         droppedItem.Launch(_playerInventory.CursorItem.BaseItem, _playerInventory.CursorItem.Amount, (int) direction);
         BlastiaGame.RequestAddEntity(droppedItem);
+        BlastiaGame.NotificationDisplay?.AddNotification($"(-) {_playerInventory.CursorItem.Amount} {_playerInventory.CursorItem.Name}", Color.IndianRed);
         
         // clear cursor item
         _playerInventory.SetCursorItem(null);

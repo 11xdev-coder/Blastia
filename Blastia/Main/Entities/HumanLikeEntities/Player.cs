@@ -216,7 +216,7 @@ public class Player : HumanLikeEntity
 				if (GetBounds().Intersects(droppedItem.GetBounds()))
 				{
 					var amountPickedUp = PlayerInventory.AddItem(droppedItem.Item, droppedItem.Amount);
-					BlastiaGame.NotificationDisplay?.AddNotification($"(+) {droppedItem.Amount} {droppedItem.Item.Name}");
+					BlastiaGame.NotificationDisplay?.AddNotification($"(+) {droppedItem.Amount} {droppedItem.Item.Name}", Color.GreenYellow);
 					if (amountPickedUp > 0)
 					{
 						droppedItem.ReduceAmount(amountPickedUp);

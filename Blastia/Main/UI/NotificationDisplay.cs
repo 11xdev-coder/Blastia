@@ -33,6 +33,7 @@ public class NotificationDisplay
     private const float RightMargin = 15f;
     private const float BottomMargin = 15f;
     private const float DefaultNotificationLifetime = 3f;
+    private static readonly Color DefaultColor = new Color(255, 255, 255, 255);
 
     public NotificationDisplay(SpriteFont font)
     {
@@ -40,11 +41,14 @@ public class NotificationDisplay
         _notifications = [];
     }
 
-    public void AddNotification(string text, float lifetime = DefaultNotificationLifetime)
+    public void AddNotification(string text, Color color, float lifetime = DefaultNotificationLifetime)
     {
         if (string.IsNullOrWhiteSpace(text)) return;
 
-        var notificationTextUi = new Text(Vector2.Zero, text, _font);
+        var notificationTextUi = new Text(Vector2.Zero, text, _font)
+        {
+            DrawColor = color
+        };
         notificationTextUi.Update();
         
         var notificationEntry = new NotificationEntry(notificationTextUi, lifetime);
@@ -57,6 +61,11 @@ public class NotificationDisplay
         }
 
         RepositionNotifications();
+    }
+
+    public void AddNotification(string text, float lifetime = DefaultNotificationLifetime)
+    {
+        AddNotification(text, DefaultColor, lifetime);
     }
 
     private void RepositionNotifications()
