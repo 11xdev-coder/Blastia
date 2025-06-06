@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Blastia.Main.Networking;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.InGame;
@@ -37,5 +38,9 @@ public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(f
         _tabGroup?.DeselectAll();
         SwitchToMenu(BlastiaGame.MainMenu);
         BlastiaGame.RequestWorldUnload();
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsInMultiplayerSession)
+        {
+            NetworkManager.Instance.DisconnectFromLobby();
+        }
     }
 }

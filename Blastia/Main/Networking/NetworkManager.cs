@@ -26,11 +26,12 @@ public enum MessageType : byte
 public class NetworkManager
 {
     public static NetworkManager? Instance { get; set; }
-    
+
+    private bool _isConnectedToHost;
     public bool IsHost { get; private set; }
     public bool IsSteamInitialized { get; private set; }
     public bool IsInMultiplayerSession { get; private set; }
-    public bool IsConnected => IsSteamInitialized && IsInMultiplayerSession;
+    public bool IsConnected => IsSteamInitialized && IsInMultiplayerSession && (IsHost || _isConnectedToHost);
     public CSteamID MySteamId { get; private set; }
 
     /// <summary>
@@ -147,7 +148,6 @@ public class NetworkManager
         
         Console.WriteLine("[NetworkManager] Creating lobby");
         IsHost = true;
-        IsInMultiplayerSession = true;
         CurrentLobbyCode = GenerateLobbyCode();
         
         // create lobby
@@ -226,10 +226,12 @@ public class NetworkManager
     {
         if (callback.m_eResult != EResult.k_EResultOK)
         {
+            // reset all flags on failure
             Console.WriteLine($"[NetworkManager] Lobby creation failed: {callback.m_eResult}");
             IsHost = false;
             IsInMultiplayerSession = false;
             CurrentLobbyCode = null;
+            _isConnectedToHost = false;
             return;
         }
         
@@ -250,13 +252,18 @@ public class NetworkManager
         
         if (_listenSocket == HSteamListenSocket.Invalid)
         {
+            // reset all flags
             Console.WriteLine("[NetworkManager] ERROR: Failed to create listen socket!");
+            IsHost = false;
+            IsInMultiplayerSession = false;
+            CurrentLobbyCode = null;
             return;
         }
     
         Console.WriteLine($"[NetworkManager] Listen socket created: {_listenSocket}");
         Console.WriteLine("[NetworkManager] Host is ready to accept connections");
         
+        // everything is up
         IsInMultiplayerSession = true;
     }
     
@@ -265,6 +272,9 @@ public class NetworkManager
         if (callback.m_EChatRoomEnterResponse != (uint) EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess)
         {
             Console.WriteLine($"[NetworkManager] Failed to enter lobby: {callback.m_EChatRoomEnterResponse}");
+            IsHost = false;
+            IsInMultiplayerSession = false;
+            _isConnectedToHost = false;
             return;
         }
         
@@ -280,13 +290,14 @@ public class NetworkManager
         var lobbyOwner = SteamMatchmaking.GetLobbyOwner(_currentLobbyId);
         Console.WriteLine($"[NetworkManager] Lobby owner: {SteamFriends.GetFriendPersonaName(lobbyOwner)}");
         
+        // is in multiplayer session but not connected to host yet
+        IsInMultiplayerSession = true;
+        
         // connect only to host (client-server)
         if (!IsHost && lobbyOwner != MySteamId)
         {
             ConnectToPlayer(lobbyOwner);
         }
-
-        IsInMultiplayerSession = true;
     }
     
     private void OnLobbyChatUpdate(LobbyChatUpdate_t callback)
@@ -312,6 +323,16 @@ public class NetworkManager
         else if (callback.m_rgfChatMemberStateChange == (uint) EChatMemberStateChange.k_EChatMemberStateChangeLeft)
         {
             Console.WriteLine($"[NetworkManager] User left: {SteamFriends.GetFriendPersonaName(userChanged)}");
+            
+            // check if host left
+            var lobbyOwner = SteamMatchmaking.GetLobbyOwner(_currentLobbyId);
+            if (userChanged == lobbyOwner && !IsHost)
+            {
+                Console.WriteLine("[NetworkManager] Host left the lobby. Disconnecting...");
+                DisconnectFromLobby();
+                return;
+            }
+            
             if (_connections.TryGetValue(userChanged, out var connection))
             {
                 SteamNetworkingSockets.CloseConnection(connection, 0, "User left lobby", false);
@@ -351,6 +372,7 @@ public class NetworkManager
             // send hello message
             if (!IsHost)
             {
+                _isConnectedToHost = true;
                 SendMessage(callback.m_hConn, MessageType.ClientHello, $"Hello from {SteamFriends.GetPersonaName()}");
             }
         }
@@ -362,6 +384,14 @@ public class NetworkManager
             // remove from connections
             var remoteSteamId = callback.m_info.m_identityRemote.GetSteamID();
             _connections.Remove(remoteSteamId);
+            
+            // if client lost connection to host, leave
+            if (!IsHost && _connections.Count == 0)
+            {
+                Console.WriteLine("[NetworkManager] Lost connection to host, leaving lobby");
+                _isConnectedToHost = false;
+                DisconnectFromLobby();
+            }
         }
     }
     
@@ -495,6 +525,15 @@ public class NetworkManager
     {
         Console.WriteLine("[NetworkManager] Disconnecting from lobby...");
         
+        // send msg to clients before leaving
+        if (IsHost)
+        {
+            foreach (var connection in _connections.Values)
+            {
+                SendMessage(connection, MessageType.PlayerLeftGame, "Host is leaving");
+            }
+        }
+        
         // close every connection
         foreach (var connection in _connections.Values)
         {
@@ -527,6 +566,7 @@ public class NetworkManager
         CurrentLobbyCode = null;
         IsHost = false;
         IsInMultiplayerSession = false;
+        _isConnectedToHost = false;
     }
 
     public void Shutdown()
@@ -537,6 +577,5 @@ public class NetworkManager
 
         SteamAPI.Shutdown();
         IsSteamInitialized = false;
-        IsInMultiplayerSession = false;
     }
 }
