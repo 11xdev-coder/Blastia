@@ -34,7 +34,8 @@ public class MultiplayerMenu(SpriteFont font, bool isActive = false) : Menu(font
 
     private void HostGame()
     {
-        NetworkManager.Instance?.HostGame();
+        SwitchToMenu(BlastiaGame.PlayersMenu);
+        BlastiaGame.WorldsMenu?.ToggleMultiplayer(true);
     }
 
     private void JoinGame()

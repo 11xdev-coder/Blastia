@@ -4,9 +4,17 @@ namespace Blastia.Main.UI.Menus.SinglePlayer;
 
 public class WorldsMenu : CollectionMenu
 {    
+	private bool Host { get; set; }
+	
 	public WorldsMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
 	{
 		
+	}
+
+	public void ToggleMultiplayer(bool host)
+	{
+		Host = host;
+		Console.WriteLine($"Worlds menu now host: {host}");
 	}
 
 	protected override string GetCreateButtonLabel() => "New world";
@@ -25,6 +33,6 @@ public class WorldsMenu : CollectionMenu
 
 	protected override void SelectItem(object worldState)
 	{
-		PlayerManager.Instance.SelectWorld((WorldState) worldState);
+		PlayerManager.Instance.SelectWorld((WorldState) worldState, Host);
 	}	
 }

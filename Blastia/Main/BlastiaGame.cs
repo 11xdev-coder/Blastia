@@ -356,7 +356,11 @@ public class BlastiaGame : Game
 		{
 			base.Update(gameTime);
 			UpdateGameTime(gameTime);
-			NetworkManager.Instance?.Update();
+
+			if (NetworkManager.Instance != null && NetworkManager.Instance.IsSteamInitialized)
+			{
+				NetworkManager.Instance.Update();
+			}
 			
 			UpdateColors();
 

@@ -1,5 +1,6 @@
 ﻿using Blastia.Main.Blocks.Common;
 using Blastia.Main.GameState;
+using Blastia.Main.Networking;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
@@ -162,10 +163,15 @@ public class PlayerManager : Singleton<PlayerManager>
 	public bool WorldExists(string worldName) => Exists(SaveFolder.World, worldName, Extension.World);
 	public List<WorldState> LoadAllWorlds() => LoadAll<WorldState>(SaveFolder.World, Extension.World);
 		
-	public void SelectWorld(WorldState worldState)
+	public void SelectWorld(WorldState worldState, bool host)
 	{
 		SelectedWorld = worldState;
 		BlastiaGame.RequestWorldInitialization();
+
+		if (host)
+		{
+			NetworkManager.Instance?.HostGame();
+		}
 	}
 	
 	private void GenerateWorldTiles(WorldState worldState) 
