@@ -25,7 +25,7 @@ public enum MessageType : byte
 /// </summary>
 public class NetworkManager
 {
-    public static NetworkManager Instance { get; private set; }
+    public static NetworkManager? Instance { get; set; }
     
     public bool IsHost { get; private set; }
     /// <summary>
@@ -34,7 +34,12 @@ public class NetworkManager
     public bool IsConnected { get; private set; }
     public CSteamID MySteamId { get; private set; }
 
+    /// <summary>
+    /// The current lobby code (only set when hosting)
+    /// </summary>
+    public string? CurrentLobbyCode { get; private set; }
     private CSteamID _currentLobbyId;
+    
     // key: SteamId of the player, value: connection
     private Dictionary<CSteamID, HSteamNetConnection> _connections = [];
     private HSteamListenSocket _listenSocket;
@@ -46,10 +51,10 @@ public class NetworkManager
     private const uint AppId = 480;
     
     // callbacks
-    private Callback<LobbyCreated_t> _lobbyCreatedCallback;
-    private Callback<LobbyEnter_t> _lobbyEnterCallback;
-    private Callback<LobbyChatUpdate_t> _lobbyChatUpdateCallback;
-    private Callback<SteamNetConnectionStatusChangedCallback_t> _connectionStatusChangedCallback;
+    private Callback<LobbyCreated_t>? _lobbyCreatedCallback;
+    private Callback<LobbyEnter_t>? _lobbyEnterCallback;
+    private Callback<LobbyChatUpdate_t>? _lobbyChatUpdateCallback;
+    private Callback<SteamNetConnectionStatusChangedCallback_t>? _connectionStatusChangedCallback;
 
     public NetworkManager()
     {
@@ -66,9 +71,11 @@ public class NetworkManager
     {
         try
         {
-            if (!SteamAPI.Init())
+            Environment.SetEnvironmentVariable("SteamAppId", AppId.ToString());
+            
+            if (SteamAPI.InitEx(out var msg) != ESteamAPIInitResult.k_ESteamAPIInitResult_OK)
             {
-                Console.WriteLine("[NetworkManager] SteamAPI.Init() failed!");
+                Console.WriteLine($"[NetworkManager] SteamAPI.InitEx() failed! {msg}");
                 return false;
             }
             
@@ -282,7 +289,7 @@ public class NetworkManager
         }
     }
     
-    private void SendMessage(HSteamNetConnection connection, MessageType type, string content)
+    private void SendMessage(HSteamNetConnection connection, MessageType type, string? content)
     {
         var messageTypeByte = (byte) type;
         var contentBytes = Encoding.UTF8.GetBytes(content ?? "");
@@ -342,7 +349,7 @@ public class NetworkManager
         var messages = new IntPtr[32];
         var messageCount = SteamNetworkingSockets.ReceiveMessagesOnPollGroup(_pollGroup, messages, 32);
 
-        for (int i = 0; i < messageCount; i++)
+        for (var i = 0; i < messageCount; i++)
         {
             var message = SteamNetworkingMessage_t.FromIntPtr(messages[i]);
 
@@ -389,5 +396,38 @@ public class NetworkManager
                 SteamNetworkingMessage_t.Release(messages[i]);
             }
         }
+    }
+
+    public void Shutdown()
+    {
+        Console.WriteLine("[NetworkManager] Shutting down...");
+
+        if (_currentLobbyId != CSteamID.Nil)
+        {
+            SteamMatchmaking.LeaveLobby(_currentLobbyId);
+            _currentLobbyId = CSteamID.Nil;
+        }
+
+        foreach (var connection in _connections.Values)
+        {
+            SteamNetworkingSockets.CloseConnection(connection, 0, "Shutting down", false);
+        }
+        _connections.Clear();
+
+        if (_listenSocket != HSteamListenSocket.Invalid)
+        {
+            SteamNetworkingSockets.CloseListenSocket(_listenSocket);
+            _listenSocket = HSteamListenSocket.Invalid;
+        }
+
+        if (_pollGroup != HSteamNetPollGroup.Invalid)
+        {
+            SteamNetworkingSockets.DestroyPollGroup(_pollGroup);
+            _pollGroup = HSteamNetPollGroup.Invalid;
+        }
+        
+        SteamAPI.Shutdown();
+        IsConnected = false;
+        IsHost = false;
     }
 }

@@ -4,6 +4,7 @@ using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
+using Blastia.Main.Networking;
 using Blastia.Main.Sounds;
 using Blastia.Main.UI;
 using Blastia.Main.UI.Menus;
@@ -80,6 +81,7 @@ public class BlastiaGame : Game
 	public static WorldsMenu? WorldsMenu { get; private set; }
 	public static PlayerCreationMenu? PlayerCreationMenu { get; private set; }	
 	public static WorldCreationMenu? WorldCreationMenu { get; private set; }
+	public static MultiplayerMenu? MultiplayerMenu { get; private set; }
 	public static SettingsMenu? SettingsMenu { get; private set; }
 	public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
@@ -189,6 +191,12 @@ public class BlastiaGame : Game
 			AddressU = TextureAddressMode.Clamp,
 			AddressV = TextureAddressMode.Clamp
 		};
+
+		NetworkManager.Instance = new NetworkManager();
+		if (NetworkManager.Instance.InitializeSteam())
+		{
+			// steam initialized
+		}
 	}
 
 	private void InitializeConsole()
@@ -287,6 +295,9 @@ public class BlastiaGame : Game
 
 			WorldCreationMenu = new WorldCreationMenu(MainFont);
 			AddMenu(WorldCreationMenu);
+			
+			MultiplayerMenu = new MultiplayerMenu(MainFont);
+			AddMenu(MultiplayerMenu);
 
 			SettingsMenu = new SettingsMenu(MainFont);
 			AddMenu(SettingsMenu);
@@ -323,6 +334,7 @@ public class BlastiaGame : Game
 
 	protected override void UnloadContent()
 	{
+		NetworkManager.Instance?.Shutdown();
 		UnloadWorld();
 		ConsoleWindow?.Close();
 		
@@ -339,11 +351,13 @@ public class BlastiaGame : Game
 		{
 			base.Update(gameTime);
 			UpdateGameTime(gameTime);
-
+			NetworkManager.Instance?.Update();
+			
 			UpdateColors();
 
 			UpdateMouseState();
 			UpdateKeyboardState();
+			NotificationDisplay?.Update();
 			TooltipDisplay?.BeginFrame();
 
 			if (IsWorldInitialized)
@@ -396,7 +410,6 @@ public class BlastiaGame : Game
 			}
 
 			TooltipDisplay?.Update();
-			NotificationDisplay?.Update();
 			
 			// update previous states in the end
 			UpdatePreviousStates();
@@ -481,6 +494,8 @@ public class BlastiaGame : Game
 			_entitiesToRemove.Clear();
 		}
 		
+		NotificationDisplay?.Draw(SpriteBatch);
+		// any menus on top of the notifications
 		foreach (Menu menu in _menus)
 		{
 			if (menu.Active)
@@ -492,7 +507,6 @@ public class BlastiaGame : Game
 		// draw cursor texture last on top of everything
 		SpriteBatch.Draw(CursorTexture, CursorPosition, Color.White);
 		TooltipDisplay?.Draw(SpriteBatch);
-		NotificationDisplay?.Draw(SpriteBatch);
 		SpriteBatch.End();
 	}
 

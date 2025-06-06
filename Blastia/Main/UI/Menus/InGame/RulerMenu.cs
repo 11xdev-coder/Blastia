@@ -42,8 +42,6 @@ public class RulerMenu(SpriteFont font, bool isActive = false) : Menu(font, isAc
             Scale = new Vector2(0.7f)
         };
         Elements.Add(removeRulerText);
-        
-        // TODO: implement bindings
     }
     
     /// <summary>

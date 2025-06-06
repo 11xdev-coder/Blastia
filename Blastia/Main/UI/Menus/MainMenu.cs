@@ -44,7 +44,7 @@ public class MainMenu(SpriteFont font, bool isActive = true) : Menu(font, isActi
 
 	private void OnClickMultiplayer()
 	{
-		
+		SwitchToMenu(BlastiaGame.MultiplayerMenu);
 	}
 
 	private void OnClickSettings()
