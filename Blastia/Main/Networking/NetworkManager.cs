@@ -55,6 +55,7 @@ public class NetworkManager
     private Callback<LobbyEnter_t>? _lobbyEnterCallback;
     private Callback<LobbyChatUpdate_t>? _lobbyChatUpdateCallback;
     private Callback<SteamNetConnectionStatusChangedCallback_t>? _connectionStatusChangedCallback;
+    private Callback<LobbyMatchList_t>? _lobbyMatchListCallback;
 
     public NetworkManager()
     {
@@ -87,6 +88,7 @@ public class NetworkManager
             _lobbyEnterCallback = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
             _lobbyChatUpdateCallback = Callback<LobbyChatUpdate_t>.Create(OnLobbyChatUpdate);
             _connectionStatusChangedCallback = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
+            _lobbyMatchListCallback = Callback<LobbyMatchList_t>.Create(OnLobbyMatchList);
             
             // initialize networking
             SteamNetworkingUtils.InitRelayNetworkAccess();
@@ -111,6 +113,23 @@ public class NetworkManager
         ReceiveNetworkMessages();
     }
 
+    /// <summary>
+    /// Generates random 6-character lobby code
+    /// </summary>
+    private string GenerateLobbyCode()
+    {
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        var random = new Random();
+        var code = new char[6];
+
+        for (var i = 0; i < 6; i++)
+        {
+            code[i] = chars[random.Next(chars.Length)];
+        }
+        
+        return new string(code);
+    }
+
     public void HostGame()
     {
         if (!SteamAPI.IsSteamRunning())
@@ -127,13 +146,62 @@ public class NetworkManager
         
         Console.WriteLine("[NetworkManager] Creating lobby");
         IsHost = true;
+        CurrentLobbyCode = GenerateLobbyCode();
         
         // create lobby
         var handle = SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, 128);
-        // callback will handle the rest
+        // callback will handle the rest (OnLobbyCreated)
     }
 
-    public void JoinLobby(CSteamID lobbyId)
+    public void JoinLobbyWithCode(string code)
+    {
+        if (!SteamAPI.IsSteamRunning())
+        {
+            Console.WriteLine("[NetworkManager] Cannot join: Steam is not running");
+            return;
+        }
+        
+        if (_currentLobbyId != CSteamID.Nil)
+        {
+            Console.WriteLine("[NetworkManager] Already in a lobby");
+            return;
+        }
+
+        if (string.IsNullOrEmpty(code) || code.Length != 6)
+        {
+            Console.WriteLine("[NetworkManager] Invalid lobby code format (must be 6 characters)");
+            return;
+        }
+        
+        Console.WriteLine($"[NetworkManager] Searching for a lobby with code: {code.ToUpper()}");
+        IsHost = false;
+        
+        // search for lobbies with this code
+        SteamMatchmaking.AddRequestLobbyListStringFilter("LobbyCode", code.ToUpper(), ELobbyComparison.k_ELobbyComparisonEqual);
+        SteamMatchmaking.AddRequestLobbyListStringFilter("GameVersion", "0.1.0", ELobbyComparison.k_ELobbyComparisonEqual);
+        SteamMatchmaking.RequestLobbyList();
+        // callback will handle joining (OnLobbyMatchList)
+    }
+    
+    private void OnLobbyMatchList(LobbyMatchList_t callback)
+    {
+        Console.WriteLine($"[NetworkManager] Found {callback.m_nLobbiesMatching} lobbies with matching code");
+
+        if (callback.m_nLobbiesMatching > 0)
+        {
+            // join first found
+            var lobbyId = SteamMatchmaking.GetLobbyByIndex(0);
+            var lobbyCode = SteamMatchmaking.GetLobbyData(lobbyId, "LobbyCode");
+            Console.WriteLine($"[NetworkManager] Found lobby with code: {lobbyCode}");
+            JoinLobby(lobbyId);
+        }
+        else
+        {
+            Console.WriteLine($"[NetworkManager] No lobbies was found (is the code correct?)");
+        }
+    }
+
+    private void JoinLobby(CSteamID lobbyId)
     {
         if (!SteamAPI.IsSteamRunning())
         {
@@ -158,13 +226,17 @@ public class NetworkManager
         {
             Console.WriteLine($"[NetworkManager] Lobby creation failed: {callback.m_eResult}");
             IsHost = false;
+            CurrentLobbyCode = null;
             return;
         }
         
         _currentLobbyId = new CSteamID(callback.m_ulSteamIDLobby);
         Console.WriteLine($"[NetworkManager] Lobby creation successful: {_currentLobbyId}");
+        Console.WriteLine($"[NetworkManager] ------------------ LOBBY CODE: {CurrentLobbyCode} ------------------");
+        Console.WriteLine($"[NetworkManager] Share this code with friends");
         
         // set lobby data
+        SteamMatchmaking.SetLobbyData(_currentLobbyId, "LobbyCode", CurrentLobbyCode);
         SteamMatchmaking.SetLobbyData(_currentLobbyId, "HostName", SteamFriends.GetPersonaName());
         SteamMatchmaking.SetLobbyData(_currentLobbyId, "GameVersion", "0.1.0");
         
@@ -187,6 +259,11 @@ public class NetworkManager
         _currentLobbyId = new CSteamID(callback.m_ulSteamIDLobby);
         Console.WriteLine($"[NetworkManager] Lobby entered: {_currentLobbyId}");
         
+        // lobby info
+        var lobbyCode = SteamMatchmaking.GetLobbyData(_currentLobbyId, "LobbyCode");
+        var hostName = SteamMatchmaking.GetLobbyData(_currentLobbyId, "HostName");
+        Console.WriteLine($"[NetworkManager] Joined lobby with code: {lobbyCode}, hosted by: {hostName}");
+        
         // get lobby owner
         var lobbyOwner = SteamMatchmaking.GetLobbyOwner(_currentLobbyId);
         Console.WriteLine($"[NetworkManager] Lobby owner: {SteamFriends.GetFriendPersonaName(lobbyOwner)}");
@@ -199,7 +276,7 @@ public class NetworkManager
         
         // connect to all existing players
         var memberCount = SteamMatchmaking.GetNumLobbyMembers(_currentLobbyId);
-        for (int i = 0; i < memberCount; i++)
+        for (var i = 0; i < memberCount; i++)
         {
             var member = SteamMatchmaking.GetLobbyMemberByIndex(_currentLobbyId, i);
             if (member != MySteamId && !_connections.ContainsKey(member))
@@ -401,31 +478,33 @@ public class NetworkManager
     public void Shutdown()
     {
         Console.WriteLine("[NetworkManager] Shutting down...");
-
-        if (_currentLobbyId != CSteamID.Nil)
-        {
-            SteamMatchmaking.LeaveLobby(_currentLobbyId);
-            _currentLobbyId = CSteamID.Nil;
-        }
-
+        
+        // close all connections
         foreach (var connection in _connections.Values)
         {
             SteamNetworkingSockets.CloseConnection(connection, 0, "Shutting down", false);
         }
         _connections.Clear();
 
+        // close listen socket
         if (_listenSocket != HSteamListenSocket.Invalid)
         {
             SteamNetworkingSockets.CloseListenSocket(_listenSocket);
-            _listenSocket = HSteamListenSocket.Invalid;
         }
 
+        // destroy poll group
         if (_pollGroup != HSteamNetPollGroup.Invalid)
         {
             SteamNetworkingSockets.DestroyPollGroup(_pollGroup);
-            _pollGroup = HSteamNetPollGroup.Invalid;
         }
         
+        // leave lobby
+        if (_currentLobbyId != CSteamID.Nil)
+        {
+            SteamMatchmaking.LeaveLobby(_currentLobbyId);
+        }
+
+        CurrentLobbyCode = null;
         SteamAPI.Shutdown();
         IsConnected = false;
         IsHost = false;

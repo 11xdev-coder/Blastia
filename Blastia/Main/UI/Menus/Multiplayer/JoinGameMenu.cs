@@ -4,20 +4,22 @@ using Blastia.Main.UI.Buttons;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
-namespace Blastia.Main.UI.Menus;
+namespace Blastia.Main.UI.Menus.Multiplayer;
 
-public class MultiplayerMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
+public class JoinGameMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
+    private Input? _codeEntry;
+    
     protected override void AddElements()
     {
-        var hostGame = new Button(Vector2.Zero, "Host game", Font, HostGame)
+        _codeEntry = new Input(Vector2.Zero, Font, defaultText: "Enter code...")
         {
             HAlign = 0.5f,
             VAlign = 0.5f,
         };
-        Elements.Add(hostGame);
+        Elements.Add(_codeEntry);
         
-        var joinGame = new Button(Vector2.Zero, "Join game", Font, JoinGame)
+        var joinGame = new Button(Vector2.Zero, "Join", Font, JoinGame)
         {
             HAlign = 0.5f,
             VAlign = 0.55f,
@@ -32,18 +34,15 @@ public class MultiplayerMenu(SpriteFont font, bool isActive = false) : Menu(font
         Elements.Add(back);
     }
 
-    private void HostGame()
-    {
-        NetworkManager.Instance?.HostGame();
-    }
-
     private void JoinGame()
     {
-        SwitchToMenu(BlastiaGame.JoinGameMenu);
+        if (_codeEntry == null || _codeEntry.Text == null) return;
+        
+        NetworkManager.Instance?.JoinLobbyWithCode(_codeEntry.Text);
     }
 
     private void Back()
     {
-        SwitchToMenu(BlastiaGame.MainMenu);
+        SwitchToMenu(BlastiaGame.MultiplayerMenu);
     }
 }

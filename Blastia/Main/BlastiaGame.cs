@@ -9,6 +9,7 @@ using Blastia.Main.Sounds;
 using Blastia.Main.UI;
 using Blastia.Main.UI.Menus;
 using Blastia.Main.UI.Menus.InGame;
+using Blastia.Main.UI.Menus.Multiplayer;
 using Blastia.Main.UI.Menus.Settings;
 using Blastia.Main.UI.Menus.SinglePlayer;
 using Blastia.Main.Utilities;
@@ -82,6 +83,7 @@ public class BlastiaGame : Game
 	public static PlayerCreationMenu? PlayerCreationMenu { get; private set; }	
 	public static WorldCreationMenu? WorldCreationMenu { get; private set; }
 	public static MultiplayerMenu? MultiplayerMenu { get; private set; }
+	public static JoinGameMenu? JoinGameMenu { get; private set; }
 	public static SettingsMenu? SettingsMenu { get; private set; }
 	public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
@@ -298,6 +300,9 @@ public class BlastiaGame : Game
 			
 			MultiplayerMenu = new MultiplayerMenu(MainFont);
 			AddMenu(MultiplayerMenu);
+			
+			JoinGameMenu = new JoinGameMenu(MainFont);
+			AddMenu(JoinGameMenu);
 
 			SettingsMenu = new SettingsMenu(MainFont);
 			AddMenu(SettingsMenu);

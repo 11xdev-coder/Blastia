@@ -20,6 +20,7 @@ public class Input : UIElement
     private Color CursorColor { get; set; }
     private int CursorWidth { get; set; }
     private int CursorHeight { get; set; }
+    private string DefaultText { get; set; }
 
     private double _leftArrowHoldTime;
     private double _rightArrowHoldTime;
@@ -31,7 +32,7 @@ public class Input : UIElement
     
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
         double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
-        int cursorWidth = 2, int cursorHeight = 30) : base(position, "", font)
+        int cursorWidth = 2, int cursorHeight = 30, string defaultText = "Text here...") : base(position, "", font)
     {
         _cursorVisible = cursorVisible;
         _shouldDrawCursor = cursorVisible;
@@ -40,6 +41,7 @@ public class Input : UIElement
         CursorColor = cursorColor ?? Color.White;
         CursorWidth = cursorWidth;
         CursorHeight = cursorHeight;
+        DefaultText = defaultText;
         
         IsFocused = focusedByDefault;
     }
@@ -58,7 +60,7 @@ public class Input : UIElement
         // if no text + unfocused -> default text; otherwise -> StringBuilder text
         if (!IsFocused && StringBuilder.Length <= 0)
         {
-            Text = "Text here...";
+            Text = DefaultText;
             DrawColor = _defaultTextColor;
         }
         else
