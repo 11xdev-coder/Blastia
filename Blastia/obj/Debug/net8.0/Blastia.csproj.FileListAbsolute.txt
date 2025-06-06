@@ -176,3 +176,11 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SlotBackgr
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SlotHighlighted.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\Apple.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Grab.wav
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\steam_appid.txt
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Steamworks.NET.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\linux-x64\lib\netstandard2.1\Steamworks.NET.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\linux-x86\lib\netstandard2.1\Steamworks.NET.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\osx-x64\lib\netstandard2.1\Steamworks.NET.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\osx-x86\lib\netstandard2.1\Steamworks.NET.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\win-x64\lib\netstandard2.1\Steamworks.NET.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\win-x86\lib\netstandard2.1\Steamworks.NET.dll

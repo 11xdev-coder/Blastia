@@ -519,6 +519,41 @@
           "buildMultiTargeting/_._": {}
         }
       },
+      "Steamworks.NET/2024.8.0": {
+        "type": "package",
+        "compile": {
+          "ref/netstandard2.1/Steamworks.NET.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.1/Steamworks.NET.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/lib/netstandard2.1/Steamworks.NET.dll": {
+            "assetType": "runtime",
+            "rid": "linux-x64"
+          },
+          "runtimes/linux-x86/lib/netstandard2.1/Steamworks.NET.dll": {
+            "assetType": "runtime",
+            "rid": "linux-x86"
+          },
+          "runtimes/osx-x64/lib/netstandard2.1/Steamworks.NET.dll": {
+            "assetType": "runtime",
+            "rid": "osx-x64"
+          },
+          "runtimes/osx-x86/lib/netstandard2.1/Steamworks.NET.dll": {
+            "assetType": "runtime",
+            "rid": "osx-x86"
+          },
+          "runtimes/win-x64/lib/netstandard2.1/Steamworks.NET.dll": {
+            "assetType": "runtime",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/lib/netstandard2.1/Steamworks.NET.dll": {
+            "assetType": "runtime",
+            "rid": "win-x86"
+          }
+        }
+      },
       "System.AppContext/4.1.0": {
         "type": "package",
         "dependencies": {
@@ -2021,6 +2056,26 @@
         "lib/netstandard2.1/SharpGen.Runtime.COM.dll",
         "sharpgen.runtime.com.2.0.0-beta.13.nupkg.sha512",
         "sharpgen.runtime.com.nuspec"
+      ]
+    },
+    "Steamworks.NET/2024.8.0": {
+      "sha512": "FHTj80ZyT09d0XwSnhE8+e6r/hwpp1+PmQ3RZbUqlyEQCVNrWDVmdA1ElIgQgx72XGIkF947kXL53z51puGD2g==",
+      "type": "package",
+      "path": "steamworks.net/2024.8.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.1/Steamworks.NET.dll",
+        "readme.md",
+        "ref/netstandard2.1/Steamworks.NET.dll",
+        "runtimes/linux-x64/lib/netstandard2.1/Steamworks.NET.dll",
+        "runtimes/linux-x86/lib/netstandard2.1/Steamworks.NET.dll",
+        "runtimes/osx-x64/lib/netstandard2.1/Steamworks.NET.dll",
+        "runtimes/osx-x86/lib/netstandard2.1/Steamworks.NET.dll",
+        "runtimes/win-x64/lib/netstandard2.1/Steamworks.NET.dll",
+        "runtimes/win-x86/lib/netstandard2.1/Steamworks.NET.dll",
+        "steamworks.net.2024.8.0.nupkg.sha512",
+        "steamworks.net.nuspec"
       ]
     },
     "System.AppContext/4.1.0": {
@@ -4604,6 +4659,7 @@
       "ImGui.NET >= 1.91.6.1",
       "MathNet.Numerics >= 6.0.0-beta2",
       "NAudio >= 2.2.1",
+      "Steamworks.NET >= 2024.8.0",
       "System.Drawing.Common >= 9.0.1",
       "Veldrid >= 4.9.0",
       "Veldrid.StartupUtilities >= 4.9.0"
@@ -4684,6 +4740,10 @@
           "NAudio": {
             "target": "Package",
             "version": "[2.2.1, )"
+          },
+          "Steamworks.NET": {
+            "target": "Package",
+            "version": "[2024.8.0, )"
           },
           "System.Drawing.Common": {
             "target": "Package",
