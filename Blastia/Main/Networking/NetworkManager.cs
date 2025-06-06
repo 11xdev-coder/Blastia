@@ -94,6 +94,8 @@ public class NetworkManager
             SteamNetworkingUtils.InitRelayNetworkAccess();
             _pollGroup = SteamNetworkingSockets.CreatePollGroup();
             
+            SetupGracefulShutdown();
+            
             IsSteamInitialized = true;
             IsInMultiplayerSession = false;
             return true;
@@ -105,6 +107,33 @@ public class NetworkManager
             IsInMultiplayerSession = false;
             return false;
         }
+    }
+
+    private void SetupGracefulShutdown()
+    {
+        Console.CancelKeyPress += (_, e) =>
+        {
+            Console.WriteLine("[NetworkManager] [SHUTDOWN] Ctrl+C detected, shutting down...");
+            e.Cancel = true; // prevent immediate exit
+            GracefulShutdown();
+            Environment.Exit(0);
+        };
+
+        AppDomain.CurrentDomain.ProcessExit += (_, _) =>
+        {
+            Console.WriteLine("[NetworkManager] [SHUTDOWN] Process exit detected, shutting down...");
+            GracefulShutdown();
+        };
+    }
+
+    private void GracefulShutdown()
+    {
+        if (!IsSteamInitialized) return;
+        
+        Console.WriteLine("[NetworkManager] [SHUTDOWN] Performing graceful shutdown");
+        DisconnectFromLobby();
+        SteamAPI.Shutdown();
+        IsSteamInitialized = false;
     }
 
     public void Update()
@@ -324,15 +353,6 @@ public class NetworkManager
         {
             Console.WriteLine($"[NetworkManager] User left: {SteamFriends.GetFriendPersonaName(userChanged)}");
             
-            // check if host left
-            var lobbyOwner = SteamMatchmaking.GetLobbyOwner(_currentLobbyId);
-            if (userChanged == lobbyOwner && !IsHost)
-            {
-                Console.WriteLine("[NetworkManager] Host left the lobby. Disconnecting...");
-                DisconnectFromLobby();
-                return;
-            }
-            
             if (_connections.TryGetValue(userChanged, out var connection))
             {
                 SteamNetworkingSockets.CloseConnection(connection, 0, "User left lobby", false);
@@ -385,8 +405,8 @@ public class NetworkManager
             var remoteSteamId = callback.m_info.m_identityRemote.GetSteamID();
             _connections.Remove(remoteSteamId);
             
-            // if client lost connection to host, leave
-            if (!IsHost && _connections.Count == 0)
+            // more reliable to check it here since connection is lost
+            if (!IsHost && _connections.Count == 0) // ensure no connections (connection lost)
             {
                 Console.WriteLine("[NetworkManager] Lost connection to host, leaving lobby");
                 _isConnectedToHost = false;
@@ -505,6 +525,11 @@ public class NetworkManager
                     case MessageType.ChatMessage:
                         ProcessChatMessageLocally(content);
                         break;
+                    case MessageType.PlayerLeftGame:
+                        // just a notification
+                        // OnConnectionStatusChanged handles host disconnect
+                        Console.WriteLine($"[NetworkManager] Received disconnect notice: {content}");
+                        break;
                     default:
                         Console.WriteLine($"[NetworkManager] Unknown message type: {type}");
                         break;
@@ -526,12 +551,17 @@ public class NetworkManager
         Console.WriteLine("[NetworkManager] Disconnecting from lobby...");
         
         // send msg to clients before leaving
-        if (IsHost)
+        if (IsHost && _connections.Count > 0)
         {
             foreach (var connection in _connections.Values)
             {
+                // TODO: PlayerLeftGame msg not sending
                 SendMessage(connection, MessageType.PlayerLeftGame, "Host is leaving");
+                // flush messages to ensure it gets sent
+                SteamNetworkingSockets.FlushMessagesOnConnection(connection);
             }
+            
+            Thread.Sleep(100);
         }
         
         // close every connection
@@ -571,11 +601,7 @@ public class NetworkManager
 
     public void Shutdown()
     {
-        Console.WriteLine("[NetworkManager] Shutting down...");
-        
-        DisconnectFromLobby();
-
-        SteamAPI.Shutdown();
-        IsSteamInitialized = false;
+        Console.WriteLine("[NetworkManager] [SHUTDOWN] Shutting down...");
+        GracefulShutdown();
     }
 }

@@ -266,6 +266,7 @@ public class BlastiaGame : Game
 	{
 		try
 		{
+			Exiting += (_, _) => NetworkManager.Instance?.Shutdown();
 			SpriteBatch = new SpriteBatch(GraphicsDevice);
 
 			LoadTextures();

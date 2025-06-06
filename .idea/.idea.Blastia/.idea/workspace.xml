@@ -9,8 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/InGameSettingsMenu.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0.zip" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0.zip" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
@@ -260,15 +260,7 @@
       <workItem from="1748949890663" duration="14772000" />
       <workItem from="1749027521760" duration="10371000" />
       <workItem from="1749111088972" duration="17963000" />
-      <workItem from="1749198959020" duration="21816000" />
-    </task>
-    <task id="LOCAL-00070" summary="walking animations">
-      <option name="closed" value="true" />
-      <created>1745690133017</created>
-      <option name="number" value="00070" />
-      <option name="presentableId" value="LOCAL-00070" />
-      <option name="project" value="LOCAL" />
-      <updated>1745690133017</updated>
+      <workItem from="1749198959020" duration="25230000" />
     </task>
     <task id="LOCAL-00071" summary="tuned gravity and jump height">
       <option name="closed" value="true" />
@@ -654,7 +646,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749245147837</updated>
     </task>
-    <option name="localTasksCounter" value="119" />
+    <task id="LOCAL-00119" summary="when host leaves all clients disconnect">
+      <option name="closed" value="true" />
+      <created>1749246571219</created>
+      <option name="number" value="00119" />
+      <option name="presentableId" value="LOCAL-00119" />
+      <option name="project" value="LOCAL" />
+      <updated>1749246571219</updated>
+    </task>
+    <option name="localTasksCounter" value="120" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -664,7 +664,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="taking swapping and putting cursor item" />
     <MESSAGE value="add same item from cursor" />
     <MESSAGE value="ui element bounds scale fix" />
     <MESSAGE value="simple dropped item drawing" />
@@ -689,7 +688,8 @@
     <MESSAGE value="steam lobby hosting" />
     <MESSAGE value="lobby codes and lib version fix" />
     <MESSAGE value="is in multiplayer session flag" />
-    <option name="LAST_COMMIT_MESSAGE" value="is in multiplayer session flag" />
+    <MESSAGE value="when host leaves all clients disconnect" />
+    <option name="LAST_COMMIT_MESSAGE" value="when host leaves all clients disconnect" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
