@@ -1,6 +1,22 @@
 ﻿[
   {
     "Id": 1,
+    "Name": "Dirt Block",
+    "Tooltip": "",
+    "IconPath": "Textures/Items/IronSword.png",
+    "MaxStack": 99,
+    "ItemType": "Placeable"
+  },
+  {
+    "Id": 2,
+    "Name": "Stone Block",
+    "Tooltip": "",
+    "IconPath": "Textures/Items/IronSword.png",
+    "MaxStack": 99,
+    "ItemType": "Placeable"
+  },
+  {
+    "Id": 3,
     "Name": "Iron Sword",
     "Tooltip": "Test tooltip",
     "IconPath": "Textures/Items/IronSword.png",
@@ -8,7 +24,7 @@
     "ItemType": "WeaponMelee"
   },
   {
-    "Id": 2,
+    "Id": 4,
     "Name": "Apple",
     "Tooltip": "daklfjadlfk",
     "IconPath": "Textures/Items/Apple.png",

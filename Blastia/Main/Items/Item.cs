@@ -46,6 +46,32 @@ public class Item
 }
 
 /// <summary>
+/// Simple item with no special properties
+/// </summary>
+public class GenericItem : Item
+{
+    public GenericItem(ushort id, string name, string tooltip, Texture2D icon, int maxStack = 1) : base(id, name, tooltip, icon, maxStack)
+    {
+    }
+}
+
+/// <summary>
+/// Placeable item that can be placed as blocks
+/// </summary>
+public class PlaceableItem : Item
+{
+    public ushort BlockId { get; set; }
+    public string PlaceSound { get; set; }
+    
+    public PlaceableItem(ushort id, string name, string tooltip, Texture2D icon, int maxStack = 99, 
+        ushort blockId = 0, string placeSound = "") : base(id, name, tooltip, icon, maxStack, ItemType.Placeable)
+    {
+        BlockId = blockId;
+        PlaceSound = placeSound;
+    }
+}
+
+/// <summary>
 /// Actual instance of the item, has properties and amount. Represents item in an inventory slot
 /// </summary>
 public class ItemInstance

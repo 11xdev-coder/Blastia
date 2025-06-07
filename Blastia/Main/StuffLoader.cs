@@ -116,43 +116,73 @@ public static class StuffLoader
 		Console.WriteLine($"[StuffLoader] Loading {itemDefinitions.Count} item definitions");
 		foreach (var def in itemDefinitions)
 		{
-			Texture2D icon;
 			try
 			{
-				string fullIconPath = Path.Combine(Paths.ContentRoot, def.IconPath);
-				if (!File.Exists(fullIconPath))
-				{
-					Console.WriteLine($"[StuffLoader] Icon not found at path: {fullIconPath} for item ID: {def.Id}");
-					icon = BlastiaGame.WhitePixel;
-				}
-				else
-				{
-					icon = Util.LoadTexture(graphicsDevice, fullIconPath);
-				}
+				var item = CreateItemForDefinition(def, graphicsDevice);
+				StuffRegistry.RegisterItem(item);
 			}
 			catch (Exception e)
 			{
-				Console.WriteLine($"[StuffLoader] Failed to load item icon: {e.Message}");
-				icon = BlastiaGame.WhitePixel;
+				Console.WriteLine($"[StuffLoader] Failed to create item {def.Id}. Exception: {e.Message}");
 			}
-
-			ItemType itemType = ItemType.Generic;
-			if (!string.IsNullOrEmpty(def.Type))
-			{
-				if (Enum.TryParse<ItemType>(def.Type, true, out ItemType parsedType))
-				{
-					itemType = parsedType;
-				}
-				else
-				{
-					Console.WriteLine($"[StuffLoader] Unknown item type: {def.Type} for item ID: {def.Id}");
-				}
-			}
-
-			Item item = new Item(def.Id, def.Name, def.Tooltip, icon, def.MaxStack, itemType);
-			StuffRegistry.RegisterItem(item);
 		}
 		
 		Console.WriteLine($"[StuffLoader] Successfully registered {itemDefinitions.Count} item definitions");
+	}
+
+	private static Item CreateItemForDefinition(DataDefinitions.ItemDefinition definition, GraphicsDevice graphicsDevice)
+	{
+		// load icon
+		Texture2D icon;
+		try
+		{
+			var fullIconPath = Path.Combine(Paths.ContentRoot, definition.IconPath);
+			if (!File.Exists(fullIconPath))
+			{
+				Console.WriteLine($"[StuffLoader] Icon not found at path: {fullIconPath} for item ID: {definition.Id}");
+				icon = BlastiaGame.WhitePixel;
+			}
+			else
+			{
+				icon = Util.LoadTexture(graphicsDevice, fullIconPath);
+			}
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine($"[StuffLoader] Failed to load item icon: {e.Message}");
+			icon = BlastiaGame.WhitePixel;
+		}
+		
+		// parse item type
+		var itemType = ItemType.Generic;
+		if (!string.IsNullOrEmpty(definition.Type))
+		{
+			if (!Enum.TryParse(definition.Type, true, out itemType))
+			{
+				Console.WriteLine($"[StuffLoader] Unknown item type: {definition.Type} for item ID: {definition.Id}");
+				itemType = ItemType.Generic;
+			}
+		}
+		
+		// create specific item type
+		return itemType switch
+		{
+			ItemType.Placeable => CreatePlaceableItem(definition, icon),
+			_ => new GenericItem(definition.Id, definition.Name, definition.Tooltip, icon, definition.MaxStack)
+		};
+	}
+
+	private static PlaceableItem CreatePlaceableItem(DataDefinitions.ItemDefinition def, Texture2D icon)
+	{
+		ushort blockId = 0;
+		var placeSound = "";
+
+		if (def.Properties != null)
+		{
+			blockId = def.Properties.Value<ushort>("BlockId");
+			placeSound = def.Properties.Value<string>("PlaceSound");
+		}
+		
+		return new PlaceableItem(def.Id, def.Name, def.Tooltip, icon, def.MaxStack, blockId, placeSound);
 	}
 }

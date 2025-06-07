@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json.Linq;
 
 namespace Blastia.Main.Data;
 
@@ -15,5 +16,10 @@ public class DataDefinitions
         public string IconPath { get; set; } = string.Empty;
         public int MaxStack { get; set; } = 1;
         public string Type { get; set; } = "Generic";
+        
+        /// <summary>
+        /// Additional item properties for specific types
+        /// </summary>
+        public JObject? Properties { get; set; }
     }
 }
