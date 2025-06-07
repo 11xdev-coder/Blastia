@@ -26,7 +26,7 @@ public class Player : HumanLikeEntity
 	private const float WalkingAnimationDuration = 0.4f;
 
 	public Camera? Camera { get; set; }
-	private World? _world;
+	public World? World;
 
 	protected override bool ApplyGravity => true;
 	public override float Height => 1.8f;
@@ -55,7 +55,7 @@ public class Player : HumanLikeEntity
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
 			new Vector2(10, 21))
 	{
-		_world = world;
+		World = world;
 		PlayerInventory = new Inventory(InventoryCapacity, this);
 		LocallyControlled = myPlayer;
 		
@@ -165,20 +165,20 @@ public class Player : HumanLikeEntity
 		if (BlastiaGame.HasClickedRight)
 		{
 			var pos = GetCoordsForBlockPlacement();
-			currentWorld.SetTile((int) pos.X, (int) pos.Y, 1);
+			currentWorld.SetTile((int) pos.X, (int) pos.Y, 1, this);
 		}
 		if (BlastiaGame.HasClickedLeft)
 		{
 			var pos = GetCoordsForBlockPlacement();
-			currentWorld.SetTile((int) pos.X, (int) pos.Y, 0);
+			currentWorld.SetTile((int) pos.X, (int) pos.Y, 0, this);
 		}
 	}
 
 	private void HandleItemInteraction()
 	{
-		if (_world == null) return;
+		if (World == null) return;
 		
-		var droppedItems = new List<DroppedItem>(_world.GetDroppedItems());
+		var droppedItems = new List<DroppedItem>(World.GetDroppedItems());
 
 		foreach (var droppedItem in droppedItems)
 		{

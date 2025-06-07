@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
 using Blastia.Main.Utilities;
@@ -210,7 +211,8 @@ public class WorldState
 	/// <param name="x"></param>
 	/// <param name="y"></param>
 	/// <param name="value">New ID</param>
-	public void SetTile(int x, int y, ushort value)
+	/// <param name="player">Player that set the tile</param>
+	public void SetTile(int x, int y, ushort value, Player? player = null)
 	{
 		Vector2 pos = new(x, y);
 		if (SetTileLogs) Console.WriteLine($"World: {Name}, Set tile at: (X: {x}, Y: {y}), ID: {value}");
@@ -218,6 +220,14 @@ public class WorldState
 		if (value == 0)
 		{
 			// if new ID is air (0) -> remove tile to save space
+			// first call its OnBreak
+			var id = GetTileAtWorldCoord(x, y);
+			var block = StuffRegistry.GetBlock(id);
+			if (block != null)
+			{
+				block.OnBreak(player?.World, pos, player);
+			}
+			
 			Tiles.Remove(pos);
 		}
 		else

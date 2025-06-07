@@ -1,3 +1,4 @@
+using Blastia.Main.Entities;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Microsoft.Xna.Framework;
@@ -48,7 +49,17 @@ public abstract class Block
 
 	// virtual methods for complex blocks
 	public virtual void OnPlace(World world, Vector2 position, Player player) {}
-	public virtual void OnBreak(World world, Vector2 position, Player player) {}
+
+	public virtual void OnBreak(World? world, Vector2 position, Player? player)
+	{
+		// TODO: Randomize speed, tweak position and scale
+		if (world == null) return;
+		
+		var droppedItem = new DroppedItem(position, 1f, world);
+		var item = StuffRegistry.GetItem(ItemIdDrop);
+		droppedItem.Launch(item, ItemDropAmount, 1, 10f, 15f);
+		BlastiaGame.RequestAddEntity(droppedItem);
+	}
 	public virtual void OnRightClick(World world, Vector2 position, Player player) {}
 	public virtual void OnLeftClick(World world, Vector2 position, Player player) {}
 	public virtual void Update(World world, Vector2 position) {}
