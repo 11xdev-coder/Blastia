@@ -351,7 +351,12 @@ public class NetworkManager
         }
         else if (callback.m_rgfChatMemberStateChange == (uint) EChatMemberStateChange.k_EChatMemberStateChangeLeft)
         {
-            Console.WriteLine($"[NetworkManager] User left: {SteamFriends.GetFriendPersonaName(userChanged)}");
+            //Console.WriteLine($"[NetworkManager] User left: {SteamFriends.GetFriendPersonaName(userChanged)}");
+
+            if (IsHost && userChanged != MySteamId)
+            {
+                NotifyPlayerLeft(userChanged, "disconnected");
+            }
             
             if (_connections.TryGetValue(userChanged, out var connection))
             {
@@ -403,6 +408,10 @@ public class NetworkManager
             
             // remove from connections
             var remoteSteamId = callback.m_info.m_identityRemote.GetSteamID();
+            if (IsHost && remoteSteamId != MySteamId && _connections.ContainsKey(remoteSteamId))
+            {
+                NotifyPlayerLeft(remoteSteamId, "lost connection");
+            }
             _connections.Remove(remoteSteamId);
             
             // more reliable to check it here since connection is lost
@@ -528,7 +537,7 @@ public class NetworkManager
                     case MessageType.PlayerLeftGame:
                         // just a notification
                         // OnConnectionStatusChanged handles host disconnect
-                        Console.WriteLine($"[NetworkManager] Received disconnect notice: {content}");
+                        ProcessPlayerLeftGameLocally(content);
                         break;
                     default:
                         Console.WriteLine($"[NetworkManager] Unknown message type: {type}");
@@ -555,13 +564,12 @@ public class NetworkManager
         {
             foreach (var connection in _connections.Values)
             {
-                // TODO: PlayerLeftGame msg not sending
                 SendMessage(connection, MessageType.PlayerLeftGame, "Host is leaving");
                 // flush messages to ensure it gets sent
                 SteamNetworkingSockets.FlushMessagesOnConnection(connection);
             }
             
-            Thread.Sleep(100);
+            Thread.Sleep(200);
         }
         
         // close every connection
@@ -597,6 +605,40 @@ public class NetworkManager
         IsHost = false;
         IsInMultiplayerSession = false;
         _isConnectedToHost = false;
+    }
+
+    /// <summary>
+    /// Notifies all clients that <c>leavingPlayer</c> has left
+    /// </summary>
+    /// <param name="leavingPlayer"></param>
+    /// <param name="reason"></param>
+    private void NotifyPlayerLeft(CSteamID leavingPlayer, string reason = "")
+    {
+        if (!IsHost || _connections.Count == 0) return;
+        
+        var playerName = SteamFriends.GetFriendPersonaName(leavingPlayer);
+        var message = string.IsNullOrEmpty(reason)
+            ? $"{playerName} left the game"
+            : $"{playerName} left the game ({reason})";
+        
+        Console.WriteLine($"[NetworkManager] [PLAYER LEFT] Notifying all clients: {message}");
+
+        // process on host locally too
+        ProcessPlayerLeftGameLocally(reason);
+        // send to all clients
+        foreach (var kvp in _connections.ToList())
+        {
+            if (kvp.Key != leavingPlayer)
+            {
+                SendMessage(kvp.Value, MessageType.PlayerLeftGame, message);
+                SteamNetworkingSockets.FlushMessagesOnConnection(kvp.Value);
+            }
+        }
+    }
+
+    private void ProcessPlayerLeftGameLocally(string content)
+    {
+        Console.WriteLine($"[NetworkManager] [PLAYER LEFT] Player left the game: {content}");
     }
 
     public void Shutdown()
