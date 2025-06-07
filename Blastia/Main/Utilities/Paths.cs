@@ -43,6 +43,7 @@ public static class Paths
 	// loading
 	public static string BlockTextures { get; private set; } = "";
 	public static string HumanTextures { get; private set; } = "";
+	public static string BlocksData { get; private set; } = "";
 	public static string ItemsData { get; private set; } = "";
 	
 	// update all paths when ContentRoot changes
@@ -65,6 +66,7 @@ public static class Paths
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";
 		HumanTextures = ContentRoot + "/Textures/Entities/Humans";
+		BlocksData = ContentRoot + "/Data/blocks.json";
 		ItemsData = ContentRoot + "/Data/items.json";
 	}
 	

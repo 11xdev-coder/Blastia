@@ -27,13 +27,13 @@ public static class StuffRegistry
 	public static void RegisterBlock(Block block, Texture2D texture)  
 	{
 		// if ID is already present in Blocks
-		if (!Blocks.TryAdd(block.ID, block)) 
+		if (!Blocks.TryAdd(block.Id, block)) 
 		{
-			throw new DuplicateNameException($"Duplicate block with ID: {block.ID}");
+			throw new DuplicateNameException($"Duplicate block with ID: {block.Id}");
 		}
 		
 		// doesnt exist -> register
-		BlockTextures[block.ID] = texture;
+		BlockTextures[block.Id] = texture;
 	}
 	
 	public static Block? GetBlock(ushort id) 

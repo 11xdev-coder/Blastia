@@ -13,7 +13,7 @@ public static class WorldGen
         Amplitude = 1f,
         HeightScale = 0.1f,
         MaxHeight = 0.4f,
-        Block = BlockID.Dirt
+        Block = BlockId.Dirt
     };
     
     public static void Generate(uint seed, WorldState worldState)
@@ -47,7 +47,7 @@ public static class WorldGen
                 int alignedHeight = (finalHeight / Block.Size) * Block.Size;
                 for (int y = alignedHeight; y < height; y += Block.Size)
                 {
-                    worldState.SetTile(x * Block.Size, y, BlockID.Dirt);
+                    worldState.SetTile(x * Block.Size, y, BlockId.Dirt);
                 }
                 
                 if (x >= randomSpawnX)

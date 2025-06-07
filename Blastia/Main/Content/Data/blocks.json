@@ -1,0 +1,26 @@
+﻿[
+  {
+    "Id": 1,
+    "Name": "Dirt",
+    "TexturePath": "Textures/Blocks/Dirt.png",
+    "DragCoefficient": 600,
+    "Hardness": 0.5,
+    "IsCollidable": true,
+    "IsTransparent": false,
+    "ItemIdDrop": 1,
+    "ItemDropAmount": 1,
+    "LightLevel": 0
+  },
+  {
+    "Id": 2,
+    "Name": "Stone",
+    "TexturePath": "Textures/Blocks/Stone.png",
+    "DragCoefficient": 750,
+    "Hardness": 1.5,
+    "IsCollidable": true,
+    "IsTransparent": false,
+    "ItemIdDrop": 2,
+    "ItemDropAmount": 1,
+    "LightLevel": 0
+  }
+]

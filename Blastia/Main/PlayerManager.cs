@@ -291,16 +291,16 @@ public class WorldState
 		ushort tileIdCenter = GetTileAtWorldCoord(checkWorldXCenter, checkWorldY);
 		ushort tileIdRight = GetTileAtWorldCoord(checkWorldXRight, checkWorldY);
 
-		ushort finalTileId = BlockID.Air; 
-		if (tileIdCenter != BlockID.Air)
+		ushort finalTileId = BlockId.Air; 
+		if (tileIdCenter != BlockId.Air)
 		{
 			finalTileId = tileIdCenter;
 		}
-		else if (tileIdLeft != BlockID.Air)
+		else if (tileIdLeft != BlockId.Air)
 		{
 			finalTileId = tileIdLeft;
 		}
-		else if (tileIdRight != BlockID.Air)
+		else if (tileIdRight != BlockId.Air)
 		{
 			finalTileId = tileIdRight;
 		}
