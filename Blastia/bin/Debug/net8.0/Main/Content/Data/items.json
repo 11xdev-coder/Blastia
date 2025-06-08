@@ -3,7 +3,7 @@
     "Id": 1,
     "Name": "Dirt Block",
     "Tooltip": "",
-    "IconPath": "Textures/Items/IronSword.png",
+    "IconPath": "Textures/Items/DirtBlock.png",
     "MaxStack": 99,
     "ItemType": "Placeable"
   },

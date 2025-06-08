@@ -250,7 +250,7 @@ public class InventoryUi : Menu
     private void HandleItemDrop()
     {
         if (_playerInventory.CursorItem == null) return;
-        var iconScale = 0.5f;
+        var iconScale = 0.25f;
         
         var playerHalfWidth = _playerInventory.Player.Width * 0.5f;
         var playerHalfHeight = _playerInventory.Player.Height * 0.5f;

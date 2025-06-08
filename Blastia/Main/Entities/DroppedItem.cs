@@ -38,8 +38,8 @@ public class DroppedItem : Entity
     ];
     private World _world;
 
-    public override float Height => 0.85f;
-    public override float Width => 0.85f;
+    public override float Height => 0.6f;
+    public override float Width => 0.6f;
     protected override bool ApplyGravity => true;
     protected override float Mass => 6;
     protected override float FrictionMultiplier => 0.3f;
