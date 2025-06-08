@@ -15,7 +15,7 @@ public class DataDefinitions
         public string Tooltip { get; set; } = string.Empty;
         public string IconPath { get; set; } = string.Empty;
         public int MaxStack { get; set; } = 1;
-        public string Type { get; set; } = "Generic";
+        public string Type { get; set; } = string.Empty;
         
         /// <summary>
         /// Additional item properties for specific types

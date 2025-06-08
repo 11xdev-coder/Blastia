@@ -5,7 +5,7 @@
     "Tooltip": "",
     "IconPath": "Textures/Items/DirtBlock.png",
     "MaxStack": 100,
-    "ItemType": "Placeable"
+    "Type": "Placeable"
   },
   {
     "Id": 2,
@@ -13,7 +13,7 @@
     "Tooltip": "",
     "IconPath": "Textures/Items/StoneBlock.png",
     "MaxStack": 100,
-    "ItemType": "Placeable"
+    "Type": "Placeable"
   },
   {
     "Id": 3,
@@ -21,7 +21,7 @@
     "Tooltip": "Test tooltip",
     "IconPath": "Textures/Items/IronSword.png",
     "MaxStack": 1,
-    "ItemType": "WeaponMelee"
+    "Type": "WeaponMelee"
   },
   {
     "Id": 4,
@@ -29,6 +29,6 @@
     "Tooltip": "daklfjadlfk",
     "IconPath": "Textures/Items/Apple.png",
     "MaxStack": 20,
-    "ItemType": "Consumable"
+    "Type": "Consumable"
   }
 ]

@@ -35,6 +35,14 @@ public class InventorySlot : UIElement
             DrawColor = AmountColor,
             Scale = new Vector2(0.7f, 0.7f)
         };
+
+        OnHover += ShowTooltip;
+    }
+
+    private void ShowTooltip()
+    {
+        if (Item == null) return;
+        BlastiaGame.TooltipDisplay?.SetTooltip(Item.Name, Item.BaseItem.Type, Item.Tooltip);
     }
 
     public void SetItem(ItemInstance? item)
