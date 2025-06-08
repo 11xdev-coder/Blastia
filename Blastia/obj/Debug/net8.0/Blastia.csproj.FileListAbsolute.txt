@@ -244,3 +244,5 @@ C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\osx-x64\native
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\win-x86\native\SDL2.dll
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Data\blocks.json
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\DirtBlock.png
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\StoneBlock.png
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\TooltipBackground.png

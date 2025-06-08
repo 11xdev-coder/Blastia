@@ -4,15 +4,15 @@
     "Name": "Dirt Block",
     "Tooltip": "",
     "IconPath": "Textures/Items/DirtBlock.png",
-    "MaxStack": 99,
+    "MaxStack": 100,
     "ItemType": "Placeable"
   },
   {
     "Id": 2,
     "Name": "Stone Block",
     "Tooltip": "",
-    "IconPath": "Textures/Items/IronSword.png",
-    "MaxStack": 99,
+    "IconPath": "Textures/Items/StoneBlock.png",
+    "MaxStack": 100,
     "ItemType": "Placeable"
   },
   {

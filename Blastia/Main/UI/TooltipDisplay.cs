@@ -10,6 +10,8 @@ public class TooltipDisplay
     private Text _hoverText;
     private bool _updatedHoverTextThisFrame;
 
+    private Image _tooltipBackground;
+    
     public TooltipDisplay(SpriteFont font)
     {
         _font = font;
@@ -18,7 +20,7 @@ public class TooltipDisplay
         {
             Scale = new Vector2(0.8f, 0.8f)
         };
-       
+        _tooltipBackground = new Image(Vector2.Zero, BlastiaGame.TooltipBackgroundTexture);
     }
 
     /// <summary>
@@ -48,49 +50,56 @@ public class TooltipDisplay
             _hoverText.Text = "";
         }
         
-        if (string.IsNullOrEmpty(_hoverText.Text))
-        {
-            return;
-        }
-
         var offsetX = 20f; 
         var offsetY = 20f;
-        _hoverText.Position = BlastiaGame.CursorPosition + new Vector2(offsetX, offsetY);
-        _hoverText.Update();
-        var designScreenWidth = VideoManager.Instance.TargetResolution.X;
-        var designScreenHeight = VideoManager.Instance.TargetResolution.Y;
+        if (!string.IsNullOrEmpty(_hoverText.Text))
+        {
+            _hoverText.Position = BlastiaGame.CursorPosition + new Vector2(offsetX, offsetY);
+            _hoverText.Update();
+            _hoverText.Position = ScreenEdgeCheck(_hoverText);
+            _hoverText.Update(); 
+        }
         
-        var adjustedPosition = _hoverText.Position;
+        _tooltipBackground.Position = BlastiaGame.CursorPosition + new Vector2(offsetX, offsetY);
+        _tooltipBackground.Update();
+        _tooltipBackground.Position = ScreenEdgeCheck(_tooltipBackground);
+        _tooltipBackground.Update();
+    }
+
+    private Vector2 ScreenEdgeCheck(UIElement element)
+    {
+        var screenWidth = VideoManager.Instance.TargetResolution.X;
+        var screenHeight = VideoManager.Instance.TargetResolution.Y;
+        var adjustedPosition = element.Position;
 
         // x
-        if (_hoverText.Bounds.Right > designScreenWidth) 
+        if (element.Bounds.Right > screenWidth)
         {
-            adjustedPosition.X = designScreenWidth - _hoverText.Bounds.Width;
+            adjustedPosition.X = screenWidth - element.Bounds.Width;
         }
-        if (adjustedPosition.X < 0) 
+        if (adjustedPosition.X < 0)
         {
             adjustedPosition.X = 0;
         }
 
-        // y
-        if (_hoverText.Bounds.Bottom > designScreenHeight)
+        if (element.Bounds.Bottom > screenHeight)
         {
-            adjustedPosition.Y = designScreenHeight - _hoverText.Bounds.Height;
+            adjustedPosition.Y = screenHeight - element.Bounds.Height;
         }
-        if (adjustedPosition.Y < 0) 
+        if (adjustedPosition.Y < 0)
         {
             adjustedPosition.Y = 0;
         }
-
-        _hoverText.Position = adjustedPosition;
-        _hoverText.Update(); 
+        
+        return adjustedPosition;
     }
-
+    
     public void Draw(SpriteBatch spriteBatch)
     {
         if (!string.IsNullOrEmpty(_hoverText.Text))
         {
             _hoverText.Draw(spriteBatch);
         }
+        _tooltipBackground.Draw(spriteBatch);
     }
 }
