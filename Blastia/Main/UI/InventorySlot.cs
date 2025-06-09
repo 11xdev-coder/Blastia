@@ -41,7 +41,7 @@ public class InventorySlot : UIElement
 
     private void ShowTooltip()
     {
-        if (Item == null) return;
+        if (BlastiaGame.PlayerInventoryUiMenu == null || Item == null || !BlastiaGame.PlayerInventoryUiMenu.IsFullInventoryOpen) return;
         BlastiaGame.TooltipDisplay?.SetTooltip(Item.Name, Item.BaseItem.Type, Item.Tooltip);
     }
 

@@ -105,7 +105,16 @@ public class DroppedItem : Entity
         return (!IsBeingPulled || PullTargetPlayer == attemptingPlayer) && PickupTime >= MaxPickupTime;
     }
 
-    public void Launch(Item? item, int amount, int launchDirection, float horizontalSpeed = 115f, float verticalSpeed = -100f)
+    /// <summary>
+    /// Drops an item with initial velocity
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="amount"></param>
+    /// <param name="launchDirection"><c>-1</c> launches to the left, <c>1</c> launches to the right</param>
+    /// <param name="horizontalSpeed"></param>
+    /// <param name="verticalSpeed"></param>
+    /// <param name="pickupTime">How much to wait until item can be picked up</param>
+    public void Launch(Item? item, int amount, int launchDirection, float horizontalSpeed = 115f, float verticalSpeed = -100f, float pickupTime = 1.6f)
     {
         Item = item;
         Amount = amount;
@@ -113,6 +122,7 @@ public class DroppedItem : Entity
 
         RefreshStackVisuals();
         
+        PickupTime = MaxPickupTime - pickupTime;
         MovementVector = new Vector2(horizontalSpeed * launchDirection, verticalSpeed);
     }
 

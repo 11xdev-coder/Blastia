@@ -24,8 +24,8 @@ public class TooltipData
 {
     public List<TooltipLine> Lines { get; set; } = [];
     public int Padding { get; set; } = 8;
-    public Color BackgroundColor { get; set; } = Color.Black;
-    public Color BorderColor { get; set; } = Color.White;
+    public Color BackgroundColor { get; set; } = new(37, 76, 167);
+    public Color BorderColor { get; set; } = new(17, 47, 118);
     public int BorderThickness { get; set; } = 2;
 
     public void AddLine(string text, Color color, float scale = 1f)
