@@ -17,7 +17,9 @@
     "IconPath": "Textures/Items/StoneBlock.png",
     "MaxStack": 100,
     "Type": "Placeable",
-    "BlockId": 2
+    "Properties": {
+      "BlockId": 2
+    }
   },
   {
     "Id": 3,

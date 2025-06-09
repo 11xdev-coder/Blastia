@@ -9,9 +9,9 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/ManagerWithStateSaving.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/ManagerWithStateSaving.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/PlayerManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/Saving.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/Saving.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -267,15 +267,7 @@
       <workItem from="1749282643777" duration="774000" />
       <workItem from="1749310991127" duration="12196000" />
       <workItem from="1749391102248" duration="10260000" />
-      <workItem from="1749462736252" duration="8310000" />
-    </task>
-    <task id="LOCAL-00077" summary="rule tiles">
-      <option name="closed" value="true" />
-      <created>1746354920092</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1746354920092</updated>
+      <workItem from="1749462736252" duration="11276000" />
     </task>
     <task id="LOCAL-00078" summary="fixed lag with large worlds">
       <option name="closed" value="true" />
@@ -661,7 +653,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749479962904</updated>
     </task>
-    <option name="localTasksCounter" value="126" />
+    <task id="LOCAL-00126" summary="block item placement">
+      <option name="closed" value="true" />
+      <created>1749497465622</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1749497465622</updated>
+    </task>
+    <option name="localTasksCounter" value="127" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -671,7 +671,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="friction tweaks and dropped items are more slippery" />
     <MESSAGE value="bounciness and player hitbox and scale fix" />
     <MESSAGE value="collision fix" />
     <MESSAGE value="selected item name" />
@@ -696,6 +695,7 @@
     <MESSAGE value="basic item inventory tooltip" />
     <MESSAGE value="dropped item and tooltip tweaks" />
     <MESSAGE value="inventory ui slot hover fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="inventory ui slot hover fix" />
+    <MESSAGE value="block item placement" />
+    <option name="LAST_COMMIT_MESSAGE" value="block item placement" />
   </component>
 </project>

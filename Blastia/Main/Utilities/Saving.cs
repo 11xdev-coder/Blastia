@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
+using Blastia.Main.Blocks.Common;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.Utilities;
@@ -58,6 +59,30 @@ public static class Saving
                             writer.Write(vector.X);
                             writer.Write(vector.Y);
                             writer.Write(id);
+                        }
+                        
+                        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
+                        break;
+                    case Dictionary<Vector2, Block> blockInstanceDictionary:
+                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, Block> with {blockInstanceDictionary.Count} items");
+                        
+                        writer.Write(blockInstanceDictionary.Count);
+                        foreach (var keyValuePair in blockInstanceDictionary)
+                        {
+                            var vector = keyValuePair.Key;
+                            var block = keyValuePair.Value;
+                            
+                            if (debugLogs)
+                            {
+                                Console.WriteLine(vector == default
+                                    ? "Couldn't write Vector2"
+                                    : $"Writing Dictionary<Vector2, Block> entry: Position({vector.X}, {vector.Y}), Block ID: {block.Id}");
+                            }
+                            
+                            writer.Write(vector.X);
+                            writer.Write(vector.Y);
+                            // write blocks ID, reconstruct later from StuffRegistry
+                            writer.Write(block.Id);
                         }
                         
                         if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
@@ -162,6 +187,40 @@ public static class Saving
             
             if (debugLogs) Console.WriteLine($"Successfully read {tileDictionary.Count} entries");
             return tileDictionary;
+        }
+        
+        if (type == typeof(Dictionary<Vector2, Block>))
+        {
+            var blockDictionary = new Dictionary<Vector2, Block>();
+            var count = reader.ReadInt32();
+            if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
+            
+            for (int i = 0; i < count; i++)
+            {
+                var x = reader.ReadSingle();
+                var y = reader.ReadSingle();
+                var blockId = reader.ReadUInt16();
+                
+                if (float.IsInfinity(x) || float.IsNaN(x) || 
+                    float.IsInfinity(y) || float.IsNaN(y))
+                {
+                    throw new InvalidDataException(
+                        $"Invalid position values at entry {i}: ({x}, {y})");
+                }
+                
+                var block = StuffRegistry.GetBlock(blockId);
+                if (block == null)
+                {
+                    if (debugLogs) Console.WriteLine($"Block ID: {blockId} not found in registry");
+                    continue;
+                }
+                
+                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), block ID: {blockId}, block name: {block.Name}");
+                blockDictionary.Add(new Vector2(x, y), block);
+            }
+            
+            if (debugLogs) Console.WriteLine($"Successfully read {blockDictionary.Count} entries");
+            return blockDictionary;
         }
             
         if (type == typeof(Vector2))
