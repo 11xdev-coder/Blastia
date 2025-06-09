@@ -5,7 +5,10 @@
     "Tooltip": "",
     "IconPath": "Textures/Items/DirtBlock.png",
     "MaxStack": 100,
-    "Type": "Placeable"
+    "Type": "Placeable",
+    "Properties": {
+      "BlockId": 1
+    }
   },
   {
     "Id": 2,
@@ -13,7 +16,8 @@
     "Tooltip": "",
     "IconPath": "Textures/Items/StoneBlock.png",
     "MaxStack": 100,
-    "Type": "Placeable"
+    "Type": "Placeable",
+    "BlockId": 2
   },
   {
     "Id": 3,

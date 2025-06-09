@@ -157,19 +157,23 @@ public class Player : HumanLikeEntity
 		return new Vector2(posX, posY);
 	}
 	
+	/// <summary>
+	/// Handles item use and block breaking
+	/// </summary>
 	private void HandleMouseClicks()
 	{
 		// dont place blocks if we are hovered on some slot
 		if (BlastiaGame.PlayerInventoryUiMenu == null || BlastiaGame.PlayerInventoryUiMenu.HoveredOnAnySlot()) return;
-		
-		
+
+		var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
 		var currentWorld = PlayerManager.Instance.SelectedWorld;
 		if (currentWorld == null) return;
-			
-		if (BlastiaGame.HasClickedRight)
+		
+		if (BlastiaGame.HasClickedRight && selectedItem is {BaseItem: PlaceableItem placeable})
 		{
 			var pos = GetCoordsForBlockPlacement();
-			currentWorld.SetTile((int) pos.X, (int) pos.Y, 1, this);
+			currentWorld.SetTile((int) pos.X, (int) pos.Y, placeable.BlockId, this);
+			PlayerInventory.RemoveItem(_selectedHotbarSlot);
 		}
 		if (BlastiaGame.HasClickedLeft)
 		{

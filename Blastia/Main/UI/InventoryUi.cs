@@ -302,20 +302,7 @@ public class InventoryUi : Menu
         // check if clicked NOT on a slot
         if (Active && _playerInventory.CursorItem != null && BlastiaGame.HasClickedLeft)
         {
-            bool clickedOnSlot = false;
-            foreach (var slot in _inventorySlotsUi)
-            {
-                if (slot.IsHovered && slot.SlotIndex < HotbarSlotsCount)
-                {
-                    clickedOnSlot = true;
-                    break;
-                }
-                if (slot.IsHovered && IsFullInventoryOpen)
-                {
-                    clickedOnSlot = true;
-                    break;
-                }
-            }
+            var clickedOnSlot = HoveredOnAnySlot();
 
             if (!clickedOnSlot)
             {
