@@ -159,6 +159,10 @@ public class Player : HumanLikeEntity
 	
 	private void HandleMouseClicks()
 	{
+		// dont place blocks if we are hovered on some slot
+		if (BlastiaGame.PlayerInventoryUiMenu == null || BlastiaGame.PlayerInventoryUiMenu.HoveredOnAnySlot()) return;
+		
+		
 		var currentWorld = PlayerManager.Instance.SelectedWorld;
 		if (currentWorld == null) return;
 			

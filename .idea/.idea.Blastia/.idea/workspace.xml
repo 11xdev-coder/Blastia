@@ -9,7 +9,11 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/Item.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/Item.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventorySlot.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventorySlot.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/InventoryUi.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/UI/TooltipDisplay.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/UI/TooltipDisplay.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
@@ -22,7 +26,6 @@
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -266,15 +269,7 @@
       <workItem from="1749282643777" duration="774000" />
       <workItem from="1749310991127" duration="12196000" />
       <workItem from="1749391102248" duration="10260000" />
-      <workItem from="1749462736252" duration="1410000" />
-    </task>
-    <task id="LOCAL-00075" summary="simple block placement">
-      <option name="closed" value="true" />
-      <created>1746118872897</created>
-      <option name="number" value="00075" />
-      <option name="presentableId" value="LOCAL-00075" />
-      <option name="project" value="LOCAL" />
-      <updated>1746118872897</updated>
+      <workItem from="1749462736252" duration="5495000" />
     </task>
     <task id="LOCAL-00076" summary="block removing">
       <option name="closed" value="true" />
@@ -660,7 +655,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749419078287</updated>
     </task>
-    <option name="localTasksCounter" value="124" />
+    <task id="LOCAL-00124" summary="dropped item and tooltip tweaks">
+      <option name="closed" value="true" />
+      <created>1749471180917</created>
+      <option name="number" value="00124" />
+      <option name="presentableId" value="LOCAL-00124" />
+      <option name="project" value="LOCAL" />
+      <updated>1749471180918</updated>
+    </task>
+    <option name="localTasksCounter" value="125" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -670,7 +673,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="dropped item velocity" />
     <MESSAGE value="dropped item icon position tweak" />
     <MESSAGE value="friction tweaks and dropped items are more slippery" />
     <MESSAGE value="bounciness and player hitbox and scale fix" />
@@ -695,6 +697,7 @@
     <MESSAGE value="block loading refactor" />
     <MESSAGE value="block item dropping" />
     <MESSAGE value="basic item inventory tooltip" />
-    <option name="LAST_COMMIT_MESSAGE" value="basic item inventory tooltip" />
+    <MESSAGE value="dropped item and tooltip tweaks" />
+    <option name="LAST_COMMIT_MESSAGE" value="dropped item and tooltip tweaks" />
   </component>
 </project>

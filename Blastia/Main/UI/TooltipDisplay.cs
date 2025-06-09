@@ -12,7 +12,7 @@ public class TooltipLine
     public Color Color { get; set; }
     public float Scale { get; set; }
 
-    public TooltipLine(string text, Color color, float scale = 1f)
+    public TooltipLine(string text, Color color, float scale = 0.8f)
     {
         Text = text;
         Color = color;
@@ -28,7 +28,7 @@ public class TooltipData
     public Color BorderColor { get; set; } = new(17, 47, 118);
     public int BorderThickness { get; set; } = 2;
 
-    public void AddLine(string text, Color color, float scale = 1f)
+    public void AddLine(string text, Color color, float scale = 0.8f)
     {
         Lines.Add(new TooltipLine(text, color, scale));
     }
@@ -89,8 +89,9 @@ public class TooltipDisplay
     /// </summary>
     /// <param name="itemName"></param>
     /// <param name="itemType"></param>
+    /// <param name="id"></param>
     /// <param name="description"></param>
-    public void SetTooltip(string itemName, ItemType itemType, string description = "")
+    public void SetTooltip(string itemName, ItemType itemType, string id, string description = "")
     {
         _currentTooltipData.Clear();
         
@@ -100,7 +101,13 @@ public class TooltipDisplay
         {
             _currentTooltipData.AddLine(description, Color.Wheat);
         }
-        _currentTooltipData.AddLine(itemType.ToString(), Color.Wheat);
+
+        if (itemType is ItemType.Placeable or ItemType.Consumable)
+        {
+            _currentTooltipData.AddLine(itemType.ToString(), Color.Wheat);
+        }
+        
+        _currentTooltipData.AddLine($"ID: {id}", Color.Wheat);
         
         _updatedTooltipThisFrame = true;
     }

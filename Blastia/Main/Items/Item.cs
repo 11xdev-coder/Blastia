@@ -71,6 +71,17 @@ public class PlaceableItem : Item
     }
 }
 
+public class ConsumableItem : Item
+{
+    public int HealthRestore { get; set; }
+    
+    public ConsumableItem(ushort id, string name, string tooltip, Texture2D icon, int maxStack = 20, 
+        int healthRestore = 0) : base(id, name, tooltip, icon, maxStack, ItemType.Consumable)
+    {
+        HealthRestore = healthRestore;
+    }
+}
+
 /// <summary>
 /// Actual instance of the item, has properties and amount. Represents item in an inventory slot
 /// </summary>

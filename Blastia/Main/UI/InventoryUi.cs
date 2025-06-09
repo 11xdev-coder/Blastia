@@ -305,7 +305,12 @@ public class InventoryUi : Menu
             bool clickedOnSlot = false;
             foreach (var slot in _inventorySlotsUi)
             {
-                if (slot.IsHovered)
+                if (slot.IsHovered && slot.SlotIndex < HotbarSlotsCount)
+                {
+                    clickedOnSlot = true;
+                    break;
+                }
+                if (slot.IsHovered && IsFullInventoryOpen)
                 {
                     clickedOnSlot = true;
                     break;
@@ -335,6 +340,34 @@ public class InventoryUi : Menu
         _selectedItemText.Update();
     }
 
+    /// <summary>
+    /// Checks if we hovered on any of the inventory slots
+    /// </summary>
+    /// <returns></returns>
+    public bool HoveredOnAnySlot()
+    {
+        if (!Active) return false;
+
+        var hoveredOnAnySlot = false;
+        foreach (var slot in _inventorySlotsUi)
+        {
+            // hovered on hotbar slot
+            if (slot.IsHovered && slot.SlotIndex < HotbarSlotsCount)
+            {
+                hoveredOnAnySlot = true;
+                break;
+            }
+            // hovered on any other slots while inventory is open
+            if (slot.IsHovered && IsFullInventoryOpen)
+            {
+                hoveredOnAnySlot = true;
+                break;
+            }
+        }
+        
+        return hoveredOnAnySlot;
+    }
+    
     private void RefreshAllSlots()
     {
         for (int i = 0; i < _inventorySlotsUi.Count; i++)

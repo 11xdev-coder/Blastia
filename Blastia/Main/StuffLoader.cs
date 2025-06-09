@@ -236,11 +236,24 @@ public static class StuffLoader
 		// create specific item type
 		return itemType switch
 		{
+			ItemType.Consumable => CreateConsumableItem(definition, icon),
 			ItemType.Placeable => CreatePlaceableItem(definition, icon),
 			_ => new GenericItem(definition.Id, definition.Name, definition.Tooltip, icon, definition.MaxStack)
 		};
 	}
 
+	private static ConsumableItem CreateConsumableItem(DataDefinitions.ItemDefinition def, Texture2D icon)
+	{
+		var healthRestore = 0;
+
+		if (def.Properties != null)
+		{
+			healthRestore = def.Properties.Value<ushort>("HealthRestore");
+		}
+		
+		return new ConsumableItem(def.Id, def.Name, def.Tooltip, icon, def.MaxStack, healthRestore);
+	}
+	
 	private static PlaceableItem CreatePlaceableItem(DataDefinitions.ItemDefinition def, Texture2D icon)
 	{
 		ushort blockId = 0;
