@@ -63,8 +63,8 @@ public static class Saving
                         
                         if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
                         break;
-                    case Dictionary<Vector2, Block> blockInstanceDictionary:
-                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, Block> with {blockInstanceDictionary.Count} items");
+                    case Dictionary<Vector2, BlockInstance> blockInstanceDictionary:
+                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, BlockInstance> with {blockInstanceDictionary.Count} items");
                         
                         writer.Write(blockInstanceDictionary.Count);
                         foreach (var keyValuePair in blockInstanceDictionary)
@@ -76,7 +76,7 @@ public static class Saving
                             {
                                 Console.WriteLine(vector == default
                                     ? "Couldn't write Vector2"
-                                    : $"Writing Dictionary<Vector2, Block> entry: Position({vector.X}, {vector.Y}), Block ID: {block.Id}");
+                                    : $"Writing Dictionary<Vector2, BlockInstance> entry: Position({vector.X}, {vector.Y}), Block ID: {block.Id}");
                             }
                             
                             writer.Write(vector.X);
@@ -189,9 +189,9 @@ public static class Saving
             return tileDictionary;
         }
         
-        if (type == typeof(Dictionary<Vector2, Block>))
+        if (type == typeof(Dictionary<Vector2, BlockInstance>))
         {
-            var blockDictionary = new Dictionary<Vector2, Block>();
+            var blockDictionary = new Dictionary<Vector2, BlockInstance>();
             var count = reader.ReadInt32();
             if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
             
@@ -216,7 +216,7 @@ public static class Saving
                 }
                 
                 if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), block ID: {blockId}, block name: {block.Name}");
-                blockDictionary.Add(new Vector2(x, y), block);
+                blockDictionary.Add(new Vector2(x, y), new BlockInstance(block, 0));
             }
             
             if (debugLogs) Console.WriteLine($"Successfully read {blockDictionary.Count} entries");

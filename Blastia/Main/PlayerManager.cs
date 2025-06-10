@@ -197,7 +197,7 @@ public class WorldState
 	
 	// 1D to support serialization
 	public Dictionary<Vector2, ushort> Tiles { get; set; } = new();
-	public Dictionary<Vector2, Block> TileInstances { get; set; } = new();
+	public Dictionary<Vector2, BlockInstance> TileInstances { get; set; } = new();
 	public int WorldWidth { get; set; }
 	public int WorldHeight { get; set; }
 
@@ -222,9 +222,9 @@ public class WorldState
 		{
 			// if new ID is air (0) -> remove tile to save space
 			// first call its OnBreak
-			if (TileInstances.TryGetValue(pos, out var block))
+			if (TileInstances.TryGetValue(pos, out var blockInstance))
 			{
-				block.OnBreak(player?.World, pos, player);
+				blockInstance.OnBreak(player?.World, pos, player);
 				TileInstances.Remove(pos);
 			}
 			Tiles.Remove(pos);
@@ -233,13 +233,14 @@ public class WorldState
 		{
 			Tiles[pos] = value;
 
-			var blockInstance = StuffRegistry.GetBlock(value);
-			if (blockInstance == null)
+			var block = StuffRegistry.GetBlock(value);
+			if (block == null)
 			{
-				Console.WriteLine($"[SetTile] Tried setting block at: (X: {x}, Y: {y}), ID: {value}, but instance is null");
+				if (SetTileLogs) Console.WriteLine($"Block ID: {value} not found in registry");
 			}
 			else
 			{
+				var blockInstance = new BlockInstance(block, 0);
 				TileInstances[pos] = blockInstance;
 			}
 		}

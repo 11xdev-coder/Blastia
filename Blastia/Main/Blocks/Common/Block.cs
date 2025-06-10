@@ -113,3 +113,27 @@ public abstract class Block
 		spriteBatch.Draw(texture, destRectangle, sourceRectangle, Color.White);
 	}
 }
+
+/// <summary>
+/// Actual instance of a <c>Block</c> class with specific properties
+/// </summary>
+public class BlockInstance
+{
+	public Block Block;
+	public float Damage;
+
+	public BlockInstance(Block block, float damage)
+	{
+		Block = block;
+		Damage = damage;
+	}
+
+	public ushort Id => Block.Id;
+	
+	public void OnPlace(World world, Vector2 position, Player player) => Block.OnPlace(world, position, player);
+	public void OnBreak(World? world, Vector2 position, Player? player) => Block.OnBreak(world, position, player);
+	public void OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);
+	public void OnLeftClick(World world, Vector2 position, Player player) => Block.OnLeftClick(world, position, player);
+	public void Update(World world, Vector2 position) => Block.Update(world, position);
+	public void OnNeighbourChanged(World world, Vector2 position, Vector2 neighbourPosition) => Block.OnNeighbourChanged(world, position, neighbourPosition);
+}
