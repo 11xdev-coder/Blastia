@@ -175,10 +175,14 @@ public class Player : HumanLikeEntity
 			currentWorld.SetTile((int) pos.X, (int) pos.Y, placeable.BlockId, this);
 			PlayerInventory.RemoveItem(_selectedHotbarSlot);
 		}
-		if (BlastiaGame.HasClickedLeft)
+		if (BlastiaGame.IsHoldingLeft)
 		{
 			var pos = GetCoordsForBlockPlacement();
-			currentWorld.SetTile((int) pos.X, (int) pos.Y, 0, this);
+			var blockInstance = currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y);
+			if (blockInstance != null)
+			{
+				blockInstance.DoBreaking(pos, this);
+			}
 		}
 	}
 

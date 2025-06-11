@@ -265,6 +265,22 @@ public class WorldState
 	/// <summary>
 	/// 
 	/// </summary>
+	/// <param name="alignedX">X aligned to Block.Size</param>
+	/// <param name="alignedY">Y aligned to Block.Size</param>
+	/// <returns></returns>
+	public BlockInstance? GetBlockInstance(int alignedX, int alignedY)
+	{
+		var pos = new Vector2(alignedX, alignedY);
+		if (TileInstances.TryGetValue(pos, out var blockInstance))
+		{
+			return blockInstance;
+		}
+		return null;
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
 	/// <param name="worldX">World (not aligned) X</param>
 	/// <param name="worldY">World (not aligned) Y</param>
 	/// <returns></returns>

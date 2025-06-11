@@ -68,6 +68,7 @@ public class BlastiaGame : Game
 	public static Texture2D ExitTexture { get; private set; } = null!;
 	public static Texture2D SlotBackgroundTexture { get; private set; } = null!;
 	public static Texture2D SlotHighlightedTexture { get; private set; } = null!;
+	public static Texture2D BlockDestroyTexture { get; private set; } = null!;
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -260,6 +261,7 @@ public class BlastiaGame : Game
 		ExitTexture = Util.LoadTexture(GraphicsDevice, Paths.ExitPath);
 		SlotBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotBackgroundTexturePath);
 		SlotHighlightedTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotHighlightedTexturePath);
+		BlockDestroyTexture = Util.LoadTexture(GraphicsDevice, Paths.BlockDestroyTexturePath);
 	}
 	
 	protected override void LoadContent()

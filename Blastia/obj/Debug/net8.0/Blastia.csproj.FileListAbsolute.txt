@@ -250,3 +250,4 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Data\blocks.json
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\DirtBlock.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\StoneBlock.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\TooltipBackground.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\BlockDestroy.png

@@ -21,6 +21,9 @@ public abstract class Block
 	/// How much drag to apply when entity walks on this block. 0 = no drag force
 	/// </summary>
 	public float DragCoefficient { get; } = 50f;
+	/// <summary>
+	/// Time to break this block in seconds
+	/// </summary>
 	public float Hardness { get; } = 1f;
 	public bool IsCollidable { get; } = true;
 	public bool IsTransparent { get; }
@@ -63,6 +66,8 @@ public abstract class Block
 		droppedItem.Launch(item, ItemDropAmount, randomDirection, 10f, 15f, 0f);
 		BlastiaGame.RequestAddEntity(droppedItem);
 	}
+
+	public virtual float GetBreakTime() => Math.Max(0.05f, Hardness);
 	public virtual void OnRightClick(World world, Vector2 position, Player player) {}
 	public virtual void OnLeftClick(World world, Vector2 position, Player player) {}
 	public virtual void Update(World world, Vector2 position) {}
@@ -129,9 +134,29 @@ public class BlockInstance
 	}
 
 	public ushort Id => Block.Id;
+
+	/// <summary>
+	/// Increments <c>Damage</c> property and breaks the block
+	/// </summary>
+	/// <param name="position"></param>
+	/// <param name="player"></param>
+	public void DoBreaking(Vector2 position, Player? player)
+	{
+		var selectedWorld = PlayerManager.Instance.SelectedWorld;
+		if (selectedWorld == null) return;
+		
+		var deltaTime = (float) BlastiaGame.GameTime.ElapsedGameTime.TotalSeconds;
+		Damage += deltaTime;
+
+		if (Damage >= Block.Hardness)
+		{
+			selectedWorld.SetTile((int) position.X, (int) position.Y, 0, player);
+		}
+	}
 	
 	public void OnPlace(World world, Vector2 position, Player player) => Block.OnPlace(world, position, player);
 	public void OnBreak(World? world, Vector2 position, Player? player) => Block.OnBreak(world, position, player);
+	public float GetBreakTime() => Block.GetBreakTime();
 	public void OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);
 	public void OnLeftClick(World world, Vector2 position, Player player) => Block.OnLeftClick(world, position, player);
 	public void Update(World world, Vector2 position) => Block.Update(world, position);
