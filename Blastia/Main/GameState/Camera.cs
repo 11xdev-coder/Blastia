@@ -95,11 +95,8 @@ public class Camera : Object
 				int worldXCoord = x * Block.Size;
 				int worldYCoord = y * Block.Size;
 				
-				ushort tileId = worldState.GetTile(worldXCoord, worldYCoord);
-				if (tileId == 0) continue; // skip empty
-				
-				Block? block = StuffRegistry.GetBlock(tileId);
-				if (block == null) continue;
+				var blockInstance = worldState.GetBlockInstance(worldXCoord, worldYCoord);
+				if (blockInstance == null) continue; // skip air
 				
 				// subtract camera position -> scrolling (camera moves right -> move tile to the left)
 				float worldPositionX = worldXCoord - Position.X;
@@ -108,11 +105,11 @@ public class Camera : Object
 					MathUtilities.SmoothRound(worldPositionY * CameraScale), 
 					scaledBlockSize, scaledBlockSize);
 						
-				Rectangle sourceRect = block.GetRuleTileSourceRectangle(!worldState.HasTile(worldXCoord, worldYCoord - 8), 
+				Rectangle sourceRect = blockInstance.Block.GetRuleTileSourceRectangle(!worldState.HasTile(worldXCoord, worldYCoord - 8), 
 					!worldState.HasTile(worldXCoord, worldYCoord + 8), 
 					!worldState.HasTile(worldXCoord + 8, worldYCoord), 
 					!worldState.HasTile(worldXCoord - 8, worldYCoord));
-				block.Draw(spriteBatch, destRect, sourceRect);				
+				blockInstance.Draw(spriteBatch, destRect, sourceRect);				
 			}
 		}
 	}

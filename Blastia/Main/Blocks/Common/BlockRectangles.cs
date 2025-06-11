@@ -23,4 +23,11 @@ public static class BlockRectangles
 	public static readonly Rectangle BottomRightTop = new((Block.Size + Offset) * 5, Block.Size + Offset, Block.Size, Block.Size);
 	public static readonly Rectangle LeftRight = new((Block.Size + Offset) * 3, (Block.Size + Offset) * 2, Block.Size, Block.Size);
 	public static readonly Rectangle LeftBottomRight = new((Block.Size + Offset) * 4, (Block.Size + Offset) * 2, Block.Size, Block.Size);
+	
+	public static readonly Rectangle DestroyOne = new(0, 0, Block.Size, Block.Size);
+	public static readonly Rectangle DestroyTwo = new(Block.Size, 0, Block.Size, Block.Size);
+	public static readonly Rectangle DestroyThree = new(Block.Size * 2, 0, Block.Size, Block.Size);
+	public static readonly Rectangle DestroyFour = new(Block.Size * 3, 0, Block.Size, Block.Size);
+	public static readonly Rectangle DestroyFive = new(Block.Size * 4, 0, Block.Size, Block.Size);
+	public static readonly Rectangle DestroySix = new(Block.Size * 5, 0, Block.Size, Block.Size);
 }

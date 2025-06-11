@@ -161,4 +161,26 @@ public class BlockInstance
 	public void OnLeftClick(World world, Vector2 position, Player player) => Block.OnLeftClick(world, position, player);
 	public void Update(World world, Vector2 position) => Block.Update(world, position);
 	public void OnNeighbourChanged(World world, Vector2 position, Vector2 neighbourPosition) => Block.OnNeighbourChanged(world, position, neighbourPosition);
+
+	private Rectangle GetBlockDestroySourceRectangle()
+	{
+		var oneSixth = Block.Hardness / 6;
+
+		if (Damage == 0) return Rectangle.Empty;
+		if (Damage <= oneSixth) return BlockRectangles.DestroyOne;
+		if (Damage <= oneSixth * 2) return BlockRectangles.DestroyTwo;
+		if (Damage <= oneSixth * 3) return BlockRectangles.DestroyThree;
+		if (Damage <= oneSixth * 4) return BlockRectangles.DestroyFour;
+		if (Damage <= oneSixth * 5) return BlockRectangles.DestroyFive;
+		if (Damage <= Block.Hardness) return BlockRectangles.DestroySix;
+		return Rectangle.Empty;
+	}
+	
+	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
+	{
+		Block.Draw(spriteBatch, destRectangle, sourceRectangle);
+
+		var blockDestroySourceRectangle = GetBlockDestroySourceRectangle();
+		spriteBatch.Draw(BlastiaGame.BlockDestroyTexture, destRectangle, blockDestroySourceRectangle, Color.White);
+	}
 }
