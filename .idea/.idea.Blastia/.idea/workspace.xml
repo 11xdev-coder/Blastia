@@ -10,9 +10,6 @@
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/BlockRectangles.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/BlockRectangles.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Blocks/BlockDestroy.png" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Blocks/BlockDestroy.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -269,15 +266,7 @@
       <workItem from="1749391102248" duration="10260000" />
       <workItem from="1749462736252" duration="12199000" />
       <workItem from="1749565727898" duration="8221000" />
-      <workItem from="1749633709775" duration="8351000" />
-    </task>
-    <task id="LOCAL-00081" summary="inventory slot constructor">
-      <option name="closed" value="true" />
-      <created>1747078977303</created>
-      <option name="number" value="00081" />
-      <option name="presentableId" value="LOCAL-00081" />
-      <option name="project" value="LOCAL" />
-      <updated>1747078977303</updated>
+      <workItem from="1749633709775" duration="12675000" />
     </task>
     <task id="LOCAL-00082" summary="basic inventory class">
       <option name="closed" value="true" />
@@ -663,7 +652,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749652248922</updated>
     </task>
-    <option name="localTasksCounter" value="130" />
+    <task id="LOCAL-00130" summary="block destroying progress texture">
+      <option name="closed" value="true" />
+      <created>1749664287918</created>
+      <option name="number" value="00130" />
+      <option name="presentableId" value="LOCAL-00130" />
+      <option name="project" value="LOCAL" />
+      <updated>1749664287918</updated>
+    </task>
+    <option name="localTasksCounter" value="131" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -673,7 +670,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="hover text screen edge check" />
     <MESSAGE value="item hover text tooltip" />
     <MESSAGE value="inventory slot image change" />
     <MESSAGE value="basic item picking up" />
@@ -698,6 +694,7 @@
     <MESSAGE value="WorldState now has instances of each block" />
     <MESSAGE value="block instances" />
     <MESSAGE value="block breaking on holding left click" />
-    <option name="LAST_COMMIT_MESSAGE" value="block breaking on holding left click" />
+    <MESSAGE value="block destroying progress texture" />
+    <option name="LAST_COMMIT_MESSAGE" value="block destroying progress texture" />
   </component>
 </project>

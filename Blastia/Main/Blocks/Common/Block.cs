@@ -126,11 +126,15 @@ public class BlockInstance
 {
 	public Block Block;
 	public float Damage;
+	private Random _rand;
+	private BlockBreakingAnimation _breakingAnimation;
 
 	public BlockInstance(Block block, float damage)
 	{
 		Block = block;
 		Damage = damage;
+		_rand = new Random();
+		_breakingAnimation = new BlockBreakingAnimation();
 	}
 
 	public ushort Id => Block.Id;
@@ -148,6 +152,13 @@ public class BlockInstance
 		var deltaTime = (float) BlastiaGame.GameTime.ElapsedGameTime.TotalSeconds;
 		Damage += deltaTime;
 
+		var shouldAnimate = _rand.NextDouble() < 0.9f;
+		if (shouldAnimate && !_breakingAnimation.IsAnimating)
+		{
+			// TODO: Update animation in Update()
+			_breakingAnimation.StartAnimation();
+		}
+		
 		if (Damage >= Block.Hardness)
 		{
 			selectedWorld.SetTile((int) position.X, (int) position.Y, 0, player);
@@ -172,8 +183,7 @@ public class BlockInstance
 		if (Damage <= oneSixth * 3) return BlockRectangles.DestroyThree;
 		if (Damage <= oneSixth * 4) return BlockRectangles.DestroyFour;
 		if (Damage <= oneSixth * 5) return BlockRectangles.DestroyFive;
-		if (Damage <= Block.Hardness) return BlockRectangles.DestroySix;
-		return Rectangle.Empty;
+		return Damage <= Block.Hardness ? BlockRectangles.DestroySix : Rectangle.Empty;
 	}
 	
 	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
