@@ -493,6 +493,11 @@ public class BlastiaGame : Game
 			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
 			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
 
+			foreach (var blockInstance in PlayerManager.Instance.SelectedWorld.TileInstances.Values)
+			{
+				blockInstance.Update();
+			}
+			
 			foreach (var entity in _entities)
 			{
 				_myPlayer?.Camera?.RenderEntity(SpriteBatch, entity);

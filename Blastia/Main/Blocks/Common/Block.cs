@@ -126,8 +126,8 @@ public class BlockInstance
 {
 	public Block Block;
 	public float Damage;
-	private Random _rand;
-	private BlockBreakingAnimation _breakingAnimation;
+	private readonly Random _rand;
+	private readonly BlockBreakingAnimation _breakingAnimation;
 
 	public BlockInstance(Block block, float damage)
 	{
@@ -155,7 +155,6 @@ public class BlockInstance
 		var shouldAnimate = _rand.NextDouble() < 0.9f;
 		if (shouldAnimate && !_breakingAnimation.IsAnimating)
 		{
-			// TODO: Update animation in Update()
 			_breakingAnimation.StartAnimation();
 		}
 		
@@ -185,10 +184,22 @@ public class BlockInstance
 		if (Damage <= oneSixth * 5) return BlockRectangles.DestroyFive;
 		return Damage <= Block.Hardness ? BlockRectangles.DestroySix : Rectangle.Empty;
 	}
+
+	public virtual void Update()
+	{
+		_breakingAnimation.Update();
+	}
 	
 	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
 	{
-		Block.Draw(spriteBatch, destRectangle, sourceRectangle);
+		var scale = _breakingAnimation.CurrentScale;
+		var scaledWidth = (int) (destRectangle.Width * scale);
+		var scaledHeight = (int) (destRectangle.Height * scale);
+		// center
+		var offsetX = (destRectangle.Width - scaledWidth) / 2;
+		var offsetY = (destRectangle.Height - scaledHeight) / 2;
+		var finalDestRect = new Rectangle(destRectangle.X + offsetX, destRectangle.Y + offsetY, scaledWidth, scaledHeight);
+		Block.Draw(spriteBatch, finalDestRect, sourceRectangle);
 
 		var blockDestroySourceRectangle = GetBlockDestroySourceRectangle();
 		spriteBatch.Draw(BlastiaGame.BlockDestroyTexture, destRectangle, blockDestroySourceRectangle, Color.White);

@@ -13,9 +13,9 @@ public enum BlockBreakingAnimationState
 
 public class BlockBreakingAnimation
 {
-    private const float AnimationDuration = 0.3f;
-    private const float ScaleUpDuration = 0.15f;
-    private const float MaxScale = 1.15f;
+    private const float AnimationDuration = 0.1f;
+    private const float ScaleUpDuration = 0.05f;
+    private const float MaxScale = 1.2f;
 
     public BlockBreakingAnimationState State { get; private set; } = BlockBreakingAnimationState.None;
     public float CurrentScale { get; private set; } = 1f;
