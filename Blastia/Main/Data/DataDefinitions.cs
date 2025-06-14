@@ -35,6 +35,7 @@ public class DataDefinitions
         public ushort ItemIdDrop { get; set; }
         public int ItemDropAmount { get; set; } = 1;
         public int LightLevel { get; set; }
+        public string[]? BreakingSounds { get; set; }
         
         /// <summary>
         /// Additional block properties

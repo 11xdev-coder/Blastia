@@ -4,6 +4,7 @@ using Blastia.Main.Data;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.Items;
+using Blastia.Main.Sounds;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -100,9 +101,19 @@ public static class StuffLoader
 				{
 					texture = Util.LoadTexture(graphicsDevice, fullTexturePath);
 				}
+				
+				// sounds
+				SoundID[]? breakingSounds = null;
+				if (def.BreakingSounds != null && def.BreakingSounds.Length > 0)
+				{
+					breakingSounds = def.BreakingSounds
+						.Where(soundName => Enum.TryParse<SoundID>(soundName, true, out _))
+						.Select(soundName => Enum.Parse<SoundID>(soundName, true))
+						.ToArray();
+				}
 
 				var block = new SimpleBlock(def.Id, def.Name, def.DragCoefficient, def.Hardness, def.IsCollidable,
-					def.IsTransparent, def.ItemIdDrop, def.ItemDropAmount, def.LightLevel);
+					def.IsTransparent, def.ItemIdDrop, def.ItemDropAmount, def.LightLevel, breakingSounds);
 				StuffRegistry.RegisterBlock(block, texture);
 				Console.WriteLine($"[StuffLoader] [SimpleBlocks] Loaded simple block: {block.Name} (ID: {block.Id})");
 			}

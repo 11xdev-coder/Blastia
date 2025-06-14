@@ -1,6 +1,7 @@
 using Blastia.Main.Entities;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -30,6 +31,7 @@ public abstract class Block
 	public ushort ItemIdDrop { get; }
 	public int ItemDropAmount { get; } = 1;
 	public int LightLevel { get; }
+	public SoundID[]? BreakingSounds { get; }
 
 	protected Block()
 	{
@@ -37,7 +39,8 @@ public abstract class Block
 	}
 
 	protected Block(ushort id, string name, float dragCoefficient = 50f, float hardness = 1f,
-		bool isCollidable = true, bool isTransparent = false, ushort itemIdDrop = 0, int itemDropAmount = 1, int lightLevel = 0)
+		bool isCollidable = true, bool isTransparent = false, ushort itemIdDrop = 0, int itemDropAmount = 1, int lightLevel = 0,
+		SoundID[]? breakingSounds = null)
 	{
 		Id = id;
 		Name = name;
@@ -48,6 +51,7 @@ public abstract class Block
 		ItemIdDrop = itemIdDrop;
 		ItemDropAmount = itemDropAmount;
 		LightLevel = lightLevel;
+		BreakingSounds = breakingSounds ?? [SoundID.Dig1, SoundID.Dig2, SoundID.Dig3];
 	}
 
 	// virtual methods for complex blocks
@@ -126,14 +130,12 @@ public class BlockInstance
 {
 	public Block Block;
 	public float Damage;
-	private readonly Random _rand;
 	private readonly BlockBreakingAnimation _breakingAnimation;
 
 	public BlockInstance(Block block, float damage)
 	{
 		Block = block;
 		Damage = damage;
-		_rand = new Random();
 		_breakingAnimation = new BlockBreakingAnimation();
 	}
 
@@ -152,8 +154,12 @@ public class BlockInstance
 		var deltaTime = (float) BlastiaGame.GameTime.ElapsedGameTime.TotalSeconds;
 		Damage += deltaTime;
 
-		var shouldAnimate = _rand.NextDouble() < 0.9f;
-		if (shouldAnimate && !_breakingAnimation.IsAnimating)
+		if (!SoundEngine.IsSoundPlayingForBlock(position))
+		{
+			SoundEngine.PlaySoundWithoutOverlappingForBlock(ChooseRandomBreakingSound(), position);
+		}
+		
+		if (!_breakingAnimation.IsAnimating)
 		{
 			_breakingAnimation.StartAnimation();
 		}
@@ -162,6 +168,13 @@ public class BlockInstance
 		{
 			selectedWorld.SetTile((int) position.X, (int) position.Y, 0, player);
 		}
+	}
+
+	private SoundID ChooseRandomBreakingSound()
+	{
+		if (Block.BreakingSounds == null) return SoundID.Dig1;
+		var randomIndex = BlastiaGame.Rand.Next(0, Block.BreakingSounds.Length);
+		return Block.BreakingSounds[randomIndex];
 	}
 	
 	public void OnPlace(World world, Vector2 position, Player player) => Block.OnPlace(world, position, player);
@@ -192,14 +205,21 @@ public class BlockInstance
 	
 	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
 	{
-		var scale = _breakingAnimation.CurrentScale;
-		var scaledWidth = (int) (destRectangle.Width * scale);
-		var scaledHeight = (int) (destRectangle.Height * scale);
-		// center
-		var offsetX = (destRectangle.Width - scaledWidth) / 2;
-		var offsetY = (destRectangle.Height - scaledHeight) / 2;
-		var finalDestRect = new Rectangle(destRectangle.X + offsetX, destRectangle.Y + offsetY, scaledWidth, scaledHeight);
-		Block.Draw(spriteBatch, finalDestRect, sourceRectangle);
+		if (_breakingAnimation.IsAnimating)
+		{
+			var scale = _breakingAnimation.CurrentScale;
+			var scaledWidth = (int) (destRectangle.Width * scale);
+			var scaledHeight = (int) (destRectangle.Height * scale);
+			// center
+			var offsetX = (destRectangle.Width - scaledWidth) / 2;
+			var offsetY = (destRectangle.Height - scaledHeight) / 2;
+			var finalDestRect = new Rectangle(destRectangle.X + offsetX, destRectangle.Y + offsetY, scaledWidth, scaledHeight);
+			Block.Draw(spriteBatch, finalDestRect, sourceRectangle);
+		}
+		else
+		{
+			Block.Draw(spriteBatch, destRectangle, sourceRectangle);
+		}
 
 		var blockDestroySourceRectangle = GetBlockDestroySourceRectangle();
 		spriteBatch.Draw(BlastiaGame.BlockDestroyTexture, destRectangle, blockDestroySourceRectangle, Color.White);

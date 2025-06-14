@@ -359,6 +359,7 @@ public class BlastiaGame : Game
 		{
 			base.Update(gameTime);
 			UpdateGameTime(gameTime);
+			SoundEngine.Update();
 
 			if (NetworkManager.Instance != null && NetworkManager.Instance.IsSteamInitialized)
 			{

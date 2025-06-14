@@ -13,8 +13,8 @@ public enum BlockBreakingAnimationState
 
 public class BlockBreakingAnimation
 {
-    private const float AnimationDuration = 0.1f;
-    private const float ScaleUpDuration = 0.05f;
+    private const float AnimationDuration = 0.2f;
+    private const float ScaleUpDuration = 0.1f;
     private const float MaxScale = 1.2f;
 
     public BlockBreakingAnimationState State { get; private set; } = BlockBreakingAnimationState.None;
@@ -23,13 +23,11 @@ public class BlockBreakingAnimation
         State != BlockBreakingAnimationState.None && State != BlockBreakingAnimationState.Finished;
 
     private float _animationTimer;
-    private bool _soundPlayed;
 
     public void StartAnimation()
     {
         State = BlockBreakingAnimationState.ScaleUp;
         _animationTimer = 0f;
-        _soundPlayed = false;
         CurrentScale = 1f;
     }
 

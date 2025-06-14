@@ -9,7 +9,8 @@
     "IsTransparent": false,
     "ItemIdDrop": 1,
     "ItemDropAmount": 1,
-    "LightLevel": 0
+    "LightLevel": 0,
+    "BreakingSounds": ["Dig1", "Dig2", "Dig3"]
   },
   {
     "Id": 2,
@@ -21,6 +22,7 @@
     "IsTransparent": false,
     "ItemIdDrop": 2,
     "ItemDropAmount": 1,
-    "LightLevel": 0
+    "LightLevel": 0,
+    "BreakingSounds": ["Tink1", "Tink2", "Tink3"]
   }
 ]

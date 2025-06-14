@@ -252,3 +252,9 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\StoneBl
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\TooltipBackground.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\BlockDestroy.png
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\BlockDestroy.png
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Dig1.wav
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Dig2.wav
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Dig3.wav
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Tink1.wav
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Tink2.wav
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Tink3.wav
