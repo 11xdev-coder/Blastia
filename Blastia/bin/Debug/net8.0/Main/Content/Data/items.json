@@ -36,5 +36,16 @@
     "IconPath": "Textures/Items/Apple.png",
     "MaxStack": 20,
     "Type": "Consumable"
+  },
+  {
+    "Id": 5,
+    "Name": "Water Block",
+    "Tooltip": "",
+    "IconPath": "Textures/Blocks/WaterLiquid.png",
+    "MaxStack": 100,
+    "Type": "Placeable",
+    "Properties": {
+      "BlockId": 3
+    }
   }
 ]

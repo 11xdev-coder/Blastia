@@ -494,9 +494,13 @@ public class BlastiaGame : Game
 			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
 			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
 
-			foreach (var blockInstance in PlayerManager.Instance.SelectedWorld.TileInstances.Values)
+			if (World != null)
 			{
-				blockInstance.Update();
+				foreach (var position in PlayerManager.Instance.SelectedWorld.TileInstances.Keys.ToArray())
+				{
+					var blockInstance = PlayerManager.Instance.SelectedWorld.TileInstances[position];
+					blockInstance.Update(World, position);
+				}
 			}
 			
 			foreach (var entity in _entities)
@@ -604,9 +608,10 @@ public class BlastiaGame : Game
 			Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, SlotHighlightedTexture, false, true);
 		AddMenu(PlayerInventoryUiMenu);
 
-		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 2);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 1);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.StoneBlock), 100);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.WaterBlock), 100);
 	}
 	
 	// WORLD UNLOADING

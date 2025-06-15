@@ -247,6 +247,19 @@ public class WorldState
 	}
 
 	/// <summary>
+	/// Sets block instance at coordinates
+	/// </summary>
+	/// <param name="x"></param>
+	/// <param name="y"></param>
+	/// <param name="block">New block instance, must not be empty</param>
+	public void SetTileInstance(int x, int y, BlockInstance block)
+	{
+		Vector2 pos = new(x, y);
+		Tiles[pos] = block.Id;
+		TileInstances[pos] = block;
+	}
+
+	/// <summary>
 	/// 
 	/// </summary>
 	/// <param name="alignedX">X aligned to Block.Size</param>

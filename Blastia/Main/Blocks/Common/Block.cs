@@ -182,7 +182,11 @@ public class BlockInstance
 	public float GetBreakTime() => Block.GetBreakTime();
 	public void OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);
 	public void OnLeftClick(World world, Vector2 position, Player player) => Block.OnLeftClick(world, position, player);
-	public void Update(World world, Vector2 position) => Block.Update(world, position);
+	public void Update(World world, Vector2 position)
+	{
+		Block.Update(world, position);
+		_breakingAnimation.Update();
+	}
 	public void OnNeighbourChanged(World world, Vector2 position, Vector2 neighbourPosition) => Block.OnNeighbourChanged(world, position, neighbourPosition);
 
 	private Rectangle GetBlockDestroySourceRectangle()
@@ -196,11 +200,6 @@ public class BlockInstance
 		if (Damage <= oneSixth * 4) return BlockRectangles.DestroyFour;
 		if (Damage <= oneSixth * 5) return BlockRectangles.DestroyFive;
 		return Damage <= Block.Hardness ? BlockRectangles.DestroySix : Rectangle.Empty;
-	}
-
-	public virtual void Update()
-	{
-		_breakingAnimation.Update();
 	}
 	
 	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
