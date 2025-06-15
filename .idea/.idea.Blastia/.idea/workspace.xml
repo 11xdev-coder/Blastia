@@ -8,18 +8,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Sounds/Game/Dig1.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Sounds/Game/Dig2.wav" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Sounds/Game/Dig3.wav" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/BlockBreakingAnimation.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/BlockBreakingAnimation.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Sounds/SoundEngine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Sounds/SoundEngine.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
@@ -269,14 +264,7 @@
       <workItem from="1749633709775" duration="12675000" />
       <workItem from="1749805416422" duration="2051000" />
       <workItem from="1749825975183" duration="7986000" />
-    </task>
-    <task id="LOCAL-00083" summary="basic inventory UI and error fixes">
-      <option name="closed" value="true" />
-      <created>1748028725155</created>
-      <option name="number" value="00083" />
-      <option name="presentableId" value="LOCAL-00083" />
-      <option name="project" value="LOCAL" />
-      <updated>1748028725155</updated>
+      <workItem from="1749890170792" duration="9293000" />
     </task>
     <task id="LOCAL-00084" summary="some menu initialization tweaks">
       <option name="closed" value="true" />
@@ -662,7 +650,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749839003080</updated>
     </task>
-    <option name="localTasksCounter" value="132" />
+    <task id="LOCAL-00132" summary="block breaking sounds without overlapping">
+      <option name="closed" value="true" />
+      <created>1749932682120</created>
+      <option name="number" value="00132" />
+      <option name="presentableId" value="LOCAL-00132" />
+      <option name="project" value="LOCAL" />
+      <updated>1749932682121</updated>
+    </task>
+    <option name="localTasksCounter" value="133" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -672,7 +668,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="inventory slot image change" />
     <MESSAGE value="basic item picking up" />
     <MESSAGE value="item pulling on pickup" />
     <MESSAGE value="dropped item visuals update" />
@@ -697,6 +692,7 @@
     <MESSAGE value="block breaking on holding left click" />
     <MESSAGE value="block destroying progress texture" />
     <MESSAGE value="block breaking animation" />
-    <option name="LAST_COMMIT_MESSAGE" value="block breaking animation" />
+    <MESSAGE value="block breaking sounds without overlapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="block breaking sounds without overlapping" />
   </component>
 </project>

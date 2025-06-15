@@ -154,9 +154,9 @@ public class BlockInstance
 		var deltaTime = (float) BlastiaGame.GameTime.ElapsedGameTime.TotalSeconds;
 		Damage += deltaTime;
 
-		if (!SoundEngine.IsSoundPlayingForBlock(position))
+		if (SoundEngine.CanPlaySoundForBlock(position))
 		{
-			SoundEngine.PlaySoundWithoutOverlappingForBlock(ChooseRandomBreakingSound(), position);
+			SoundEngine.PlaySoundWithoutOverlappingForBlock(ChooseRandomBreakingSound(), position, 0.2f);
 		}
 		
 		if (!_breakingAnimation.IsAnimating)

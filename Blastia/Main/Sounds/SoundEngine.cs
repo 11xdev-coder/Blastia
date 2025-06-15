@@ -5,6 +5,18 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Blastia.Main.Sounds;
 
+public struct DelayInfo
+{
+    public float DelayEndTime;
+    public float DelayDuration;
+
+    public DelayInfo(float delayEndTime, float delayDuration)
+    {
+        DelayEndTime = delayEndTime;
+        DelayDuration = delayDuration;
+    }
+}
+
 public enum SoundID
 {
     Tick,
@@ -22,7 +34,8 @@ public static class SoundEngine
     private static Dictionary<SoundID, SoundEffect> _sounds = new();
     private static ContentManager? _contentManager;
 
-    private static Dictionary<Vector2, SoundEffectInstance> _activeBlockSounds = [];
+    private static readonly Dictionary<Vector2, SoundEffectInstance> ActiveBlockSounds = [];
+    private static readonly Dictionary<Vector2, DelayInfo> BlockSoundDelays = [];
 
     public static void Initialize(ContentManager contentManager)
     {
@@ -73,7 +86,8 @@ public static class SoundEngine
     /// </summary>
     /// <param name="id"></param>
     /// <param name="position"></param>
-    public static void PlaySoundWithoutOverlappingForBlock(SoundID id, Vector2 position)
+    /// <param name="delayAfterSound">How much time to wait before <see cref="CanPlaySoundForBlock"/> method will return true</param>
+    public static void PlaySoundWithoutOverlappingForBlock(SoundID id, Vector2 position, float delayAfterSound = 0.5f)
     {
         StopSoundsForBlock(position);
 
@@ -84,7 +98,13 @@ public static class SoundEngine
             soundInstance.Volume = volume;
             soundInstance.Play();
             
-            _activeBlockSounds[position] = soundInstance;
+            ActiveBlockSounds[position] = soundInstance;
+            
+            // delay
+            var currentTime = (float) BlastiaGame.GameTime.TotalGameTime.TotalSeconds;
+            var soundDuration = (float) sound.Duration.TotalSeconds;
+            var delayEndTime = currentTime + soundDuration + delayAfterSound;
+            BlockSoundDelays[position] = new DelayInfo(delayEndTime, delayAfterSound);
         }
     }
 
@@ -94,23 +114,44 @@ public static class SoundEngine
     /// <param name="position"></param>
     public static void StopSoundsForBlock(Vector2 position)
     {
-        if (_activeBlockSounds.TryGetValue(position, out var sound))
+        if (ActiveBlockSounds.TryGetValue(position, out var sound))
         {
             sound.Stop();
             sound.Dispose();
-            _activeBlockSounds.Remove(position);
+            ActiveBlockSounds.Remove(position);
+            BlockSoundDelays.Remove(position);
         }
     }
     
     /// <summary>
-    /// Use in pair with <see cref="PlaySoundWithoutOverlappingForBlock"/>. Checks if any sound is playing for this block position
+    /// Use in pair with <see cref="PlaySoundWithoutOverlappingForBlock"/>. Checks if sound can be played (delay passed and no sound is playing)
+    /// for this block position
     /// </summary>
     /// <param name="position"></param>
-    public static bool IsSoundPlayingForBlock(Vector2 position)
+    public static bool CanPlaySoundForBlock(Vector2 position)
     {
-        if (_activeBlockSounds.TryGetValue(position, out var sound))
+        return !IsSoundPlayingForBlock(position) && !IsSoundInDelayForBlock(position);
+    }
+
+    private static bool IsSoundPlayingForBlock(Vector2 position)
+    {
+        if (ActiveBlockSounds.TryGetValue(position, out var sound))
         {
             return sound.State == SoundState.Playing;
+        }
+
+        return false;
+    }
+
+    private static bool IsSoundInDelayForBlock(Vector2 position)
+    {
+        var currentTime = (float) BlastiaGame.GameTime.TotalGameTime.TotalSeconds;
+        if (BlockSoundDelays.TryGetValue(position, out var delay))
+        {
+            if (currentTime < delay.DelayEndTime)
+            {
+                return true;
+            }
         }
 
         return false;
@@ -121,9 +162,11 @@ public static class SoundEngine
     /// </summary>
     public static void Update()
     {
+        var currentTime = (float) BlastiaGame.GameTime.TotalGameTime.TotalSeconds;
+        
         // clean up
         var finishedBlockSoundPositions = new List<Vector2>();
-        foreach (var kvp in _activeBlockSounds)
+        foreach (var kvp in ActiveBlockSounds)
         {
             if (kvp.Value.State == SoundState.Stopped)
             {
@@ -133,8 +176,23 @@ public static class SoundEngine
 
         foreach (var position in finishedBlockSoundPositions)
         {
-            _activeBlockSounds[position].Dispose();
-            _activeBlockSounds.Remove(position);
+            ActiveBlockSounds[position].Dispose();
+            ActiveBlockSounds.Remove(position);
+        }
+        
+        // clear delays
+        var expiredBlockDelayPositions = new List<Vector2>();
+        foreach (var kvp in BlockSoundDelays)
+        {
+            if (currentTime >= kvp.Value.DelayEndTime)
+            {
+                expiredBlockDelayPositions.Add(kvp.Key);
+            }
+        }
+
+        foreach (var position in expiredBlockDelayPositions)
+        {
+            BlockSoundDelays.Remove(position);
         }
     }
 
