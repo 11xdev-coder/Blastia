@@ -8,8 +8,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Sounds/SoundEngine.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Sounds/SoundEngine.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -265,22 +265,7 @@
       <workItem from="1749805416422" duration="2051000" />
       <workItem from="1749825975183" duration="7986000" />
       <workItem from="1749890170792" duration="9293000" />
-    </task>
-    <task id="LOCAL-00084" summary="some menu initialization tweaks">
-      <option name="closed" value="true" />
-      <created>1748106508649</created>
-      <option name="number" value="00084" />
-      <option name="presentableId" value="LOCAL-00084" />
-      <option name="project" value="LOCAL" />
-      <updated>1748106508649</updated>
-    </task>
-    <task id="LOCAL-00085" summary="inventory slot bug fix">
-      <option name="closed" value="true" />
-      <created>1748120008723</created>
-      <option name="number" value="00085" />
-      <option name="presentableId" value="LOCAL-00085" />
-      <option name="project" value="LOCAL" />
-      <updated>1748120008723</updated>
+      <workItem from="1749997924894" duration="12177000" />
     </task>
     <task id="LOCAL-00086" summary="inventory unloading">
       <option name="closed" value="true" />
@@ -658,7 +643,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749932682121</updated>
     </task>
-    <option name="localTasksCounter" value="133" />
+    <task id="LOCAL-00133" summary="block sound delays">
+      <option name="closed" value="true" />
+      <created>1750001580727</created>
+      <option name="number" value="00133" />
+      <option name="presentableId" value="LOCAL-00133" />
+      <option name="project" value="LOCAL" />
+      <updated>1750001580728</updated>
+    </task>
+    <task id="LOCAL-00134" summary="liquid block">
+      <option name="closed" value="true" />
+      <created>1750022534961</created>
+      <option name="number" value="00134" />
+      <option name="presentableId" value="LOCAL-00134" />
+      <option name="project" value="LOCAL" />
+      <updated>1750022534961</updated>
+    </task>
+    <option name="localTasksCounter" value="135" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -668,8 +669,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="basic item picking up" />
-    <MESSAGE value="item pulling on pickup" />
     <MESSAGE value="dropped item visuals update" />
     <MESSAGE value="basic notification system" />
     <MESSAGE value="notification colors" />
@@ -693,6 +692,8 @@
     <MESSAGE value="block destroying progress texture" />
     <MESSAGE value="block breaking animation" />
     <MESSAGE value="block breaking sounds without overlapping" />
-    <option name="LAST_COMMIT_MESSAGE" value="block breaking sounds without overlapping" />
+    <MESSAGE value="block sound delays" />
+    <MESSAGE value="liquid block" />
+    <option name="LAST_COMMIT_MESSAGE" value="liquid block" />
   </component>
 </project>

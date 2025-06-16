@@ -297,7 +297,7 @@ public class WorldState
 	/// <param name="worldX">World (not aligned) X</param>
 	/// <param name="worldY">World (not aligned) Y</param>
 	/// <returns></returns>
-	private ushort GetTileAtWorldCoord(int worldX, int worldY)
+	public ushort GetTileAtWorldCoord(int worldX, int worldY)
 	{
 		int tileWorldX = (int)Math.Floor((float)worldX / Block.Size) * Block.Size;
 		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;

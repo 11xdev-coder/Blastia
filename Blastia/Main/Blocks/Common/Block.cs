@@ -85,7 +85,7 @@ public abstract class Block
 	/// <param name="emptyRight">Is right block air</param>
 	/// <param name="emptyLeft">Is left block air</param>
 	/// <returns></returns>
-	public Rectangle GetRuleTileSourceRectangle(bool emptyTop, bool emptyBottom, bool emptyRight, bool emptyLeft)
+	public virtual Rectangle GetRuleTileSourceRectangle(bool emptyTop, bool emptyBottom, bool emptyRight, bool emptyLeft)
 	{
 		// 4 exposed sides
 		if (emptyTop && emptyBottom && emptyLeft && emptyRight) return BlockRectangles.All; // Isolated block
