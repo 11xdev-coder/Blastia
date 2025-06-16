@@ -209,14 +209,14 @@ public class WorldState
 	/// <summary>
 	/// Sets tile's ID at x y coords. If new ID is 0 -> removes the tile completely
 	/// </summary>
-	/// <param name="x"></param>
-	/// <param name="y"></param>
+	/// <param name="alignedX"></param>
+	/// <param name="alignedY"></param>
 	/// <param name="value">New ID</param>
 	/// <param name="player">Player that set the tile</param>
-	public void SetTile(int x, int y, ushort value, Player? player = null)
+	public void SetTile(int alignedX, int alignedY, ushort value, Player? player = null)
 	{
-		Vector2 pos = new(x, y);
-		if (SetTileLogs) Console.WriteLine($"World: {Name}, Set tile at: (X: {x}, Y: {y}), ID: {value}");
+		Vector2 pos = new(alignedX, alignedY);
+		if (SetTileLogs) Console.WriteLine($"World: {Name}, Set tile at: (X: {alignedX}, Y: {alignedY}), ID: {value}");
 		
 		if (value == 0)
 		{
@@ -249,12 +249,12 @@ public class WorldState
 	/// <summary>
 	/// Sets block instance at coordinates
 	/// </summary>
-	/// <param name="x"></param>
-	/// <param name="y"></param>
+	/// <param name="alignedX"></param>
+	/// <param name="alignedY"></param>
 	/// <param name="block">New block instance, must not be empty</param>
-	public void SetTileInstance(int x, int y, BlockInstance block)
+	public void SetTileInstance(int alignedX, int alignedY, BlockInstance block)
 	{
-		Vector2 pos = new(x, y);
+		Vector2 pos = new(alignedX, alignedY);
 		Tiles[pos] = block.Id;
 		TileInstances[pos] = block;
 	}
@@ -303,7 +303,7 @@ public class WorldState
 		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;
 		return GetTile(tileWorldX, tileWorldY);
 	}
-
+	
 	/// <summary>
 	/// 
 	/// </summary>
@@ -318,7 +318,7 @@ public class WorldState
 		ushort tileId = GetTile(tileWorldX, tileWorldY);
 		return tileId >= 1;
 	}
-
+	
 	/// <summary>
 	/// Return tile ID of the tile below the entity's feet
 	/// </summary>

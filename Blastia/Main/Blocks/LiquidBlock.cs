@@ -78,24 +78,21 @@ public abstract class LiquidBlock : Block
     /// <returns>False if we need to try flowing horizontally</returns>
     private bool TryToFlowDown(int x, int y)
     {
-        var belowBlockId = _currentWorldState.GetTile(x, y+8);
+        var belowBlockId = _currentWorldState.GetTile(x, y+Size);
         if (belowBlockId == 0)
         {
             CreateLiquidBelow(x, y);
             return true;
         }
 
-        var belowBlockInstance = _currentWorldState.GetBlockInstance(x, y + 8);
+        var belowBlockInstance = _currentWorldState.GetBlockInstance(x, y + Size);
 
         // flow into same liquid with not full level
-        // if (belowBlockInstance?.Block is LiquidBlock liquidBlock && liquidBlock.Id == Id && !liquidBlock.IsSourceBlock)
-        // {
-        //     if (liquidBlock.FlowLevel < 8)
-        //     {
-        //         TransferLiquid(liquidBlock, x, y+1);
-        //         return true;
-        //     }
-        // }
+        if (belowBlockInstance?.Block is LiquidBlock liquidBelow && liquidBelow.Id == Id && !liquidBelow.IsSourceBlock && FlowLevel == 8)
+        {
+            liquidBelow.FlowLevel = FlowLevel;
+            return true;
+        }
 
         return false;
     }
@@ -106,11 +103,11 @@ public abstract class LiquidBlock : Block
         if (currentLevel <= 1) return; // at least 2 levels to flow
         
         // only flow horizontally if it has a solid tile below
-        var belowBlockId = _currentWorldState.GetTile(x, y+8);
+        var belowBlockId = _currentWorldState.GetTile(x, y+Size);
         if (belowBlockId > 0 && StuffRegistry.GetBlock(belowBlockId) is {IsCollidable: true})
         {
-            TryToFlowHorizontalDirection(x - 8, y, currentLevel - 1);
-            TryToFlowHorizontalDirection(x + 8, y, currentLevel - 1);
+            TryToFlowHorizontalDirection(x - Size, y, currentLevel - 1);
+            TryToFlowHorizontalDirection(x + Size, y, currentLevel - 1);
         }
         
     }
@@ -138,39 +135,21 @@ public abstract class LiquidBlock : Block
         // }
     }
 
-    private void CreateLiquidBelow(int x, int y)
+    private void CreateLiquidBelow(int tileX, int tileY)
     {
         var newLiquid = CreateNewInstance();
-        newLiquid.FlowLevel = Math.Min(8, FlowLevel);
-        _currentWorldState.SetTileInstance(x, y+8, new BlockInstance(newLiquid, 0));
+        newLiquid.FlowLevel = 8;
+        _currentWorldState.SetTileInstance(tileX, tileY + Size, new BlockInstance(newLiquid, 0));
     }
 
-    private void CreateLiquidAt(int x, int y, int level)
+    private void CreateLiquidAt(int tileX, int tileY, int level)
     {
         var newLiquid = CreateNewInstance();
         newLiquid.FlowLevel = level;
-        _currentWorldState.SetTileInstance(x, y, new BlockInstance(newLiquid, 0));
+        _currentWorldState.SetTileInstance(tileX, tileY, new BlockInstance(newLiquid, 0));
     }
     
     protected abstract LiquidBlock CreateNewInstance();
-
-    private void TransferLiquid(LiquidBlock target, int targetX, int targetY)
-    {
-        var spaceInTarget = 8 - target.FlowLevel;
-        var amountToTransfer = Math.Min(spaceInTarget, FlowLevel);
-
-        target.FlowLevel += amountToTransfer;
-
-        if (!IsSourceBlock)
-        {
-            ReduceLevel(amountToTransfer);
-        }
-    }
-    
-    private void ReduceLevel(int amount)
-    {
-        FlowLevel -= amount;
-    }
 
     public override void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
     {
