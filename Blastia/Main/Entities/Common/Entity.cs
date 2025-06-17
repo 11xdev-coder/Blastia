@@ -207,11 +207,11 @@ public abstract class Entity : Object
         }
 
         // is on ground check
-        var strictTileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
-        IsGrounded = strictTileIdBelow >= 1;
+        var strictTileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
+        IsGrounded = strictTileBelow != null && strictTileBelow.Block.IsCollidable;
         
-        var tileIdBelow = currentWorld.GetTileIdBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 3f);
-        CanJump = tileIdBelow >= 1;
+        var tileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 3f);
+        CanJump = tileBelow != null && tileBelow.Block.IsCollidable;
         
         var dragCoefficient = IsGrounded
             ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width)

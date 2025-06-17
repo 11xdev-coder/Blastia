@@ -7,15 +7,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="complete liquid refactor">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/WaterLiquid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/WaterLiquid.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/PlayerManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/imgui.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
@@ -270,15 +270,7 @@
       <workItem from="1749890170792" duration="9293000" />
       <workItem from="1749997924894" duration="12177000" />
       <workItem from="1750069220409" duration="22712000" />
-      <workItem from="1750143692315" duration="349000" />
-    </task>
-    <task id="LOCAL-00088" summary="inventory opening">
-      <option name="closed" value="true" />
-      <created>1748177747061</created>
-      <option name="number" value="00088" />
-      <option name="presentableId" value="LOCAL-00088" />
-      <option name="project" value="LOCAL" />
-      <updated>1748177747061</updated>
+      <workItem from="1750143692315" duration="3733000" />
     </task>
     <task id="LOCAL-00089" summary="slot highlighted texture">
       <option name="closed" value="true" />
@@ -664,7 +656,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750087233419</updated>
     </task>
-    <option name="localTasksCounter" value="137" />
+    <task id="LOCAL-00137" summary="complete liquid refactor">
+      <option name="closed" value="true" />
+      <created>1750144200143</created>
+      <option name="number" value="00137" />
+      <option name="presentableId" value="LOCAL-00137" />
+      <option name="project" value="LOCAL" />
+      <updated>1750144200144</updated>
+    </task>
+    <option name="localTasksCounter" value="138" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -674,7 +674,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="notification colors" />
     <MESSAGE value="item grab sound" />
     <MESSAGE value="fixed inventory ui unloading" />
     <MESSAGE value="basic network manager" />
@@ -699,6 +698,7 @@
     <MESSAGE value="liquid block" />
     <MESSAGE value="liquid fix" />
     <MESSAGE value="liquid and worldstate refactor" />
-    <option name="LAST_COMMIT_MESSAGE" value="liquid and worldstate refactor" />
+    <MESSAGE value="complete liquid refactor" />
+    <option name="LAST_COMMIT_MESSAGE" value="complete liquid refactor" />
   </component>
 </project>

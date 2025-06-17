@@ -184,6 +184,9 @@ public static class Collision
 
                 if (world.HasTile(tileWorldX, tileWorldY))
                 {
+                    var blockInstance = world.GetBlockInstance(tileWorldX, tileWorldY);
+                    if (blockInstance != null && !blockInstance.Block.IsCollidable) continue;
+                    
                     Rectangle tileRect = new Rectangle(tileWorldX, tileWorldY, Block.Size, Block.Size);
                     tiles.Add(tileRect);
                 }

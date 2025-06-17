@@ -104,11 +104,15 @@ public class Camera : Object
 				Rectangle destRect = new Rectangle(MathUtilities.SmoothRound(worldPositionX * CameraScale), 
 					MathUtilities.SmoothRound(worldPositionY * CameraScale), 
 					scaledBlockSize, scaledBlockSize);
-						
-				Rectangle sourceRect = blockInstance.Block.GetRuleTileSourceRectangle(!worldState.HasTile(worldXCoord, worldYCoord - 8), 
-					!worldState.HasTile(worldXCoord, worldYCoord + 8), 
-					!worldState.HasTile(worldXCoord + 8, worldYCoord), 
-					!worldState.HasTile(worldXCoord - 8, worldYCoord));
+
+				var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - 8);
+				var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + 8);
+				var rightTile = worldState.GetBlockInstance(worldXCoord + 8, worldYCoord);
+				var leftTile = worldState.GetBlockInstance(worldXCoord - 8, worldYCoord);
+				Rectangle sourceRect = blockInstance.Block.GetRuleTileSourceRectangle(topTile == null || topTile.Block.IsTransparent, 
+					bottomTile == null || bottomTile.Block.IsTransparent, 
+					rightTile == null || rightTile.Block.IsTransparent, 
+					leftTile == null || leftTile.Block.IsTransparent);
 				blockInstance.Draw(spriteBatch, destRect, sourceRect);				
 			}
 		}

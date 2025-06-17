@@ -309,6 +309,19 @@ public class WorldState
 	/// </summary>
 	/// <param name="worldX">World (not aligned) X</param>
 	/// <param name="worldY">World (not aligned) Y</param>
+	/// <returns></returns>
+	public BlockInstance? GetBlockInstanceAtWorldCoord(int worldX, int worldY)
+	{
+		int tileWorldX = (int)Math.Floor((float)worldX / Block.Size) * Block.Size;
+		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;
+		return GetBlockInstance(tileWorldX, tileWorldY);
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="worldX">World (not aligned) X</param>
+	/// <param name="worldY">World (not aligned) Y</param>
 	/// <returns><c>True</c> if tile at coordinates is not air</returns>
 	public bool HasTile(int worldX, int worldY)
 	{
@@ -318,9 +331,43 @@ public class WorldState
 		ushort tileId = GetTile(tileWorldX, tileWorldY);
 		return tileId >= 1;
 	}
+
 	
 	/// <summary>
-	/// Return tile ID of the tile below the entity's feet
+	/// Helper method to find first non-air tile below an entity
+	/// </summary>
+	/// <param name="entityLeftX">Entity left edge world X</param>
+	/// <param name="entityBottomY">Entity bottom edge world Y</param>
+	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
+	/// <param name="checkDistance">Distance to check for tile below</param>
+	/// <returns>Tuple containing tile ID and coordinates, returns <c>(BlockId.Air, 0, 0)</c> if none found</returns>
+	private (ushort tileId, int x, int y) GetFirstTileBelowWithCoords(float entityLeftX, float entityBottomY,
+		float entityWidthPixels, float checkDistance)
+	{
+		var checkWorldY = (int) (entityBottomY + checkDistance);
+
+		var checkWorldXLeft = (int) (entityLeftX + 1);
+		var checkWorldXCenter = (int) (entityLeftX + entityWidthPixels * 0.5f);
+		var checkWorldXRight = (int) (entityLeftX + entityWidthPixels - 1);
+		
+		// get tile IDs
+		var tileIdCenter = GetTileAtWorldCoord(checkWorldXCenter, checkWorldY);
+		if (tileIdCenter != BlockId.Air)
+			return (tileIdCenter, checkWorldXCenter, checkWorldY);
+		
+		var tileIdLeft = GetTileAtWorldCoord(checkWorldXLeft, checkWorldY);
+		if (tileIdLeft != BlockId.Air)
+			return (tileIdLeft, checkWorldXLeft, checkWorldY);
+		
+		var tileIdRight = GetTileAtWorldCoord(checkWorldXRight, checkWorldY);
+		if (tileIdRight != BlockId.Air)
+			return (tileIdRight, checkWorldXRight, checkWorldY);
+
+		return (BlockId.Air, 0, 0);
+	} 
+	
+	/// <summary>
+	/// Returns tile ID of the tile below the entity's feet
 	/// </summary>
 	/// <param name="entityLeftX">Entity left edge world X</param>
 	/// <param name="entityBottomY">Entity bottom edge world Y</param>
@@ -329,32 +376,26 @@ public class WorldState
 	/// <returns>If tile was found returns its ID, otherwise returns <c>BlockID.Air</c></returns>
 	public ushort GetTileIdBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, float checkDistance)
 	{
-		int checkWorldY = (int)(entityBottomY + checkDistance);
+		var (tileId, _, _) = GetFirstTileBelowWithCoords(entityLeftX, entityBottomY, entityWidthPixels, checkDistance);
+		return tileId;
+	}
+	
+	
+	/// <summary>
+	/// Returns block instance below the entity's feet
+	/// </summary>
+	/// <param name="entityLeftX">Entity left edge world X</param>
+	/// <param name="entityBottomY">Entity bottom edge world Y</param>
+	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
+	/// <param name="checkDistance">Distance to check for tile below</param>
+	/// <returns>If tile was found returns its <c>BlockInstance</c>, otherwise returns null</returns>
+	public BlockInstance? GetBlockInstanceBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, float checkDistance)
+	{
+		var (tileId, x, y) = GetFirstTileBelowWithCoords(entityLeftX, entityBottomY, entityWidthPixels, checkDistance);
+		if (tileId == BlockId.Air) 
+			return null;
 
-		int checkWorldXLeft = (int)(entityLeftX + 1);
-		int checkWorldXCenter = (int)(entityLeftX + entityWidthPixels * 0.5f);
-		int checkWorldXRight = (int)(entityLeftX + entityWidthPixels - 1);
-
-		// Get the Tile IDs at the check locations using the corrected HasTile logic
-		ushort tileIdLeft = GetTileAtWorldCoord(checkWorldXLeft, checkWorldY);
-		ushort tileIdCenter = GetTileAtWorldCoord(checkWorldXCenter, checkWorldY);
-		ushort tileIdRight = GetTileAtWorldCoord(checkWorldXRight, checkWorldY);
-
-		ushort finalTileId = BlockId.Air; 
-		if (tileIdCenter != BlockId.Air)
-		{
-			finalTileId = tileIdCenter;
-		}
-		else if (tileIdLeft != BlockId.Air)
-		{
-			finalTileId = tileIdLeft;
-		}
-		else if (tileIdRight != BlockId.Air)
-		{
-			finalTileId = tileIdRight;
-		}
-		
-		return finalTileId;
+		return GetBlockInstanceAtWorldCoord(x, y);
 	}
 
 	/// <summary>
