@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Blocks.Common;
+﻿using Blastia.Main.Blocks;
+using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
@@ -173,6 +174,11 @@ public class Player : HumanLikeEntity
 		{
 			var pos = GetCoordsForBlockPlacement();
 			currentWorld.SetTile((int) pos.X, (int) pos.Y, placeable.BlockId, this);
+			// liquids placed by players are source blocks
+			if (currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y)?.Block is LiquidBlock liquidBlock)
+			{
+				liquidBlock.IsSourceBlock = true;
+			}
 			PlayerInventory.RemoveItem(_selectedHotbarSlot);
 		}
 		if (BlastiaGame.IsHoldingLeft)
