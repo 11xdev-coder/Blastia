@@ -222,14 +222,6 @@ public abstract class LiquidBlock : Block
             }
         }
     }
-    
-    private bool FindSpecificSource(int sourceId)
-    {
-        // Use the source registry to check if the source is active
-        return LiquidSourceRegistry.IsSourceActive(sourceId) && 
-               LiquidSourceRegistry.TryGetSourceType(sourceId, out var liquidType) && 
-               liquidType == Id;
-    }
 
     /// <summary>
     /// Finds all available sources and determines best connection
