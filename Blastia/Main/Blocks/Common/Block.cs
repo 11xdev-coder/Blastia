@@ -55,7 +55,7 @@ public abstract class Block
 	}
 
 	// virtual methods for complex blocks
-	public virtual void OnPlace(World world, Vector2 position, Player player) {}
+	public virtual void OnPlace(World? world, Vector2 position, Player? player) {}
 
 	public virtual void OnBreak(World? world, Vector2 position, Player? player)
 	{
@@ -177,7 +177,7 @@ public class BlockInstance
 		return Block.BreakingSounds[randomIndex];
 	}
 	
-	public void OnPlace(World world, Vector2 position, Player player) => Block.OnPlace(world, position, player);
+	public void OnPlace(World? world, Vector2 position, Player? player) => Block.OnPlace(world, position, player);
 	public void OnBreak(World? world, Vector2 position, Player? player) => Block.OnBreak(world, position, player);
 	public float GetBreakTime() => Block.GetBreakTime();
 	public void OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);

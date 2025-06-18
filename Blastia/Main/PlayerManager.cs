@@ -241,6 +241,7 @@ public class WorldState
 			else
 			{
 				var blockInstance = new BlockInstance(block, 0);
+				blockInstance.OnPlace(player?.World, pos, player);
 				TileInstances[pos] = blockInstance;
 			}
 		}
