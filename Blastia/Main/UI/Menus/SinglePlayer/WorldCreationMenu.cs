@@ -57,10 +57,10 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Creatio
 		if (NameInput?.Text == null) return;
 		string playerName = NameInput.StringBuilder.ToString();
 
-		if (!PlayerManager.Instance.WorldExists(playerName))
+		if (!PlayerNWorldManager.Instance.WorldExists(playerName))
 		{	
 			// create world with custom difficulty if doesnt exist
-			PlayerManager.Instance.NewWorld(NameInput.StringBuilder.ToString(), 
+			PlayerNWorldManager.Instance.NewWorld(NameInput.StringBuilder.ToString(), 
 				_difficultyHandler.CurrentItem, width, height);			
 			
 			Back(); // go back

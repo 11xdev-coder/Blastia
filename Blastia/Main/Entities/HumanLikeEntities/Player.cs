@@ -167,7 +167,7 @@ public class Player : HumanLikeEntity
 		if (BlastiaGame.PlayerInventoryUiMenu == null || BlastiaGame.PlayerInventoryUiMenu.HoveredOnAnySlot()) return;
 
 		var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
-		var currentWorld = PlayerManager.Instance.SelectedWorld;
+		var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
 		if (currentWorld == null) return;
 		
 		if (BlastiaGame.HasClickedRight && selectedItem is {BaseItem: PlaceableItem placeable})

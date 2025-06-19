@@ -93,7 +93,7 @@ public abstract class LiquidBlock : Block
         DecayDelay = decayDelay;
         DecayRate = decayRate;
 
-        _currentWorldState = PlayerManager.Instance.SelectedWorld ?? new WorldState();
+        _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld ?? new WorldState();
     }
 
     public override void OnPlace(World? world, Vector2 position, Player? player)
@@ -128,8 +128,8 @@ public abstract class LiquidBlock : Block
     public override void Update(World world, Vector2 position)
     {
         base.Update(world, position);
-        if (PlayerManager.Instance.SelectedWorld == null) return;
-        _currentWorldState = PlayerManager.Instance.SelectedWorld;
+        if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
+        _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld;
         _globalTime += (float) BlastiaGame.GameTimeElapsedSeconds;
 
         var blockX = (int) position.X;

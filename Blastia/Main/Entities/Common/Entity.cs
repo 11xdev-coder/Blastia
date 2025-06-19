@@ -113,7 +113,7 @@ public abstract class Entity : Object
     
     private void UpdatePosition()
     {
-        var currentWorld = PlayerManager.Instance.SelectedWorld;
+        var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
         var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
         if (currentWorld == null || deltaTime < 0)
         {
@@ -308,7 +308,7 @@ public abstract class Entity : Object
     {
          if (!ApplyGravity || IsGrounded) return;
          
-         var currentWorld = PlayerManager.Instance.SelectedWorld;
+         var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
          if (currentWorld == null) return;
         
          var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);

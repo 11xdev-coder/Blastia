@@ -33,10 +33,10 @@ public class PlayerCreationMenu(SpriteFont font, bool isActive = false) : Creati
 		if (NameInput?.Text == null) return;
 		string playerName = NameInput.StringBuilder.ToString();
 
-		if (!PlayerManager.Instance.PlayerExists(playerName))
+		if (!PlayerNWorldManager.Instance.PlayerExists(playerName))
 		{
 			// create player if doesnt exist
-			PlayerManager.Instance.NewPlayer(NameInput.StringBuilder.ToString());
+			PlayerNWorldManager.Instance.NewPlayer(NameInput.StringBuilder.ToString());
 			
 			Back(); // go back
 		}

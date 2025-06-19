@@ -21,11 +21,11 @@ public class PlayersMenu : CollectionMenu
 		SwitchToMenu(BlastiaGame.MainMenu);
 	}
 	
-	protected override IEnumerable<object> LoadItems() => PlayerManager.Instance.LoadAllPlayers();
+	protected override IEnumerable<object> LoadItems() => PlayerNWorldManager.Instance.LoadAllPlayers();
 
 	protected override void SelectItem(object playerState)
 	{
-		PlayerManager.Instance.SelectPlayer((PlayerState) playerState);
+		PlayerNWorldManager.Instance.SelectPlayer((PlayerState) playerState);
 		SwitchToMenu(BlastiaGame.WorldsMenu);
 	}	
 }

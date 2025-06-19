@@ -148,7 +148,7 @@ public class BlockInstance
 	/// <param name="player"></param>
 	public void DoBreaking(Vector2 position, Player? player)
 	{
-		var selectedWorld = PlayerManager.Instance.SelectedWorld;
+		var selectedWorld = PlayerNWorldManager.Instance.SelectedWorld;
 		if (selectedWorld == null) return;
 		
 		var deltaTime = (float) BlastiaGame.GameTime.ElapsedGameTime.TotalSeconds;

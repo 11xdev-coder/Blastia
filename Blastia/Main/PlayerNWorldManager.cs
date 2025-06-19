@@ -11,10 +11,10 @@ namespace Blastia.Main;
 public enum SaveFolder { Player, World }
 public enum Extension { Player, World }
 
-public class PlayerManager : Singleton<PlayerManager>
+public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 {
 	private string _playersSaveFolder = "";
-	private string _worldsSaveFolder = "";
+	public string WorldsSaveFolder = "";
 	
 	public PlayerState? SelectedPlayer { get; private set; }
 	public WorldState? SelectedWorld { get; private set; }
@@ -22,11 +22,11 @@ public class PlayerManager : Singleton<PlayerManager>
 	public void Initialize()
 	{
 		_playersSaveFolder = Path.Combine(Paths.GetSaveGameDirectory(), "Players");
-		_worldsSaveFolder = Path.Combine(Paths.GetSaveGameDirectory(), "Worlds");
+		WorldsSaveFolder = Path.Combine(Paths.GetSaveGameDirectory(), "Worlds");
 		
 		// create folders if dont exist
 		if (!Directory.Exists(_playersSaveFolder)) Directory.CreateDirectory(_playersSaveFolder);
-		if (!Directory.Exists(_worldsSaveFolder)) Directory.CreateDirectory(_worldsSaveFolder);
+		if (!Directory.Exists(WorldsSaveFolder)) Directory.CreateDirectory(WorldsSaveFolder);
 	}
 
 	private void New(SaveFolder folderType, string name, Extension extensionType, object? data = null)
@@ -109,7 +109,7 @@ public class PlayerManager : Singleton<PlayerManager>
 		string folder = folderType switch 
 		{
 			SaveFolder.Player => _playersSaveFolder,
-			SaveFolder.World => _worldsSaveFolder,
+			SaveFolder.World => WorldsSaveFolder,
 			_ => ""
 		};
 		
@@ -145,6 +145,8 @@ public class PlayerManager : Singleton<PlayerManager>
 		SelectedPlayer = playerState;
 	}
 	
+	public void UnselectPlayer() => SelectedPlayer = null;
+	
 	// WORLD
 	public void NewWorld(string worldName, WorldDifficulty difficulty = WorldDifficulty.Easy, 
 			int worldWidth = 0, int worldHeight = 0) 
@@ -174,11 +176,8 @@ public class PlayerManager : Singleton<PlayerManager>
 			NetworkManager.Instance?.HostGame();
 		}
 	}
-	
-	private void GenerateWorldTiles(WorldState worldState) 
-	{
-		
-	}
+
+	public void UnselectWorld() => SelectedWorld = null;
 }
 
 [Serializable]

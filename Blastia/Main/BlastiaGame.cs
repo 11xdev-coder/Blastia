@@ -16,6 +16,7 @@ using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.IO; // for Path and File
 
 namespace Blastia.Main;
 
@@ -177,7 +178,7 @@ public class BlastiaGame : Game
 		AudioManager.Instance.Initialize();
 		AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
 		// load player manager
-		PlayerManager.Instance.Initialize();
+		PlayerNWorldManager.Instance.Initialize();
 		Console.WriteLine($"Save game directory: {Paths.GetSaveGameDirectory()}");
 		
 		ExitRequestEvent += OnExitRequested;
@@ -488,17 +489,17 @@ public class BlastiaGame : Game
 		SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
 			_pixelatedSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
 			null, matrix);
-		
-		if (IsWorldInitialized && PlayerManager.Instance.SelectedWorld != null)
+
+		if (IsWorldInitialized && PlayerNWorldManager.Instance.SelectedWorld != null)
 		{
-			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerManager.Instance.SelectedWorld);
+			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
 
 			if (World != null)
 			{
-				foreach (var position in PlayerManager.Instance.SelectedWorld.TileInstances.Keys.ToArray())
+				foreach (var position in PlayerNWorldManager.Instance.SelectedWorld.TileInstances.Keys.ToArray())
 				{
-					var blockInstance = PlayerManager.Instance.SelectedWorld.TileInstances[position];
+					var blockInstance = PlayerNWorldManager.Instance.SelectedWorld.TileInstances[position];
 					blockInstance.Update(World, position);
 				}
 			}
@@ -556,7 +557,7 @@ public class BlastiaGame : Game
 	public static void RequestWorldInitialization() => RequestWorldInitializationEvent?.Invoke();
 	private void InitializeWorld()
 	{
-		var worldState = PlayerManager.Instance.SelectedWorld;
+		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
 		if (worldState == null) return;
 		
 		World = new World(worldState, _entities.AsReadOnly());
@@ -618,9 +619,21 @@ public class BlastiaGame : Game
 	public static void RequestWorldUnload() => RequestWorldUnloadEvent?.Invoke();
 	private void UnloadWorld()
 	{
+		// save world state before unloading
+		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+		if (worldState != null)
+		{
+			var savePath = Path.Combine(PlayerNWorldManager.Instance.WorldsSaveFolder, worldState.Name + ".bmwld");
+			Saving.Save(savePath, worldState);
+		}
+		
 		if (LogoMenu != null) LogoMenu.Active = true;
 		
 		ConsoleWindow?.UnloadWorldCommands();
+		
+		// unselect
+		PlayerNWorldManager.Instance.UnselectPlayer();
+		PlayerNWorldManager.Instance.UnselectWorld();
 		
 		IsWorldInitialized = false;
 		World?.Unload();

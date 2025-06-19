@@ -29,10 +29,10 @@ public class WorldsMenu : CollectionMenu
 		SwitchToMenu(BlastiaGame.PlayersMenu);
 	}
 	
-	protected override IEnumerable<object> LoadItems() => PlayerManager.Instance.LoadAllWorlds();
+	protected override IEnumerable<object> LoadItems() => PlayerNWorldManager.Instance.LoadAllWorlds();
 
 	protected override void SelectItem(object worldState)
 	{
-		PlayerManager.Instance.SelectWorld((WorldState) worldState, Host);
+		PlayerNWorldManager.Instance.SelectWorld((WorldState) worldState, Host);
 	}	
 }
