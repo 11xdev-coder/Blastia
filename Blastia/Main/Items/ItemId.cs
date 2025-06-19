@@ -7,4 +7,5 @@ public static class ItemId
     public static readonly ushort IronSword = 3;
     public static readonly ushort Apple = 4;
     public static readonly ushort WaterBlock = 5;
+    public static readonly ushort CandyBlock = 6;
 }

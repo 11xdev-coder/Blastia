@@ -24,5 +24,18 @@
     "ItemDropAmount": 1,
     "LightLevel": 0,
     "BreakingSounds": ["Tink1", "Tink2", "Tink3"]
+  },
+  {
+    "Id": 4,
+    "Name": "Candy",
+    "TexturePath": "Textures/Blocks/Candy.png",
+    "DragCoefficient": 400,
+    "Hardness": 0.4,
+    "IsCollidable": true,
+    "IsTransparent": false,
+    "ItemIdDrop": 6,
+    "ItemDropAmount": 1,
+    "LightLevel": 0,
+    "BreakingSounds": ["Dig1", "Dig2", "Dig3"]
   }
 ]

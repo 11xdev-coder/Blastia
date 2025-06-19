@@ -47,5 +47,16 @@
     "Properties": {
       "BlockId": 3
     }
+  },
+  {
+    "Id": 6,
+    "Name": "Candy Block",
+    "Tooltip": "",
+    "IconPath": "Textures/Items/CandyBlock.png",
+    "MaxStack": 100,
+    "Type": "Placeable",
+    "Properties": {
+      "BlockId": 4
+    }
   }
 ]

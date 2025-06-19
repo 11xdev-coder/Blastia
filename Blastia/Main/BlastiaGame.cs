@@ -611,7 +611,7 @@ public class BlastiaGame : Game
 
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 1);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
-		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.StoneBlock), 100);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.CandyBlock), 100);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.WaterBlock), 100);
 	}
 	

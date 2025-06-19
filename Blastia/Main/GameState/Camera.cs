@@ -26,7 +26,7 @@ public class Camera : Object
 	public int DrawHeight;
 
 	// ZOOM/SCALE
-	private float _cameraScale = 1;
+	private float _cameraScale = 10;
 	public float CameraScale
 	{
 		get => _cameraScale;

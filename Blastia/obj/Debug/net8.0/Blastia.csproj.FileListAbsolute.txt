@@ -259,3 +259,5 @@ C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Gam
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Tink2.wav
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\Tink3.wav
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\WaterLiquid.png
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\Candy.png
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\CandyBlock.png
