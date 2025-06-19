@@ -17,6 +17,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.IO; // for Path and File
+using Blastia.Main.Blocks.Common; // for Block.Size
 
 namespace Blastia.Main;
 
@@ -70,6 +71,7 @@ public class BlastiaGame : Game
 	public static Texture2D SlotBackgroundTexture { get; private set; } = null!;
 	public static Texture2D SlotHighlightedTexture { get; private set; } = null!;
 	public static Texture2D BlockDestroyTexture { get; private set; } = null!;
+	public static Texture2D SignEditBackgroundTexture { get; private set; } = null!;
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -94,6 +96,7 @@ public class BlastiaGame : Game
 	public static InGameSettingsMenu? InGameSettingsMenu { get; private set; }
 	public static InGameVideoSettingsMenu? InGameVideoSettingsMenu { get; private set; }
 	public static InGameAudioSettingsMenu? InGameAudioSettingsMenu { get; private set; }
+	public static InGameSignEditMenu? InGameSignEditMenu { get; private set; }
 	public static InventoryUi? PlayerInventoryUiMenu { get; private set; }
 	private readonly List<Menu> _menus = [];
 	private readonly List<Menu> _menusToAdd = [];
@@ -263,6 +266,7 @@ public class BlastiaGame : Game
 		SlotBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotBackgroundTexturePath);
 		SlotHighlightedTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotHighlightedTexturePath);
 		BlockDestroyTexture = Util.LoadTexture(GraphicsDevice, Paths.BlockDestroyTexturePath);
+		SignEditBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SignEditBackgroundTexturePath);
 	}
 	
 	protected override void LoadContent()
@@ -331,6 +335,9 @@ public class BlastiaGame : Game
 			
 			InGameAudioSettingsMenu = new InGameAudioSettingsMenu(MainFont);
 			AddMenu(InGameAudioSettingsMenu);
+			
+			InGameSignEditMenu = new InGameSignEditMenu(MainFont);
+			AddMenu(InGameSignEditMenu);
 			
 			TooltipDisplay = new TooltipDisplay(MainFont);
 			NotificationDisplay = new NotificationDisplay(MainFont);

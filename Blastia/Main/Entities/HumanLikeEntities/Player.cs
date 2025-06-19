@@ -98,6 +98,8 @@ public class Player : HumanLikeEntity
 				BlastiaGame.PlayerInventoryUiMenu.ToggleFullInventoryDisplay();
 			}
 			UpdateHotbarSelection();
+
+			UpdateSignHoverText();
 		}
 	}
 
@@ -329,6 +331,22 @@ public class Player : HumanLikeEntity
 		}
 		
 		BlastiaGame.PlayerInventoryUiMenu.SetSelectedHotbarSlotIndex(_selectedHotbarSlot);
+	}
+	
+	private void UpdateSignHoverText()
+	{
+		// sign hover tooltip
+		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+		if (worldState != null && Camera != null)
+		{
+			var pos = GetCoordsForBlockPlacement();
+			var tilePos = new Vector2((int) pos.X, (int) pos.Y);
+			
+			if (worldState.SignTexts.TryGetValue(tilePos, out var signText))
+			{
+				BlastiaGame.TooltipDisplay?.SetHoverText(signText);
+			}
+		}
 	}
 
 	/// <summary>

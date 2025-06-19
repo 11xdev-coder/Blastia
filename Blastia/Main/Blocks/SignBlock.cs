@@ -18,7 +18,20 @@ public class SignBlock : Block
     public override void OnRightClick(World world, Vector2 position, Player player)
     {
         base.OnRightClick(world, position, player);
+        if (BlastiaGame.InGameSignEditMenu == null) return;
         
         Console.WriteLine($"Editing sign at {position}");
+        BlastiaGame.InGameSignEditMenu.SignPosition = position;
+        BlastiaGame.InGameSignEditMenu.Active = true;
+    }
+
+    public override void OnBreak(World? world, Vector2 position, Player? player)
+    {
+        base.OnBreak(world, position, player);
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        if (worldState == null) return;
+        
+        // clear text
+        worldState.SignTexts.Remove(position);
     }
 }

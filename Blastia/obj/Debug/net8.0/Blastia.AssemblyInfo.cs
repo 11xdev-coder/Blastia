@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Blastia")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6a3b9e6647970bb82a526b310256057a0e077c9b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+37b2669619dace5d60add16f65e0d61815a18b8c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Blastia")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Blastia")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

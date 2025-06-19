@@ -30,6 +30,10 @@ public class Input : UIElement
     private Color _defaultTextColor = Color.Wheat;
     private Color _normalTextColor = Color.White;
     
+    public bool IsSignEditing { get; set; }
+    public int CharacterLimit { get; set; } = 144;
+    public int WrapLength { get; set; } = 36;
+
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
         double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
         int cursorWidth = 2, int cursorHeight = 30, string defaultText = "Text here...") : base(position, "", font)
@@ -49,28 +53,78 @@ public class Input : UIElement
     public override void Update()
     {
         base.Update();
-        
+
+        if (IsSignEditing)
+        {
+            // clamp cursor index to valid range
+            _cursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
+        }
+
         // handle input if focused
         if (IsFocused)
         {
             HandleArrows();
-            KeyboardHelper.ProcessInput(ref _cursorIndex, StringBuilder);
+            try
+            {
+                KeyboardHelper.ProcessInput(ref _cursorIndex, StringBuilder);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                _cursorIndex = StringBuilder.Length;
+            }
         }
-        
-        // if no text + unfocused -> default text; otherwise -> StringBuilder text
-        if (!IsFocused && StringBuilder.Length <= 0)
+
+        if (IsSignEditing)
         {
-            Text = DefaultText;
-            DrawColor = _defaultTextColor;
+            // clamp length and cursor
+            if (StringBuilder.Length > CharacterLimit)
+            {
+                StringBuilder.Length = CharacterLimit;
+                _cursorIndex = Math.Min(_cursorIndex, StringBuilder.Length);
+            }
+            // placeholder when not editing or empty
+            if (!IsFocused && StringBuilder.Length <= 0)
+            {
+                Text = DefaultText;
+                DrawColor = _defaultTextColor;
+            }
+            else
+            {
+                // wrap text
+                var plain = StringBuilder.ToString();
+                var wrapped = new StringBuilder();
+                for (int i = 0; i < plain.Length; i += WrapLength)
+                {
+                    int len = Math.Min(WrapLength, plain.Length - i);
+                    wrapped.Append(plain.Substring(i, len));
+                    if (i + len < plain.Length) wrapped.Append('\n');
+                }
+                Text = wrapped.ToString();
+                DrawColor = _normalTextColor;
+            }
         }
         else
         {
-            Text = StringBuilder.ToString();
-            DrawColor = _normalTextColor;
+            if (!IsFocused && StringBuilder.Length <= 0)
+            {
+                Text = DefaultText;
+                DrawColor = _defaultTextColor;
+            }
+            else
+            {
+                Text = StringBuilder.ToString();
+                DrawColor = _normalTextColor;
+            }
         }
-        
+
         // blink if cursor is visible + focused
         if (_cursorVisible && IsFocused) Blink();
+
+        // ensure hitbox matches sign-edit area
+        if (IsSignEditing)
+        {
+            UpdateBounds();
+        }
     }
 
     private void HandleArrows()
@@ -115,27 +169,84 @@ public class Input : UIElement
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        base.Draw(spriteBatch);
-
-        if (Font == null || Text == null) return;
-        
-        // draw cursor only if we should + focused
-        if (_shouldDrawCursor && IsFocused)
+        if (IsSignEditing)
         {
-            // little offset if no text
-            float yOffset = 0;
-            if (string.IsNullOrEmpty(Text)) yOffset = 10;
-            
-            // measure text size until _cursorIndex
-            var textSizeToCursorIndex = 
-                Font.MeasureString(Text.Substring(0, _cursorIndex));
-            
-            var cursorPosition = new Vector2(Bounds.Left + textSizeToCursorIndex.X, 
-                Bounds.Center.Y - CursorHeight * 0.5f - yOffset);
-            
-            var cursorRectangle = new Rectangle((int)cursorPosition.X, (int)cursorPosition.Y, 
-                CursorWidth, CursorHeight);
-            spriteBatch.Draw(BlastiaGame.WhitePixel, cursorRectangle, CursorColor);
+            if (Font == null || Text == null) return;
+            var lines = Text.Split('\n');
+            float lineHeight = Font.LineSpacing * Scale.Y;
+            // draw each line left-aligned
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var pos = new Vector2(Bounds.Left, Bounds.Top + i * lineHeight);
+                spriteBatch.DrawString(Font, lines[i], pos, DrawColor * (Alpha), 0f, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+            }
+            // draw cursor at end of text
+            if (_shouldDrawCursor && IsFocused)
+            {
+                // calculate cursor position in wrapped text
+                int idx = _cursorIndex;
+                int acc = 0;
+                int lineIdx = 0;
+                foreach (var ln in lines)
+                {
+                    if (idx <= acc + ln.Length)
+                    {
+                        int posInLine = idx - acc;
+                        var substr = ln[..Math.Min(posInLine, ln.Length)];
+                        var size = Font.MeasureString(substr) * Scale;
+                        var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIdx * lineHeight);
+                        var rect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, CursorWidth, CursorHeight);
+                        spriteBatch.Draw(BlastiaGame.WhitePixel, rect, CursorColor * (Alpha));
+                        break;
+                    }
+                    acc += ln.Length;
+                    lineIdx++;
+                }
+            }
         }
+        else
+        {
+            base.Draw(spriteBatch);
+            if (Font == null || Text == null) return;
+            if (_shouldDrawCursor && IsFocused)
+            {
+                float yOffset = string.IsNullOrEmpty(Text) ? 10 : 0;
+                var textSize = Font.MeasureString(Text[.._cursorIndex]);
+                var cursorPosition = new Vector2(Bounds.Left + textSize.X, Bounds.Center.Y - CursorHeight * 0.5f - yOffset);
+                var cursorRectangle = new Rectangle((int)cursorPosition.X, (int)cursorPosition.Y, CursorWidth, CursorHeight);
+                spriteBatch.Draw(BlastiaGame.WhitePixel, cursorRectangle, CursorColor * (Alpha));
+            }
+        }
+    }
+
+    public override void UpdateBounds()
+    {
+        if (IsSignEditing && Font != null)
+        {
+            // fixed hitbox width based on wrap length, supports placeholder click
+            var charSize = Font.MeasureString("W") * Scale;
+            float width = charSize.X * WrapLength;
+            float lineHeight = Font.LineSpacing * Scale.Y;
+            int maxLines = (CharacterLimit + WrapLength - 1) / WrapLength;
+            float height = lineHeight * maxLines;
+
+            // apply alignment
+            UpdateBoundsBase(width, height);
+        }
+        else
+        {
+            base.UpdateBounds();
+        }
+    }
+
+    /// <summary>
+    /// Set input text, replacing any existing content
+    /// </summary>
+    public void SetText(string newText)
+    {
+        StringBuilder.Clear();
+        StringBuilder.Append(newText);
+        _cursorIndex = StringBuilder.Length;
+        Text = newText;
     }
 }

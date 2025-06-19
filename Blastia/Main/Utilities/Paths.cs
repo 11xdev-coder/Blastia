@@ -29,6 +29,7 @@ public static class Paths
 	public static string SlotBackgroundTexturePath { get; private set; } = "";
 	public static string SlotHighlightedTexturePath { get; private set; } = "";
 	public static string BlockDestroyTexturePath { get; private set; } = "";
+	public static string SignEditBackgroundTexturePath { get; private set; } = "";
 	
 	// sounds
 	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
@@ -70,6 +71,7 @@ public static class Paths
 		SlotBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotBackground.png");
 		SlotHighlightedTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotHighlighted.png");
 		BlockDestroyTexturePath = Path.Combine(ContentRoot, "Textures/Blocks/BlockDestroy.png");
+		SignEditBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SignEditBackground.png");
 		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";
