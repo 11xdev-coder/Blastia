@@ -561,6 +561,7 @@ public class BlastiaGame : Game
 		if (worldState == null) return;
 		
 		World = new World(worldState, _entities.AsReadOnly());
+		//worldState.SetSpawnPoint(1600, 468);
 		_myPlayer = new Player(worldState.GetSpawnPoint(), World, 0.15f, true);
 		World.SetPlayer(_myPlayer);
 		
@@ -613,6 +614,7 @@ public class BlastiaGame : Game
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.CandyBlock), 100);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.WaterBlock), 100);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.SignBlock), 100);
 	}
 	
 	// WORLD UNLOADING

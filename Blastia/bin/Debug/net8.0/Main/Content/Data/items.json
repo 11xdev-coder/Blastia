@@ -46,7 +46,7 @@
     "Type": "Placeable",
     "Properties": {
       "BlockId": 3
-    }
+    }  
   },
   {
     "Id": 6,
@@ -57,6 +57,17 @@
     "Type": "Placeable",
     "Properties": {
       "BlockId": 4
+    }  
+  },
+  {
+    "Id": 7,
+    "Name": "Sign",
+    "Tooltip": "",
+    "IconPath": "Textures/Items/SignBlock.png",
+    "MaxStack": 100,
+    "Type": "Placeable",
+    "Properties": {
+      "BlockId": 5
     }
   }
 ]

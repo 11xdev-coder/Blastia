@@ -170,16 +170,19 @@ public class Player : HumanLikeEntity
 		var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
 		if (currentWorld == null) return;
 		
-		if (BlastiaGame.HasClickedRight && selectedItem is {BaseItem: PlaceableItem placeable})
+		if (BlastiaGame.HasClickedRight)
 		{
 			var pos = GetCoordsForBlockPlacement();
-			currentWorld.SetTile((int) pos.X, (int) pos.Y, placeable.BlockId, this);
-			// liquids placed by players are source blocks
-			if (currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y)?.Block is LiquidBlock liquidBlock)
+			if (selectedItem is {BaseItem: PlaceableItem placeable} && currentWorld.GetTile((int) pos.X, (int) pos.Y) == BlockId.Air)
 			{
-				liquidBlock.IsSourceBlock = true;
+				// air and item selected -> place block
+				PlaceBlock(currentWorld, pos, placeable);
 			}
-			PlayerInventory.RemoveItem(_selectedHotbarSlot);
+			else
+			{
+				// no item selected / no air -> interact
+				InteractWithBlock(currentWorld, pos);
+			}
 		}
 		if (BlastiaGame.IsHoldingLeft)
 		{
@@ -190,6 +193,24 @@ public class Player : HumanLikeEntity
 				blockInstance.DoBreaking(pos, this);
 			}
 		}
+	}
+
+	private void PlaceBlock(WorldState worldState, Vector2 position, PlaceableItem placeable)
+	{
+		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, this);
+		// liquids placed by players are source blocks
+		if (worldState.GetBlockInstance((int) position.X, (int) position.Y)?.Block is LiquidBlock liquidBlock)
+		{
+			liquidBlock.IsSourceBlock = true;
+		}
+		PlayerInventory.RemoveItem(_selectedHotbarSlot);
+	}
+
+	private void InteractWithBlock(WorldState worldState, Vector2 position)
+	{
+		var blockInstance = worldState.GetBlockInstance((int) position.X, (int) position.Y);
+		if (blockInstance == null || World == null) return;
+		blockInstance.OnRightClick(World, position, this);
 	}
 
 	private void HandleItemInteraction()

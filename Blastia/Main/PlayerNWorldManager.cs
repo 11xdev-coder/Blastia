@@ -200,6 +200,9 @@ public class WorldState
 	public int WorldWidth { get; set; }
 	public int WorldHeight { get; set; }
 
+	// sign position -> sign text
+	public Dictionary<Vector2, string> SignTexts { get; set; } = [];
+
 	public float SpawnX { get; set; }
 	public float SpawnY { get; set; }
 

@@ -170,7 +170,7 @@ public class World
 	}
 
 	public IEnumerable<DroppedItem> GetDroppedItems() => Entities.OfType<DroppedItem>();
-
+	
 	public void Update()
 	{
 		

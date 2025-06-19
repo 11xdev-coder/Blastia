@@ -87,6 +87,29 @@ public static class Saving
                         
                         if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
                         break;
+                    case Dictionary<Vector2, string> stringDictionary:
+                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, string> with {stringDictionary.Count} items");
+                        
+                        writer.Write(stringDictionary.Count);
+                        foreach (var keyValuePair in stringDictionary)
+                        {
+                            var vector = keyValuePair.Key;
+                            var str = keyValuePair.Value;
+                            
+                            if (debugLogs)
+                            {
+                                Console.WriteLine(vector == default
+                                    ? "Couldn't write Vector2"
+                                    : $"Writing Dictionary<Vector2, string> entry: Position({vector.X}, {vector.Y}), String: {str}");
+                            }
+                            
+                            writer.Write(vector.X);
+                            writer.Write(vector.Y);
+                            writer.Write(str);
+                        }
+                        
+                        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
+                        break;
                     case Vector2 vectorValue:
                         // write X and Y
                         writer.Write(vectorValue.X);
@@ -146,12 +169,17 @@ public static class Saving
             PropertyInfo[] properties = typeof(T).GetProperties();
             foreach (PropertyInfo property in properties)
             {
-                // get property type
-                Type propertyType = property.PropertyType;
-                // read property value
-                object value = ReadValue(reader, propertyType, debugLogs);
-                // set state's property to value
-                property.SetValue(state, value);
+                try
+                {
+                    Type propertyType = property.PropertyType;
+                    object value = ReadValue(reader, propertyType, debugLogs);
+                    property.SetValue(state, value);
+                }
+                catch (EndOfStreamException)
+                {
+                    // legacy save without this property -> stop reading further properties
+                    break;
+                }
             }
         }
 
@@ -221,6 +249,39 @@ public static class Saving
             
             if (debugLogs) Console.WriteLine($"Successfully read {blockDictionary.Count} entries");
             return blockDictionary;
+        }
+        
+        if (type == typeof(Dictionary<Vector2, string>))
+        {
+            var stringDictionary = new Dictionary<Vector2, string>();
+            var count = reader.ReadInt32();
+            if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
+            
+            for (int i = 0; i < count; i++)
+            {
+                var x = reader.ReadSingle();
+                var y = reader.ReadSingle();
+                var str = reader.ReadString();
+                
+                if (float.IsInfinity(x) || float.IsNaN(x) || 
+                    float.IsInfinity(y) || float.IsNaN(y))
+                {
+                    throw new InvalidDataException(
+                        $"Invalid position values at entry {i}: ({x}, {y})");
+                }
+                
+                if (string.IsNullOrEmpty(str))
+                {
+                    if (debugLogs) Console.WriteLine("String is null or empty, skipping");
+                    continue;
+                }
+                
+                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), string: {str}");
+                stringDictionary.Add(new Vector2(x, y), str);
+            }
+            
+            if (debugLogs) Console.WriteLine($"Successfully read {stringDictionary.Count} entries");
+            return stringDictionary;
         }
             
         if (type == typeof(Vector2))
