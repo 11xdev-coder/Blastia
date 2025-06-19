@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
+using Blastia.Main.Blocks;
 using Blastia.Main.Blocks.Common;
 using Microsoft.Xna.Framework;
 
@@ -83,6 +84,11 @@ public static class Saving
                             writer.Write(vector.Y);
                             // write blocks ID, reconstruct later from StuffRegistry
                             writer.Write(block.Id);
+                            if (keyValuePair.Value.Block is LiquidBlock liquid)
+                            {
+                                writer.Write(liquid.IsSourceBlock);
+                                writer.Write(liquid.FlowLevel);
+                            }
                         }
                         
                         if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
@@ -202,11 +208,11 @@ public static class Saving
                 var y = reader.ReadSingle();
                 var id = reader.ReadUInt16();
                 
-                if (float.IsInfinity(x) || float.IsNaN(x) || 
+                if (float.IsInfinity(x) || float.IsNaN(x) ||
                     float.IsInfinity(y) || float.IsNaN(y))
                 {
-                    throw new InvalidDataException(
-                        $"Invalid position values at entry {i}: ({x}, {y})");
+                    if (debugLogs) Console.WriteLine($"Skipping invalid tile entry {i}: ({x}, {y})");
+                    continue;
                 }
                 
                 if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), ID: {id}");
@@ -222,29 +228,41 @@ public static class Saving
             var blockDictionary = new Dictionary<Vector2, BlockInstance>();
             var count = reader.ReadInt32();
             if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
-            
+
             for (int i = 0; i < count; i++)
             {
                 var x = reader.ReadSingle();
                 var y = reader.ReadSingle();
                 var blockId = reader.ReadUInt16();
-                
-                if (float.IsInfinity(x) || float.IsNaN(x) || 
+
+                if (float.IsInfinity(x) || float.IsNaN(x) ||
                     float.IsInfinity(y) || float.IsNaN(y))
                 {
-                    throw new InvalidDataException(
-                        $"Invalid position values at entry {i}: ({x}, {y})");
+                    if (debugLogs) Console.WriteLine($"Skipping invalid block entry {i}: Position({x}, {y})");
+                    continue;
                 }
                 
-                var block = StuffRegistry.GetBlock(blockId);
-                if (block == null)
+                var blockTemplate = StuffRegistry.GetBlock(blockId);
+                if (blockTemplate == null)
                 {
                     if (debugLogs) Console.WriteLine($"Block ID: {blockId} not found in registry");
                     continue;
                 }
+
+                Block instance;
+                if (blockTemplate is LiquidBlock liquid)
+                {
+                    var clone = liquid.CreateNewInstance();
+                    clone.IsSourceBlock = reader.ReadBoolean();
+                    clone.FlowLevel = reader.ReadInt32();
+                    clone.MarkAsJustLoaded();
+                    instance = clone;
+                }
+                else
+                    instance = blockTemplate;
                 
-                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), block ID: {blockId}, block name: {block.Name}");
-                blockDictionary.Add(new Vector2(x, y), new BlockInstance(block, 0));
+                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), block ID: {blockId}, block name: {instance.Name}");
+                blockDictionary.Add(new Vector2(x, y), new BlockInstance(instance, 0));
             }
             
             if (debugLogs) Console.WriteLine($"Successfully read {blockDictionary.Count} entries");
@@ -263,11 +281,11 @@ public static class Saving
                 var y = reader.ReadSingle();
                 var str = reader.ReadString();
                 
-                if (float.IsInfinity(x) || float.IsNaN(x) || 
+                if (float.IsInfinity(x) || float.IsNaN(x) ||
                     float.IsInfinity(y) || float.IsNaN(y))
                 {
-                    throw new InvalidDataException(
-                        $"Invalid position values at entry {i}: ({x}, {y})");
+                    if (debugLogs) Console.WriteLine($"Skipping invalid string entry {i}: ({x}, {y})");
+                    continue;
                 }
                 
                 if (string.IsNullOrEmpty(str))

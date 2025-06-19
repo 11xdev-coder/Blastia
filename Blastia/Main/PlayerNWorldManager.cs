@@ -87,7 +87,7 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 				{
 					// load new instance
 					var loadedState = Saving.Load<T>(file);
-					items.Add(loadedState);				
+					items.Add(loadedState);
 				}
 			}
 

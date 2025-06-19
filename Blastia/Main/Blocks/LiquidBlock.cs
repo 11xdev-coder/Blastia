@@ -84,6 +84,7 @@ public abstract class LiquidBlock : Block
 
     private float _globalTime;
     private WorldState _currentWorldState;
+    private bool _hasJustLoaded;
 
     protected LiquidBlock(ushort id, string name, float flowSpeed = 2f, int maxFlowDistance = 8, float decayDelay = 2f,
         float decayRate = 0.5f) : base(id, name, 200f, 0f, false, true, 0, 0)
@@ -125,8 +126,19 @@ public abstract class LiquidBlock : Block
         return BlockRectangles.TopLeft;
     }
 
+    /// <summary>
+    /// Used when liquid has just loaded into the world to save the natural flow (skips first update)
+    /// </summary>
+    public void MarkAsJustLoaded() => _hasJustLoaded = true;
+    
     public override void Update(World world, Vector2 position)
     {
+        if (_hasJustLoaded)
+        {
+            _hasJustLoaded = false;
+            return;
+        }
+        
         base.Update(world, position);
         if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
         _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld;
@@ -671,8 +683,8 @@ public abstract class LiquidBlock : Block
         
         _currentWorldState.SetTileInstance(tileX, tileY, new BlockInstance(newLiquid, 0));
     }
-    
-    protected abstract LiquidBlock CreateNewInstance();
+
+    public abstract LiquidBlock CreateNewInstance();
 
     public override void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
     {
