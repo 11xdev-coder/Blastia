@@ -66,6 +66,15 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
         _signText.SetText(originalText);
     }
 
+    public void UpdateText()
+    {
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        if (_signText == null || worldState == null) return;
+        
+        worldState.SignTexts.TryGetValue(SignPosition, out var text);
+        _signText.SetText(text ?? "");
+    }
+
     public override void Update()
     {
         base.Update();

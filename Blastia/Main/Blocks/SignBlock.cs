@@ -22,6 +22,7 @@ public class SignBlock : Block
         
         Console.WriteLine($"Editing sign at {position}");
         BlastiaGame.InGameSignEditMenu.SignPosition = position;
+        BlastiaGame.InGameSignEditMenu.UpdateText();
         BlastiaGame.InGameSignEditMenu.Active = true;
     }
 
