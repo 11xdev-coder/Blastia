@@ -113,7 +113,7 @@ public class Camera : Object
 					bottomTile == null || bottomTile.Block.IsTransparent, 
 					rightTile == null || rightTile.Block.IsTransparent, 
 					leftTile == null || leftTile.Block.IsTransparent);
-				blockInstance.Draw(spriteBatch, destRect, sourceRect);				
+				blockInstance.Draw(spriteBatch, destRect, sourceRect, new Vector2(worldXCoord, worldYCoord));				
 			}
 		}
 	}

@@ -4,6 +4,7 @@ using Blastia.Main.GameState;
 using Blastia.Main.Items;
 using Blastia.Main.Sounds;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.Blocks;
 
@@ -34,5 +35,32 @@ public class SignBlock : Block
         
         // clear text
         worldState.SignTexts.Remove(position);
+    }
+
+    public override void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle, Vector2 worldPosition)
+    {
+        base.Draw(spriteBatch, destRectangle, sourceRectangle, worldPosition);
+        
+        // draw overlay depending on text
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        if (worldState == null) return;
+    
+        worldState.SignTexts.TryGetValue(worldPosition, out var text);
+        if (string.IsNullOrEmpty(text)) return;
+
+        var overlayRect = new Rectangle(
+            destRectangle.X, 
+            destRectangle.Y - (int)(destRectangle.Height * 0.05f), 
+            (int)(destRectangle.Width * 0.8f),
+            (int)(destRectangle.Height * 0.8f)
+        );
+        if (text.Length > 72)
+        {
+            spriteBatch.Draw(BlastiaGame.SignWrittenOverlay2Texture, overlayRect, Color.White);
+        }
+        else if (text.Length > 0)
+        {
+            spriteBatch.Draw(BlastiaGame.SignWrittenOverlay1Texture, overlayRect, Color.White);
+        }
     }
 }

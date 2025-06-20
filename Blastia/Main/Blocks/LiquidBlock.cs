@@ -754,7 +754,7 @@ public abstract class LiquidBlock : Block
 
     public abstract LiquidBlock CreateNewInstance();
 
-    public override void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
+    public override void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle, Vector2 worldPosition)
     {
         var texture = StuffRegistry.GetBlockTexture(Id);
 

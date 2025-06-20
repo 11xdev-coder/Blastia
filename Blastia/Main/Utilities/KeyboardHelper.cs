@@ -12,20 +12,15 @@ public static class KeyboardHelper
     private static readonly Dictionary<Keys, double> KeyHoldTimes = new();
     private const double CharacterInitialHoldDelay = 0.5f;
     private const double CharacterHoldRepeatInterval = 0.1f;
-
-    private static readonly Dictionary<Keys, (char normal, char shifted)> SymbolKeyMap = new()
+    
+    private static readonly Dictionary<int, char> SdlRussianScanCodes = new Dictionary<int, char>
     {
-        { Keys.OemOpenBrackets, ('[', '{') },
-        { Keys.OemCloseBrackets, (']', '}') },
-        { Keys.OemSemicolon, (';', ':') },
-        { Keys.OemQuotes, ('\'', '"') },
-        { Keys.OemComma, (',', '<') },
-        { Keys.OemPeriod, ('.', '>') },
-        { Keys.OemQuestion, ('/', '?') },
-        { Keys.OemPipe, ('\\', '|') },
-        { Keys.OemMinus, ('-', '_') },
-        { Keys.OemPlus, ('=', '+') },
-        { Keys.OemTilde, ('`', '~') }
+        { 1073, 'б' }, // SDL_SCANCODE_COMMA -> б
+        { 1074, 'ю' }, // SDL_SCANCODE_PERIOD -> ю
+        { 1075, 'ж' }, // SDL_SCANCODE_SEMICOLON -> ж
+        { 1076, 'э' }, // SDL_SCANCODE_QUOTE -> э
+        { 1077, 'х' }, // SDL_SCANCODE_LEFTBRACKET -> х
+        { 1078, 'ъ' }, // SDL_SCANCODE_RIGHTBRACKET -> ъ
     };
     
     /// <summary>
@@ -54,27 +49,54 @@ public static class KeyboardHelper
 
     [DllImport("user32.dll")]
     private static extern IntPtr GetKeyboardLayout(uint idThread);
-
+    
+    public static bool HandleSdlScanCodeError(int scanCode, ref int index, StringBuilder stringBuilder, bool isShiftDown)
+    {
+        if (SdlRussianScanCodes.TryGetValue(scanCode, out char russianChar))
+        {
+            char charToInsert = isShiftDown ? char.ToUpper(russianChar) : russianChar;
+            stringBuilder.Insert(index, charToInsert);
+            index++;
+            return true;
+        }
+        return false;
+    }
+    
     private static char GetCharFromKey(Keys key, bool isShiftDown)
     {
-        var keyboardState = new byte[256];
-        GetKeyboardState(keyboardState);
+        try
+        {
+            var keyboardState = new byte[256];
+            GetKeyboardState(keyboardState);
 
-        if (isShiftDown)
-            keyboardState[(int) Keys.LeftShift] = 0x80;
+            if (isShiftDown)
+                keyboardState[(int)Keys.LeftShift] = 0x80;
 
-        uint vk = (uint) key;
-        uint scan = MapVirtualKey(vk, 0);
-        var buff = new StringBuilder(2);
-        IntPtr hkl = GetKeyboardLayout(0);
+            uint vk = (uint)key;
+            uint scan = MapVirtualKey(vk, 0);
 
-        int ret = ToUnicodeEx(vk, scan, keyboardState, buff, buff.Capacity, 0, hkl);
-        if (ret > 0)
-            return buff[0];
+            // If scan code is 0, try extended mapping
+            if (scan == 0)
+            {
+                scan = MapVirtualKey(vk, 4); // MAPVK_VK_TO_VSC_EX
+            }
+
+            var buff = new StringBuilder(5);
+            IntPtr hkl = GetKeyboardLayout(0);
+
+            int result = ToUnicodeEx(vk, scan, keyboardState, buff, buff.Capacity, 0, hkl);
+
+            // ToUnicodeEx returns the number of characters written
+            if (result > 0)
+                return buff[0];
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in GetCharFromKey: {ex.Message}");
+        }
 
         return '\0';
     }
-
 
     /// <summary>
     /// Determines whether the Caps Lock key is currently on.
@@ -174,58 +196,13 @@ public static class KeyboardHelper
     private static bool HandleCharacter(ref int index, Keys key, StringBuilder stringBuilder,
         bool isShiftDown = false)
     {
-        // string keyString = key.ToString();
-        //
-        // // handle digits (1 = 'D1', 2 = 'D2' etc.)
-        // if (keyString.Length == 2 && keyString[0] == 'D' && char.IsDigit(keyString[1]))
-        // {
-        //     char digit = keyString[1];
-        //     if (isShiftDown)
-        //     {
-        //         // map shifted digis to symbols
-        //         var shiftedDigits = ")!@#$%^&*(";
-        //         digit = shiftedDigits[keyString[1] - '0'];
-        //     }
-        //     
-        //     stringBuilder.Insert(index, digit);
-        //     index++;
-        //     return true;
-        // }
-        //
-        // // handle normal letters (like 'A', 'B', 'C')
-        // if (keyString.Length == 1 && char.IsLetter(keyString[0]))
-        // {
-        //     char character = keyString[0];
-        //
-        //     if ((isShiftDown || IsCapsLockOn()) && !(isShiftDown && IsCapsLockOn()))
-        //     {
-        //         stringBuilder.Insert(index, char.ToUpper(character));
-        //         index++;
-        //         return true;
-        //     }
-        //
-        //     // if no shift/caps -> lower
-        //     stringBuilder.Insert(index, char.ToLower(character));
-        //     index++;
-        //     return true;
-        // }
-        //
-        // // handle symbols
-        // if (SymbolKeyMap.TryGetValue(key, out var symbolPair))
-        // {
-        //     var charToInsert = isShiftDown ? symbolPair.shifted : symbolPair.normal;
-        //     stringBuilder.Insert(index, charToInsert);
-        //     index++;
-        //     return true;
-        // }
-        
+        // Fall back to the regular character handling
         var ch = GetCharFromKey(key, isShiftDown);
         if (ch == '\0')
             return false;
 
         stringBuilder.Insert(index, ch);
         index++;
-
         return true;
     }
     #endregion

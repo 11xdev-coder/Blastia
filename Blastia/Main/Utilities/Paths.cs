@@ -30,6 +30,8 @@ public static class Paths
 	public static string SlotHighlightedTexturePath { get; private set; } = "";
 	public static string BlockDestroyTexturePath { get; private set; } = "";
 	public static string SignEditBackgroundTexturePath { get; private set; } = "";
+	public static string SignWrittenOverlay1TexturePath { get; private set; } = "";
+	public static string SignWrittenOverlay2TexturePath { get; private set; } = "";
 	
 	// sounds
 	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
@@ -72,6 +74,8 @@ public static class Paths
 		SlotHighlightedTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotHighlighted.png");
 		BlockDestroyTexturePath = Path.Combine(ContentRoot, "Textures/Blocks/BlockDestroy.png");
 		SignEditBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SignEditBackground.png");
+		SignWrittenOverlay1TexturePath = Path.Combine(ContentRoot, "Textures/Blocks/SignWrittenOverlay1.png");
+		SignWrittenOverlay2TexturePath = Path.Combine(ContentRoot, "Textures/Blocks/SignWrittenOverlay2.png");
 		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";

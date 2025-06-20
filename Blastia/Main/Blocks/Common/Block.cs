@@ -116,7 +116,7 @@ public abstract class Block
 		return BlockRectangles.Middle;
 	}
 	
-	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
+	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle, Vector2 worldPosition)
 	{
 		var texture = StuffRegistry.GetBlockTexture(Id);
 		spriteBatch.Draw(texture, destRectangle, sourceRectangle, Color.White);
@@ -202,7 +202,7 @@ public class BlockInstance
 		return Damage <= Block.Hardness ? BlockRectangles.DestroySix : Rectangle.Empty;
 	}
 	
-	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle)
+	public virtual void Draw(SpriteBatch spriteBatch, Rectangle destRectangle, Rectangle sourceRectangle, Vector2 worldPosition)
 	{
 		if (_breakingAnimation.IsAnimating)
 		{
@@ -213,11 +213,11 @@ public class BlockInstance
 			var offsetX = (destRectangle.Width - scaledWidth) / 2;
 			var offsetY = (destRectangle.Height - scaledHeight) / 2;
 			var finalDestRect = new Rectangle(destRectangle.X + offsetX, destRectangle.Y + offsetY, scaledWidth, scaledHeight);
-			Block.Draw(spriteBatch, finalDestRect, sourceRectangle);
+			Block.Draw(spriteBatch, finalDestRect, sourceRectangle, worldPosition);
 		}
 		else
 		{
-			Block.Draw(spriteBatch, destRectangle, sourceRectangle);
+			Block.Draw(spriteBatch, destRectangle, sourceRectangle, worldPosition);
 		}
 
 		var blockDestroySourceRectangle = GetBlockDestroySourceRectangle();

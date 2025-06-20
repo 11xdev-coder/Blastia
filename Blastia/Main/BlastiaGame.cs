@@ -72,6 +72,8 @@ public class BlastiaGame : Game
 	public static Texture2D SlotHighlightedTexture { get; private set; } = null!;
 	public static Texture2D BlockDestroyTexture { get; private set; } = null!;
 	public static Texture2D SignEditBackgroundTexture { get; private set; } = null!;
+	public static Texture2D SignWrittenOverlay1Texture { get; private set; } = null!;
+	public static Texture2D SignWrittenOverlay2Texture { get; private set; } = null!;
 
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
@@ -267,6 +269,8 @@ public class BlastiaGame : Game
 		SlotHighlightedTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotHighlightedTexturePath);
 		BlockDestroyTexture = Util.LoadTexture(GraphicsDevice, Paths.BlockDestroyTexturePath);
 		SignEditBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SignEditBackgroundTexturePath);
+		SignWrittenOverlay1Texture = Util.LoadTexture(GraphicsDevice, Paths.SignWrittenOverlay1TexturePath);
+		SignWrittenOverlay2Texture = Util.LoadTexture(GraphicsDevice, Paths.SignWrittenOverlay2TexturePath);
 	}
 	
 	protected override void LoadContent()
@@ -373,7 +377,7 @@ public class BlastiaGame : Game
 			{
 				NetworkManager.Instance.Update();
 			}
-			
+
 			UpdateColors();
 
 			UpdateMouseState();
@@ -392,10 +396,29 @@ public class BlastiaGame : Game
 						if (KeyboardState.IsKeyDown(Keys.F)) World.SetRulerEnd(pos);
 						if (KeyboardHelper.IsKeyJustPressed(Keys.G)) World.DrawRulerLine();
 					}
-				
+
+					if (PlayerNWorldManager.Instance.SelectedWorld != null)
+					{
+						var tilesToUpdate = PlayerNWorldManager.Instance.SelectedWorld.TileInstances
+							.Select(kvp => (kvp.Key, kvp.Value))
+							.ToArray();
+
+						foreach (var (position, blockInstance) in tilesToUpdate)
+						{
+							try
+							{
+								blockInstance.Update(World, position);
+							}
+							catch (Exception ex)
+							{
+								Console.WriteLine($"Error updating block at {position}. Exception: {ex.Message}");
+							}
+						}
+					}
+
 					World.Update();
 				}
-				
+
 				_myPlayer?.Update();
 				foreach (var player in Players)
 				{
@@ -415,7 +438,7 @@ public class BlastiaGame : Game
 				{
 					if (menu.CameraUpdate && _myPlayer?.Camera != null) menu.Update(_myPlayer.Camera);
 					else menu.Update();
-					
+
 					// prevent new menu from updating when switched
 					if (menu.CheckAndResetMenuSwitchedFlag())
 					{
@@ -431,7 +454,7 @@ public class BlastiaGame : Game
 			}
 
 			TooltipDisplay?.Update();
-			
+
 			// update previous states in the end
 			UpdatePreviousStates();
 		}
@@ -501,25 +524,6 @@ public class BlastiaGame : Game
 		{
 			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
-
-			if (World != null)
-			{
-				var tilesToUpdate = PlayerNWorldManager.Instance.SelectedWorld.TileInstances
-					.Select(kvp => (kvp.Key, kvp.Value))
-					.ToArray();
-				
-				foreach (var (position, blockInstance) in tilesToUpdate)
-				{
-					try
-					{
-						blockInstance.Update(World, position);
-					}
-					catch (Exception ex)
-					{
-						Console.WriteLine($"Error updating block at {position}. Exception: {ex.Message}");
-					}
-				}
-			}
 			
 			foreach (var entity in _entities)
 			{
