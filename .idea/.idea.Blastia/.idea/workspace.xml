@@ -7,7 +7,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="" />
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/WaterLiquid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/WaterLiquid.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Blocks/Candy.png" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Blocks/Candy.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Textures/Blocks/Candy.png" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Textures/Blocks/Candy.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -259,54 +277,8 @@
       <workItem from="1750276578831" duration="523000" />
       <workItem from="1750277171903" duration="242000" />
       <workItem from="1750277481699" duration="4497000" />
-    </task>
-    <task id="LOCAL-00092" summary="basic left click functionality">
-      <option name="closed" value="true" />
-      <created>1748366042061</created>
-      <option name="number" value="00092" />
-      <option name="presentableId" value="LOCAL-00092" />
-      <option name="project" value="LOCAL" />
-      <updated>1748366042061</updated>
-    </task>
-    <task id="LOCAL-00093" summary="cursor item amount text">
-      <option name="closed" value="true" />
-      <created>1748375001951</created>
-      <option name="number" value="00093" />
-      <option name="presentableId" value="LOCAL-00093" />
-      <option name="project" value="LOCAL" />
-      <updated>1748375001951</updated>
-    </task>
-    <task id="LOCAL-00094" summary="taking swapping and putting cursor item">
-      <option name="closed" value="true" />
-      <created>1748457839402</created>
-      <option name="number" value="00094" />
-      <option name="presentableId" value="LOCAL-00094" />
-      <option name="project" value="LOCAL" />
-      <updated>1748457839403</updated>
-    </task>
-    <task id="LOCAL-00095" summary="add same item from cursor">
-      <option name="closed" value="true" />
-      <created>1748546723480</created>
-      <option name="number" value="00095" />
-      <option name="presentableId" value="LOCAL-00095" />
-      <option name="project" value="LOCAL" />
-      <updated>1748546723480</updated>
-    </task>
-    <task id="LOCAL-00096" summary="ui element bounds scale fix">
-      <option name="closed" value="true" />
-      <created>1748597649515</created>
-      <option name="number" value="00096" />
-      <option name="presentableId" value="LOCAL-00096" />
-      <option name="project" value="LOCAL" />
-      <updated>1748597649515</updated>
-    </task>
-    <task id="LOCAL-00097" summary="simple dropped item drawing">
-      <option name="closed" value="true" />
-      <created>1748630435022</created>
-      <option name="number" value="00097" />
-      <option name="presentableId" value="LOCAL-00097" />
-      <option name="project" value="LOCAL" />
-      <updated>1748630435023</updated>
+      <workItem from="1750317702902" duration="28615000" />
+      <workItem from="1750401674464" duration="16446000" />
     </task>
     <task id="LOCAL-00098" summary="item drop position fix">
       <option name="closed" value="true" />
@@ -652,7 +624,55 @@
       <option name="project" value="LOCAL" />
       <updated>1750281393510</updated>
     </task>
-    <option name="localTasksCounter" value="141" />
+    <task id="LOCAL-00141" summary="world state saving on unload">
+      <option name="closed" value="true" />
+      <created>1750333870454</created>
+      <option name="number" value="00141" />
+      <option name="presentableId" value="LOCAL-00141" />
+      <option name="project" value="LOCAL" />
+      <updated>1750333870454</updated>
+    </task>
+    <task id="LOCAL-00142" summary="candy block">
+      <option name="closed" value="true" />
+      <created>1750341566151</created>
+      <option name="number" value="00142" />
+      <option name="presentableId" value="LOCAL-00142" />
+      <option name="project" value="LOCAL" />
+      <updated>1750341566151</updated>
+    </task>
+    <task id="LOCAL-00143" summary="saving fixes and sign block">
+      <option name="closed" value="true" />
+      <created>1750345482761</created>
+      <option name="number" value="00143" />
+      <option name="presentableId" value="LOCAL-00143" />
+      <option name="project" value="LOCAL" />
+      <updated>1750345482761</updated>
+    </task>
+    <task id="LOCAL-00144" summary="sign text editing">
+      <option name="closed" value="true" />
+      <created>1750349946371</created>
+      <option name="number" value="00144" />
+      <option name="presentableId" value="LOCAL-00144" />
+      <option name="project" value="LOCAL" />
+      <updated>1750349946371</updated>
+    </task>
+    <task id="LOCAL-00145" summary="sign text fix">
+      <option name="closed" value="true" />
+      <created>1750350248167</created>
+      <option name="number" value="00145" />
+      <option name="presentableId" value="LOCAL-00145" />
+      <option name="project" value="LOCAL" />
+      <updated>1750350248167</updated>
+    </task>
+    <task id="LOCAL-00146" summary="water flow level saving">
+      <option name="closed" value="true" />
+      <created>1750368948619</created>
+      <option name="number" value="00146" />
+      <option name="presentableId" value="LOCAL-00146" />
+      <option name="project" value="LOCAL" />
+      <updated>1750368948619</updated>
+    </task>
+    <option name="localTasksCounter" value="147" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -662,12 +682,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="steam lobby hosting" />
-    <MESSAGE value="lobby codes and lib version fix" />
-    <MESSAGE value="is in multiplayer session flag" />
-    <MESSAGE value="when host leaves all clients disconnect" />
-    <MESSAGE value="graceful shutdown" />
-    <MESSAGE value="block loading refactor" />
     <MESSAGE value="block item dropping" />
     <MESSAGE value="basic item inventory tooltip" />
     <MESSAGE value="dropped item and tooltip tweaks" />
@@ -687,6 +701,12 @@
     <MESSAGE value="collision and tile source rect fixes" />
     <MESSAGE value="liquid source fix" />
     <MESSAGE value="little liquid refactor" />
-    <option name="LAST_COMMIT_MESSAGE" value="little liquid refactor" />
+    <MESSAGE value="world state saving on unload" />
+    <MESSAGE value="candy block" />
+    <MESSAGE value="saving fixes and sign block" />
+    <MESSAGE value="sign text editing" />
+    <MESSAGE value="sign text fix" />
+    <MESSAGE value="water flow level saving" />
+    <option name="LAST_COMMIT_MESSAGE" value="water flow level saving" />
   </component>
 </project>

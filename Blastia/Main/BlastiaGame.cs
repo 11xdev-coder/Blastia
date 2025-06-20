@@ -504,10 +504,20 @@ public class BlastiaGame : Game
 
 			if (World != null)
 			{
-				foreach (var position in PlayerNWorldManager.Instance.SelectedWorld.TileInstances.Keys.ToArray())
+				var tilesToUpdate = PlayerNWorldManager.Instance.SelectedWorld.TileInstances
+					.Select(kvp => (kvp.Key, kvp.Value))
+					.ToArray();
+				
+				foreach (var (position, blockInstance) in tilesToUpdate)
 				{
-					var blockInstance = PlayerNWorldManager.Instance.SelectedWorld.TileInstances[position];
-					blockInstance.Update(World, position);
+					try
+					{
+						blockInstance.Update(World, position);
+					}
+					catch (Exception ex)
+					{
+						Console.WriteLine($"Error updating block at {position}. Exception: {ex.Message}");
+					}
 				}
 			}
 			
