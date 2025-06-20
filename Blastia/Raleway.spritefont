@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XnaContent xmlns:Graphics="Microsoft.Xna.Framework.Content.Pipeline.Graphics">
+  <Asset Type="Graphics:FontDescription">
+
+    <!-- Font name (TTF file name without extension) -->
+    <FontName>Raleway</FontName>
+
+    <!-- Font size -->
+    <Size>24</Size>
+
+    <!-- Font spacing -->
+    <Spacing>0</Spacing>
+
+    <!-- Use kerning? -->
+    <UseKerning>true</UseKerning>
+
+    <!-- Font style (Regular, Bold, Italic) -->
+    <Style>Regular</Style>
+
+    <!-- Character regions to include -->
+    <CharacterRegions>
+      <!-- Basic Latin (English) -->
+      <CharacterRegion>
+        <Start>&#32;</Start>   <!-- Space -->
+        <End>&#126;</End>      <!-- Tilde ~ -->
+      </CharacterRegion>
+      
+      <!-- Extended Latin -->
+      <CharacterRegion>
+        <Start>&#160;</Start>  <!-- Non-breaking space -->
+        <End>&#255;</End>      <!-- ÿ -->
+      </CharacterRegion>
+      
+      <!-- Cyrillic (Russian) -->
+      <CharacterRegion>
+        <Start>&#1040;</Start> <!-- А -->
+        <End>&#1103;</End>     <!-- я -->
+      </CharacterRegion>
+      
+      <!-- Additional Cyrillic symbols -->
+      <CharacterRegion>
+        <Start>&#1025;</Start> <!-- Ё -->
+        <End>&#1025;</End>
+      </CharacterRegion>
+      <CharacterRegion>
+        <Start>&#1105;</Start> <!-- ё -->
+        <End>&#1105;</End>
+      </CharacterRegion>
+    </CharacterRegions>
+
+  </Asset>
+</XnaContent>

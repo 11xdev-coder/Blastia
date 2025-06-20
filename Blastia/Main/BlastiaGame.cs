@@ -285,7 +285,7 @@ public class BlastiaGame : Game
 			StuffLoader.LoadHumans(GraphicsDevice);
 			StuffLoader.LoadItemsFromJson(GraphicsDevice, Paths.ItemsData);
 
-			MainFont = Content.Load<SpriteFont>("Font/Raleway_24_Regular");
+			MainFont = Content.Load<SpriteFont>("Font/Raleway");
 
 			// menus
 			LogoMenu = new LogoMenu(MainFont);

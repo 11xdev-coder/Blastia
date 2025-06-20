@@ -13,6 +13,16 @@
     <SourceRoot Include="C:\Users\matve\.nuget\packages\" />
     <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <Content Include="$(NuGetPackageRoot)monogame.framework.content.pipeline\3.8.4\contentFiles\any\net8.0\mgfxc.dll" Condition="Exists('$(NuGetPackageRoot)monogame.framework.content.pipeline\3.8.4\contentFiles\any\net8.0\mgfxc.dll')">
+      <NuGetPackageId>MonoGame.Framework.Content.Pipeline</NuGetPackageId>
+      <NuGetPackageVersion>3.8.4</NuGetPackageVersion>
+      <NuGetItemType>Content</NuGetItemType>
+      <Pack>false</Pack>
+      <Private>False</Private>
+      <Link>mgfxc.dll</Link>
+    </Content>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgNewtonsoft_Json Condition=" '$(PkgNewtonsoft_Json)' == '' ">C:\Users\matve\.nuget\packages\newtonsoft.json\9.0.1</PkgNewtonsoft_Json>
   </PropertyGroup>
