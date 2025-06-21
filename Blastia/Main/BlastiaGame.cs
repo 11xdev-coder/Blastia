@@ -164,6 +164,7 @@ public class BlastiaGame : Game
 		File.WriteAllText(_crashLogPath, string.Empty); // remove everything
 		
 		InitializeConsole();
+		RedirectConsoleOutput();
 		
 		_graphics = new GraphicsDeviceManager(this);
 		_entities = new List<Entity>();
@@ -212,6 +213,12 @@ public class BlastiaGame : Game
 	{
 		ConsoleWindow = new ConsoleWindow();
 		ConsoleWindow.Open("Blastia Game Console");
+	}
+
+	private void RedirectConsoleOutput()
+	{
+		Console.SetOut(new FilteredTextWriter(Console.Out, line => 
+			!line.Contains("KEY/SCANCODE MISSING FROM SDL2->XNA DICTIONARY:")));
 	}
 
 	protected override void Initialize()

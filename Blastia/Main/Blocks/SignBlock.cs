@@ -54,13 +54,14 @@ public class SignBlock : Block
             (int)(destRectangle.Width * 0.8f),
             (int)(destRectangle.Height * 0.8f)
         );
-        if (text.Length > 72)
+        switch (text.Length)
         {
-            spriteBatch.Draw(BlastiaGame.SignWrittenOverlay2Texture, overlayRect, Color.White);
-        }
-        else if (text.Length > 0)
-        {
-            spriteBatch.Draw(BlastiaGame.SignWrittenOverlay1Texture, overlayRect, Color.White);
+            case > 72:
+                spriteBatch.Draw(BlastiaGame.SignWrittenOverlay2Texture, overlayRect, Color.White);
+                break;
+            case > 0:
+                spriteBatch.Draw(BlastiaGame.SignWrittenOverlay1Texture, overlayRect, Color.White);
+                break;
         }
     }
 }
