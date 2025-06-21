@@ -50,7 +50,7 @@ public class SignBlock : Block
 
         var overlayRect = new Rectangle(
             destRectangle.X, 
-            destRectangle.Y - (int)(destRectangle.Height * 0.05f), 
+            destRectangle.Y - (int)(destRectangle.Height * 0.03f), 
             (int)(destRectangle.Width * 0.8f),
             (int)(destRectangle.Height * 0.8f)
         );
