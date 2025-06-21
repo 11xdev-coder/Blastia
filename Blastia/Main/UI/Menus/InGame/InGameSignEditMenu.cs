@@ -7,7 +7,7 @@ namespace Blastia.Main.UI.Menus.InGame;
 public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
     public Vector2 SignPosition { get; set; } = Vector2.Zero;
-    private Input? _signText;
+    public Input? SignText;
     private Button? _closeButton;
     
     protected override void AddElements()
@@ -19,14 +19,14 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
         };
         Elements.Add(background);
 
-        _signText = new Input(Vector2.Zero, Font, true)
+        SignText = new Input(Vector2.Zero, Font, true)
         {
             HAlign = 0.62f,
             VAlign = 0.28f,
             IsSignEditing = true,
             Scale = new Vector2(0.8f, 0.8f)
         };
-        Elements.Add(_signText);
+        Elements.Add(SignText);
         
         var save = new Button(Vector2.Zero, "Save", Font, SaveText)
         {
@@ -46,9 +46,9 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
     private void SaveText()
     {
         var worldState = PlayerNWorldManager.Instance.SelectedWorld;
-        if (worldState == null || SignPosition == Vector2.Zero || _signText == null) return;
+        if (worldState == null || SignPosition == Vector2.Zero || SignText == null) return;
         // set world state sign text
-        worldState.SignTexts[SignPosition] = _signText.StringBuilder.ToString();
+        worldState.SignTexts[SignPosition] = SignText.StringBuilder.ToString();
         Active = false;
     }
 
@@ -58,21 +58,21 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
         
         // fallback to original text
         var worldState = PlayerNWorldManager.Instance.SelectedWorld;
-        if (_signText == null || worldState == null) return;
+        if (SignText == null || worldState == null) return;
         
         worldState.SignTexts.TryGetValue(SignPosition, out var originalText);
         if (string.IsNullOrEmpty(originalText)) // fallback to empty string if not saved
             originalText = "";
-        _signText.SetText(originalText);
+        SignText.SetText(originalText);
     }
 
     public void UpdateText()
     {
         var worldState = PlayerNWorldManager.Instance.SelectedWorld;
-        if (_signText == null || worldState == null) return;
+        if (SignText == null || worldState == null) return;
         
         worldState.SignTexts.TryGetValue(SignPosition, out var text);
-        _signText.SetText(text ?? "");
+        SignText.SetText(text ?? "");
     }
 
     public override void Update()
@@ -82,7 +82,7 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
         var worldState = PlayerNWorldManager.Instance.SelectedWorld;
         if (_closeButton == null || worldState == null) return;
         worldState.SignTexts.TryGetValue(SignPosition, out var originalText);
-        var currentText = _signText?.StringBuilder.ToString();
+        var currentText = SignText?.StringBuilder.ToString();
         _closeButton.Text = currentText != originalText ? "Discard" : "Close";
     }
 }

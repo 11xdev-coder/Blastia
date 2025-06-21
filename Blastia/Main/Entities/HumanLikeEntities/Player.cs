@@ -8,6 +8,7 @@ using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using NAudio.Dsp;
 
 namespace Blastia.Main.Entities.HumanLikeEntities;
 
@@ -20,7 +21,8 @@ public class Player : HumanLikeEntity
 	public bool IsPreview { get; set; }
 	public bool LocallyControlled { get; private set; }
 
-	protected override bool FlipSpriteHorizontallyOnKeyPress => true;
+	private bool _isBlocked;
+	protected override bool FlipSpriteHorizontallyOnKeyPress => !_isBlocked;
 
 	private const float ArmMaxAngle = 20;
 	private const float LegMaxAngle = 25;
@@ -72,6 +74,13 @@ public class Player : HumanLikeEntity
 		AccelerationFactor = 10f;
 	}
 
+	private bool ShouldBlockInput()
+	{
+		// typing in sign edit menu:
+		return BlastiaGame.InGameSignEditMenu != null && BlastiaGame.InGameSignEditMenu.Active
+			&& BlastiaGame.InGameSignEditMenu.SignText != null && BlastiaGame.InGameSignEditMenu.SignText.IsFocused;
+	}
+
 	public override void Update()
 	{
 		if (IsPreview) PreviewUpdate();
@@ -89,8 +98,18 @@ public class Player : HumanLikeEntity
 	{
 		if (LocallyControlled)
 		{
-			HandleMovement();
-			HandleMouseClicks();
+			if (!ShouldBlockInput())
+			{
+				_isBlocked = false;
+				HandleMovement();
+				HandleMouseClicks();
+			}
+			else
+			{
+				_isBlocked = true;
+				StopAnimations();
+			}
+			
 			HandleItemInteraction();
 			
 			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null)
@@ -165,8 +184,8 @@ public class Player : HumanLikeEntity
 	/// </summary>
 	private void HandleMouseClicks()
 	{
-		// dont place blocks if we are hovered on some slot
-		if (BlastiaGame.PlayerInventoryUiMenu == null || BlastiaGame.PlayerInventoryUiMenu.HoveredOnAnySlot()) return;
+		// dont place blocks if we are hovered on ui
+		if (BlastiaGame.IsHoveredOnAnyUi) return;
 
 		var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
 		var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;

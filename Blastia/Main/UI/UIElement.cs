@@ -239,8 +239,12 @@ public abstract class UIElement
         bool hasClickedRight = BlastiaGame.HasClickedRight;
         bool isHoldingLeft = BlastiaGame.IsHoldingLeft;
         IsHovered = Bounds.Contains(cursorX, cursorY);
-    
-        if (IsHovered) OnHover?.Invoke(); // if hovering
+
+        if (IsHovered)  // if hovering
+        {
+            OnHover?.Invoke();
+            BlastiaGame.IsHoveredOnAnyUi = true;
+        }
         
         switch (IsHovered)
         {

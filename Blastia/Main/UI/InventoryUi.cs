@@ -287,7 +287,22 @@ public class InventoryUi : Menu
 
     public override void Update()
     {
-        base.Update();
+        for (int i = 0; i < _inventorySlotsUi.Count; i++)
+        {
+            var isHotbarSlot = i < HotbarSlotsCount;
+            var slotToUpdate = _inventorySlotsUi[i];
+            
+            // always draw hotbar slots
+            if (isHotbarSlot)
+            {
+                slotToUpdate.Update();
+            }
+            else if (IsFullInventoryOpen) // main inv slots only if inv is opened
+            {
+                slotToUpdate.Update();
+            }
+        }
+        
         if (_playerInventory.CursorItem != null)
         {
             _cursorItemImage.Position = BlastiaGame.CursorPosition + new Vector2(35, 20);

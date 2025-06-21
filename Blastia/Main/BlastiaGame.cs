@@ -51,6 +51,7 @@ public class BlastiaGame : Game
 	public static Vector2 CursorPosition { get; private set; }
 	public static bool IsHoldingLeft { get; private set; }
 	public static float ScrollWheelDelta { get; private set; }
+	public static bool IsHoveredOnAnyUi { get; set; }
 	
 	// KEYBOARD
 	public static KeyboardState KeyboardState { get; private set; }
@@ -392,6 +393,27 @@ public class BlastiaGame : Game
 			NotificationDisplay?.Update();
 			TooltipDisplay?.BeginFrame();
 
+			foreach (Menu menu in _menus)
+			{
+				if (menu.Active)
+				{
+					if (menu.CameraUpdate && _myPlayer?.Camera != null) menu.Update(_myPlayer.Camera);
+					else menu.Update();
+
+					// prevent new menu from updating when switched
+					if (menu.CheckAndResetMenuSwitchedFlag())
+					{
+						break;
+					}
+				}
+			}
+
+			if (_menusToAdd.Count > 0)
+			{
+				_menus.AddRange(_menusToAdd);
+				_menusToAdd.Clear();
+			}
+			
 			if (IsWorldInitialized)
 			{
 				if (World != null)
@@ -439,27 +461,6 @@ public class BlastiaGame : Game
 				}
 			}
 
-			foreach (Menu menu in _menus)
-			{
-				if (menu.Active)
-				{
-					if (menu.CameraUpdate && _myPlayer?.Camera != null) menu.Update(_myPlayer.Camera);
-					else menu.Update();
-
-					// prevent new menu from updating when switched
-					if (menu.CheckAndResetMenuSwitchedFlag())
-					{
-						break;
-					}
-				}
-			}
-
-			if (_menusToAdd.Count > 0)
-			{
-				_menus.AddRange(_menusToAdd);
-				_menusToAdd.Clear();
-			}
-
 			TooltipDisplay?.Update();
 
 			// update previous states in the end
@@ -503,6 +504,9 @@ public class BlastiaGame : Game
 		// mouse position that is aligned with OS cursor
 		CursorPosition = Vector2.Transform(new Vector2(_currentMouseState.X, _currentMouseState.Y),
 			Matrix.Invert(VideoManager.Instance.CalculateResolutionScaleMatrix()));
+
+		// reset this flag, will be set in any UIElement that is hovered on
+		IsHoveredOnAnyUi = false;
 	}
 
 	private void UpdateKeyboardState()
