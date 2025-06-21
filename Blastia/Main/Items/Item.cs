@@ -62,12 +62,14 @@ public class PlaceableItem : Item
 {
     public ushort BlockId { get; set; }
     public string PlaceSound { get; set; }
+    public ushort EmptyBucketId { get; set; }
     
     public PlaceableItem(ushort id, string name, string tooltip, Texture2D icon, int maxStack = 99, 
-        ushort blockId = 0, string placeSound = "") : base(id, name, tooltip, icon, maxStack, ItemType.Placeable)
+        ushort blockId = 0, string placeSound = "", ushort emptyBucketId = 0) : base(id, name, tooltip, icon, maxStack, ItemType.Placeable)
     {
         BlockId = blockId;
         PlaceSound = placeSound;
+        EmptyBucketId = emptyBucketId;
     }
 }
 

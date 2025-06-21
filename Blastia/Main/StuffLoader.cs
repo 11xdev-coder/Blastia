@@ -9,6 +9,7 @@ using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Blastia.Main;
 
@@ -269,14 +270,20 @@ public static class StuffLoader
 	{
 		ushort blockId = 0;
 		var placeSound = "";
+		ushort emptyBucketId = 0;
 
 		if (def.Properties != null)
 		{
 			blockId = def.Properties.Value<ushort>("BlockId");
 			placeSound = def.Properties.Value<string>("PlaceSound");
+			
+			if (((IDictionary<string, JToken>) def.Properties).ContainsKey("EmptyBucketId"))
+			{
+				emptyBucketId = def.Properties.Value<ushort>("EmptyBucketId");
+			}
 		}
 		
-		return new PlaceableItem(def.Id, def.Name, def.Tooltip, icon, def.MaxStack, blockId, placeSound);
+		return new PlaceableItem(def.Id, def.Name, def.Tooltip, icon, def.MaxStack, blockId, placeSound, emptyBucketId);
 	}
 	#endregion
 }

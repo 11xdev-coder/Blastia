@@ -29,6 +29,11 @@ public struct SourceConnectionResult
 public abstract class LiquidBlock : Block
 {
     /// <summary>
+    /// <c>ItemId</c> to give when player right clicked on this liquid with an empty bucket
+    /// </summary>
+    public ushort BucketItemId { get; protected set; }
+    
+    /// <summary>
     /// 1-8, where 8 is full block
     /// </summary>
     public int FlowLevel { get; set; } = 8;
@@ -42,24 +47,14 @@ public abstract class LiquidBlock : Block
     public int MaxFlowDownDistance { get; protected set; }
     public int CurrentFlowDownDistance { get; set; }
 
-    /// <summary>
-    /// How long to wait before starting decay (in seconds)
-    /// </summary>
-    public float DecayDelay { get; protected set; }
-    /// <summary>
-    /// How fast liquid decays when cut off (levels per second)
-    /// </summary>
-    public float DecayRate { get; protected set; }
-
     private WorldState _currentWorldState;
 
-    protected LiquidBlock(ushort id, string name, float flowSpeed = 2f, int maxFlowDownDistance = 8, float decayDelay = 2f,
-        float decayRate = 0.5f) : base(id, name, 200f, 0f, false, true, 0, 0)
+    protected LiquidBlock(ushort id, string name, float flowSpeed = 2f, int maxFlowDownDistance = 8, ushort bucketItemId = 0) 
+        : base(id, name, 200f, 0f, false, true, 0, 0)
     {
         FlowRate = flowSpeed;
         MaxFlowDownDistance = maxFlowDownDistance;
-        DecayDelay = decayDelay;
-        DecayRate = decayRate;
+        BucketItemId = bucketItemId;
 
         _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld ?? new WorldState();
     }

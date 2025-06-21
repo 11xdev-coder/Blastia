@@ -39,13 +39,14 @@
   },
   {
     "Id": 5,
-    "Name": "Water Block",
+    "Name": "Water Bucket",
     "Tooltip": "",
-    "IconPath": "Textures/Blocks/WaterLiquid.png",
-    "MaxStack": 100,
+    "IconPath": "Textures/Items/WaterBucket.png",
+    "MaxStack": 20,
     "Type": "Placeable",
     "Properties": {
-      "BlockId": 3
+      "BlockId": 3,
+      "EmptyBucketId": 8
     }  
   },
   {
@@ -69,5 +70,13 @@
     "Properties": {
       "BlockId": 5
     }
+  },
+  {
+    "Id": 8,
+    "Name": "Empty Bucket",
+    "Tooltip": "Can be filled with liquids",
+    "IconPath": "Textures/Items/EmptyBucket.png",
+    "MaxStack": 20,
+    "Type": "Tool"
   }
 ]

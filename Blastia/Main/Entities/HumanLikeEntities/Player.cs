@@ -229,6 +229,21 @@ public class Player : HumanLikeEntity
 			liquidBlock.CurrentFlowDownDistance = 0;
 		}
 		PlayerInventory.RemoveItem(_selectedHotbarSlot);
+		
+		// return empty bucket if specified
+		if (placeable.EmptyBucketId > 0)
+		{
+			var emptyBucket = StuffRegistry.GetItem(placeable.EmptyBucketId);
+			if (emptyBucket != null)
+				PlayerInventory.AddItem(emptyBucket);
+		}
+		
+		// play sound if specified
+		if (!string.IsNullOrEmpty(placeable.PlaceSound))
+		{
+			if (Enum.TryParse<SoundID>(placeable.PlaceSound, out var soundId))
+				SoundEngine.PlaySound(soundId);
+		}
 	}
 
 	private void InteractWithBlock(WorldState worldState, Vector2 position)
@@ -236,6 +251,23 @@ public class Player : HumanLikeEntity
 		var blockInstance = worldState.GetBlockInstance((int) position.X, (int) position.Y);
 		if (blockInstance == null || World == null) return;
 		blockInstance.OnRightClick(World, position, this);
+		
+		// clicked on liquid with empty bucket selected -> scoop it
+		var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
+		if (selectedItem != null && selectedItem.Id == ItemId.EmptyBucket && 
+		    blockInstance.Block is LiquidBlock liquid && 
+		    liquid.FlowLevel >= 7 && liquid.BucketItemId > 0)
+		{
+			// has a bucket item to give -> remove this block and give the bucket
+			var liquidBucketItem = StuffRegistry.GetItem(liquid.BucketItemId);
+			if (liquidBucketItem != null)
+			{
+				// remove empty bucket, give bucket with liquid
+				PlayerInventory.RemoveItem(_selectedHotbarSlot);
+				PlayerInventory.AddItem(liquidBucketItem);
+				worldState.SetTile((int) position.X, (int) position.Y, 0, this);
+			}
+		}
 	}
 
 	private void HandleItemInteraction()
