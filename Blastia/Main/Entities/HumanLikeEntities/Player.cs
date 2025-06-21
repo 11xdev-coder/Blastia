@@ -225,7 +225,8 @@ public class Player : HumanLikeEntity
 		// liquids placed by players are source blocks
 		if (worldState.GetBlockInstance((int) position.X, (int) position.Y)?.Block is LiquidBlock liquidBlock)
 		{
-			liquidBlock.IsSourceBlock = true;
+			liquidBlock.FlowLevel = 8;
+			liquidBlock.CurrentFlowDownDistance = 0;
 		}
 		PlayerInventory.RemoveItem(_selectedHotbarSlot);
 	}

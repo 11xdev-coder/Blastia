@@ -86,7 +86,6 @@ public static class Saving
                             writer.Write(block.Id);
                             if (keyValuePair.Value.Block is LiquidBlock liquid)
                             {
-                                writer.Write(liquid.IsSourceBlock);
                                 writer.Write(liquid.FlowLevel);
                             }
                         }
@@ -253,9 +252,7 @@ public static class Saving
                 if (blockTemplate is LiquidBlock liquid)
                 {
                     var clone = liquid.CreateNewInstance();
-                    clone.IsSourceBlock = reader.ReadBoolean();
                     clone.FlowLevel = reader.ReadInt32();
-                    clone.MarkAsJustLoaded();
                     instance = clone;
                 }
                 else
