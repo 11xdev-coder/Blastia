@@ -124,7 +124,10 @@ public class Player : HumanLikeEntity
 
 	private void UpdateCamera()
 	{
-		Camera?.Update();
+		if (Camera == null) return;
+		
+		Camera.IsPlayerBlocked = _isBlocked;
+		Camera.Update();
 		MakeCameraFollow();
 	}
 
@@ -306,7 +309,7 @@ public class Player : HumanLikeEntity
 
 	private void UpdateHotbarSelection()
 	{
-		if (BlastiaGame.PlayerInventoryUiMenu == null) return;
+		if (BlastiaGame.PlayerInventoryUiMenu == null || _isBlocked) return;
 		
 		Keys[] hotbarKeys =
 		[

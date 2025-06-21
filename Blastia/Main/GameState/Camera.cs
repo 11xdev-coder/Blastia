@@ -38,6 +38,8 @@ public class Camera : Object
 	}
 	private const float ScaleSpeed = 0.25f;
 
+	public bool IsPlayerBlocked { get; set; }
+	
 	/// <summary>
 	/// Event called whenever <c>CameraScale</c> changes
 	/// </summary>
@@ -50,7 +52,9 @@ public class Camera : Object
 
 	public override void Update()
 	{
-		// zoom
+		// dont zoom if player input is blocked
+		if (IsPlayerBlocked) return;
+		
 		float zoom = 0;
 		KeyboardHelper.AccumulateValueFromMap(_zoomMap, ref zoom);
 		

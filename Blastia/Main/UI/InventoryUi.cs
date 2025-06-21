@@ -292,7 +292,7 @@ public class InventoryUi : Menu
             var isHotbarSlot = i < HotbarSlotsCount;
             var slotToUpdate = _inventorySlotsUi[i];
             
-            // always draw hotbar slots
+            // always update hotbar slots
             if (isHotbarSlot)
             {
                 slotToUpdate.Update();
