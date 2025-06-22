@@ -47,7 +47,7 @@ public static class WorldGen
                 int alignedHeight = (finalHeight / Block.Size) * Block.Size;
                 for (int y = alignedHeight; y < height; y += Block.Size)
                 {
-                    worldState.SetTile(x * Block.Size, y, BlockId.Dirt);
+                    worldState.SetTile(x * Block.Size, y, BlockId.Dirt, TileLayer.Ground);
                 }
                 
                 if (x >= randomSpawnX)

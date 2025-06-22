@@ -113,7 +113,7 @@ public static class StuffLoader
 						.ToArray();
 				}
 
-				var block = new SimpleBlock(def.Id, def.Name, def.DragCoefficient, def.Hardness, def.IsCollidable,
+				var block = new SimpleBlock(def.Id, def.Name, def.DragCoefficient, def.Hardness, def.IsBreakable, def.IsCollidable,
 					def.IsTransparent, def.ItemIdDrop, def.ItemDropAmount, def.LightLevel, breakingSounds);
 				StuffRegistry.RegisterBlock(block, texture);
 				Console.WriteLine($"[StuffLoader] [SimpleBlocks] Loaded simple block: {block.Name} (ID: {block.Id})");

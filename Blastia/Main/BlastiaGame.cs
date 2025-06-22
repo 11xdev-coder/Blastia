@@ -451,8 +451,9 @@ public class BlastiaGame : Game
 
 						if (collisionBodies == null || tilesToUpdate == null) return;
 						
-						foreach (var (position, blockInstance) in tilesToUpdate)
+						foreach (var (t, blockInstance) in tilesToUpdate)
 						{
+							var position = t.Item1;
 							try
 							{
 								blockInstance.Update(World, position);

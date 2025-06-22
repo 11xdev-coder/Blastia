@@ -26,6 +26,7 @@ public abstract class Block
 	/// Time to break this block in seconds
 	/// </summary>
 	public float Hardness { get; } = 1f;
+	public bool IsBreakable { get; } = true;
 	public bool IsCollidable { get; } = true;
 	public bool IsTransparent { get; }
 	public ushort ItemIdDrop { get; }
@@ -38,7 +39,7 @@ public abstract class Block
 		
 	}
 
-	protected Block(ushort id, string name, float dragCoefficient = 50f, float hardness = 1f,
+	protected Block(ushort id, string name, float dragCoefficient = 50f, float hardness = 1f, bool isBreakable = true,
 		bool isCollidable = true, bool isTransparent = false, ushort itemIdDrop = 0, int itemDropAmount = 1, int lightLevel = 0,
 		SoundID[]? breakingSounds = null)
 	{
@@ -46,6 +47,7 @@ public abstract class Block
 		Name = name;
 		DragCoefficient = dragCoefficient;
 		Hardness = hardness;
+		IsBreakable = isBreakable;
 		IsCollidable = isCollidable;
 		IsTransparent = isTransparent;
 		ItemIdDrop = itemIdDrop;
@@ -76,6 +78,15 @@ public abstract class Block
 	public virtual void OnLeftClick(World world, Vector2 position, Player player) {}
 	public virtual void Update(World world, Vector2 position) {}
 	public virtual void OnNeighbourChanged(World world, Vector2 position, Vector2 neighbourPosition) {}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <returns>TileLayer this block belongs to</returns>
+	public virtual TileLayer GetLayer()
+	{
+		return TileLayer.Ground;
+	}
 	
 	/// <summary>
 	/// Returns source rectangle for drawing depending on neighbouring blocks
@@ -166,7 +177,7 @@ public class BlockInstance
 		
 		if (Damage >= Block.Hardness)
 		{
-			selectedWorld.SetTile((int) position.X, (int) position.Y, 0, player);
+			selectedWorld.SetTile((int) position.X, (int) position.Y, 0, Block.GetLayer(), player);
 		}
 	}
 

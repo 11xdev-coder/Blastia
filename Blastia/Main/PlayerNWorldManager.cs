@@ -188,16 +188,41 @@ public class PlayerState
 	public override string ToString() => Name;
 }
 
+public enum TileLayer
+{
+	Ground, // dirt, stone, basic blocks
+	Liquid, // water, lava
+	Furniture // chests, signs, chairs
+}
+
 [Serializable]
 public class WorldState
 {
 	public string Name { get; set; } = "";
 	public override string ToString() => Name;
 	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
+
+	public Dictionary<Vector2, ushort> GroundTiles { get; set; } = [];
+	public Dictionary<Vector2, ushort> LiquidTiles { get; set; } = [];
+	public Dictionary<Vector2, ushort> FurnitureTiles { get; set; } = [];
+	
+	public Dictionary<Vector2, BlockInstance> GroundInstances { get; set; } = [];
+	public Dictionary<Vector2, BlockInstance> LiquidInstances { get; set; } = [];
+	public Dictionary<Vector2, BlockInstance> FurnitureInstances { get; set; } = [];
 	
 	// 1D to support serialization
-	public Dictionary<Vector2, ushort> Tiles { get; set; } = new();
-	public Dictionary<Vector2, BlockInstance> TileInstances { get; set; } = new();
+	public Dictionary<Vector2, ushort> Tiles
+	{
+		get => GroundTiles;
+		set => GroundTiles = value;
+	}
+
+	public Dictionary<Vector2, BlockInstance> TileInstances
+	{
+		get => GroundInstances;
+		set => GroundInstances = value;
+	}
+	
 	public int WorldWidth { get; set; }
 	public int WorldHeight { get; set; }
 
@@ -208,6 +233,38 @@ public class WorldState
 	public float SpawnY { get; set; }
 
 	public bool SetTileLogs { get; set; } = false;
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="layer"></param>
+	/// <returns>Dictionary of <c>BlockId</c> for this layer</returns>
+	private Dictionary<Vector2, ushort> GetTileDictionary(TileLayer layer)
+	{
+		return layer switch
+		{
+			TileLayer.Ground => GroundTiles,
+			TileLayer.Liquid => LiquidTiles,
+			TileLayer.Furniture => FurnitureTiles,
+			_ => GroundTiles
+		};
+	}
+	
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <param name="layer"></param>
+	/// <returns>Dictionary of <c>BlockInstance</c> for this layer</returns>
+	private Dictionary<Vector2, BlockInstance> GetInstanceDictionary(TileLayer layer)
+	{
+		return layer switch
+		{
+			TileLayer.Ground => GroundInstances,
+			TileLayer.Liquid => LiquidInstances,
+			TileLayer.Furniture => FurnitureInstances,
+			_ => GroundInstances
+		};
+	}
 	
 	/// <summary>
 	/// Sets tile's ID at x y coords. If new ID is 0 -> removes the tile completely
@@ -215,26 +272,31 @@ public class WorldState
 	/// <param name="alignedX"></param>
 	/// <param name="alignedY"></param>
 	/// <param name="value">New ID</param>
+	/// <param name="layer"></param>
 	/// <param name="player">Player that set the tile</param>
-	public void SetTile(int alignedX, int alignedY, ushort value, Player? player = null)
+	public void SetTile(int alignedX, int alignedY, ushort value, TileLayer layer, Player? player = null)
 	{
 		Vector2 pos = new(alignedX, alignedY);
-		if (SetTileLogs) Console.WriteLine($"World: {Name}, Set tile at: (X: {alignedX}, Y: {alignedY}), ID: {value}");
+		if (SetTileLogs) 
+			Console.WriteLine($"World: {Name}, Set tile at: (X: {alignedX}, Y: {alignedY}), ID: {value}");
+		
+		var tileDict = GetTileDictionary(layer);
+		var instanceDict = GetInstanceDictionary(layer);
 		
 		if (value == 0)
 		{
 			// if new ID is air (0) -> remove tile to save space
 			// first call its OnBreak
-			if (TileInstances.TryGetValue(pos, out var blockInstance))
+			if (instanceDict.TryGetValue(pos, out var blockInstance))
 			{
 				blockInstance.OnBreak(player?.World, pos, player);
-				TileInstances.Remove(pos);
+				instanceDict.Remove(pos);
 			}
-			Tiles.Remove(pos);
+			tileDict.Remove(pos);
 		}
 		else
 		{
-			Tiles[pos] = value;
+			tileDict[pos] = value;
 
 			var block = StuffRegistry.GetBlock(value);
 			if (block == null)
@@ -245,11 +307,8 @@ public class WorldState
 			{
 				var blockInstance = new BlockInstance(block, 0);
 				blockInstance.OnPlace(player?.World, pos, player);
-				TileInstances[pos] = blockInstance;
+				instanceDict[pos] = blockInstance;
 			}
-			
-			var rect = new Rectangle(alignedX, alignedY, Block.Size, Block.Size);
-			Collision.AddBodyToGrid(rect);
 		}
 	}
 
@@ -259,11 +318,14 @@ public class WorldState
 	/// <param name="alignedX"></param>
 	/// <param name="alignedY"></param>
 	/// <param name="block">New block instance, must not be empty</param>
-	public void SetTileInstance(int alignedX, int alignedY, BlockInstance block)
+	/// <param name="layer"></param>
+	public void SetTile(int alignedX, int alignedY, BlockInstance block, TileLayer layer)
 	{
 		Vector2 pos = new(alignedX, alignedY);
-		Tiles[pos] = block.Id;
-		TileInstances[pos] = block;
+		var tileDict = GetTileDictionary(layer);
+		var instanceDict = GetInstanceDictionary(layer);
+		tileDict[pos] = block.Id;
+		instanceDict[pos] = block;
 	}
 
 	/// <summary>
@@ -271,11 +333,13 @@ public class WorldState
 	/// </summary>
 	/// <param name="alignedX">X aligned to Block.Size</param>
 	/// <param name="alignedY">Y aligned to Block.Size</param>
+	/// <param name="layer"></param>
 	/// <returns></returns>
-	public ushort GetTile(int alignedX, int alignedY)
+	public ushort GetTile(int alignedX, int alignedY, TileLayer layer)
 	{
 		Vector2 pos = new(alignedX, alignedY);
-		if (Tiles.TryGetValue(pos, out ushort id))
+		var tileDict = GetTileDictionary(layer);
+		if (tileDict.TryGetValue(pos, out var id))
 		{
 			return id;
 		}
@@ -287,11 +351,13 @@ public class WorldState
 	/// </summary>
 	/// <param name="alignedX">X aligned to Block.Size</param>
 	/// <param name="alignedY">Y aligned to Block.Size</param>
+	/// <param name="layer"></param>
 	/// <returns></returns>
-	public BlockInstance? GetBlockInstance(int alignedX, int alignedY)
+	public BlockInstance? GetBlockInstance(int alignedX, int alignedY, TileLayer layer)
 	{
 		var pos = new Vector2(alignedX, alignedY);
-		if (TileInstances.TryGetValue(pos, out var blockInstance))
+		var instanceDict = GetInstanceDictionary(layer);
+		if (instanceDict.TryGetValue(pos, out var blockInstance))
 		{
 			return blockInstance;
 		}
@@ -303,12 +369,13 @@ public class WorldState
 	/// </summary>
 	/// <param name="worldX">World (not aligned) X</param>
 	/// <param name="worldY">World (not aligned) Y</param>
+	/// <param name="layer"></param>
 	/// <returns></returns>
-	public ushort GetTileAtWorldCoord(int worldX, int worldY)
+	public ushort GetTileAtWorldCoord(int worldX, int worldY, TileLayer layer)
 	{
 		int tileWorldX = (int)Math.Floor((float)worldX / Block.Size) * Block.Size;
 		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;
-		return GetTile(tileWorldX, tileWorldY);
+		return GetTile(tileWorldX, tileWorldY, layer);
 	}
 	
 	/// <summary>
@@ -316,12 +383,13 @@ public class WorldState
 	/// </summary>
 	/// <param name="worldX">World (not aligned) X</param>
 	/// <param name="worldY">World (not aligned) Y</param>
+	/// <param name="layer"></param>
 	/// <returns></returns>
-	public BlockInstance? GetBlockInstanceAtWorldCoord(int worldX, int worldY)
+	public BlockInstance? GetBlockInstanceAtWorldCoord(int worldX, int worldY, TileLayer layer)
 	{
 		int tileWorldX = (int)Math.Floor((float)worldX / Block.Size) * Block.Size;
 		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;
-		return GetBlockInstance(tileWorldX, tileWorldY);
+		return GetBlockInstance(tileWorldX, tileWorldY, layer);
 	}
 	
 	/// <summary>
@@ -329,13 +397,14 @@ public class WorldState
 	/// </summary>
 	/// <param name="worldX">World (not aligned) X</param>
 	/// <param name="worldY">World (not aligned) Y</param>
+	/// <param name="layer"></param>
 	/// <returns><c>True</c> if tile at coordinates is not air</returns>
-	public bool HasTile(int worldX, int worldY)
+	public bool HasTile(int worldX, int worldY, TileLayer layer)
 	{
 		int tileWorldX = (int)Math.Floor((float)worldX / Block.Size) * Block.Size;
 		int tileWorldY = (int)Math.Floor((float)worldY / Block.Size) * Block.Size;
 
-		ushort tileId = GetTile(tileWorldX, tileWorldY);
+		ushort tileId = GetTile(tileWorldX, tileWorldY, layer);
 		return tileId >= 1;
 	}
 
@@ -347,9 +416,10 @@ public class WorldState
 	/// <param name="entityBottomY">Entity bottom edge world Y</param>
 	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
 	/// <param name="checkDistance">Distance to check for tile below</param>
+	/// <param name="layer"></param>
 	/// <returns>Tuple containing tile ID and coordinates, returns <c>(BlockId.Air, 0, 0)</c> if none found</returns>
 	private (ushort tileId, int x, int y) GetFirstTileBelowWithCoords(float entityLeftX, float entityBottomY,
-		float entityWidthPixels, float checkDistance)
+		float entityWidthPixels, float checkDistance, TileLayer layer)
 	{
 		var checkWorldY = (int) (entityBottomY + checkDistance);
 
@@ -358,15 +428,15 @@ public class WorldState
 		var checkWorldXRight = (int) (entityLeftX + entityWidthPixels - 1);
 		
 		// get tile IDs
-		var tileIdCenter = GetTileAtWorldCoord(checkWorldXCenter, checkWorldY);
+		var tileIdCenter = GetTileAtWorldCoord(checkWorldXCenter, checkWorldY, layer);
 		if (tileIdCenter != BlockId.Air)
 			return (tileIdCenter, checkWorldXCenter, checkWorldY);
 		
-		var tileIdLeft = GetTileAtWorldCoord(checkWorldXLeft, checkWorldY);
+		var tileIdLeft = GetTileAtWorldCoord(checkWorldXLeft, checkWorldY, layer);
 		if (tileIdLeft != BlockId.Air)
 			return (tileIdLeft, checkWorldXLeft, checkWorldY);
 		
-		var tileIdRight = GetTileAtWorldCoord(checkWorldXRight, checkWorldY);
+		var tileIdRight = GetTileAtWorldCoord(checkWorldXRight, checkWorldY, layer);
 		if (tileIdRight != BlockId.Air)
 			return (tileIdRight, checkWorldXRight, checkWorldY);
 
@@ -380,10 +450,11 @@ public class WorldState
 	/// <param name="entityBottomY">Entity bottom edge world Y</param>
 	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
 	/// <param name="checkDistance">Distance to check for tile below</param>
+	/// <param name="layer"></param>
 	/// <returns>If tile was found returns its ID, otherwise returns <c>BlockID.Air</c></returns>
-	public ushort GetTileIdBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, float checkDistance)
+	public ushort GetTileIdBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, float checkDistance, TileLayer layer)
 	{
-		var (tileId, _, _) = GetFirstTileBelowWithCoords(entityLeftX, entityBottomY, entityWidthPixels, checkDistance);
+		var (tileId, _, _) = GetFirstTileBelowWithCoords(entityLeftX, entityBottomY, entityWidthPixels, checkDistance, layer);
 		return tileId;
 	}
 	
@@ -395,14 +466,15 @@ public class WorldState
 	/// <param name="entityBottomY">Entity bottom edge world Y</param>
 	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
 	/// <param name="checkDistance">Distance to check for tile below</param>
+	/// <param name="layer"></param>
 	/// <returns>If tile was found returns its <c>BlockInstance</c>, otherwise returns null</returns>
-	public BlockInstance? GetBlockInstanceBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, float checkDistance)
+	public BlockInstance? GetBlockInstanceBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, float checkDistance, TileLayer layer)
 	{
-		var (tileId, x, y) = GetFirstTileBelowWithCoords(entityLeftX, entityBottomY, entityWidthPixels, checkDistance);
+		var (tileId, x, y) = GetFirstTileBelowWithCoords(entityLeftX, entityBottomY, entityWidthPixels, checkDistance, layer);
 		if (tileId == BlockId.Air) 
 			return null;
 
-		return GetBlockInstanceAtWorldCoord(x, y);
+		return GetBlockInstanceAtWorldCoord(x, y, layer);
 	}
 
 	/// <summary>
@@ -412,10 +484,11 @@ public class WorldState
 	/// <param name="entityLeftX">Entity left edge world X</param>
 	/// <param name="entityBottomY">Entity bottom edge world Y</param>
 	/// <param name="entityWidthPixels">Entity width (in pixels)</param>
+	/// <param name="layer"></param>
 	/// <returns>If tile was found returns its drag, otherwise returns <c>Block.AirDragCoefficient</c></returns>
-	public float GetDragCoefficientTileBelow(float entityLeftX, float entityBottomY, float entityWidthPixels)
+	public float GetDragCoefficientTileBelow(float entityLeftX, float entityBottomY, float entityWidthPixels, TileLayer layer)
 	{
-	    var tileId = GetTileIdBelow(entityLeftX, entityBottomY, entityWidthPixels, 1f);
+	    var tileId = GetTileIdBelow(entityLeftX, entityBottomY, entityWidthPixels, 1f, layer);
 	    var block = StuffRegistry.GetBlock(tileId);
 	    if (block != null)
 	    {

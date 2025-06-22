@@ -29,6 +29,7 @@ public class DataDefinitions
         public string Name { get; set; } = string.Empty;
         public string TexturePath { get; set; } = string.Empty;
         public float DragCoefficient { get; set; } = 50f;
+        public bool IsBreakable { get; set; } = true;
         public float Hardness { get; set; } = 1f;
         public bool IsCollidable { get; set; } = true;
         public bool IsTransparent { get; set; }

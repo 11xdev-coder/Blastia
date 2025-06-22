@@ -42,7 +42,7 @@ public class Camera : Object
 	public bool IsPlayerBlocked { get; set; }
 	
 	// world tile position -> block instance (only drawn ones)
-	private Dictionary<Vector2, BlockInstance> _drawnTiles = new();
+	private Dictionary<(Vector2, TileLayer), BlockInstance> _drawnTiles = new();
 	
 	/// <summary>
 	/// Event called whenever <c>CameraScale</c> changes
@@ -75,46 +75,52 @@ public class Camera : Object
 		
 	}
 
-	public (Dictionary<Vector2, Rectangle>, Dictionary<Vector2, BlockInstance>) SetDrawnTiles(WorldState worldState)
+	public (Dictionary<Vector2, Rectangle>, Dictionary<(Vector2, TileLayer), BlockInstance>) SetDrawnTiles(WorldState worldState)
 	{
 		_drawnTiles.Clear();
 		
-		int firstTileX = (int) Math.Floor(Position.X / Block.Size);
-		int firstTileY = (int) Math.Floor(Position.Y / Block.Size);
+		int viewLeft = (int)Math.Floor(Position.X / Block.Size);
+		int viewTop = (int)Math.Floor(Position.Y / Block.Size);
+    
+		// Calculate how many tiles fit in view
+		int scaledBlockSize = (int)(Block.Size * CameraScale);
+		int tilesHorizontal = DrawWidth / scaledBlockSize + 1;
+		int tilesVertical = DrawHeight / scaledBlockSize + 1;
 
-		// num of tiles visible
-		int numTilesX = (int) Math.Ceiling(DrawWidth / CameraScale / Block.Size) + 1;
-		int numTilesY = (int) Math.Ceiling(DrawHeight / CameraScale / Block.Size) + 1;
-
-		int lastTileX = firstTileX + numTilesX;
-		int lastTileY = firstTileY + numTilesY;
+		int lastTileX = viewLeft + tilesHorizontal;
+		int lastTileY = viewTop + tilesVertical;
 		
 		// clamp
-		firstTileX = Math.Max(0, firstTileX);
-		firstTileY = Math.Max(0, firstTileY);
+		viewLeft = Math.Max(0, viewLeft);
+		viewTop = Math.Max(0, viewTop);
 		lastTileX = Math.Min(worldState.WorldWidth / Block.Size, lastTileX);
 		lastTileY = Math.Min(worldState.WorldHeight / Block.Size, lastTileY);
-		
-		var estimatedWidth = lastTileX - firstTileX;
-		var estimatedHeight = lastTileY - firstTileY;
-		var estimatedCapacity = estimatedWidth * estimatedHeight;
-		var drawnBoxes = new Dictionary<Vector2, Rectangle>(estimatedCapacity);
+		    
+		int capacity = Math.Max(1, Math.Min(tilesHorizontal * tilesVertical, 100000));
+		var drawnBoxes = new Dictionary<Vector2, Rectangle>(capacity);
 		
 		// go through each tile
-		for (int x = firstTileX; x < lastTileX; x++)
+		for (int x = viewLeft; x < lastTileX; x++)
 		{
-			for (int y = firstTileY; y < lastTileY; y++)
+			for (int y = viewTop; y < lastTileY; y++)
 			{
 				int worldXCoord = x * Block.Size;
 				int worldYCoord = y * Block.Size;
-				
-				var blockInstance = worldState.GetBlockInstance(worldXCoord, worldYCoord);
-				if (blockInstance == null) continue; // skip air
-				
-				_drawnTiles.Add(new Vector2(worldXCoord, worldYCoord), blockInstance);
+				var position = new Vector2(worldXCoord, worldYCoord);
 
-				var tileBox = new Rectangle(worldXCoord, worldYCoord, Block.Size, Block.Size);
-				drawnBoxes.Add(new Vector2(worldXCoord, worldYCoord), tileBox);
+				foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer)))
+				{
+					var blockInstance = worldState.GetBlockInstance(worldXCoord, worldYCoord, layer);
+					if (blockInstance == null) continue; // skip air
+					
+					_drawnTiles.Add((position, layer), blockInstance);
+
+					if (!drawnBoxes.ContainsKey(position))
+					{
+						var tileBox = new Rectangle(worldXCoord, worldYCoord, Block.Size, Block.Size);
+						drawnBoxes.Add(position, tileBox);
+					}
+				}
 			}
 		}
 
@@ -123,10 +129,27 @@ public class Camera : Object
 	
 	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState)
 	{
-		int scaledBlockSize = MathUtilities.SmoothRound(Block.Size * CameraScale);
+		int scaledBlockSize = (int)(Block.Size * CameraScale);
+
+		var groundTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Ground);
+		var liquidTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Liquid);
+		var furnitureTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Furniture);
 		
-		foreach (var (tilePosition, blockInstance) in _drawnTiles)
+		// ground -> furniture -> liquid
+		RenderTileLayer(spriteBatch, worldState, groundTiles, scaledBlockSize);
+		RenderTileLayer(spriteBatch, worldState, furnitureTiles, scaledBlockSize);
+		RenderTileLayer(spriteBatch, worldState, liquidTiles, scaledBlockSize);
+	}
+
+	private void RenderTileLayer(SpriteBatch spriteBatch, WorldState worldState,
+		IEnumerable<KeyValuePair<(Vector2, TileLayer), BlockInstance>> tiles, int scaledBlockSize)
+	{
+		foreach (var kvp in tiles)
 		{
+			var tilePosition = kvp.Key.Item1;
+			var layer = kvp.Key.Item2;
+			var blockInstance = kvp.Value;
+			
 			var worldXCoord = (int) tilePosition.X;
 			var worldYCoord = (int) tilePosition.Y;
 			
@@ -137,15 +160,16 @@ public class Camera : Object
 				MathUtilities.SmoothRound(worldPositionY * CameraScale), 
 				scaledBlockSize, scaledBlockSize);
 
-			var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - 8);
-			var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + 8);
-			var rightTile = worldState.GetBlockInstance(worldXCoord + 8, worldYCoord);
-			var leftTile = worldState.GetBlockInstance(worldXCoord - 8, worldYCoord);
+			var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - 8, layer);
+			var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + 8, layer);
+			var rightTile = worldState.GetBlockInstance(worldXCoord + 8, worldYCoord, layer);
+			var leftTile = worldState.GetBlockInstance(worldXCoord - 8, worldYCoord, layer);
 			Rectangle sourceRect = blockInstance.Block.GetRuleTileSourceRectangle(topTile == null || topTile.Block.IsTransparent, 
 				bottomTile == null || bottomTile.Block.IsTransparent, 
 				rightTile == null || rightTile.Block.IsTransparent, 
 				leftTile == null || leftTile.Block.IsTransparent);
-			blockInstance.Draw(spriteBatch, destRect, sourceRect, new Vector2(worldXCoord, worldYCoord));
+			
+			blockInstance.Draw(spriteBatch, destRect, sourceRect, tilePosition);
 		}
 	}
 

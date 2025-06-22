@@ -197,10 +197,30 @@ public class Player : HumanLikeEntity
 		if (BlastiaGame.HasClickedRight)
 		{
 			var pos = GetCoordsForBlockPlacement();
-			if (selectedItem is {BaseItem: PlaceableItem placeable} && currentWorld.GetTile((int) pos.X, (int) pos.Y) == BlockId.Air)
+			// cant place anything on ground blocks
+			if (currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Ground) != BlockId.Air)
+				return;
+			// can place liquid on furniture
+			if (selectedItem is {BaseItem: PlaceableItem placeableLiquid} && 
+			    StuffRegistry.GetBlock(placeableLiquid.BlockId)?.GetLayer() == TileLayer.Liquid
+			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Furniture) != BlockId.Air)
 			{
-				// air and item selected -> place block
-				PlaceBlock(currentWorld, pos, placeable);
+				PlaceBlock(currentWorld, pos, placeableLiquid);
+			}
+			// can place furniture on liquids
+			else if (selectedItem is {BaseItem: PlaceableItem placeableFurniture} && 
+			    StuffRegistry.GetBlock(placeableFurniture.BlockId)?.GetLayer() == TileLayer.Furniture
+			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Liquid) != BlockId.Air)
+			{
+				PlaceBlock(currentWorld, pos, placeableFurniture);
+			}
+			// can place anything on air
+			else if (selectedItem is {BaseItem: PlaceableItem anyPlaceable} &&
+			         currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Ground) == BlockId.Air &&
+			         currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Liquid) == BlockId.Air &&
+			         currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Furniture) == BlockId.Air)
+			{
+				PlaceBlock(currentWorld, pos, anyPlaceable);
 			}
 			else
 			{
@@ -211,19 +231,27 @@ public class Player : HumanLikeEntity
 		if (BlastiaGame.IsHoldingLeft)
 		{
 			var pos = GetCoordsForBlockPlacement();
-			var blockInstance = currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y);
-			if (blockInstance != null)
-			{
-				blockInstance.DoBreaking(pos, this);
-			}
+			// can only break ground and furniture
+			var groundInst = currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y, TileLayer.Ground);
+			if (groundInst is {Block.IsBreakable: true})
+				groundInst.DoBreaking(pos, this);
+			
+			var furnitureInst = currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y, TileLayer.Furniture);
+			if (furnitureInst is {Block.IsBreakable: true}) 
+				furnitureInst.DoBreaking(pos, this);
 		}
 	}
 
 	private void PlaceBlock(WorldState worldState, Vector2 position, PlaceableItem placeable)
 	{
-		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, this);
+		var placeableBlock = StuffRegistry.GetBlock(placeable.BlockId);
+		if (placeableBlock == null) return;
+		
+		var layer = placeableBlock.GetLayer();
+		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, layer, this);
+		
 		// liquids placed by players are source blocks
-		if (worldState.GetBlockInstance((int) position.X, (int) position.Y)?.Block is LiquidBlock liquidBlock)
+		if (worldState.GetBlockInstance((int) position.X, (int) position.Y, TileLayer.Liquid)?.Block is LiquidBlock liquidBlock)
 		{
 			liquidBlock.FlowLevel = 8;
 			liquidBlock.CurrentFlowDownDistance = 0;
@@ -248,26 +276,33 @@ public class Player : HumanLikeEntity
 
 	private void InteractWithBlock(WorldState worldState, Vector2 position)
 	{
-		var blockInstance = worldState.GetBlockInstance((int) position.X, (int) position.Y);
-		if (blockInstance == null || World == null) return;
-		blockInstance.OnRightClick(World, position, this);
-		
-		// clicked on liquid with empty bucket selected -> scoop it
-		var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
-		if (selectedItem != null && selectedItem.Id == ItemId.EmptyBucket && 
-		    blockInstance.Block is LiquidBlock liquid && 
-		    liquid.FlowLevel >= 7 && liquid.BucketItemId > 0)
+		foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer)))
 		{
-			// has a bucket item to give -> remove this block and give the bucket
-			var liquidBucketItem = StuffRegistry.GetItem(liquid.BucketItemId);
-			if (liquidBucketItem != null)
+			var blockInstance = worldState.GetBlockInstance((int) position.X, (int) position.Y, layer);
+			if (blockInstance == null || World == null) return;
+			blockInstance.OnRightClick(World, position, this);
+		
+			// clicked on liquid with empty bucket selected -> scoop it
+			var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
+			if (selectedItem != null && selectedItem.Id == ItemId.EmptyBucket && 
+			    blockInstance.Block is LiquidBlock liquid && 
+			    liquid.FlowLevel >= 7 && liquid.BucketItemId > 0)
 			{
-				// remove empty bucket, give bucket with liquid
-				PlayerInventory.RemoveItem(_selectedHotbarSlot);
-				PlayerInventory.AddItem(liquidBucketItem);
-				worldState.SetTile((int) position.X, (int) position.Y, 0, this);
+				// has a bucket item to give -> remove this block and give the bucket
+				var liquidBucketItem = StuffRegistry.GetItem(liquid.BucketItemId);
+				if (liquidBucketItem != null)
+				{
+					// remove empty bucket, give bucket with liquid
+					PlayerInventory.RemoveItem(_selectedHotbarSlot);
+					PlayerInventory.AddItem(liquidBucketItem);
+					worldState.SetTile((int) position.X, (int) position.Y, 0, TileLayer.Liquid, this);
+				}
 			}
+
+			// right click only on first block found
+			break;
 		}
+		
 	}
 
 	private void HandleItemInteraction()

@@ -37,7 +37,7 @@ public abstract class LiquidBlock : Block
     private WorldState _currentWorldState;
 
     protected LiquidBlock(ushort id, string name, float flowUpdateInterval = 0.15f, int maxFlowDownDistance = 8, ushort bucketItemId = 0) 
-        : base(id, name, 200f, 0f, false, true, 0, 0)
+        : base(id, name, 200f, 0f, false, false, true, 0, 0)
     {
         FlowUpdateInterval = flowUpdateInterval;
         MaxFlowDownDistance = maxFlowDownDistance;
@@ -50,7 +50,9 @@ public abstract class LiquidBlock : Block
     {
         return BlockRectangles.TopLeft;
     }
-    
+
+    public override TileLayer GetLayer() => TileLayer.Liquid;
+
     public override void Update(World world, Vector2 position)
     {
         base.Update(world, position);
@@ -77,9 +79,9 @@ public abstract class LiquidBlock : Block
     /// <param name="y"></param>
     private void TryFlowingDown(int x, int y)
     {
-        var below = _currentWorldState.GetBlockInstance(x, y + Size);
+        var belowLiquidInst = _currentWorldState.GetBlockInstance(x, y + Size, TileLayer.Liquid);
 
-        if (below?.Block is LiquidBlock belowLiquid && belowLiquid.Id == Id)
+        if (belowLiquidInst?.Block is LiquidBlock belowLiquid && belowLiquid.Id == Id)
         {
             // combine levels
             var combinedLevels = FlowLevel + belowLiquid.FlowLevel;
@@ -88,7 +90,7 @@ public abstract class LiquidBlock : Block
             {
                 // dont exceed max -> move all liquid down
                 belowLiquid.FlowLevel = combinedLevels;
-                _currentWorldState.SetTile(x, y, BlockId.Air); // remove this liquid
+                _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer()); // remove this liquid
             }
             else
             {
@@ -111,10 +113,11 @@ public abstract class LiquidBlock : Block
         }
 
         // no blocks below -> continue flowing
-        if (below == null || below.Block is {IsCollidable: false})
+        var belowGroundInst = _currentWorldState.GetBlockInstance(x, y + Size, TileLayer.Ground);
+        if (belowGroundInst == null || belowGroundInst.Block is {IsCollidable: false})
         {
             CreateLiquidAt(x, y + Size, FlowLevel, CurrentFlowDownDistance + 1);
-            _currentWorldState.SetTile(x, y, BlockId.Air);
+            _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer());
         }
         else
         {
@@ -130,8 +133,8 @@ public abstract class LiquidBlock : Block
     /// <param name="y">Y of this block</param>
     private void ShiftThisAndAboveLiquidDown(int x, int y)
     {
-        var belowTile = _currentWorldState.GetBlockInstance(x, y + Size);
-        bool onSolidGround = belowTile?.Block is {IsCollidable: true} || _currentWorldState.GetTile(x, y + Size) > 0;
+        var belowTile = _currentWorldState.GetBlockInstance(x, y + Size, TileLayer.Ground);
+        bool onSolidGround = belowTile?.Block is {IsCollidable: true} || _currentWorldState.GetTile(x, y + Size, TileLayer.Ground) > 0;
 
         if (onSolidGround)
         {
@@ -141,11 +144,11 @@ public abstract class LiquidBlock : Block
         else
         {
             // can flow down -> shift down
-            _currentWorldState.SetTile(x, y, BlockId.Air);
+            _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer());
             CreateLiquidAt(x, y + Size, FlowLevel, CurrentFlowDownDistance);
 
             // tell block above to shift down
-            var aboveTile = _currentWorldState.GetBlockInstance(x, y - Size);
+            var aboveTile = _currentWorldState.GetBlockInstance(x, y - Size, TileLayer.Liquid);
             if (aboveTile?.Block is LiquidBlock aboveLiquid && aboveLiquid.Id == Id)
                 aboveLiquid.ShiftThisAndAboveLiquidDown(x, y - Size);
         }
@@ -156,13 +159,15 @@ public abstract class LiquidBlock : Block
         // flow with enough levels
         if (FlowLevel < 2) return;
 
-        var leftInstance = _currentWorldState.GetBlockInstance(x - Size, y);
-        var rightInstance = _currentWorldState.GetBlockInstance(x + Size, y);
+        var leftGroundInst = _currentWorldState.GetBlockInstance(x - Size, y, TileLayer.Ground);
+        var leftLiquidInst = _currentWorldState.GetBlockInstance(x - Size, y, TileLayer.Liquid);
+        var rightGroundInst = _currentWorldState.GetBlockInstance(x + Size, y, TileLayer.Ground);
+        var rightLiquidInst = _currentWorldState.GetBlockInstance(x + Size, y, TileLayer.Liquid);
 
         // flow levels of near liquids
-        var leftLevel = (leftInstance?.Block is LiquidBlock leftLiquid && leftLiquid.Id == Id) 
+        var leftLevel = (leftLiquidInst?.Block is LiquidBlock leftLiquid && leftLiquid.Id == Id) 
             ? leftLiquid.FlowLevel : 0;
-        var rightLevel = (rightInstance?.Block is LiquidBlock rightLiquid && rightLiquid.Id == Id) 
+        var rightLevel = (rightLiquidInst?.Block is LiquidBlock rightLiquid && rightLiquid.Id == Id) 
             ? rightLiquid.FlowLevel : 0;
         
         // level differences (-1 ensuring flow goes downhill)
@@ -170,8 +175,8 @@ public abstract class LiquidBlock : Block
         var rightDiff = FlowLevel - rightLevel - 1;
 
         // flow only if there's a difference (flow downhill)
-        var flowLeft = leftDiff > 0 && (leftInstance == null || leftInstance.Block is LiquidBlock);
-        var flowRight = rightDiff > 0 && (rightInstance == null || rightInstance.Block is LiquidBlock);
+        var flowLeft = leftDiff > 0 && (leftGroundInst == null || leftLiquidInst?.Block is LiquidBlock);
+        var flowRight = rightDiff > 0 && (rightGroundInst == null || rightLiquidInst?.Block is LiquidBlock);
 
         // no flow needed
         if (!flowLeft && !flowRight) return;
@@ -217,13 +222,13 @@ public abstract class LiquidBlock : Block
                 remainder--;
             }
             
-            if (leftInstance?.Block is LiquidBlock existingLeft && existingLeft.Id == Id) 
+            if (leftLiquidInst?.Block is LiquidBlock existingLeft && existingLeft.Id == Id) 
             {
                 existingLeft.FlowLevel = newLeftLevel;
             } 
             else 
             {
-                var leftHasAirBelow = _currentWorldState.GetTile(x - Size, y + Size) == 0;
+                var leftHasAirBelow = _currentWorldState.GetTile(x - Size, y + Size, TileLayer.Ground) == 0;
                 CreateLiquidAt(x - Size, y, newLeftLevel, leftHasAirBelow 
                     ? 0 : CurrentFlowDownDistance);
             }
@@ -233,13 +238,13 @@ public abstract class LiquidBlock : Block
         {
             var newRightLevel = targetLevel + remainder; // any remaining liquid
             
-            if (rightInstance?.Block is LiquidBlock existingRight && existingRight.Id == Id) 
+            if (rightLiquidInst?.Block is LiquidBlock existingRight && existingRight.Id == Id) 
             {
                 existingRight.FlowLevel = newRightLevel;
             } 
             else 
             {
-                var rightHasAirBelow = _currentWorldState.GetTile(x + Size, y + Size) == 0;
+                var rightHasAirBelow = _currentWorldState.GetTile(x + Size, y + Size, TileLayer.Ground) == 0;
                 CreateLiquidAt(x + Size, y, newRightLevel, rightHasAirBelow 
                     ? 0 : CurrentFlowDownDistance);
             }
@@ -248,7 +253,7 @@ public abstract class LiquidBlock : Block
         // remove if empty
         if (FlowLevel <= 0) 
         {
-            _currentWorldState.SetTile(x, y, BlockId.Air);
+            _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer());
         }
     }
 
@@ -257,7 +262,7 @@ public abstract class LiquidBlock : Block
         var liquid = CreateNewInstance();
         liquid.FlowLevel = targetFlowLevel;
         liquid.CurrentFlowDownDistance = flowDownDistance;
-        _currentWorldState.SetTileInstance(x, y, new BlockInstance(liquid, 0));
+        _currentWorldState.SetTile(x, y, new BlockInstance(liquid, 0), GetLayer());
     }
     
     public abstract LiquidBlock CreateNewInstance();

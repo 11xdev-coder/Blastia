@@ -10,11 +10,13 @@ namespace Blastia.Main.Blocks;
 
 public class SignBlock : Block
 {
-    public SignBlock() : base(BlockId.Sign, "Sign", 0f, 1.5f, false, false,
+    public SignBlock() : base(BlockId.Sign, "Sign", 0f, 1.5f, true, false, false,
         ItemId.SignBlock, 1, 0, [SoundID.Dig1, SoundID.Dig2, SoundID.Dig3])
     {
         
     }
+
+    public override TileLayer GetLayer() => TileLayer.Furniture;
 
     public override void OnRightClick(World world, Vector2 position, Player player)
     {

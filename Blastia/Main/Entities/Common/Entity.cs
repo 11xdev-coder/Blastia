@@ -214,14 +214,14 @@ public abstract class Entity : Object
         }
 
         // is on ground check
-        var strictTileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f);
+        var strictTileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f, TileLayer.Ground);
         IsGrounded = strictTileBelow != null && strictTileBelow.Block.IsCollidable;
         
-        var tileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 3f);
+        var tileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 3f, TileLayer.Ground);
         CanJump = tileBelow != null && tileBelow.Block.IsCollidable;
         
         var dragCoefficient = IsGrounded
-            ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width)
+            ? currentWorld.GetDragCoefficientTileBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, TileLayer.Ground)
             : Block.AirDragCoefficient;
         ApplyGroundDrag(dragCoefficient * FrictionMultiplier);
         

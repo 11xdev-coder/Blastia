@@ -12,10 +12,10 @@ public class SimpleBlock : Block
         
     }
 
-    public SimpleBlock(ushort id, string name, float dragCoefficient = 50f, float hardness = 1f,
+    public SimpleBlock(ushort id, string name, float dragCoefficient = 50f, float hardness = 1f, bool isBreakable = true,
         bool isCollidable = true, bool isTransparent = false, ushort itemIdDrop = 0, int itemDropAmount = 1, int lightLevel = 0, 
         SoundID[]? breakingSounds = null)
-        : base(id, name, dragCoefficient, hardness, isCollidable, isTransparent, itemIdDrop, itemDropAmount, lightLevel, breakingSounds)
+        : base(id, name, dragCoefficient, hardness, isBreakable, isCollidable, isTransparent, itemIdDrop, itemDropAmount, lightLevel, breakingSounds)
     {
         
     }
