@@ -37,7 +37,7 @@ public class Camera : Object
 			Properties.OnValueChangedProperty(ref _cameraScale, clamped, OnZoomed);
 		}
 	}
-	private const float ScaleSpeed = 0.25f;
+	private const float ScaleSpeed = 15f;
 
 	public bool IsPlayerBlocked { get; set; }
 	
@@ -62,7 +62,7 @@ public class Camera : Object
 		float zoom = 0;
 		KeyboardHelper.AccumulateValueFromMap(_zoomMap, ref zoom);
 		
-		CameraScale += zoom * ScaleSpeed;
+		CameraScale += zoom * ScaleSpeed * (float) BlastiaGame.GameTimeElapsedSeconds;
 	}
 
 	public override void Draw(SpriteBatch spriteBatch)

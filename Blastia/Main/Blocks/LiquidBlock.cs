@@ -113,7 +113,7 @@ public abstract class LiquidBlock : Block
         // no blocks below -> continue flowing
         if (below == null || below.Block is {IsCollidable: false})
         {
-            CreateLiquidAt(x, y + Size, 8, CurrentFlowDownDistance + 1);
+            CreateLiquidAt(x, y + Size, FlowLevel, CurrentFlowDownDistance + 1);
             _currentWorldState.SetTile(x, y, BlockId.Air);
         }
         else
@@ -153,66 +153,102 @@ public abstract class LiquidBlock : Block
 
     private void TryFlowingHorizontally(int x, int y)
     {
-        // check left and right
-        var leftBlock = _currentWorldState.GetTile(x - Size, y);
-        var rightBlock = _currentWorldState.GetTile(x + Size, y);
-        
-        var leftHasAirBelow = _currentWorldState.GetTile(x - Size, y + Size) == 0;
-        var rightHasAirBelow = _currentWorldState.GetTile(x + Size, y + Size) == 0;
-        
-        int flowTargets = 0;
-        if (leftBlock == 0) flowTargets++;
-        if (rightBlock == 0) flowTargets++;
+        // flow with enough levels
+        if (FlowLevel < 2) return;
 
-        // no targets -> no flow
-        if (flowTargets == 0) return;
-        
-        // total blocks to distribute to
-        var totalBlocks = flowTargets + 1;
+        var leftInstance = _currentWorldState.GetBlockInstance(x - Size, y);
+        var rightInstance = _currentWorldState.GetBlockInstance(x + Size, y);
 
-        var originalLevel = FlowLevel;
+        // flow levels of near liquids
+        var leftLevel = (leftInstance?.Block is LiquidBlock leftLiquid && leftLiquid.Id == Id) 
+            ? leftLiquid.FlowLevel : 0;
+        var rightLevel = (rightInstance?.Block is LiquidBlock rightLiquid && rightLiquid.Id == Id) 
+            ? rightLiquid.FlowLevel : 0;
         
-        // how much goes to each block
-        var levelPerBlock = originalLevel / totalBlocks;
-        var remainder = originalLevel % totalBlocks;
+        // level differences (-1 ensuring flow goes downhill)
+        var leftDiff = FlowLevel - leftLevel - 1;
+        var rightDiff = FlowLevel - rightLevel - 1;
 
-        // cant distribute at least 1 level per block
-        if (levelPerBlock == 0)
+        // flow only if there's a difference (flow downhill)
+        var flowLeft = leftDiff > 0 && (leftInstance == null || leftInstance.Block is LiquidBlock);
+        var flowRight = rightDiff > 0 && (rightInstance == null || rightInstance.Block is LiquidBlock);
+
+        // no flow needed
+        if (!flowLeft && !flowRight) return;
+
+        // calculate equalized level
+        var totalLiquid = FlowLevel;
+        var blockCount = 1;
+        
+        if (flowLeft) 
         {
-            // move all liquid to one side if we cant divide it 
-            if (leftBlock == 0)
-            {
-                CreateLiquidAt(x - Size, y, originalLevel, CurrentFlowDownDistance);
-                _currentWorldState.SetTile(x, y, BlockId.Air);
-            }
-            else if (rightBlock == 0)
-            {
-                CreateLiquidAt(x + Size, y, originalLevel, CurrentFlowDownDistance);
-                _currentWorldState.SetTile(x, y, BlockId.Air);
-            }
-            return;
+            totalLiquid += leftLevel;
+            blockCount++;
         }
         
-        // distribute liquid evenly
-        FlowLevel = levelPerBlock + remainder;
-    
-        // add the remainder to this block
-        if (remainder > 0)
-            FlowLevel += remainder;
-
-        // flow to available spaces
-        // Create new liquid blocks if needed
-        if (leftBlock == 0)
+        if (flowRight) 
         {
-            // If there's air below this new liquid, reset flow distance to allow falling
-            CreateLiquidAt(x - Size, y, levelPerBlock, 
-                leftHasAirBelow ? 0 : CurrentFlowDownDistance);
+            totalLiquid += rightLevel;
+            blockCount++;
         }
-
-        if (rightBlock == 0)
+        
+        // target levels
+        var targetLevel = totalLiquid / blockCount;
+        var remainder = totalLiquid % blockCount;
+        
+        // apply changes
+        var newSourceLevel = targetLevel;
+        if (remainder > 0) 
         {
-            CreateLiquidAt(x + Size, y, levelPerBlock,
-                rightHasAirBelow ? 0 : CurrentFlowDownDistance);
+            newSourceLevel++;
+            remainder--;
+        }
+        
+        // update source
+        FlowLevel = newSourceLevel;
+        
+        // update near blocks
+        if (flowLeft) 
+        {
+            var newLeftLevel = targetLevel;
+            if (remainder > 0) 
+            {
+                newLeftLevel++;
+                remainder--;
+            }
+            
+            if (leftInstance?.Block is LiquidBlock existingLeft && existingLeft.Id == Id) 
+            {
+                existingLeft.FlowLevel = newLeftLevel;
+            } 
+            else 
+            {
+                var leftHasAirBelow = _currentWorldState.GetTile(x - Size, y + Size) == 0;
+                CreateLiquidAt(x - Size, y, newLeftLevel, leftHasAirBelow 
+                    ? 0 : CurrentFlowDownDistance);
+            }
+        }
+        
+        if (flowRight) 
+        {
+            var newRightLevel = targetLevel + remainder; // any remaining liquid
+            
+            if (rightInstance?.Block is LiquidBlock existingRight && existingRight.Id == Id) 
+            {
+                existingRight.FlowLevel = newRightLevel;
+            } 
+            else 
+            {
+                var rightHasAirBelow = _currentWorldState.GetTile(x + Size, y + Size) == 0;
+                CreateLiquidAt(x + Size, y, newRightLevel, rightHasAirBelow 
+                    ? 0 : CurrentFlowDownDistance);
+            }
+        }
+        
+        // remove if empty
+        if (FlowLevel <= 0) 
+        {
+            _currentWorldState.SetTile(x, y, BlockId.Air);
         }
     }
 

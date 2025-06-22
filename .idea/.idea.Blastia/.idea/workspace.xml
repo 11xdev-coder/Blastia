@@ -9,9 +9,8 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Commands/ConsoleWindow.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Commands/ConsoleWindow.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/World.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/World.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -279,15 +278,7 @@
       <workItem from="1750401674464" duration="23808000" />
       <workItem from="1750452034872" duration="6010000" />
       <workItem from="1750487786266" duration="22426000" />
-      <workItem from="1750573918817" duration="15110000" />
-    </task>
-    <task id="LOCAL-00113" summary="item grab sound">
-      <option name="closed" value="true" />
-      <created>1749125610957</created>
-      <option name="number" value="00113" />
-      <option name="presentableId" value="LOCAL-00113" />
-      <option name="project" value="LOCAL" />
-      <updated>1749125610957</updated>
+      <workItem from="1750573918817" duration="17119000" />
     </task>
     <task id="LOCAL-00114" summary="fixed inventory ui unloading">
       <option name="closed" value="true" />
@@ -673,7 +664,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750611919230</updated>
     </task>
-    <option name="localTasksCounter" value="162" />
+    <task id="LOCAL-00162" summary="draw collision grid command">
+      <option name="closed" value="true" />
+      <created>1750616494338</created>
+      <option name="number" value="00162" />
+      <option name="presentableId" value="LOCAL-00162" />
+      <option name="project" value="LOCAL" />
+      <updated>1750616494338</updated>
+    </task>
+    <option name="localTasksCounter" value="163" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -683,7 +682,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="complete liquid refactor" />
     <MESSAGE value="collision and tile source rect fixes" />
     <MESSAGE value="liquid source fix" />
     <MESSAGE value="little liquid refactor" />
@@ -708,6 +706,7 @@
     <MESSAGE value="block update call optimizations" />
     <MESSAGE value="collision fixes and optimizations" />
     <MESSAGE value="fps dependency fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fps dependency fixes" />
+    <MESSAGE value="draw collision grid command" />
+    <option name="LAST_COMMIT_MESSAGE" value="draw collision grid command" />
   </component>
 </project>
