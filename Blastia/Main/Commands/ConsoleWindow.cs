@@ -29,6 +29,7 @@ public class ConsoleWindow
         {
             world.RulerMode = b;
         }, () => world.RulerMode);
+        _gameRules.AddGameRule("draw_collision_grid", b => world.DrawCollisionGrid = b, () => world.DrawCollisionGrid);
         Console.WriteLine("Commands initialized");
     }
 

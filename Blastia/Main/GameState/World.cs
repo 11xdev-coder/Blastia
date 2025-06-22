@@ -26,6 +26,7 @@ public class World
 		get => _rulerMode;
 		set => Properties.OnValueChangedProperty(ref _rulerMode, value, OnRulerModeUpdated);
 	}
+	public bool DrawCollisionGrid { get; set; }
 	
 	private Vector2 _rulerStart;
 	private Vector2 _rulerEnd;

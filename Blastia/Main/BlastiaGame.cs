@@ -556,7 +556,7 @@ public class BlastiaGame : Game
 		if (IsWorldInitialized && PlayerNWorldManager.Instance.SelectedWorld != null)
 		{
 			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
-			_myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
+			if (World is {DrawCollisionGrid: true}) _myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
 			
 			foreach (var entity in _entities)
