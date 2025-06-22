@@ -2,6 +2,7 @@
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
+using Blastia.Main.Physics;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
@@ -246,6 +247,9 @@ public class WorldState
 				blockInstance.OnPlace(player?.World, pos, player);
 				TileInstances[pos] = blockInstance;
 			}
+			
+			var rect = new Rectangle(alignedX, alignedY, Block.Size, Block.Size);
+			Collision.AddBodyToGrid(rect);
 		}
 	}
 

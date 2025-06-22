@@ -189,6 +189,31 @@ public class Camera : Object
 	            spriteBatch.Draw(pixelTexture, destRect, gridColor);
 	        }
 	    }
+
+	    var font = BlastiaGame.MainFont;
+	    if (font == null) return;
+
+	    var textColor = new Color(255, 255, 255, 128);
+	    var textScale = Math.Max(0.6f, Math.Min(0.8f, (int) (1 * CameraScale / 5)));
+
+	    for (var x = firstCellX; x <= lastCellX; x++)
+	    {
+		    for (var y = firstCellY; y <= lastCellY; y++)
+		    {
+			    // cell pos in world coordinates
+			    var cellPos = new Vector2(x * Collision.CellSize, y * Collision.CellSize);
+
+			    var entityCount = 0;
+			    if (Collision.Cells.TryGetValue(cellPos, out var entityList))
+			    {
+				    entityCount = entityList.Count;
+			    }
+			    
+			    var screenPos = WorldToScreen(cellPos);
+			    spriteBatch.DrawString(font, $"entities: {entityCount.ToString()}", screenPos + new Vector2(lineThickness + 2),
+				    textColor, 0f, Vector2.Zero, textScale, SpriteEffects.None, 0f);
+		    }
+	    }
 	}
 
 	public Vector2 ScreenToWorld(Vector2 screenPosition)

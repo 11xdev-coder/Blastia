@@ -6,7 +6,8 @@ namespace Blastia.Main.Physics;
 public static class Collision
 {
     public static readonly int CellSize = 8 * Block.Size;
-    private static Dictionary<Point, List<Rectangle>> _spatialGrid = new();
+    // cell position -> entities in that cell
+    public static Dictionary<Vector2, List<Rectangle>> Cells = new();
 
     /// <summary>
     /// Calculates collision details between moving AABB and static AABB
@@ -200,57 +201,34 @@ public static class Collision
         return tiles;
     }
 
-    public static void InitializeSpatialGrid()
+    public static void AddBodyToGrid(Rectangle box)
     {
-        _spatialGrid.Clear();
-    }
-
-    public static void AddToSpatialGrid(Rectangle bounds)
-    {
-        var startCellX = bounds.Left / CellSize;
-        var startCellY = bounds.Top / CellSize;
-        var endCellX = bounds.Right / CellSize;
-        var endCellY = bounds.Bottom / CellSize;
+        // Calculate the grid cells this entity overlaps with
+        var startCellX = box.Left / CellSize;
+        var startCellY = box.Top / CellSize;
+        var endCellX = (box.Right - 1) / CellSize;
+        var endCellY = (box.Bottom - 1) / CellSize;
         
-        // add entity to each cell it overlaps
-        for (var x = startCellX; x <= endCellX; x++)
+        // Add entity to each overlapping cell
+        for (int x = startCellX; x <= endCellX; x++)
         {
-            for (var y = startCellY; y <= endCellY; y++)
+            for (int y = startCellY; y <= endCellY; y++)
             {
-                var cell = new Point(x, y);
-                if (!_spatialGrid.TryGetValue(cell, out var list))
+                Vector2 cellPos = new Vector2(x * CellSize, y * CellSize);
+                
+                // initialize list if it doesnt exist
+                if (!Cells.TryGetValue(cellPos, out var bodiesInCell))
                 {
-                    list = [];
-                    _spatialGrid[cell] = list;
+                    bodiesInCell = [];
+                    Cells[cellPos] = bodiesInCell;
                 }
-                list.Add(bounds);
-            }
-        }
-    }
-    
-    public static List<Rectangle> GetPotentialColliders(Rectangle bounds, Vector2 displacement)
-    {
-        var sweptBounds = GetSweptBounds(bounds, displacement);
-        var potentialColliders = new List<Rectangle>();
-
-        var startCellX = sweptBounds.Left / CellSize;
-        var startCellY = sweptBounds.Top / CellSize;
-        var endCellX = sweptBounds.Right / CellSize;
-        var endCellY = sweptBounds.Bottom / CellSize;
-
-        // Collect all entities in overlapping cells
-        for (var x = startCellX; x <= endCellX; x++)
-        {
-            for (var y = startCellY; y <= endCellY; y++)
-            {
-                var cell = new Point(x, y);
-                if (_spatialGrid.TryGetValue(cell, out var list))
+                
+                // no duplicates
+                if (!bodiesInCell.Contains(box))
                 {
-                    potentialColliders.AddRange(list);
+                    bodiesInCell.Add(box);
                 }
             }
         }
-
-        return potentialColliders;
     }
 }

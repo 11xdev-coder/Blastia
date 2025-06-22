@@ -80,8 +80,7 @@ public class BlastiaGame : Game
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
 	
-	public SpriteFont? MainFont { get; private set; }
-	
+	public static SpriteFont? MainFont { get; private set; }
 	
 	// MENUS
 	public static LogoMenu? LogoMenu { get; private set; }
@@ -394,7 +393,6 @@ public class BlastiaGame : Game
 		try
 		{
 			base.Update(gameTime);
-			Collision.InitializeSpatialGrid();
 			UpdateGameTime(gameTime);
 			SoundEngine.Update();
 
