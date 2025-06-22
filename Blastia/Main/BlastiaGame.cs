@@ -443,20 +443,20 @@ public class BlastiaGame : Game
 
 					if (PlayerNWorldManager.Instance.SelectedWorld != null)
 					{
-						var tilesToUpdate = PlayerNWorldManager.Instance.SelectedWorld.TileInstances
-							.Select(kvp => (kvp.Key, kvp.Value))
-							.ToArray();
+						var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+						var collisionBodies = tuple?.Item1;
+						var tilesToUpdate = tuple?.Item2;
 
+						if (collisionBodies == null || tilesToUpdate == null) return;
+						
 						foreach (var (position, blockInstance) in tilesToUpdate)
 						{
 							try
 							{
 								blockInstance.Update(World, position);
-								if (blockInstance.Block.IsCollidable)
+								if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
 								{
-									var rect = new Rectangle((int) position.X, (int) position.Y, Block.Size,
-										Block.Size);
-									//Collision.AddToSpatialGrid(rect);
+									Collision.AddBodyToGrid(box);
 								}
 							}
 							catch (Exception ex)

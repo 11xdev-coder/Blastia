@@ -11,8 +11,6 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/PlayerNWorldManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/PlayerNWorldManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -280,15 +278,7 @@
       <workItem from="1750401674464" duration="23808000" />
       <workItem from="1750452034872" duration="6010000" />
       <workItem from="1750487786266" duration="22426000" />
-      <workItem from="1750573918817" duration="7507000" />
-    </task>
-    <task id="LOCAL-00109" summary="item pulling on pickup">
-      <option name="closed" value="true" />
-      <created>1748988754314</created>
-      <option name="number" value="00109" />
-      <option name="presentableId" value="LOCAL-00109" />
-      <option name="project" value="LOCAL" />
-      <updated>1748988754314</updated>
+      <workItem from="1750573918817" duration="10071000" />
     </task>
     <task id="LOCAL-00110" summary="dropped item visuals update">
       <option name="closed" value="true" />
@@ -674,7 +664,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750594772563</updated>
     </task>
-    <option name="localTasksCounter" value="158" />
+    <task id="LOCAL-00158" summary="collision simple grid">
+      <option name="closed" value="true" />
+      <created>1750597036291</created>
+      <option name="number" value="00158" />
+      <option name="presentableId" value="LOCAL-00158" />
+      <option name="project" value="LOCAL" />
+      <updated>1750597036291</updated>
+    </task>
+    <option name="localTasksCounter" value="159" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -684,7 +682,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="block sound delays" />
     <MESSAGE value="liquid block" />
     <MESSAGE value="liquid fix" />
     <MESSAGE value="liquid and worldstate refactor" />
@@ -709,6 +706,7 @@
     <MESSAGE value="buckets" />
     <MESSAGE value="fps counter" />
     <MESSAGE value="spacial grid draw" />
-    <option name="LAST_COMMIT_MESSAGE" value="spacial grid draw" />
+    <MESSAGE value="collision simple grid" />
+    <option name="LAST_COMMIT_MESSAGE" value="collision simple grid" />
   </component>
 </project>

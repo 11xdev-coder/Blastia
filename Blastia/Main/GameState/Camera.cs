@@ -41,6 +41,9 @@ public class Camera : Object
 
 	public bool IsPlayerBlocked { get; set; }
 	
+	// world tile position -> block instance (only drawn ones)
+	private Dictionary<Vector2, BlockInstance> _drawnTiles = new();
+	
 	/// <summary>
 	/// Event called whenever <c>CameraScale</c> changes
 	/// </summary>
@@ -71,9 +74,11 @@ public class Camera : Object
 	{
 		
 	}
-	
-	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState)
+
+	public (Dictionary<Vector2, Rectangle>, Dictionary<Vector2, BlockInstance>) SetDrawnTiles(WorldState worldState)
 	{
+		_drawnTiles.Clear();
+		
 		int firstTileX = (int) Math.Floor(Position.X / Block.Size);
 		int firstTileY = (int) Math.Floor(Position.Y / Block.Size);
 
@@ -90,10 +95,13 @@ public class Camera : Object
 		lastTileX = Math.Min(worldState.WorldWidth / Block.Size, lastTileX);
 		lastTileY = Math.Min(worldState.WorldHeight / Block.Size, lastTileY);
 		
-		int scaledBlockSize = MathUtilities.SmoothRound(Block.Size * CameraScale);
+		var estimatedWidth = lastTileX - firstTileX;
+		var estimatedHeight = lastTileY - firstTileY;
+		var estimatedCapacity = estimatedWidth * estimatedHeight;
+		var drawnBoxes = new Dictionary<Vector2, Rectangle>(estimatedCapacity);
 		
 		// go through each tile
-		for (int x = firstTileX; x < lastTileX; x++) 
+		for (int x = firstTileX; x < lastTileX; x++)
 		{
 			for (int y = firstTileY; y < lastTileY; y++)
 			{
@@ -103,23 +111,41 @@ public class Camera : Object
 				var blockInstance = worldState.GetBlockInstance(worldXCoord, worldYCoord);
 				if (blockInstance == null) continue; // skip air
 				
-				// subtract camera position -> scrolling (camera moves right -> move tile to the left)
-				float worldPositionX = worldXCoord - Position.X;
-				float worldPositionY = worldYCoord - Position.Y;
-				Rectangle destRect = new Rectangle(MathUtilities.SmoothRound(worldPositionX * CameraScale), 
-					MathUtilities.SmoothRound(worldPositionY * CameraScale), 
-					scaledBlockSize, scaledBlockSize);
+				_drawnTiles.Add(new Vector2(worldXCoord, worldYCoord), blockInstance);
 
-				var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - 8);
-				var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + 8);
-				var rightTile = worldState.GetBlockInstance(worldXCoord + 8, worldYCoord);
-				var leftTile = worldState.GetBlockInstance(worldXCoord - 8, worldYCoord);
-				Rectangle sourceRect = blockInstance.Block.GetRuleTileSourceRectangle(topTile == null || topTile.Block.IsTransparent, 
-					bottomTile == null || bottomTile.Block.IsTransparent, 
-					rightTile == null || rightTile.Block.IsTransparent, 
-					leftTile == null || leftTile.Block.IsTransparent);
-				blockInstance.Draw(spriteBatch, destRect, sourceRect, new Vector2(worldXCoord, worldYCoord));				
+				var tileBox = new Rectangle(worldXCoord, worldYCoord, Block.Size, Block.Size);
+				drawnBoxes.Add(new Vector2(worldXCoord, worldYCoord), tileBox);
 			}
+		}
+
+		return (drawnBoxes, _drawnTiles);
+	}
+	
+	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState)
+	{
+		int scaledBlockSize = MathUtilities.SmoothRound(Block.Size * CameraScale);
+		
+		foreach (var (tilePosition, blockInstance) in _drawnTiles)
+		{
+			var worldXCoord = (int) tilePosition.X;
+			var worldYCoord = (int) tilePosition.Y;
+			
+			// subtract camera position -> scrolling (camera moves right -> move tile to the left)
+			float worldPositionX = worldXCoord - Position.X;
+			float worldPositionY = worldYCoord - Position.Y;
+			Rectangle destRect = new Rectangle(MathUtilities.SmoothRound(worldPositionX * CameraScale), 
+				MathUtilities.SmoothRound(worldPositionY * CameraScale), 
+				scaledBlockSize, scaledBlockSize);
+
+			var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - 8);
+			var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + 8);
+			var rightTile = worldState.GetBlockInstance(worldXCoord + 8, worldYCoord);
+			var leftTile = worldState.GetBlockInstance(worldXCoord - 8, worldYCoord);
+			Rectangle sourceRect = blockInstance.Block.GetRuleTileSourceRectangle(topTile == null || topTile.Block.IsTransparent, 
+				bottomTile == null || bottomTile.Block.IsTransparent, 
+				rightTile == null || rightTile.Block.IsTransparent, 
+				leftTile == null || leftTile.Block.IsTransparent);
+			blockInstance.Draw(spriteBatch, destRect, sourceRect, new Vector2(worldXCoord, worldYCoord));
 		}
 	}
 
