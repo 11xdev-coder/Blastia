@@ -147,7 +147,7 @@ public abstract class Entity : Object
             // broadphase
             // only check tiles that are possibly in the way
             var sweptBounds = Collision.GetSweptBounds(entityBounds, currentIterationDisplacement);
-            var potentialColliders = Collision.GetTilesInRectangle(currentWorld, sweptBounds);
+            var potentialColliders = Collision.GetPotentialCollidersInRectangle(sweptBounds);
             
             // narrow phase
             foreach (var collider in potentialColliders)
@@ -183,6 +183,13 @@ public abstract class Entity : Object
                 if (Math.Abs(firstHitNormal.X) > Math.Abs(firstHitNormal.Y)) 
                 {
                     MovementVector.X = 0f;
+    
+                    // avoid hitting the wall when moving up
+                    if (MovementVector.Y < 0)
+                    {
+                        // move slightly away from the wall
+                        Position += new Vector2(firstHitNormal.X * 0.1f, 0);
+                    }
                 }
                 else // vertical
                 {

@@ -171,34 +171,37 @@ public static class Collision
     }
 
 
-    public static List<Rectangle> GetTilesInRectangle(WorldState world, Rectangle bounds)
+    public static List<Rectangle> GetPotentialCollidersInRectangle(Rectangle bounds)
     {
-        var minTileX = (int) Math.Floor(bounds.Left / (float)  Block.Size) * Block.Size;
-        var maxTileX = (int) Math.Ceiling(bounds.Right / (float)  Block.Size) * Block.Size;
-        var minTileY = (int) Math.Floor(bounds.Top / (float)  Block.Size) * Block.Size;
-        var maxTileY = (int) Math.Ceiling(bounds.Bottom / (float)  Block.Size) * Block.Size;
-        
-        // estimate capacity to avoid reallocations
-        var estimatedWidth = (maxTileX - minTileX) / Block.Size;
-        var estimatedHeight = (maxTileY - minTileY) / Block.Size;
-        var estimatedCapacity = estimatedWidth * estimatedHeight;
-        
-        List<Rectangle> tiles = new(estimatedCapacity);
-
-        for (var x = minTileX; x <= maxTileX; x += Block.Size)
+        List<Rectangle> potentialColliders = new List<Rectangle>();
+    
+        // convert bounds to grid cell coords
+        int startCellX = (int)Math.Floor(bounds.Left / (float)CellSize);
+        int startCellY = (int)Math.Floor(bounds.Top / (float)CellSize);
+        int endCellX = (int)Math.Ceiling(bounds.Right / (float)CellSize);
+        int endCellY = (int)Math.Ceiling(bounds.Bottom / (float)CellSize);
+    
+        // check each cell
+        for (int x = startCellX; x < endCellX; x++)
         {
-            for (var y = minTileY; y <= maxTileY; y += Block.Size)
+            for (int y = startCellY; y < endCellY; y++)
             {
-                var blockInstance = world.GetBlockInstance(x, y);
-                if (blockInstance != null && blockInstance.Block.IsCollidable)
+                var cellPos = new Vector2(x * CellSize, y * CellSize);
+            
+                // add this cell's bodies to potential colliders
+                if (Cells.TryGetValue(cellPos, out var bodies))
                 {
-                    var tileRect = new Rectangle(x, y, Block.Size, Block.Size);
-                    tiles.Add(tileRect);
+                    potentialColliders.AddRange(bodies);
                 }
             }
         }
+    
+        return potentialColliders;
+    }
 
-        return tiles;
+    public static void ClearGrid()
+    {
+        Cells.Clear();
     }
 
     public static void AddBodyToGrid(Rectangle box)

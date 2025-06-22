@@ -443,6 +443,8 @@ public class BlastiaGame : Game
 
 					if (PlayerNWorldManager.Instance.SelectedWorld != null)
 					{
+						Collision.ClearGrid();
+						
 						var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
 						var collisionBodies = tuple?.Item1;
 						var tilesToUpdate = tuple?.Item2;
