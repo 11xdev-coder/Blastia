@@ -5,6 +5,9 @@ namespace Blastia.Main.Physics;
 
 public static class Collision
 {
+    private static readonly int CellSize = 16 * Block.Size;
+    private static Dictionary<Point, List<Rectangle>> _spatialGrid = new();
+
     /// <summary>
     /// Calculates collision details between moving AABB and static AABB
     /// </summary>
@@ -138,7 +141,7 @@ public static class Collision
     }
 
     /// <summary>
-    /// Calculates bounding box that includes starting & ending position. (Broad-phase collision)
+    /// Calculates bounding box that includes starting and ending position. (Broad-phase collision)
     /// </summary>
     /// <param name="box">Bounding box of the entity</param>
     /// <param name="displacement">Intended movement for this iteration</param>
@@ -166,33 +169,88 @@ public static class Collision
         return swept;
     }
 
-    public static List<Rectangle> GetTilesInRectangle(WorldState world, Rectangle rect)
+
+    public static List<Rectangle> GetTilesInRectangle(WorldState world, Rectangle bounds)
     {
-        List<Rectangle> tiles = [];
+        var minTileX = (int) Math.Floor(bounds.Left / (float)  Block.Size) * Block.Size;
+        var maxTileX = (int) Math.Ceiling(bounds.Right / (float)  Block.Size) * Block.Size;
+        var minTileY = (int) Math.Floor(bounds.Top / (float)  Block.Size) * Block.Size;
+        var maxTileY = (int) Math.Ceiling(bounds.Bottom / (float)  Block.Size) * Block.Size;
+        
+        // estimate capacity to avoid reallocations
+        var estimatedWidth = (maxTileX - minTileX) / Block.Size;
+        var estimatedHeight = (maxTileY - minTileY) / Block.Size;
+        var estimatedCapacity = estimatedWidth * estimatedHeight;
+        
+        List<Rectangle> tiles = new(estimatedCapacity);
 
-        var tileX = (int) Math.Floor((float) rect.Left / Block.Size);
-        var tileY = (int) Math.Floor((float) rect.Top / Block.Size);
-        var tileXEnd = (int) Math.Floor((float) (rect.Right - 1) / Block.Size);
-        var tileYEnd = (int) Math.Floor((float) (rect.Bottom - 1) / Block.Size);
-
-        for (var tx = tileX; tx <= tileXEnd; tx++)
+        for (var x = minTileX; x <= maxTileX; x += Block.Size)
         {
-            for (var ty = tileY; ty <= tileYEnd; ty++)
+            for (var y = minTileY; y <= maxTileY; y += Block.Size)
             {
-                var tileWorldX = tx * Block.Size;
-                var tileWorldY = ty * Block.Size;
-
-                if (world.HasTile(tileWorldX, tileWorldY))
+                var blockInstance = world.GetBlockInstance(x, y);
+                if (blockInstance != null && blockInstance.Block.IsCollidable)
                 {
-                    var blockInstance = world.GetBlockInstance(tileWorldX, tileWorldY);
-                    if (blockInstance != null && !blockInstance.Block.IsCollidable) continue;
-                    
-                    Rectangle tileRect = new Rectangle(tileWorldX, tileWorldY, Block.Size, Block.Size);
+                    var tileRect = new Rectangle(x, y, Block.Size, Block.Size);
                     tiles.Add(tileRect);
                 }
             }
         }
 
         return tiles;
+    }
+
+    public static void InitializeSpatialGrid()
+    {
+        _spatialGrid.Clear();
+    }
+
+    public static void AddToSpatialGrid(Rectangle bounds)
+    {
+        var startCellX = bounds.Left / CellSize;
+        var startCellY = bounds.Top / CellSize;
+        var endCellX = bounds.Right / CellSize;
+        var endCellY = bounds.Bottom / CellSize;
+        
+        // add entity to each cell it overlaps
+        for (var x = startCellX; x <= endCellX; x++)
+        {
+            for (var y = startCellY; y <= endCellY; y++)
+            {
+                var cell = new Point(x, y);
+                if (!_spatialGrid.TryGetValue(cell, out var list))
+                {
+                    list = [];
+                    _spatialGrid[cell] = list;
+                }
+                list.Add(bounds);
+            }
+        }
+    }
+    
+    public static List<Rectangle> GetPotentialColliders(Rectangle bounds, Vector2 displacement)
+    {
+        var sweptBounds = GetSweptBounds(bounds, displacement);
+        var potentialColliders = new List<Rectangle>();
+
+        var startCellX = sweptBounds.Left / CellSize;
+        var startCellY = sweptBounds.Top / CellSize;
+        var endCellX = sweptBounds.Right / CellSize;
+        var endCellY = sweptBounds.Bottom / CellSize;
+
+        // Collect all entities in overlapping cells
+        for (var x = startCellX; x <= endCellX; x++)
+        {
+            for (var y = startCellY; y <= endCellY; y++)
+            {
+                var cell = new Point(x, y);
+                if (_spatialGrid.TryGetValue(cell, out var list))
+                {
+                    potentialColliders.AddRange(list);
+                }
+            }
+        }
+
+        return potentialColliders;
     }
 }

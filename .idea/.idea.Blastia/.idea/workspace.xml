@@ -8,13 +8,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/FpsCounterMenu.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Utilities/KeyboardHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Utilities/KeyboardHelper.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
@@ -276,54 +280,8 @@
       <workItem from="1750317702902" duration="28615000" />
       <workItem from="1750401674464" duration="23808000" />
       <workItem from="1750452034872" duration="6010000" />
-    </task>
-    <task id="LOCAL-00101" summary="friction tweaks and dropped items are more slippery">
-      <option name="closed" value="true" />
-      <created>1748798081827</created>
-      <option name="number" value="00101" />
-      <option name="presentableId" value="LOCAL-00101" />
-      <option name="project" value="LOCAL" />
-      <updated>1748798081827</updated>
-    </task>
-    <task id="LOCAL-00102" summary="bounciness and player hitbox and scale fix">
-      <option name="closed" value="true" />
-      <created>1748810272422</created>
-      <option name="number" value="00102" />
-      <option name="presentableId" value="LOCAL-00102" />
-      <option name="project" value="LOCAL" />
-      <updated>1748810272422</updated>
-    </task>
-    <task id="LOCAL-00103" summary="collision fix">
-      <option name="closed" value="true" />
-      <created>1748811335914</created>
-      <option name="number" value="00103" />
-      <option name="presentableId" value="LOCAL-00103" />
-      <option name="project" value="LOCAL" />
-      <updated>1748811335914</updated>
-    </task>
-    <task id="LOCAL-00104" summary="selected item name">
-      <option name="closed" value="true" />
-      <created>1748816275748</created>
-      <option name="number" value="00104" />
-      <option name="presentableId" value="LOCAL-00104" />
-      <option name="project" value="LOCAL" />
-      <updated>1748816275748</updated>
-    </task>
-    <task id="LOCAL-00105" summary="hover text screen edge check">
-      <option name="closed" value="true" />
-      <created>1748867548926</created>
-      <option name="number" value="00105" />
-      <option name="presentableId" value="LOCAL-00105" />
-      <option name="project" value="LOCAL" />
-      <updated>1748867548926</updated>
-    </task>
-    <task id="LOCAL-00106" summary="item hover text tooltip">
-      <option name="closed" value="true" />
-      <created>1748879808145</created>
-      <option name="number" value="00106" />
-      <option name="presentableId" value="LOCAL-00106" />
-      <option name="project" value="LOCAL" />
-      <updated>1748879808145</updated>
+      <workItem from="1750487786266" duration="22426000" />
+      <workItem from="1750573918817" duration="3860000" />
     </task>
     <task id="LOCAL-00107" summary="inventory slot image change">
       <option name="closed" value="true" />
@@ -669,7 +627,55 @@
       <option name="project" value="LOCAL" />
       <updated>1750453506309</updated>
     </task>
-    <option name="localTasksCounter" value="150" />
+    <task id="LOCAL-00150" summary="sdl scancode error workaround">
+      <option name="closed" value="true" />
+      <created>1750490499555</created>
+      <option name="number" value="00150" />
+      <option name="presentableId" value="LOCAL-00150" />
+      <option name="project" value="LOCAL" />
+      <updated>1750490499556</updated>
+    </task>
+    <task id="LOCAL-00151" summary="console log filter">
+      <option name="closed" value="true" />
+      <created>1750491442393</created>
+      <option name="number" value="00151" />
+      <option name="presentableId" value="LOCAL-00151" />
+      <option name="project" value="LOCAL" />
+      <updated>1750491442393</updated>
+    </task>
+    <task id="LOCAL-00152" summary="player doesnt move when editing a sign">
+      <option name="closed" value="true" />
+      <created>1750504272781</created>
+      <option name="number" value="00152" />
+      <option name="presentableId" value="LOCAL-00152" />
+      <option name="project" value="LOCAL" />
+      <updated>1750504272781</updated>
+    </task>
+    <task id="LOCAL-00153" summary="player input block fixes">
+      <option name="closed" value="true" />
+      <created>1750517528983</created>
+      <option name="number" value="00153" />
+      <option name="presentableId" value="LOCAL-00153" />
+      <option name="project" value="LOCAL" />
+      <updated>1750517528983</updated>
+    </task>
+    <task id="LOCAL-00154" summary="liquid refactor">
+      <option name="closed" value="true" />
+      <created>1750526170394</created>
+      <option name="number" value="00154" />
+      <option name="presentableId" value="LOCAL-00154" />
+      <option name="project" value="LOCAL" />
+      <updated>1750526170394</updated>
+    </task>
+    <task id="LOCAL-00155" summary="buckets">
+      <option name="closed" value="true" />
+      <created>1750539516364</created>
+      <option name="number" value="00155" />
+      <option name="presentableId" value="LOCAL-00155" />
+      <option name="project" value="LOCAL" />
+      <updated>1750539516364</updated>
+    </task>
+    <option name="localTasksCounter" value="156" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -679,12 +685,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="inventory ui slot hover fix" />
-    <MESSAGE value="block item placement" />
-    <MESSAGE value="WorldState now has instances of each block" />
-    <MESSAGE value="block instances" />
-    <MESSAGE value="block breaking on holding left click" />
-    <MESSAGE value="block destroying progress texture" />
     <MESSAGE value="block breaking animation" />
     <MESSAGE value="block breaking sounds without overlapping" />
     <MESSAGE value="block sound delays" />
@@ -704,6 +704,12 @@
     <MESSAGE value="liquid rework and candy texture change" />
     <MESSAGE value="keyboard input fix, font fix" />
     <MESSAGE value="sign overlay" />
-    <option name="LAST_COMMIT_MESSAGE" value="sign overlay" />
+    <MESSAGE value="sdl scancode error workaround" />
+    <MESSAGE value="console log filter" />
+    <MESSAGE value="player doesnt move when editing a sign" />
+    <MESSAGE value="player input block fixes" />
+    <MESSAGE value="liquid refactor" />
+    <MESSAGE value="buckets" />
+    <option name="LAST_COMMIT_MESSAGE" value="buckets" />
   </component>
 </project>

@@ -17,7 +17,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.IO; // for Path and File
-using Blastia.Main.Blocks.Common; // for Block.Size
+using Blastia.Main.Blocks.Common;
+using Blastia.Main.Physics; // for Block.Size
 
 namespace Blastia.Main;
 
@@ -96,6 +97,7 @@ public class BlastiaGame : Game
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
 	public static RulerMenu? RulerMenu { get; private set; }
 	public static InGameMenu? InGameMenu { get; private set; }
+	public static FpsCounterMenu? FpsCounterMenu { get; private set; }
 	public static InGameSettingsMenu? InGameSettingsMenu { get; private set; }
 	public static InGameVideoSettingsMenu? InGameVideoSettingsMenu { get; private set; }
 	public static InGameAudioSettingsMenu? InGameAudioSettingsMenu { get; private set; }
@@ -168,6 +170,8 @@ public class BlastiaGame : Game
 		RedirectConsoleOutput();
 		
 		_graphics = new GraphicsDeviceManager(this);
+		UncapFps();
+		
 		_entities = new List<Entity>();
 		_entitiesToRemove = new List<Entity>();
 		Players = new List<Player>();
@@ -220,6 +224,15 @@ public class BlastiaGame : Game
 	{
 		Console.SetOut(new FilteredTextWriter(Console.Out, line => 
 			!line.Contains("KEY/SCANCODE MISSING FROM SDL2->XNA DICTIONARY:")));
+	}
+
+	private void UncapFps()
+	{
+		// uncap framerate for accurate FPS measurement
+		IsFixedTimeStep = false;
+		_graphics.SynchronizeWithVerticalRetrace = false;
+		_graphics.ApplyChanges();
+		GraphicsDevice.PresentationParameters.PresentationInterval = PresentInterval.Immediate;
 	}
 
 	protected override void Initialize()
@@ -339,6 +352,9 @@ public class BlastiaGame : Game
 			InGameMenu = new InGameMenu(MainFont);
 			AddMenu(InGameMenu);
 			
+			FpsCounterMenu = new FpsCounterMenu(MainFont);
+			AddMenu(FpsCounterMenu);
+			
 			InGameSettingsMenu = new InGameSettingsMenu(MainFont);
 			AddMenu(InGameSettingsMenu);
 			
@@ -378,6 +394,7 @@ public class BlastiaGame : Game
 		try
 		{
 			base.Update(gameTime);
+			Collision.InitializeSpatialGrid();
 			UpdateGameTime(gameTime);
 			SoundEngine.Update();
 
@@ -437,6 +454,12 @@ public class BlastiaGame : Game
 							try
 							{
 								blockInstance.Update(World, position);
+								if (blockInstance.Block.IsCollidable)
+								{
+									var rect = new Rectangle((int) position.X, (int) position.Y, Block.Size,
+										Block.Size);
+									//Collision.AddToSpatialGrid(rect);
+								}
 							}
 							catch (Exception ex)
 							{
@@ -454,8 +477,7 @@ public class BlastiaGame : Game
 					player.Update();
 				}
 
-				var entities = _entities.ToList();
-				foreach (var entity in entities)
+				foreach (var entity in _entities)
 				{
 					entity.Update();
 				}

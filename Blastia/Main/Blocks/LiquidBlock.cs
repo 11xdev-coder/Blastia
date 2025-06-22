@@ -7,21 +7,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.Blocks;
 
-public enum LiquidFlowType
-{
-    Source,
-    Vertical,
-    Horizontal
-}
-
-public struct SourceConnectionResult
-{
-    public bool IsConnected;
-    public int BestSourceId;
-    public int DistanceFromSource;
-    public HashSet<int> ConnectedSources;
-}
-
 /// <summary>
 /// Base block class for liquids
 /// </summary>
