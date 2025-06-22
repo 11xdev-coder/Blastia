@@ -23,21 +23,23 @@ public abstract class LiquidBlock : Block
     /// </summary>
     public int FlowLevel { get; set; } = 8;
     /// <summary>
-    /// Flow speed in blocks per second
+    /// Time between each <c>Update()</c> call. Less interval -> faster liquid flow
     /// </summary>
-    public float FlowRate { get; protected set; }
+    public float FlowUpdateInterval { get; protected set; }
     /// <summary>
     /// How far liquid can flow horizontally
     /// </summary>
     public int MaxFlowDownDistance { get; protected set; }
     public int CurrentFlowDownDistance { get; set; }
 
+    private float _flowTimer;
+
     private WorldState _currentWorldState;
 
-    protected LiquidBlock(ushort id, string name, float flowSpeed = 2f, int maxFlowDownDistance = 8, ushort bucketItemId = 0) 
+    protected LiquidBlock(ushort id, string name, float flowUpdateInterval = 0.15f, int maxFlowDownDistance = 8, ushort bucketItemId = 0) 
         : base(id, name, 200f, 0f, false, true, 0, 0)
     {
-        FlowRate = flowSpeed;
+        FlowUpdateInterval = flowUpdateInterval;
         MaxFlowDownDistance = maxFlowDownDistance;
         BucketItemId = bucketItemId;
 
@@ -51,14 +53,21 @@ public abstract class LiquidBlock : Block
     
     public override void Update(World world, Vector2 position)
     {
-        
         base.Update(world, position);
-        if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
-        _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld;
 
-        var blockX = (int) position.X;
-        var blockY = (int) position.Y;
-        TryFlowingDown(blockX, blockY);
+        _flowTimer += (float) BlastiaGame.GameTimeElapsedSeconds;
+
+        if (_flowTimer >= FlowUpdateInterval)
+        {
+            if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
+            _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld;
+
+            var blockX = (int) position.X;
+            var blockY = (int) position.Y;
+            TryFlowingDown(blockX, blockY);
+            
+            _flowTimer -= FlowUpdateInterval;
+        }
     }
 
     /// <summary>

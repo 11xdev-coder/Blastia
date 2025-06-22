@@ -317,7 +317,7 @@ public abstract class UIElement
         // lerp alpha until 0 and reset the flag
         if (LerpAlphaToZero)
         {
-            Alpha -= 0.01f;
+            Alpha -= 1f * (float) BlastiaGame.GameTimeElapsedSeconds;
             if (Alpha <= 0)
             {
                 Alpha = 0;

@@ -5,7 +5,7 @@ namespace Blastia.Main.Blocks;
 
 public class WaterLiquid : LiquidBlock
 {
-    public WaterLiquid() : base(BlockId.Water, "Water", 2f, 1, ItemId.WaterBucket)
+    public WaterLiquid() : base(BlockId.Water, "Water", 0.2f, 1, ItemId.WaterBucket)
     {
     }
 
