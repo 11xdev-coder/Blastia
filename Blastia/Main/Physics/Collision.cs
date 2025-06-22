@@ -5,7 +5,7 @@ namespace Blastia.Main.Physics;
 
 public static class Collision
 {
-    private static readonly int CellSize = 16 * Block.Size;
+    public static readonly int CellSize = 8 * Block.Size;
     private static Dictionary<Point, List<Rectangle>> _spatialGrid = new();
 
     /// <summary>

@@ -1,6 +1,7 @@
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
+using Blastia.Main.Physics;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -133,6 +134,61 @@ public class Camera : Object
 		
 		Vector2 scaledPosition = new Vector2(scaledPositionX, scaledPositionY);
 		entity.Draw(spriteBatch, scaledPosition, CameraScale);
+	}
+	
+	public void RenderSpatialGrid(SpriteBatch spriteBatch, WorldState worldState)
+	{
+	    // visible area
+	    float visibleWorldWidth = DrawWidth / CameraScale;
+	    float visibleWorldHeight = DrawHeight / CameraScale;
+	    
+	    // draw lines only in camera view
+	    int firstCellX = (int)Math.Floor(Position.X / Collision.CellSize);
+	    int firstCellY = (int)Math.Floor(Position.Y / Collision.CellSize);
+	    int lastCellX = (int)Math.Ceiling((Position.X + visibleWorldWidth) / Collision.CellSize);
+	    int lastCellY = (int)Math.Ceiling((Position.Y + visibleWorldHeight) / Collision.CellSize);
+	    
+	    // clamp to world bounds
+	    firstCellX = Math.Max(0, firstCellX);
+	    firstCellY = Math.Max(0, firstCellY);
+	    lastCellX = Math.Min(worldState.WorldWidth / Collision.CellSize + 1, lastCellX);
+	    lastCellY = Math.Min(worldState.WorldHeight / Collision.CellSize + 1, lastCellY);
+	    
+	    var gridColor = new Color(128, 128, 128, 64);
+	    
+	    // use fixed line thickness, dont scale too much
+	    int lineThickness = Math.Max(3, Math.Min(6, (int)(1 * CameraScale / 5)));
+	    Texture2D pixelTexture = BlastiaGame.WhitePixel;
+	    
+	    // vertical lines
+	    for (int x = firstCellX; x <= lastCellX; x++)
+	    {
+	        float worldX = x * Collision.CellSize;
+	        // world to screen space
+	        float screenX = (float)Math.Round((worldX - Position.X) * CameraScale);
+	        
+	        // line is within screen bounds
+	        if (screenX >= 0 && screenX < DrawWidth)
+	        {
+	            Rectangle destRect = new Rectangle((int)screenX, 0, lineThickness, DrawHeight);
+	            spriteBatch.Draw(pixelTexture, destRect, gridColor);
+	        }
+	    }
+	    
+	    // horizontal lines
+	    for (int y = firstCellY; y <= lastCellY; y++)
+	    {
+	        float worldY = y * Collision.CellSize;
+	        // world to screen space
+	        float screenY = (float)Math.Round((worldY - Position.Y) * CameraScale);
+	        
+	        // line is within bounds
+	        if (screenY >= 0 && screenY < DrawHeight)
+	        {
+	            Rectangle destRect = new Rectangle(0, (int)screenY, DrawWidth, lineThickness);
+	            spriteBatch.Draw(pixelTexture, destRect, gridColor);
+	        }
+	    }
 	}
 
 	public Vector2 ScreenToWorld(Vector2 screenPosition)
