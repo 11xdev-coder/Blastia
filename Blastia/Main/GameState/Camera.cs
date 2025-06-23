@@ -267,8 +267,8 @@ public class Camera : Object
 			    var entitiesCount = 0;
 			    if (Collision.Cells.TryGetValue(cellPos, out var entityList))
 			    {
-				    var collidables = entityList.Where(e => e.isCollidable);
-				    var entities = entityList.Where(e => !e.isCollidable);
+				    var collidables = entityList.Where(e => e.IsCollidable);
+				    var entities = entityList.Where(e => !e.IsCollidable);
 				    collidablesCount = collidables.Count();
 				    entitiesCount = entities.Count();
 			    }

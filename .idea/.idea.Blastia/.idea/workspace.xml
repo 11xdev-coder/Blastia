@@ -10,6 +10,7 @@
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LavaLiquid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LavaLiquid.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
@@ -280,15 +281,7 @@
       <workItem from="1750452034872" duration="6010000" />
       <workItem from="1750487786266" duration="22426000" />
       <workItem from="1750573918817" duration="25860000" />
-      <workItem from="1750673477325" duration="18953000" />
-    </task>
-    <task id="LOCAL-00122" summary="block item dropping">
-      <option name="closed" value="true" />
-      <created>1749328210523</created>
-      <option name="number" value="00122" />
-      <option name="presentableId" value="LOCAL-00122" />
-      <option name="project" value="LOCAL" />
-      <updated>1749328210523</updated>
+      <workItem from="1750673477325" duration="22873000" />
     </task>
     <task id="LOCAL-00123" summary="basic item inventory tooltip">
       <option name="closed" value="true" />
@@ -674,7 +667,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750705076758</updated>
     </task>
-    <option name="localTasksCounter" value="171" />
+    <task id="LOCAL-00171" summary="collision grid IsCollidable separation">
+      <option name="closed" value="true" />
+      <created>1750707113261</created>
+      <option name="number" value="00171" />
+      <option name="presentableId" value="LOCAL-00171" />
+      <option name="project" value="LOCAL" />
+      <updated>1750707113261</updated>
+    </task>
+    <option name="localTasksCounter" value="172" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -684,7 +685,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="water flow level saving" />
     <MESSAGE value="liquid rework and candy texture change" />
     <MESSAGE value="keyboard input fix, font fix" />
     <MESSAGE value="sign overlay" />
@@ -709,6 +709,7 @@
     <MESSAGE value="more candy blocks" />
     <MESSAGE value="lava" />
     <MESSAGE value="health" />
-    <option name="LAST_COMMIT_MESSAGE" value="health" />
+    <MESSAGE value="collision grid IsCollidable separation" />
+    <option name="LAST_COMMIT_MESSAGE" value="collision grid IsCollidable separation" />
   </component>
 </project>

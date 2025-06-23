@@ -1,13 +1,21 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.Common;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.Physics;
+
+public class CollisionObject(Rectangle box, bool isCollidable, Entity? entity)
+{
+    public Rectangle Box { get; set; } = box;
+    public bool IsCollidable { get; set; } = isCollidable;
+    public Entity? Entity { get; set; } = entity;
+}
 
 public static class Collision
 {
     public static readonly int CellSize = 8 * Block.Size;
     // cell position -> entities in that cell
-    public static Dictionary<Vector2, List<(Rectangle box, bool isCollidable)>> Cells = new();
+    public static Dictionary<Vector2, List<CollisionObject>> Cells = new();
 
     /// <summary>
     /// Calculates collision details between moving AABB and static AABB
@@ -170,36 +178,66 @@ public static class Collision
         return swept;
     }
 
-
-    public static List<Rectangle> GetPotentialCollidersInRectangle(Rectangle bounds)
+    /// <summary>
+    /// Gets all objects in the grid within the specified rectangle
+    /// </summary>
+    /// <param name="rectangle"></param>
+    /// <returns></returns>
+    private static List<CollisionObject> GetObjectsInRectangle(Rectangle rectangle)
     {
-        List<Rectangle> potentialColliders = new List<Rectangle>();
-    
+        var results = new List<CollisionObject>();
+        
         // convert bounds to grid cell coords
-        int startCellX = (int)Math.Floor(bounds.Left / (float)CellSize);
-        int startCellY = (int)Math.Floor(bounds.Top / (float)CellSize);
-        int endCellX = (int)Math.Ceiling(bounds.Right / (float)CellSize);
-        int endCellY = (int)Math.Ceiling(bounds.Bottom / (float)CellSize);
-    
+        var startCellX = (int)Math.Floor(rectangle.Left / (float)CellSize);
+        var startCellY = (int)Math.Floor(rectangle.Top / (float)CellSize);
+        var endCellX = (int)Math.Ceiling(rectangle.Right / (float)CellSize);
+        var endCellY = (int)Math.Ceiling(rectangle.Bottom / (float)CellSize);
+        
         // check each cell
-        for (int x = startCellX; x < endCellX; x++)
+        for (var x = startCellX; x < endCellX; x++)
         {
-            for (int y = startCellY; y < endCellY; y++)
+            for (var y = startCellY; y < endCellY; y++)
             {
                 var cellPos = new Vector2(x * CellSize, y * CellSize);
             
                 // add this cell's bodies to potential colliders
-                if (Cells.TryGetValue(cellPos, out var bodies))
+                if (Cells.TryGetValue(cellPos, out var objects))
                 {
-                    var boxes = bodies
-                        .Where(b => b.isCollidable)
-                        .Select(b => b.box).ToList();
-                    potentialColliders.AddRange(boxes);
+                    results.AddRange(objects);
                 }
             }
         }
-    
-        return potentialColliders;
+        
+        return results;
+    }
+
+    /// <summary>
+    /// Gets all collidable objects in the specified rectangle
+    /// </summary>
+    /// <param name="bounds"></param>
+    /// <returns></returns>
+    public static List<Rectangle> GetPotentialCollidersInRectangle(Rectangle bounds)
+    {
+        var objects = GetObjectsInRectangle(bounds);
+        // filter out collidables
+        var colliders = objects.Where(b => b.IsCollidable)
+            .Select(b => b.Box).ToList();
+        return colliders;
+    }
+
+    /// <summary>
+    /// Gets all non-collidable objects in the specified rectangle
+    /// </summary>
+    /// <param name="bounds"></param>
+    /// <returns></returns>
+    public static List<Entity?> GetPotentialEntitiesInRectangle(Rectangle bounds)
+    {
+        var objects = GetObjectsInRectangle(bounds);
+        
+        // filter out non-collidables
+        var entities = objects.Where(b => !b.IsCollidable)
+            .Select(b => b.Entity).ToList();
+        return entities;
     }
 
     public static void ClearGrid()
@@ -207,8 +245,10 @@ public static class Collision
         Cells.Clear();
     }
 
-    public static void AddObjectToGrid(Rectangle box,  bool isCollidable)
+    public static void AddObjectToGrid(Rectangle box,  bool isCollidable, Entity? entity = null)
     {
+        var collisionObject = new CollisionObject(box, isCollidable, entity);
+        
         // Calculate the grid cells this entity overlaps with
         var startCellX = box.Left / CellSize;
         var startCellY = box.Top / CellSize;
@@ -229,11 +269,7 @@ public static class Collision
                     Cells[cellPos] = bodiesInCell;
                 }
                 
-                // no duplicates
-                if (!bodiesInCell.Contains((box, isCollidable)))
-                {
-                    bodiesInCell.Add((box, isCollidable));
-                }
+                bodiesInCell.Add(collisionObject);
             }
         }
     }

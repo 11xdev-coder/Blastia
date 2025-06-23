@@ -447,7 +447,15 @@ public class BlastiaGame : Game
 
 					if (PlayerNWorldManager.Instance.SelectedWorld != null)
 					{
+						// then add tiles and update tiles
 						Collision.ClearGrid();
+						
+						// first add entities to grid
+						if (_myPlayer != null)
+						{
+							var rect = _myPlayer.GetBounds();
+							Collision.AddObjectToGrid(rect, false, _myPlayer);
+						}
 						
 						var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
 						var collisionBodies = tuple?.Item1;
@@ -476,14 +484,8 @@ public class BlastiaGame : Game
 					World.Update();
 				}
 
+				// then update entities
 				_myPlayer?.Update();
-
-				if (_myPlayer != null)
-				{
-					var rect = _myPlayer.GetBounds();
-					Collision.AddObjectToGrid(rect, false);
-				}
-				
 				foreach (var player in Players)
 				{
 					player.Update();
