@@ -40,5 +40,33 @@
     "ItemDropAmount": 1,
     "LightLevel": 0,
     "BreakingSounds": ["Dig1", "Dig2", "Dig3"]
+  },
+  {
+    "Id": 6,
+    "Name": "Apple Candy",
+    "TexturePath": "Textures/Blocks/AppleCandy.png",
+    "DragCoefficient": 400,
+    "Hardness": 0.4,
+    "IsBreakable": true,
+    "IsCollidable": true,
+    "IsTransparent": false,
+    "ItemIdDrop": 9,
+    "ItemDropAmount": 1,
+    "LightLevel": 0,
+    "BreakingSounds": ["Dig1", "Dig2", "Dig3"]
+  },
+  {
+    "Id": 7,
+    "Name": "Blueberry Candy",
+    "TexturePath": "Textures/Blocks/BlueberryCandy.png",
+    "DragCoefficient": 400,
+    "Hardness": 0.4,
+    "IsBreakable": true,
+    "IsCollidable": true,
+    "IsTransparent": false,
+    "ItemIdDrop": 10,
+    "ItemDropAmount": 1,
+    "LightLevel": 0,
+    "BreakingSounds": ["Dig1", "Dig2", "Dig3"]
   }
 ]

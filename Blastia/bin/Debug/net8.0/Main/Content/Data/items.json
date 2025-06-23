@@ -78,5 +78,27 @@
     "IconPath": "Textures/Items/EmptyBucket.png",
     "MaxStack": 20,
     "Type": "Tool"
+  },
+  {
+    "Id": 9,
+    "Name": "Apple Candy Block",
+    "Tooltip": "",
+    "IconPath": "Textures/Items/AppleCandyBlock.png",
+    "MaxStack": 100,
+    "Type": "Placeable",
+    "Properties": {
+      "BlockId": 6
+    }
+  },
+  {
+    "Id": 10,
+    "Name": "Blueberry Candy Block",
+    "Tooltip": "",
+    "IconPath": "Textures/Items/BlueberryCandyBlock.png",
+    "MaxStack": 100,
+    "Type": "Placeable",
+    "Properties": {
+      "BlockId": 7
+    }
   }
 ]

@@ -673,6 +673,8 @@ public class BlastiaGame : Game
 		AddMenu(PlayerInventoryUiMenu);
 
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.CandyBlock), 100);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.AppleCandyBlock), 100);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.BlueberryCandyBlock), 100);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.WaterBucket), 20);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.EmptyBucket), 20);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.SignBlock), 100);
