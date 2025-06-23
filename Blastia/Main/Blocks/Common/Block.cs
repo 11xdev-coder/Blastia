@@ -74,7 +74,7 @@ public abstract class Block
 	}
 
 	public virtual float GetBreakTime() => Math.Max(0.05f, Hardness);
-	public virtual void OnRightClick(World world, Vector2 position, Player player) {}
+	public virtual bool OnRightClick(World world, Vector2 position, Player player) => false;
 	public virtual void OnLeftClick(World world, Vector2 position, Player player) {}
 	public virtual void Update(World world, Vector2 position) {}
 	public virtual void OnNeighbourChanged(World world, Vector2 position, Vector2 neighbourPosition) {}
@@ -191,7 +191,7 @@ public class BlockInstance
 	public void OnPlace(World? world, Vector2 position, Player? player) => Block.OnPlace(world, position, player);
 	public void OnBreak(World? world, Vector2 position, Player? player) => Block.OnBreak(world, position, player);
 	public float GetBreakTime() => Block.GetBreakTime();
-	public void OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);
+	public bool OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);
 	public void OnLeftClick(World world, Vector2 position, Player player) => Block.OnLeftClick(world, position, player);
 	public void Update(World world, Vector2 position)
 	{

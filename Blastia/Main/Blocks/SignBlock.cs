@@ -18,15 +18,17 @@ public class SignBlock : Block
 
     public override TileLayer GetLayer() => TileLayer.Furniture;
 
-    public override void OnRightClick(World world, Vector2 position, Player player)
+    public override bool OnRightClick(World world, Vector2 position, Player player)
     {
         base.OnRightClick(world, position, player);
-        if (BlastiaGame.InGameSignEditMenu == null) return;
+        if (BlastiaGame.InGameSignEditMenu == null) return false;
         
         Console.WriteLine($"Editing sign at {position}");
         BlastiaGame.InGameSignEditMenu.SignPosition = position;
         BlastiaGame.InGameSignEditMenu.UpdateText();
         BlastiaGame.InGameSignEditMenu.Active = true;
+
+        return true;
     }
 
     public override void OnBreak(World? world, Vector2 position, Player? player)

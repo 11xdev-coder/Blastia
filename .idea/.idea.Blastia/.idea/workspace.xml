@@ -11,22 +11,15 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/Block.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/SimpleBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/SimpleBlock.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/SignBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/SignBlock.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Content/Data/blocks.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Content/Data/blocks.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Blocks/WaterLiquid.png" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Blocks/WaterLiquid.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Data/DataDefinitions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Data/DataDefinitions.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/WorldGen.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/WorldGen.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/PlayerNWorldManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/PlayerNWorldManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/StuffLoader.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/blocks.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/blocks.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Textures/Blocks/WaterLiquid.png" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Textures/Blocks/WaterLiquid.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
@@ -37,7 +30,6 @@
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -294,15 +286,8 @@
       <workItem from="1750401674464" duration="23808000" />
       <workItem from="1750452034872" duration="6010000" />
       <workItem from="1750487786266" duration="22426000" />
-      <workItem from="1750573918817" duration="25396000" />
-    </task>
-    <task id="LOCAL-00115" summary="basic network manager">
-      <option name="closed" value="true" />
-      <created>1749206048493</created>
-      <option name="number" value="00115" />
-      <option name="presentableId" value="LOCAL-00115" />
-      <option name="project" value="LOCAL" />
-      <updated>1749206048494</updated>
+      <workItem from="1750573918817" duration="25860000" />
+      <workItem from="1750673477325" duration="6152000" />
     </task>
     <task id="LOCAL-00116" summary="steam lobby hosting">
       <option name="closed" value="true" />
@@ -688,7 +673,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750618873192</updated>
     </task>
-    <option name="localTasksCounter" value="164" />
+    <task id="LOCAL-00164" summary="massive rework: different tile layers">
+      <option name="closed" value="true" />
+      <created>1750627894068</created>
+      <option name="number" value="00164" />
+      <option name="presentableId" value="LOCAL-00164" />
+      <option name="project" value="LOCAL" />
+      <updated>1750627894068</updated>
+    </task>
+    <option name="localTasksCounter" value="165" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -698,7 +691,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="liquid source fix" />
     <MESSAGE value="little liquid refactor" />
     <MESSAGE value="world state saving on unload" />
     <MESSAGE value="candy block" />
@@ -723,6 +715,7 @@
     <MESSAGE value="fps dependency fixes" />
     <MESSAGE value="draw collision grid command" />
     <MESSAGE value="liquid fix" />
-    <option name="LAST_COMMIT_MESSAGE" value="liquid fix" />
+    <MESSAGE value="massive rework: different tile layers" />
+    <option name="LAST_COMMIT_MESSAGE" value="massive rework: different tile layers" />
   </component>
 </project>

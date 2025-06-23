@@ -71,7 +71,7 @@ public class Player : HumanLikeEntity
 			};
 		}
 		MovementSpeed = 80f;
-		AccelerationFactor = 10f;
+		TimeToMaxSpeed = 0.2f;
 	}
 
 	private bool ShouldBlockInput()
@@ -151,8 +151,23 @@ public class Player : HumanLikeEntity
 			StopAnimations();
 		}
 		
-		MovementVector.X = MathHelper.Lerp(MovementVector.X, targetHorizontalSpeed, 
-			AccelerationFactor * (float) BlastiaGame.GameTimeElapsedSeconds);
+		// fps independent acceleration
+		var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
+		var maxAccelerationPerSecond = MovementSpeed / TimeToMaxSpeed; // max possible accel per second
+		var maxAccelerationThisFrame = maxAccelerationPerSecond * deltaTime; // max possible accel this frame
+		var speedDifference = targetHorizontalSpeed - MovementVector.X; // how much we need to accelerate to reach target
+		
+		if (Math.Abs(speedDifference) <= maxAccelerationThisFrame)
+		{
+			// if we can reach target speed this frame, just set it
+			MovementVector.X = targetHorizontalSpeed;
+		}
+		else
+		{
+			// else apply max possible accel towards target
+			MovementVector.X += Math.Sign(speedDifference) * maxAccelerationThisFrame;
+		}
+		Console.WriteLine(MovementVector.X);
 		
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump)
 		{
@@ -200,17 +215,20 @@ public class Player : HumanLikeEntity
 			// cant place anything on ground blocks
 			if (currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Ground) != BlockId.Air)
 				return;
-			// can place liquid on furniture
+			
+			// can place liquid on furniture (but cant place liquid on liquid!)
 			if (selectedItem is {BaseItem: PlaceableItem placeableLiquid} && 
 			    StuffRegistry.GetBlock(placeableLiquid.BlockId)?.GetLayer() == TileLayer.Liquid
-			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Furniture) != BlockId.Air)
+			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Furniture) != BlockId.Air
+			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Liquid) == BlockId.Air)
 			{
 				PlaceBlock(currentWorld, pos, placeableLiquid);
 			}
-			// can place furniture on liquids
+			// can place furniture on liquids (but cant place furniture on furniture!)
 			else if (selectedItem is {BaseItem: PlaceableItem placeableFurniture} && 
 			    StuffRegistry.GetBlock(placeableFurniture.BlockId)?.GetLayer() == TileLayer.Furniture
-			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Liquid) != BlockId.Air)
+			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Liquid) != BlockId.Air
+			    && currentWorld.GetTile((int) pos.X, (int) pos.Y, TileLayer.Furniture) == BlockId.Air)
 			{
 				PlaceBlock(currentWorld, pos, placeableFurniture);
 			}
@@ -247,11 +265,12 @@ public class Player : HumanLikeEntity
 		var placeableBlock = StuffRegistry.GetBlock(placeable.BlockId);
 		if (placeableBlock == null) return;
 		
-		var layer = placeableBlock.GetLayer();
-		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, layer, this);
+		var placeableLayer = placeableBlock.GetLayer();
+		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
 		
 		// liquids placed by players are source blocks
-		if (worldState.GetBlockInstance((int) position.X, (int) position.Y, TileLayer.Liquid)?.Block is LiquidBlock liquidBlock)
+		if (placeableLayer == TileLayer.Liquid && 
+		    worldState.GetBlockInstance((int) position.X, (int) position.Y, TileLayer.Liquid)?.Block is LiquidBlock liquidBlock)
 		{
 			liquidBlock.FlowLevel = 8;
 			liquidBlock.CurrentFlowDownDistance = 0;
@@ -276,12 +295,15 @@ public class Player : HumanLikeEntity
 
 	private void InteractWithBlock(WorldState worldState, Vector2 position)
 	{
+		if (World == null) return;
+		
 		foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer)))
 		{
 			var blockInstance = worldState.GetBlockInstance((int) position.X, (int) position.Y, layer);
-			if (blockInstance == null || World == null) return;
-			blockInstance.OnRightClick(World, position, this);
-		
+			if (blockInstance == null) continue;
+
+			bool succeeded;
+			// only do right click logic for first found block
 			// clicked on liquid with empty bucket selected -> scoop it
 			var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
 			if (selectedItem != null && selectedItem.Id == ItemId.EmptyBucket && 
@@ -297,10 +319,16 @@ public class Player : HumanLikeEntity
 					PlayerInventory.AddItem(liquidBucketItem);
 					worldState.SetTile((int) position.X, (int) position.Y, 0, TileLayer.Liquid, this);
 				}
+
+				succeeded = true;
+			}
+			else // else -> do normal right click
+			{
+				succeeded = blockInstance.OnRightClick(World, position, this); 
 			}
 
-			// right click only on first block found
-			break;
+			// if any of the right clicks succeeded, dont check other layers
+			if (succeeded) break;
 		}
 		
 	}

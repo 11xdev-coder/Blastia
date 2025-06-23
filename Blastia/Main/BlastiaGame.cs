@@ -556,14 +556,20 @@ public class BlastiaGame : Game
 
 		if (IsWorldInitialized && PlayerNWorldManager.Instance.SelectedWorld != null)
 		{
-			_myPlayer?.Camera?.RenderWorld(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
+			// first ground
+			_myPlayer?.Camera?.RenderGroundTiles(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 			if (World is {DrawCollisionGrid: true}) _myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
+			
+			// then entities
 			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
 			
 			foreach (var entity in _entities)
 			{
 				_myPlayer?.Camera?.RenderEntity(SpriteBatch, entity);
 			}
+			
+			// then liquids and furniture
+			_myPlayer?.Camera?.RenderFurnitureThenLiquids(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 			
 			// after updating and drawing each entity one time, remove ones that are scheduled
 			foreach (var entityToRemove in _entitiesToRemove)

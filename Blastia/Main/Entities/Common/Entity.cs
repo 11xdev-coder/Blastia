@@ -35,7 +35,7 @@ public abstract class Entity : Object
     // velocity
     protected Vector2 MovementVector;
     protected float MovementSpeed;
-    protected float AccelerationFactor;
+    protected float TimeToMaxSpeed;
     
     /// <summary>
     /// How much friction entity has with surfaces. <c>1.0</c> is normal friction, <c>&lt; 1.0</c> is more slippery

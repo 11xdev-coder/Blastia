@@ -43,6 +43,7 @@ public class Camera : Object
 	
 	// world tile position -> block instance (only drawn ones)
 	private Dictionary<(Vector2, TileLayer), BlockInstance> _drawnTiles = new();
+	private Array _layers;
 	
 	/// <summary>
 	/// Event called whenever <c>CameraScale</c> changes
@@ -52,6 +53,7 @@ public class Camera : Object
 	public Camera(Vector2 position) 
 	{
 		Position = position;
+		_layers = Enum.GetValues(typeof(TileLayer));
 	}
 
 	public override void Update()
@@ -108,7 +110,7 @@ public class Camera : Object
 				int worldYCoord = y * Block.Size;
 				var position = new Vector2(worldXCoord, worldYCoord);
 
-				foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer)))
+				foreach (TileLayer layer in _layers)
 				{
 					var blockInstance = worldState.GetBlockInstance(worldXCoord, worldYCoord, layer);
 					if (blockInstance == null) continue; // skip air
@@ -127,16 +129,24 @@ public class Camera : Object
 		return (drawnBoxes, _drawnTiles);
 	}
 	
-	public void RenderWorld(SpriteBatch spriteBatch, WorldState worldState)
+	public void RenderGroundTiles(SpriteBatch spriteBatch, WorldState worldState)
 	{
 		int scaledBlockSize = (int)(Block.Size * CameraScale);
 
 		var groundTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Ground);
-		var liquidTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Liquid);
-		var furnitureTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Furniture);
 		
-		// ground -> furniture -> liquid
+		// ground 
 		RenderTileLayer(spriteBatch, worldState, groundTiles, scaledBlockSize);
+	}
+
+	public void RenderFurnitureThenLiquids(SpriteBatch spriteBatch, WorldState worldState)
+	{
+		int scaledBlockSize = (int)(Block.Size * CameraScale);
+		
+		var furnitureTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Furniture);
+		var liquidTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Liquid);
+		
+		// furniture -> liquids
 		RenderTileLayer(spriteBatch, worldState, furnitureTiles, scaledBlockSize);
 		RenderTileLayer(spriteBatch, worldState, liquidTiles, scaledBlockSize);
 	}

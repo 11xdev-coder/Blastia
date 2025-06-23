@@ -285,6 +285,7 @@ public abstract class LiquidBlock : Block
             sourceRectangle.Width,
             sourceHeight);
 
-        spriteBatch.Draw(texture, adjustedDestRectangle, adjustedSourceRectangle, Color.White);
+        var color = new Color(255, 255, 255, 160);
+        spriteBatch.Draw(texture, adjustedDestRectangle, adjustedSourceRectangle, color);
     }
 }
