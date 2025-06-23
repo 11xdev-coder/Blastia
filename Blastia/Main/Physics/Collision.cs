@@ -7,7 +7,7 @@ public static class Collision
 {
     public static readonly int CellSize = 8 * Block.Size;
     // cell position -> entities in that cell
-    public static Dictionary<Vector2, List<Rectangle>> Cells = new();
+    public static Dictionary<Vector2, List<(Rectangle box, bool isCollidable)>> Cells = new();
 
     /// <summary>
     /// Calculates collision details between moving AABB and static AABB
@@ -191,7 +191,10 @@ public static class Collision
                 // add this cell's bodies to potential colliders
                 if (Cells.TryGetValue(cellPos, out var bodies))
                 {
-                    potentialColliders.AddRange(bodies);
+                    var boxes = bodies
+                        .Where(b => b.isCollidable)
+                        .Select(b => b.box).ToList();
+                    potentialColliders.AddRange(boxes);
                 }
             }
         }
@@ -204,7 +207,7 @@ public static class Collision
         Cells.Clear();
     }
 
-    public static void AddBodyToGrid(Rectangle box)
+    public static void AddObjectToGrid(Rectangle box,  bool isCollidable)
     {
         // Calculate the grid cells this entity overlaps with
         var startCellX = box.Left / CellSize;
@@ -227,9 +230,9 @@ public static class Collision
                 }
                 
                 // no duplicates
-                if (!bodiesInCell.Contains(box))
+                if (!bodiesInCell.Contains((box, isCollidable)))
                 {
-                    bodiesInCell.Add(box);
+                    bodiesInCell.Add((box, isCollidable));
                 }
             }
         }

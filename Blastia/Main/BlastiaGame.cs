@@ -463,7 +463,7 @@ public class BlastiaGame : Game
 								blockInstance.Update(World, position);
 								if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
 								{
-									Collision.AddBodyToGrid(box);
+									Collision.AddObjectToGrid(box, true);
 								}
 							}
 							catch (Exception ex)
@@ -477,6 +477,13 @@ public class BlastiaGame : Game
 				}
 
 				_myPlayer?.Update();
+
+				if (_myPlayer != null)
+				{
+					var rect = _myPlayer.GetBounds();
+					Collision.AddObjectToGrid(rect, false);
+				}
+				
 				foreach (var player in Players)
 				{
 					player.Update();

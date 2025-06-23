@@ -263,14 +263,21 @@ public class Camera : Object
 			    // cell pos in world coordinates
 			    var cellPos = new Vector2(x * Collision.CellSize, y * Collision.CellSize);
 
-			    var entityCount = 0;
+			    var collidablesCount = 0;
+			    var entitiesCount = 0;
 			    if (Collision.Cells.TryGetValue(cellPos, out var entityList))
 			    {
-				    entityCount = entityList.Count;
+				    var collidables = entityList.Where(e => e.isCollidable);
+				    var entities = entityList.Where(e => !e.isCollidable);
+				    collidablesCount = collidables.Count();
+				    entitiesCount = entities.Count();
 			    }
 			    
 			    var screenPos = WorldToScreen(cellPos);
-			    spriteBatch.DrawString(font, $"entities: {entityCount.ToString()}", screenPos + new Vector2(lineThickness + 2),
+			    var screenPosWithOffset = WorldToScreen(new Vector2(cellPos.X, cellPos.Y + 3));
+			    spriteBatch.DrawString(font, $"col.: {collidablesCount.ToString()}", screenPos + new Vector2(lineThickness + 2),
+				    textColor, 0f, Vector2.Zero, textScale, SpriteEffects.None, 0f);
+			    spriteBatch.DrawString(font, $"entities: {entitiesCount.ToString()}", screenPosWithOffset + new Vector2(lineThickness + 2),
 				    textColor, 0f, Vector2.Zero, textScale, SpriteEffects.None, 0f);
 		    }
 	    }
