@@ -297,3 +297,5 @@ C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\B
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\BlueberryCandy.png
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\AppleCandyBlock.png
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\BlueberryCandyBlock.png
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\LavaLiquid.png
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\LavaBucket.png

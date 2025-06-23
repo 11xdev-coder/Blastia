@@ -676,6 +676,7 @@ public class BlastiaGame : Game
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.AppleCandyBlock), 100);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.BlueberryCandyBlock), 100);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.WaterBucket), 20);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.LavaBucket), 20);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.EmptyBucket), 20);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.SignBlock), 100);
 	}

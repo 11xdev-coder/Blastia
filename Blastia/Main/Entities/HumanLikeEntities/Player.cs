@@ -283,7 +283,6 @@ public class Player : HumanLikeEntity
 			// create a fresh liquid instance for placement
 			var newLiquid = liquidBlock.CreateNewInstance();
 			newLiquid.FlowLevel = 8;
-			newLiquid.CurrentFlowDownDistance = 0;
 			
 			var inst = new BlockInstance(newLiquid, 0f);
 			inst.OnPlace(World, position, this);

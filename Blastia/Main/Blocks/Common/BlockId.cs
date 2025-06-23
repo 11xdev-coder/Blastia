@@ -10,4 +10,5 @@ public static class BlockId
 	public static readonly ushort Sign = 5;
 	public static readonly ushort AppleCandy = 6;
 	public static readonly ushort BlueberryCandy = 7;
+	public static readonly ushort Lava = 8;
 }

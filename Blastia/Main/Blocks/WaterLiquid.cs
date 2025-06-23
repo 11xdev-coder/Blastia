@@ -3,11 +3,7 @@ using Blastia.Main.Items;
 
 namespace Blastia.Main.Blocks;
 
-public class WaterLiquid : LiquidBlock
+public class WaterLiquid() : LiquidBlock(BlockId.Water, "Water", 0.2f, ItemId.WaterBucket)
 {
-    public WaterLiquid() : base(BlockId.Water, "Water", 0.2f, 1, ItemId.WaterBucket)
-    {
-    }
-
     public override LiquidBlock CreateNewInstance() => new WaterLiquid();
 }

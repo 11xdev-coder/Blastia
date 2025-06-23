@@ -14,6 +14,11 @@ namespace Blastia.Main.Blocks;
 public abstract class LiquidBlock : Block
 {
     /// <summary>
+    /// Liquid transparency, <c>0</c> invisible, <c>255</c> fully opaque
+    /// </summary>
+    public virtual int Alpha { get; set; } = 160;
+    
+    /// <summary>
     /// <c>ItemId</c> to give when player right clicked on this liquid with an empty bucket
     /// </summary>
     public ushort BucketItemId { get; protected set; }
@@ -26,21 +31,15 @@ public abstract class LiquidBlock : Block
     /// Time between each <c>Update()</c> call. Less interval -> faster liquid flow
     /// </summary>
     public float FlowUpdateInterval { get; protected set; }
-    /// <summary>
-    /// How far liquid can flow horizontally
-    /// </summary>
-    public int MaxFlowDownDistance { get; protected set; }
-    public int CurrentFlowDownDistance { get; set; }
 
     private float _flowTimer;
 
     private WorldState _currentWorldState;
 
-    protected LiquidBlock(ushort id, string name, float flowUpdateInterval = 0.15f, int maxFlowDownDistance = 8, ushort bucketItemId = 0) 
+    protected LiquidBlock(ushort id, string name, float flowUpdateInterval = 0.15f, ushort bucketItemId = 0) 
         : base(id, name, 200f, 0f, false, false, true, 0, 0)
     {
         FlowUpdateInterval = flowUpdateInterval;
-        MaxFlowDownDistance = maxFlowDownDistance;
         BucketItemId = bucketItemId;
 
         _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld ?? new WorldState();
@@ -104,19 +103,12 @@ public abstract class LiquidBlock : Block
 
             return;
         }
-        
-        if (CurrentFlowDownDistance >= MaxFlowDownDistance)
-        {
-            // exceed distance -> move whole thing down
-            ShiftThisAndAboveLiquidDown(x, y);
-            return;
-        }
 
         // no blocks below -> continue flowing
         var belowGroundInst = _currentWorldState.GetBlockInstance(x, y + Size, TileLayer.Ground);
         if (belowGroundInst == null || belowGroundInst.Block is {IsCollidable: false})
         {
-            CreateLiquidAt(x, y + Size, FlowLevel, CurrentFlowDownDistance + 1);
+            CreateLiquidAt(x, y + Size, FlowLevel);
             _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer());
         }
         else
@@ -145,7 +137,7 @@ public abstract class LiquidBlock : Block
         {
             // can flow down -> shift down
             _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer());
-            CreateLiquidAt(x, y + Size, FlowLevel, CurrentFlowDownDistance);
+            CreateLiquidAt(x, y + Size, FlowLevel);
 
             // tell block above to shift down
             var aboveTile = _currentWorldState.GetBlockInstance(x, y - Size, TileLayer.Liquid);
@@ -228,9 +220,7 @@ public abstract class LiquidBlock : Block
             } 
             else 
             {
-                var leftHasAirBelow = _currentWorldState.GetTile(x - Size, y + Size, TileLayer.Ground) == 0;
-                CreateLiquidAt(x - Size, y, newLeftLevel, leftHasAirBelow 
-                    ? 0 : CurrentFlowDownDistance);
+                CreateLiquidAt(x - Size, y, newLeftLevel);
             }
         }
         
@@ -244,9 +234,7 @@ public abstract class LiquidBlock : Block
             } 
             else 
             {
-                var rightHasAirBelow = _currentWorldState.GetTile(x + Size, y + Size, TileLayer.Ground) == 0;
-                CreateLiquidAt(x + Size, y, newRightLevel, rightHasAirBelow 
-                    ? 0 : CurrentFlowDownDistance);
+                CreateLiquidAt(x + Size, y, newRightLevel);
             }
         }
         
@@ -257,11 +245,10 @@ public abstract class LiquidBlock : Block
         }
     }
 
-    private void CreateLiquidAt(int x, int y, int targetFlowLevel, int flowDownDistance)
+    private void CreateLiquidAt(int x, int y, int targetFlowLevel)
     {
         var liquid = CreateNewInstance();
         liquid.FlowLevel = targetFlowLevel;
-        liquid.CurrentFlowDownDistance = flowDownDistance;
         _currentWorldState.SetTile(x, y, new BlockInstance(liquid, 0), GetLayer());
     }
     
@@ -285,7 +272,7 @@ public abstract class LiquidBlock : Block
             sourceRectangle.Width,
             sourceHeight);
 
-        var color = new Color(255, 255, 255, 160);
+        var color = new Color(255, 255, 255, Alpha);
         spriteBatch.Draw(texture, adjustedDestRectangle, adjustedSourceRectangle, color);
     }
 }

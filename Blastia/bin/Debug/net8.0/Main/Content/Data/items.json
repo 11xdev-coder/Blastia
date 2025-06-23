@@ -100,5 +100,17 @@
     "Properties": {
       "BlockId": 7
     }
+  },
+  {
+    "Id": 11,
+    "Name": "Lava Bucket",
+    "Tooltip": "",
+    "IconPath": "Textures/Items/LavaBucket.png",
+    "MaxStack": 20,
+    "Type": "Placeable",
+    "Properties": {
+      "BlockId": 8,
+      "EmptyBucketId": 8
+    }
   }
 ]

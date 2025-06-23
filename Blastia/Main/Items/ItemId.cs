@@ -12,4 +12,5 @@ public static class ItemId
     public static readonly ushort EmptyBucket = 8;
     public static readonly ushort AppleCandyBlock = 9;
     public static readonly ushort BlueberryCandyBlock = 10;
+    public static readonly ushort LavaBucket = 11;
 }
