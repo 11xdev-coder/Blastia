@@ -36,6 +36,7 @@ public abstract class Entity : Object
     protected Vector2 MovementVector;
     protected float MovementSpeed;
     protected float TimeToMaxSpeed;
+    protected const float FixedTimeStep = 1 / 240f; // simulate velocity at 240 FPS
     
     /// <summary>
     /// How much friction entity has with surfaces. <c>1.0</c> is normal friction, <c>&lt; 1.0</c> is more slippery

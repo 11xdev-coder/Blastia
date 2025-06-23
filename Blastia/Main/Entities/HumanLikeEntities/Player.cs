@@ -151,23 +151,34 @@ public class Player : HumanLikeEntity
 			StopAnimations();
 		}
 		
-		// fps independent acceleration
-		var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
-		var maxAccelerationPerSecond = MovementSpeed / TimeToMaxSpeed; // max possible accel per second
-		var maxAccelerationThisFrame = maxAccelerationPerSecond * deltaTime; // max possible accel this frame
-		var speedDifference = targetHorizontalSpeed - MovementVector.X; // how much we need to accelerate to reach target
-		
-		if (Math.Abs(speedDifference) <= maxAccelerationThisFrame)
+		// fps independent acceleration (still not perfect)
+		var deltaTime = (float)BlastiaGame.GameTimeElapsedSeconds;
+		var remainingTime = deltaTime;
+  
+		while (remainingTime > 0.0001f)
 		{
-			// if we can reach target speed this frame, just set it
-			MovementVector.X = targetHorizontalSpeed;
+			var dt = Math.Min(FixedTimeStep, remainingTime);
+			remainingTime -= dt;
+    
+			// max possible acceleration
+			var maxAccelPerSecond = MovementSpeed / TimeToMaxSpeed;
+			var maxAccelThisStep = maxAccelPerSecond * dt;
+    
+			// by how much do we need to change velocity
+			float speedDiff = targetHorizontalSpeed - MovementVector.X;
+			float absSpeedDiff = Math.Abs(speedDiff);
+    
+			// apply
+			if (absSpeedDiff <= maxAccelThisStep)
+			{
+				// close enough -> set directly
+				MovementVector.X = targetHorizontalSpeed;
+			}
+			else
+			{
+				MovementVector.X += Math.Sign(speedDiff) * maxAccelThisStep;
+			}
 		}
-		else
-		{
-			// else apply max possible accel towards target
-			MovementVector.X += Math.Sign(speedDifference) * maxAccelerationThisFrame;
-		}
-		Console.WriteLine(MovementVector.X);
 		
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump)
 		{
