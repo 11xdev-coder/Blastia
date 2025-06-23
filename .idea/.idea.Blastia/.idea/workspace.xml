@@ -9,7 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
@@ -279,15 +279,7 @@
       <workItem from="1750452034872" duration="6010000" />
       <workItem from="1750487786266" duration="22426000" />
       <workItem from="1750573918817" duration="25860000" />
-      <workItem from="1750673477325" duration="7436000" />
-    </task>
-    <task id="LOCAL-00117" summary="lobby codes and lib version fix">
-      <option name="closed" value="true" />
-      <created>1749225989102</created>
-      <option name="number" value="00117" />
-      <option name="presentableId" value="LOCAL-00117" />
-      <option name="project" value="LOCAL" />
-      <updated>1749225989102</updated>
+      <workItem from="1750673477325" duration="10372000" />
     </task>
     <task id="LOCAL-00118" summary="is in multiplayer session flag">
       <option name="closed" value="true" />
@@ -673,7 +665,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750682644121</updated>
     </task>
-    <option name="localTasksCounter" value="166" />
+    <task id="LOCAL-00166" summary="fps independent acceleration">
+      <option name="closed" value="true" />
+      <created>1750683620707</created>
+      <option name="number" value="00166" />
+      <option name="presentableId" value="LOCAL-00166" />
+      <option name="project" value="LOCAL" />
+      <updated>1750683620707</updated>
+    </task>
+    <option name="localTasksCounter" value="167" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -683,7 +683,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="world state saving on unload" />
     <MESSAGE value="candy block" />
     <MESSAGE value="saving fixes and sign block" />
     <MESSAGE value="sign text editing" />
@@ -708,6 +707,7 @@
     <MESSAGE value="liquid fix" />
     <MESSAGE value="massive rework: different tile layers" />
     <MESSAGE value="player place and interaction fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="player place and interaction fixes" />
+    <MESSAGE value="fps independent acceleration" />
+    <option name="LAST_COMMIT_MESSAGE" value="fps independent acceleration" />
   </component>
 </project>

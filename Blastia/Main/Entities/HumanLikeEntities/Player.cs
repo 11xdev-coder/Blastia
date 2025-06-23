@@ -277,14 +277,22 @@ public class Player : HumanLikeEntity
 		if (placeableBlock == null) return;
 		
 		var placeableLayer = placeableBlock.GetLayer();
-		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
-		
-		// liquids placed by players are source blocks
-		if (placeableLayer == TileLayer.Liquid && 
-		    worldState.GetBlockInstance((int) position.X, (int) position.Y, TileLayer.Liquid)?.Block is LiquidBlock liquidBlock)
+		// placing a liquid
+		if (placeableLayer == TileLayer.Liquid && placeableBlock is LiquidBlock liquidBlock)
 		{
-			liquidBlock.FlowLevel = 8;
-			liquidBlock.CurrentFlowDownDistance = 0;
+			// create a fresh liquid instance for placement
+			var newLiquid = liquidBlock.CreateNewInstance();
+			newLiquid.FlowLevel = 8;
+			newLiquid.CurrentFlowDownDistance = 0;
+			
+			var inst = new BlockInstance(newLiquid, 0f);
+			inst.OnPlace(World, position, this);
+			worldState.SetTile((int)position.X, (int)position.Y, inst, TileLayer.Liquid);
+		}
+		else
+		{
+			// placing other blocks
+			worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
 		}
 		PlayerInventory.RemoveItem(_selectedHotbarSlot);
 		
@@ -319,7 +327,7 @@ public class Player : HumanLikeEntity
 			var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
 			if (selectedItem != null && selectedItem.Id == ItemId.EmptyBucket && 
 			    blockInstance.Block is LiquidBlock liquid && 
-			    liquid.FlowLevel >= 7 && liquid.BucketItemId > 0)
+			    liquid.FlowLevel >= 1 && liquid.BucketItemId > 0)
 			{
 				// has a bucket item to give -> remove this block and give the bucket
 				var liquidBucketItem = StuffRegistry.GetItem(liquid.BucketItemId);

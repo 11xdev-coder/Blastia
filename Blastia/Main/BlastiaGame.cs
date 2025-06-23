@@ -672,10 +672,9 @@ public class BlastiaGame : Game
 			Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, SlotHighlightedTexture, false, true);
 		AddMenu(PlayerInventoryUiMenu);
 
-		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.IronSword), 1);
-		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.Apple), 30);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.CandyBlock), 100);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.WaterBucket), 20);
+		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.EmptyBucket), 20);
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.SignBlock), 100);
 	}
 	
