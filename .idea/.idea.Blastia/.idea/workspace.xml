@@ -8,25 +8,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Blocks/LavaLiquid.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Content/Textures/Items/LavaBucket.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/UI/Menus/InGame/PlayerStatsMenu.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/BlockId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/Common/BlockId.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LavaLiquid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LavaLiquid.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LiquidBlock.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/WaterLiquid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/WaterLiquid.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Content/Data/items.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Items/ItemId.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Items/ItemId.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/items.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Main/Content/Data/items.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
@@ -290,15 +282,7 @@
       <workItem from="1750452034872" duration="6010000" />
       <workItem from="1750487786266" duration="22426000" />
       <workItem from="1750573918817" duration="25860000" />
-      <workItem from="1750673477325" duration="13817000" />
-    </task>
-    <task id="LOCAL-00120" summary="graceful shutdown">
-      <option name="closed" value="true" />
-      <created>1749249888185</created>
-      <option name="number" value="00120" />
-      <option name="presentableId" value="LOCAL-00120" />
-      <option name="project" value="LOCAL" />
-      <updated>1749249888185</updated>
+      <workItem from="1750673477325" duration="16664000" />
     </task>
     <task id="LOCAL-00121" summary="block loading refactor">
       <option name="closed" value="true" />
@@ -684,7 +668,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750694375903</updated>
     </task>
-    <option name="localTasksCounter" value="169" />
+    <task id="LOCAL-00169" summary="lava">
+      <option name="closed" value="true" />
+      <created>1750702155912</created>
+      <option name="number" value="00169" />
+      <option name="presentableId" value="LOCAL-00169" />
+      <option name="project" value="LOCAL" />
+      <updated>1750702155912</updated>
+    </task>
+    <option name="localTasksCounter" value="170" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -694,7 +686,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="sign text editing" />
     <MESSAGE value="sign text fix" />
     <MESSAGE value="water flow level saving" />
     <MESSAGE value="liquid rework and candy texture change" />
@@ -719,6 +710,7 @@
     <MESSAGE value="fps independent acceleration" />
     <MESSAGE value="liquid placement bug fix" />
     <MESSAGE value="more candy blocks" />
-    <option name="LAST_COMMIT_MESSAGE" value="more candy blocks" />
+    <MESSAGE value="lava" />
+    <option name="LAST_COMMIT_MESSAGE" value="lava" />
   </component>
 </project>

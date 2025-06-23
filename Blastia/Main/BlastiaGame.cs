@@ -102,6 +102,7 @@ public class BlastiaGame : Game
 	public static InGameAudioSettingsMenu? InGameAudioSettingsMenu { get; private set; }
 	public static InGameSignEditMenu? InGameSignEditMenu { get; private set; }
 	public static InventoryUi? PlayerInventoryUiMenu { get; private set; }
+	public static PlayerStatsMenu? PlayerStatsMenu { get; private set; }
 	private readonly List<Menu> _menus = [];
 	private readonly List<Menu> _menusToAdd = [];
 
@@ -365,6 +366,9 @@ public class BlastiaGame : Game
 			
 			InGameSignEditMenu = new InGameSignEditMenu(MainFont);
 			AddMenu(InGameSignEditMenu);
+			
+			PlayerStatsMenu = new PlayerStatsMenu(MainFont);
+			AddMenu(PlayerStatsMenu);
 			
 			TooltipDisplay = new TooltipDisplay(MainFont);
 			NotificationDisplay = new NotificationDisplay(MainFont);
@@ -631,6 +635,7 @@ public class BlastiaGame : Game
 		if (WorldsMenu != null) WorldsMenu.Active = false;
 		if (RulerMenu != null) RulerMenu.Active = World.RulerMode;
 		if (InGameMenu != null) InGameMenu.Active = true;
+		if (PlayerStatsMenu != null) PlayerStatsMenu.Active = true;
 		
 		ConsoleWindow?.InitializeWorldCommands(World);
 		
@@ -694,6 +699,7 @@ public class BlastiaGame : Game
 		}
 		
 		if (LogoMenu != null) LogoMenu.Active = true;
+		if (PlayerStatsMenu != null) PlayerStatsMenu.Active = false;
 		
 		ConsoleWindow?.UnloadWorldCommands();
 		

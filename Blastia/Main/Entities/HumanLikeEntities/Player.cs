@@ -35,7 +35,9 @@ public class Player : HumanLikeEntity
 	public override float Height => 1.8f;
 	public override float Width => 0.9f;
 	protected override float Mass => 46f;
-	
+
+	public override float MaxLife => 100f;
+
 	private const float MinJumpVelocity = 200f;
 	private const float MaxJumpVelocity = 320f;
 	private const float MaxChargeTime = 0.35f;
@@ -72,6 +74,14 @@ public class Player : HumanLikeEntity
 		}
 		MovementSpeed = 80f;
 		TimeToMaxSpeed = 0.2f;
+	}
+
+	protected override void OnLifeChanged()
+	{
+		base.OnLifeChanged();
+		
+		if (BlastiaGame.PlayerStatsMenu != null)
+			BlastiaGame.PlayerStatsMenu.UpdateHealth(Life, MaxLife);
 	}
 
 	private bool ShouldBlockInput()

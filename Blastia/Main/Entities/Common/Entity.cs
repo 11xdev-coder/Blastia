@@ -73,13 +73,43 @@ public abstract class Entity : Object
     /// Entity width in blocks
     /// </summary>
     public virtual float Width { get; set; }
+    
+    /// <summary>
+    /// Entity max health
+    /// </summary>
+    public virtual float MaxLife { get; set; }
 
+    /// <summary>
+    /// Entity current health
+    /// </summary>
+    public float Life
+    {
+        get => _life;
+        set => Properties.OnValueChangedProperty(ref _life, value, OnLifeChanged);
+    }
+    private float _life;
+    
     protected virtual ushort ID { get; set; }
     
     protected Entity(Vector2 position, float initialScaleFactor)
     {
         Position = position;
         Scale = initialScaleFactor;
+        
+        InitializeLife();
+    }
+
+    private void InitializeLife()
+    {
+        Life = MaxLife;
+    }
+
+    /// <summary>
+    /// Called whenever <c>Life</c> changed
+    /// </summary>
+    protected virtual void OnLifeChanged()
+    {
+        
     }
 
     /// <summary>
