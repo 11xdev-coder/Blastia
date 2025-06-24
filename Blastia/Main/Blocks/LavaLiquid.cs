@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
 using Blastia.Main.Physics;
@@ -12,20 +13,10 @@ public class LavaLiquid() : LiquidBlock(BlockId.Lava, "Lava", 0.8f, ItemId.LavaB
 
     public override LiquidBlock CreateNewInstance() => new LavaLiquid();
 
-    public override void Update(World world, Vector2 position)
+    protected override void OnEntityEnter(Entity entity)
     {
-        base.Update(world, position);
-        
-        var rect = new Rectangle((int)position.X, (int)position.Y, Size, Size);
-        var potentialEntities = Collision.GetPotentialEntitiesInRectangle(rect);
-        foreach (var entity in potentialEntities)
-        {
-            if (entity == null) continue;
-            
-            if (entity.GetBounds().Intersects(rect))
-            {
-                
-            }
-        }
+        base.OnEntityEnter(entity);
+
+        entity.TryDamage(20);
     }
 }

@@ -78,7 +78,6 @@ public abstract class Entity : Object
     /// Entity max health
     /// </summary>
     public virtual float MaxLife { get; set; }
-
     /// <summary>
     /// Entity current health
     /// </summary>
@@ -88,6 +87,11 @@ public abstract class Entity : Object
         set => Properties.OnValueChangedProperty(ref _life, value, OnLifeChanged);
     }
     private float _life;
+    /// <summary>
+    /// Immunity time after being hit in seconds
+    /// </summary>
+    public virtual float ImmunitySeconds { get; set; } = 0.7f;
+    private float _immunityTimer;
     
     protected virtual ushort ID { get; set; }
     
@@ -104,6 +108,7 @@ public abstract class Entity : Object
         Life = MaxLife;
     }
 
+    #region Life
     /// <summary>
     /// Called whenever <c>Life</c> changed
     /// </summary>
@@ -111,6 +116,31 @@ public abstract class Entity : Object
     {
         
     }
+
+    /// <summary>
+    /// Tries to damage the entity accounting to its <c>ImmunitySeconds</c>
+    /// </summary>
+    /// <param name="damage"></param>
+    public void TryDamage(float damage)
+    {
+        if (_immunityTimer <= 0)
+        {
+            // apply damage
+            ApplyDamage(damage);
+        }
+    }
+
+    /// <summary>
+    /// Applies damage ignoring <c>ImmunitySeconds</c>
+    /// </summary>
+    /// <param name="damage"></param>
+    public void ApplyDamage(float damage)
+    {
+        Life -= damage;
+        _immunityTimer = ImmunitySeconds;
+    }
+    
+    #endregion
 
     /// <summary>
     /// Call in constructor to set the ID
@@ -128,6 +158,11 @@ public abstract class Entity : Object
     /// </summary>
     public override void Update()
     {
+        if (_immunityTimer > 0)
+        {
+            _immunityTimer -= (float) BlastiaGame.GameTimeElapsedSeconds;
+        }
+        
         UpdatePosition();
         UpdateSprite();
     }

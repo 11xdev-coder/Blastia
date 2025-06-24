@@ -1,6 +1,8 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.Physics;
 using Blastia.Main.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -52,6 +54,11 @@ public abstract class LiquidBlock : Block
 
     public override TileLayer GetLayer() => TileLayer.Liquid;
 
+    protected virtual void OnEntityEnter(Entity entity)
+    {
+        
+    }
+    
     public override void Update(World world, Vector2 position)
     {
         base.Update(world, position);
@@ -68,6 +75,18 @@ public abstract class LiquidBlock : Block
             TryFlowingDown(blockX, blockY);
             
             _flowTimer -= FlowUpdateInterval;
+        }
+        
+        var rect = new Rectangle((int)position.X, (int)position.Y, Size, Size);
+        var potentialEntities = Collision.GetPotentialEntitiesInRectangle(rect);
+        foreach (var entity in potentialEntities)
+        {
+            if (entity == null) continue;
+            
+            if (entity.GetBounds().Intersects(rect))
+            {
+                OnEntityEnter(entity);
+            }
         }
     }
 

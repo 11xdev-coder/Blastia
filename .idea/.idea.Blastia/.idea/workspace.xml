@@ -7,24 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Blocks/LavaLiquid.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Blocks/LavaLiquid.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/GameState/Camera.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Physics/Collision.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
-    </list>
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -281,15 +264,7 @@
       <workItem from="1750452034872" duration="6010000" />
       <workItem from="1750487786266" duration="22426000" />
       <workItem from="1750573918817" duration="25860000" />
-      <workItem from="1750673477325" duration="22873000" />
-    </task>
-    <task id="LOCAL-00123" summary="basic item inventory tooltip">
-      <option name="closed" value="true" />
-      <created>1749419078286</created>
-      <option name="number" value="00123" />
-      <option name="presentableId" value="LOCAL-00123" />
-      <option name="project" value="LOCAL" />
-      <updated>1749419078287</updated>
+      <workItem from="1750673477325" duration="23117000" />
     </task>
     <task id="LOCAL-00124" summary="dropped item and tooltip tweaks">
       <option name="closed" value="true" />
@@ -675,7 +650,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750707113261</updated>
     </task>
-    <option name="localTasksCounter" value="172" />
+    <task id="LOCAL-00172" summary="collision update, memory optimization">
+      <option name="closed" value="true" />
+      <created>1750713027919</created>
+      <option name="number" value="00172" />
+      <option name="presentableId" value="LOCAL-00172" />
+      <option name="project" value="LOCAL" />
+      <updated>1750713027919</updated>
+    </task>
+    <option name="localTasksCounter" value="173" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -685,7 +668,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="liquid rework and candy texture change" />
     <MESSAGE value="keyboard input fix, font fix" />
     <MESSAGE value="sign overlay" />
     <MESSAGE value="sdl scancode error workaround" />
@@ -710,6 +692,7 @@
     <MESSAGE value="lava" />
     <MESSAGE value="health" />
     <MESSAGE value="collision grid IsCollidable separation" />
-    <option name="LAST_COMMIT_MESSAGE" value="collision grid IsCollidable separation" />
+    <MESSAGE value="collision update, memory optimization" />
+    <option name="LAST_COMMIT_MESSAGE" value="collision update, memory optimization" />
   </component>
 </project>
