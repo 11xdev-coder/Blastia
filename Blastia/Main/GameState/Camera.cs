@@ -33,7 +33,7 @@ public class Camera : Object
 		get => _cameraScale;
 		private set
 		{
-			var clamped = Math.Clamp(value, 1, 9999);
+			var clamped = Math.Clamp(value, 10, 9999);
 			Properties.OnValueChangedProperty(ref _cameraScale, clamped, OnZoomed);
 		}
 	}
