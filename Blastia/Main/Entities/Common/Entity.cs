@@ -143,7 +143,7 @@ public abstract class Entity : Object
         Life -= damage;
         _immunityTimer = ImmunitySeconds;
 
-        BlastiaGame.TooltipDisplay?.AddBouncingText(damage.ToString(CultureInfo.CurrentCulture), Color.DarkRed, Position, Vector2.One);
+        BlastiaGame.TooltipDisplay?.AddBouncingText(damage.ToString(CultureInfo.CurrentCulture), Color.DarkRed, Position, new Vector2(1.6f, 1.6f));
         SoundEngine.PlaySound(HitSound);
     }
     

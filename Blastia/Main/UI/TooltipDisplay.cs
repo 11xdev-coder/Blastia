@@ -133,12 +133,16 @@ public class TooltipDisplay
     
     public void Update()
     {
-        foreach (var bouncingText in _activeBouncingTexts)
+        foreach (var bouncingText in _activeBouncingTexts.ToList())
         {
             var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
             // update position
             bouncingText.WorldPosition += bouncingText.Velocity * deltaTime;
             bouncingText.Velocity.Y += 500f * deltaTime;
+            bouncingText.Scale -= Vector2.One * 2 * deltaTime; // shrink over time
+
+            if (bouncingText.Scale.X <= 0 && bouncingText.Scale.Y <= 0)
+                _activeBouncingTexts.Remove(bouncingText);
         }
         
         // if hover text was not set this frame, clear it
@@ -231,9 +235,9 @@ public class TooltipDisplay
     
     public void AddBouncingText(string text, Color color, Vector2 position, Vector2 scale)
     {
-        // -10 to -5 or 5 to 10
-        var leftVelocity = BlastiaGame.Rand.Next(-10, -4);
-        var rightVelocity = BlastiaGame.Rand.Next(5, 11);
+        // -30 to -20 or 20 to 30
+        var leftVelocity = BlastiaGame.Rand.Next(-30, -19);
+        var rightVelocity = BlastiaGame.Rand.Next(20, 31);
         var horizontalVelocity = BlastiaGame.Rand.NextDouble() > 0.5 ? leftVelocity : rightVelocity;
         
         _activeBouncingTexts.Add(new BouncingTextData
