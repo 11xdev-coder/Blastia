@@ -33,16 +33,6 @@ public static class Paths
 	public static string SignWrittenOverlay1TexturePath { get; private set; } = "";
 	public static string SignWrittenOverlay2TexturePath { get; private set; } = "";
 	
-	// sounds
-	public static readonly string TickSoundPath = "Sounds/Menu/Tick.wav";
-	public static readonly string GrabPath = "Sounds/Game/Grab.wav";
-	public static readonly string Dig1Path = "Sounds/Game/Dig1.wav";
-	public static readonly string Dig2Path = "Sounds/Game/Dig2.wav";
-	public static readonly string Dig3Path = "Sounds/Game/Dig3.wav";
-	public static readonly string Tink1Path = "Sounds/Game/Tink1.wav";
-	public static readonly string Tink2Path = "Sounds/Game/Tink2.wav";
-	public static readonly string Tink3Path = "Sounds/Game/Tink3.wav";
-	
 	// music
 	public static readonly string RatsOnSaturn = "Sounds/MenuSongs/rats_on_saturn.ogg";
 	public static readonly string PeacefulJourney00 = "Sounds/MenuSongs/peaceful journey_00.ogg";

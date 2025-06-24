@@ -37,6 +37,7 @@ public class Player : HumanLikeEntity
 	protected override float Mass => 46f;
 
 	public override float MaxLife => 100f;
+	public override SoundID HitSound => SoundID.FleshHit;
 
 	private const float MinJumpVelocity = 200f;
 	private const float MaxJumpVelocity = 320f;

@@ -1,6 +1,7 @@
 ﻿using Blastia.Main.Blocks.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Physics;
+using Blastia.Main.Sounds;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -92,6 +93,7 @@ public abstract class Entity : Object
     /// </summary>
     public virtual float ImmunitySeconds { get; set; } = 0.7f;
     private float _immunityTimer;
+    public virtual SoundID HitSound { get; set; }
     
     protected virtual ushort ID { get; set; }
     
@@ -138,6 +140,8 @@ public abstract class Entity : Object
     {
         Life -= damage;
         _immunityTimer = ImmunitySeconds;
+        
+        SoundEngine.PlaySound(HitSound);
     }
     
     #endregion

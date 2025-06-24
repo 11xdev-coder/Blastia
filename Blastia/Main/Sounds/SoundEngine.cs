@@ -26,7 +26,8 @@ public enum SoundID
     Dig3,
     Tink1,
     Tink2,
-    Tink3
+    Tink3,
+    FleshHit
 }
 
 public static class SoundEngine
@@ -42,16 +43,19 @@ public static class SoundEngine
         _contentManager = contentManager;
     }
 
+    private static string GetPath(string folder, string name) => $"Sounds/{folder}/{name}.wav";
+
     public static void LoadSounds()
     {
-        LoadSound(SoundID.Tick, Paths.TickSoundPath);
-        LoadSound(SoundID.Grab, Paths.GrabPath);
-        LoadSound(SoundID.Dig1, Paths.Dig1Path);
-        LoadSound(SoundID.Dig2, Paths.Dig2Path);
-        LoadSound(SoundID.Dig3, Paths.Dig3Path);
-        LoadSound(SoundID.Tink1, Paths.Tink1Path);
-        LoadSound(SoundID.Tink2, Paths.Tink2Path);
-        LoadSound(SoundID.Tink3, Paths.Tink3Path);
+        LoadSound(SoundID.Tick, GetPath("Menu", "Tick"));
+        LoadSound(SoundID.Grab, GetPath("Game", "Grab"));
+        LoadSound(SoundID.Dig1, GetPath("Game", "Dig1"));
+        LoadSound(SoundID.Dig2, GetPath("Game", "Dig2"));
+        LoadSound(SoundID.Dig3, GetPath("Game", "Dig3"));
+        LoadSound(SoundID.Tink1, GetPath("Game", "Tink1"));
+        LoadSound(SoundID.Tink2, GetPath("Game", "Tink2"));
+        LoadSound(SoundID.Tink3, GetPath("Game", "Tink3"));
+        LoadSound(SoundID.FleshHit, GetPath("Game", "FleshHit"));
     }
 
     private static void LoadSound(SoundID id, string path)
