@@ -497,6 +497,7 @@ public class BlastiaGame : Game
 				}
 			}
 
+			TooltipDisplay?.SetPlayerCamera(_myPlayer?.Camera);
 			TooltipDisplay?.Update();
 
 			// update previous states in the end

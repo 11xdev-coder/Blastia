@@ -1,8 +1,10 @@
-﻿using Blastia.Main.Blocks.Common;
+﻿using System.Globalization;
+using Blastia.Main.Blocks.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Physics;
 using Blastia.Main.Sounds;
 using Blastia.Main.Utilities;
+using MathNet.Numerics.LinearAlgebra;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Object = Blastia.Main.GameState.Object;
@@ -140,7 +142,8 @@ public abstract class Entity : Object
     {
         Life -= damage;
         _immunityTimer = ImmunitySeconds;
-        
+
+        BlastiaGame.TooltipDisplay?.AddBouncingText(damage.ToString(CultureInfo.CurrentCulture), Color.DarkRed, Position, Vector2.One);
         SoundEngine.PlaySound(HitSound);
     }
     

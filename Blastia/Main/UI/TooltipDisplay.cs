@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Items;
+﻿using Blastia.Main.GameState;
+using Blastia.Main.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
@@ -39,6 +40,15 @@ public class TooltipData
     }
 }
 
+public class BouncingTextData
+{
+    public string Text { get; set; } = "";
+    public Color Color { get; set; }
+    public Vector2 WorldPosition { get; set; }
+    public Vector2 Scale { get; set; }
+    public Vector2 Velocity;
+}
+
 public class TooltipDisplay
 {
     private SpriteFont _font;
@@ -52,6 +62,9 @@ public class TooltipDisplay
     private Rectangle _tooltipBackgroundRect;
     private bool _updatedTooltipThisFrame;
     
+    private List<BouncingTextData> _activeBouncingTexts = [];
+    private Camera? _playerCamera;
+    
     public TooltipDisplay(SpriteFont font)
     {
         _font = font;
@@ -62,6 +75,12 @@ public class TooltipDisplay
         };
         _currentTooltipData = new TooltipData();
     }
+    
+    /// <summary>
+    /// Important to set player camera for correct bouncing text rendering
+    /// </summary>
+    /// <param name="camera"></param>
+    public void SetPlayerCamera(Camera? camera) => _playerCamera = camera;
 
     /// <summary>
     /// Updates hover text under the cursor. If at some frame no text was set, it clears.
@@ -114,6 +133,14 @@ public class TooltipDisplay
     
     public void Update()
     {
+        foreach (var bouncingText in _activeBouncingTexts)
+        {
+            var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
+            // update position
+            bouncingText.WorldPosition += bouncingText.Velocity * deltaTime;
+            bouncingText.Velocity.Y += 500f * deltaTime;
+        }
+        
         // if hover text was not set this frame, clear it
         if (!_updatedHoverTextThisFrame)
         {
@@ -202,8 +229,39 @@ public class TooltipDisplay
         return adjustedPosition;
     }
     
+    public void AddBouncingText(string text, Color color, Vector2 position, Vector2 scale)
+    {
+        // -10 to -5 or 5 to 10
+        var leftVelocity = BlastiaGame.Rand.Next(-10, -4);
+        var rightVelocity = BlastiaGame.Rand.Next(5, 11);
+        var horizontalVelocity = BlastiaGame.Rand.NextDouble() > 0.5 ? leftVelocity : rightVelocity;
+        
+        _activeBouncingTexts.Add(new BouncingTextData
+        {
+            Text = text,
+            Color = color,
+            WorldPosition = position,
+            Scale = scale,
+            Velocity = new Vector2(horizontalVelocity, -100)
+        });
+    }
+    
     public void Draw(SpriteBatch spriteBatch)
     {
+        if (_playerCamera != null)
+        {
+            foreach (var bouncingText in _activeBouncingTexts)
+            {
+                // correct position
+                var screenPosition = _playerCamera.WorldToScreen(bouncingText.WorldPosition);
+                var textSize = _font.MeasureString(bouncingText.Text) * bouncingText.Scale;
+                var pos = new Vector2(screenPosition.X - textSize.X * 0.5f, screenPosition.Y - textSize.Y * 0.5f);
+                
+                spriteBatch.DrawString(_font, bouncingText.Text, pos, bouncingText.Color, 
+                    0f, Vector2.Zero, bouncingText.Scale, SpriteEffects.None, 0f);
+            }
+        }
+        
         if (!string.IsNullOrEmpty(_hoverText.Text))
         {
             _hoverText.Draw(spriteBatch);
