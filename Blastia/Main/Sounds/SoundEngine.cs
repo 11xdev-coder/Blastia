@@ -27,7 +27,8 @@ public enum SoundID
     Tink1,
     Tink2,
     Tink3,
-    FleshHit
+    FleshHit,
+    PlayerDeath
 }
 
 public static class SoundEngine
@@ -56,6 +57,7 @@ public static class SoundEngine
         LoadSound(SoundID.Tink2, GetPath("Game", "Tink2"));
         LoadSound(SoundID.Tink3, GetPath("Game", "Tink3"));
         LoadSound(SoundID.FleshHit, GetPath("Game", "FleshHit"));
+        LoadSound(SoundID.PlayerDeath, GetPath("Game", "PlayerDeath"));
     }
 
     private static void LoadSound(SoundID id, string path)

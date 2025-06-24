@@ -38,6 +38,8 @@ public class Player : HumanLikeEntity
 
 	public override float MaxLife => 100f;
 	public override SoundID HitSound => SoundID.FleshHit;
+	private float _flickerTimer;
+	private bool _isDrawing;
 
 	private const float MinJumpVelocity = 200f;
 	private const float MaxJumpVelocity = 320f;
@@ -83,6 +85,32 @@ public class Player : HumanLikeEntity
 		
 		if (BlastiaGame.PlayerStatsMenu != null)
 			BlastiaGame.PlayerStatsMenu.UpdateHealth(Life, MaxLife);
+	}
+
+	protected override void OnHit()
+	{
+		base.OnHit();
+		
+		// reset the flicker timer for better visuals
+		_flickerTimer = 0f;
+		_isDrawing = false;
+	}
+
+	protected override void OnKill()
+	{
+		// for player, instead of removing him, respawn
+		SoundEngine.PlaySound(SoundID.PlayerDeath);
+		Respawn();
+	}
+
+	private void Respawn()
+	{
+		if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
+
+		ImmunityTimer = 3f; // 3 seconds of immunity after respawn
+		VisualFlickerTimer = 3f;
+		Life = MaxLife;
+		Position = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint();
 	}
 
 	private bool ShouldBlockInput()
@@ -502,5 +530,28 @@ public class Player : HumanLikeEntity
 	private void PreviewUpdate()
 	{
 		WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
+	}
+
+	public override void Draw(SpriteBatch spriteBatch, Vector2 position, float bodyPartScale = 1)
+	{
+		if (VisualFlickerTimer > 0)
+		{
+			_flickerTimer += (float) BlastiaGame.GameTimeElapsedSeconds;
+
+			if (_flickerTimer >= 0.2f)
+			{
+				_flickerTimer = 0f;
+				_isDrawing = !_isDrawing;
+			}
+			
+			if (_isDrawing)
+			{
+				base.Draw(spriteBatch, position, bodyPartScale);
+			}
+		}
+		else
+		{
+			base.Draw(spriteBatch, position, bodyPartScale);
+		}
 	}
 }

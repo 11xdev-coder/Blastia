@@ -94,7 +94,13 @@ public abstract class Entity : Object
     /// Immunity time after being hit in seconds
     /// </summary>
     public virtual float ImmunitySeconds { get; set; } = 0.7f;
-    private float _immunityTimer;
+    protected float ImmunityTimer;
+    /// <summary>
+    /// Duration when entity will flicker after being hit
+    /// </summary>
+    public virtual float VisualFlickerImmunitySeconds { get; set; } = 0.35f;
+    protected float VisualFlickerTimer;
+    
     public virtual SoundID HitSound { get; set; }
     
     protected virtual ushort ID { get; set; }
@@ -127,7 +133,7 @@ public abstract class Entity : Object
     /// <param name="damage"></param>
     public void TryDamage(float damage)
     {
-        if (_immunityTimer <= 0)
+        if (ImmunityTimer <= 0)
         {
             // apply damage
             ApplyDamage(damage);
@@ -141,10 +147,31 @@ public abstract class Entity : Object
     public void ApplyDamage(float damage)
     {
         Life -= damage;
-        _immunityTimer = ImmunitySeconds;
-
+        ImmunityTimer = ImmunitySeconds;
+        VisualFlickerTimer = VisualFlickerImmunitySeconds;
         BlastiaGame.TooltipDisplay?.AddBouncingText(damage.ToString(CultureInfo.CurrentCulture), Color.DarkRed, Position, new Vector2(1.6f, 1.6f));
+        
+        if (Life <= 0)
+        {
+            OnKill();
+            return;
+        }
+
+        OnHit();
         SoundEngine.PlaySound(HitSound);
+    }
+
+    /// <summary>
+    /// Called whenever entity is killed (Life &lt;= 0). By default removes this entity
+    /// </summary>
+    protected virtual void OnKill()
+    {
+        BlastiaGame.RequestRemoveEntity(this);
+    }
+
+    protected virtual void OnHit()
+    {
+        
     }
     
     #endregion
@@ -165,9 +192,13 @@ public abstract class Entity : Object
     /// </summary>
     public override void Update()
     {
-        if (_immunityTimer > 0)
+        if (ImmunityTimer > 0)
         {
-            _immunityTimer -= (float) BlastiaGame.GameTimeElapsedSeconds;
+            ImmunityTimer -= (float) BlastiaGame.GameTimeElapsedSeconds;
+        }
+        if (VisualFlickerTimer > 0)
+        {
+            VisualFlickerTimer -= (float) BlastiaGame.GameTimeElapsedSeconds;
         }
         
         UpdatePosition();

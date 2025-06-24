@@ -43,7 +43,8 @@ public class Camera : Object
 	
 	// world tile position -> block instance (only drawn ones)
 	private Dictionary<(Vector2, TileLayer), BlockInstance> _drawnTiles = new();
-	private Array _layers;
+	private Dictionary<Vector2, Rectangle> _drawnBoxes = new();
+	private readonly TileLayer[] _layers;
 	
 	/// <summary>
 	/// Event called whenever <c>CameraScale</c> changes
@@ -53,7 +54,7 @@ public class Camera : Object
 	public Camera(Vector2 position) 
 	{
 		Position = position;
-		_layers = Enum.GetValues(typeof(TileLayer));
+		_layers = [TileLayer.Ground, TileLayer.Liquid, TileLayer.Furniture];
 	}
 
 	public override void Update()
@@ -79,6 +80,7 @@ public class Camera : Object
 
 	public (Dictionary<Vector2, Rectangle>, Dictionary<(Vector2, TileLayer), BlockInstance>) SetDrawnTiles(WorldState worldState)
 	{
+		_drawnBoxes.Clear();
 		_drawnTiles.Clear();
 		
 		int viewLeft = (int)Math.Floor(Position.X / Block.Size);
@@ -97,9 +99,6 @@ public class Camera : Object
 		viewTop = Math.Max(0, viewTop);
 		lastTileX = Math.Min(worldState.WorldWidth / Block.Size, lastTileX);
 		lastTileY = Math.Min(worldState.WorldHeight / Block.Size, lastTileY);
-		    
-		int capacity = Math.Max(1, Math.Min(tilesHorizontal * tilesVertical, 100000));
-		var drawnBoxes = new Dictionary<Vector2, Rectangle>(capacity);
 		
 		// go through each tile
 		for (int x = viewLeft; x < lastTileX; x++)
@@ -110,23 +109,23 @@ public class Camera : Object
 				int worldYCoord = y * Block.Size;
 				var position = new Vector2(worldXCoord, worldYCoord);
 
-				foreach (TileLayer layer in _layers)
+				foreach (var layer in _layers)
 				{
 					var blockInstance = worldState.GetBlockInstance(worldXCoord, worldYCoord, layer);
 					if (blockInstance == null) continue; // skip air
 					
 					_drawnTiles.Add((position, layer), blockInstance);
 
-					if (!drawnBoxes.ContainsKey(position))
+					if (!_drawnBoxes.ContainsKey(position))
 					{
 						var tileBox = new Rectangle(worldXCoord, worldYCoord, Block.Size, Block.Size);
-						drawnBoxes.Add(position, tileBox);
+						_drawnBoxes.Add(position, tileBox);
 					}
 				}
 			}
 		}
 
-		return (drawnBoxes, _drawnTiles);
+		return (_drawnBoxes, _drawnTiles);
 	}
 	
 	public void RenderGroundTiles(SpriteBatch spriteBatch, WorldState worldState)

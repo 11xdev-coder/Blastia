@@ -300,3 +300,4 @@ C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\I
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\LavaLiquid.png
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Items\LavaBucket.png
 C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\FleshHit.wav
+C:\Users\matve\projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Game\PlayerDeath.wav

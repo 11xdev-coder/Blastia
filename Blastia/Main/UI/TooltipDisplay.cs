@@ -141,7 +141,7 @@ public class TooltipDisplay
             bouncingText.Velocity.Y += 500f * deltaTime;
             bouncingText.Scale -= Vector2.One * 2 * deltaTime; // shrink over time
 
-            if (bouncingText.Scale.X <= 0 && bouncingText.Scale.Y <= 0)
+            if (bouncingText.Scale is {X: <= 0, Y: <= 0})
                 _activeBouncingTexts.Remove(bouncingText);
         }
         
