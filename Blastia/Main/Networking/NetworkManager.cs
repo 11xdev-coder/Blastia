@@ -1,5 +1,9 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
+using Blastia.Main.Blocks.Common;
+using Blastia.Main.Utilities.ListHandlers;
+using Microsoft.Xna.Framework;
+using Newtonsoft.Json;
 using Steamworks;
 
 namespace Blastia.Main.Networking;
@@ -13,11 +17,17 @@ public enum MessageType : byte
     PlayerLeftGame, // host -> all clients "player left"
     
     // game state messages
+    RequestUpdateWorldForClient, // client -> host, requests world update
     PlayerPositionUpdate,
     BlockChanged,
     EntitySpawned,
     EntityKilled,
-    ChatMessage
+    ChatMessage,
+    
+    // world transfer
+    WorldTransferStart, // host -> client, start of world transfer
+    WorldChunk, // host -> client, contains a chunk of world data
+    WorldTransferComplete // host -> client, all chunks sent
 }
 
 /// <summary>
@@ -402,6 +412,7 @@ public class NetworkManager
             {
                 _isConnectedToHost = true;
                 SendMessage(callback.m_hConn, MessageType.ClientHello, $"Hello from {SteamFriends.GetPersonaName()}");
+                SendMessage(callback.m_hConn, MessageType.RequestUpdateWorldForClient, "host send me the world!!!");
             }
         }
         else if (callback.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer ||
@@ -425,14 +436,6 @@ public class NetworkManager
                 DisconnectFromLobby();
             }
         }
-    }
-
-    /// <summary>
-    /// Called whenever 
-    /// </summary>
-    private void OnClientConnectedToHost()
-    {
-        
     }
     
     private void ConnectToPlayer(CSteamID playerSteamId)
@@ -504,7 +507,7 @@ public class NetworkManager
     {
         Console.WriteLine($"[CHAT] {message}");
     }
-    
+
     private void ReceiveNetworkMessages()
     {
         if (_pollGroup == HSteamNetPollGroup.Invalid) return;
@@ -550,6 +553,20 @@ public class NetworkManager
                         // just a notification
                         // OnConnectionStatusChanged handles host disconnect
                         ProcessPlayerLeftGameLocally(content);
+                        break;
+                    case MessageType.RequestUpdateWorldForClient:
+                        // if this is the host, send the world to client
+                        if (IsHost)
+                            NetworkWorldTransfer.SerializeWorldForConnection(message.m_conn, IsHost, SendMessage);
+                        break;
+                    case MessageType.WorldTransferStart:
+                        NetworkWorldTransfer.HandleWorldTransferStart(content, IsHost);
+                        break;
+                    case MessageType.WorldChunk:
+                        NetworkWorldTransfer.HandleWorldChunk(content, IsHost);
+                        break;
+                    case MessageType.WorldTransferComplete:
+                        Console.WriteLine($"[NetworkManager] {content}");
                         break;
                     default:
                         Console.WriteLine($"[NetworkManager] Unknown message type: {type}");

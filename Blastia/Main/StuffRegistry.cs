@@ -39,7 +39,9 @@ public static class StuffRegistry
 	public static Block? GetBlock(ushort id) 
 	{
 		// if found value -> return block
-		return Blocks.GetValueOrDefault(id);
+		var block = Blocks.GetValueOrDefault(id);
+		// clone to avoid reference issues
+		return block?.Clone();
 	}
 	
 	public static Texture2D? GetBlockTexture(ushort id) 

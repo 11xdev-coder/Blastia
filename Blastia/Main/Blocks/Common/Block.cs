@@ -39,6 +39,8 @@ public abstract class Block
 		
 	}
 
+	public abstract Block Clone();
+
 	protected Block(ushort id, string name, float dragCoefficient = 50f, float hardness = 1f, bool isBreakable = true,
 		bool isCollidable = true, bool isTransparent = false, ushort itemIdDrop = 0, int itemDropAmount = 1, int lightLevel = 0,
 		SoundID[]? breakingSounds = null)

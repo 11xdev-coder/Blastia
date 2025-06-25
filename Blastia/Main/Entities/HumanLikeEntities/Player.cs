@@ -316,22 +316,7 @@ public class Player : HumanLikeEntity
 		if (placeableBlock == null) return;
 		
 		var placeableLayer = placeableBlock.GetLayer();
-		// placing a liquid
-		if (placeableLayer == TileLayer.Liquid && placeableBlock is LiquidBlock liquidBlock)
-		{
-			// create a fresh liquid instance for placement
-			var newLiquid = liquidBlock.CreateNewInstance();
-			newLiquid.FlowLevel = 8;
-			
-			var inst = new BlockInstance(newLiquid, 0f);
-			inst.OnPlace(World, position, this);
-			worldState.SetTile((int)position.X, (int)position.Y, inst, TileLayer.Liquid);
-		}
-		else
-		{
-			// placing other blocks
-			worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
-		}
+		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
 		PlayerInventory.RemoveItem(_selectedHotbarSlot);
 		
 		// return empty bucket if specified

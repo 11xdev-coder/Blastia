@@ -19,4 +19,6 @@ public class LavaLiquid() : LiquidBlock(BlockId.Lava, "Lava", 0.8f, ItemId.LavaB
 
         entity.TryDamage(20);
     }
+
+    public override Block Clone() => CreateNewInstance();
 }

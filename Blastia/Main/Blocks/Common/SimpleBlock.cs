@@ -19,4 +19,9 @@ public class SimpleBlock : Block
     {
         
     }
+
+    public override Block Clone()
+    {
+        return new SimpleBlock(Id, Name, DragCoefficient, Hardness, IsBreakable, IsCollidable, IsTransparent, ItemIdDrop, ItemDropAmount, LightLevel, BreakingSounds);
+    }
 }

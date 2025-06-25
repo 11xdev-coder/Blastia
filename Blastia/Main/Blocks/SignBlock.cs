@@ -31,6 +31,8 @@ public class SignBlock : Block
         return true;
     }
 
+    public override Block Clone() => new SignBlock();
+
     public override void OnBreak(World? world, Vector2 position, Player? player)
     {
         base.OnBreak(world, position, player);
