@@ -45,6 +45,69 @@ public static class NetworkWorldTransfer
     private static int _receivedChunks;
     private static Dictionary<int, WorldChunk> _receivedWorldChunks = [];
 
+    private static byte[] SerializeWorldTransferData(WorldTransferData data)
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new BinaryWriter(stream))
+        {
+            writer.Write(data.WorldName);
+            writer.Write((byte) data.Difficulty);
+            writer.Write(data.WorldWidth);
+            writer.Write(data.WorldHeight);
+            writer.Write(data.SpawnX);
+            writer.Write(data.SpawnY);
+            
+            // serialize sign texts
+            writer.Write(data.SignTexts.Count);
+            foreach (var kvp in data.SignTexts)
+            {
+                writer.Write(kvp.Key.X);
+                writer.Write(kvp.Key.Y);
+                writer.Write(kvp.Value); 
+            }
+            
+            writer.Write(data.TotalChunksToSend);
+        }
+        
+        return stream.ToArray();
+    }
+    
+    private static WorldTransferData DeserializeWorldTransferData(byte[] dataBytes)
+    {
+        var data = new WorldTransferData();
+        
+        using var stream = new MemoryStream(dataBytes);
+        using (var reader = new BinaryReader(stream))
+        {
+            data.WorldName = reader.ReadString();
+            data.Difficulty = (WorldDifficulty) reader.ReadByte();
+            data.WorldWidth = reader.ReadInt32();
+            data.WorldHeight = reader.ReadInt32();
+            data.SpawnX = reader.ReadSingle();
+            data.SpawnY = reader.ReadSingle();
+            
+            var signTextCount = reader.ReadInt32();
+            var signTextDict = new Dictionary<Vector2, string>(signTextCount);
+            for (var i = 0; i < signTextCount; i++)
+            {
+                var vector = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                var text = reader.ReadString();
+                
+                signTextDict.Add(vector, text);
+            }
+            data.SignTexts = signTextDict;
+            
+            data.TotalChunksToSend = reader.ReadInt32();
+        }
+
+        return data;
+    }
+    
+    /// <summary>
+    /// Writes a chunk to byte array
+    /// </summary>
+    /// <param name="chunk"></param>
+    /// <returns></returns>
     private static byte[] SerializeChunk(WorldChunk chunk)
     {
         using var stream = new MemoryStream();
@@ -67,6 +130,11 @@ public static class NetworkWorldTransfer
         return stream.ToArray();
     }
 
+    /// <summary>
+    /// Reads a chunk from byte array
+    /// </summary>
+    /// <param name="chunkBytes"></param>
+    /// <returns></returns>
     private static WorldChunk DeserializeChunk(byte[] chunkBytes)
     {
         var chunk = new WorldChunk();
@@ -79,8 +147,9 @@ public static class NetworkWorldTransfer
             chunk.Layer = (TileLayer) reader.ReadByte();
             chunk.Tiles = Saving.ReadTileDictionary(reader);
             
-            var instDict = new Dictionary<Vector2, NetworkBlockInstance>(reader.ReadInt32());
-            for (var i = 0; i < instDict.Count; i++)
+            var instCount = reader.ReadInt32();
+            var instDict = new Dictionary<Vector2, NetworkBlockInstance>(instCount);
+            for (var i = 0; i < instCount; i++)
             {
                 var vector = new Vector2(reader.ReadSingle(), reader.ReadSingle());
                 var inst = new NetworkBlockInstance().Deserialize(reader);
@@ -137,31 +206,28 @@ public static class NetworkWorldTransfer
         
         // update data total chunks
         data.TotalChunksToSend = allChunks.Count;
+        
+        for (var i = 0; i < allChunks.Count; i++)
+        {
+            allChunks[i].ChunkIndex = i;
+            allChunks[i].TotalChunks = allChunks.Count;
+        }
+        
         // send basic data
-        var dataJson = JsonConvert.SerializeObject(data);
-        sendMessage(connection, MessageType.WorldTransferStart, dataJson);
+        var dataBytes = SerializeWorldTransferData(data);
+        var dataBase64 = Convert.ToBase64String(dataBytes);
+        sendMessage(connection, MessageType.WorldTransferStart, dataBase64);
         
         Console.WriteLine($"[NetworkWorldTransfer] Sending {allChunks.Count} chunks total:");
         Console.WriteLine($"  - Ground: {groundChunks.Count} chunks");
         Console.WriteLine($"  - Liquid: {liquidChunks.Count} chunks");
         Console.WriteLine($"  - Furniture: {furnitureChunks.Count} chunks");
-        
-        for (var i = 0; i < allChunks.Count; i++)
+
+        foreach (var chunk in allChunks)
         {
-            var chunk = allChunks[i];
-            chunk.ChunkIndex = i;
-            chunk.TotalChunks = allChunks.Count;
-            
             var chunkBytes = SerializeChunk(chunk);
             var chunkBase64 = Convert.ToBase64String(chunkBytes);
             sendMessage(connection, MessageType.WorldChunk, chunkBase64);
-            
-            // add a small delay to prevent overwhelming the connection
-            if (i % 10 == 0) // 10ms delay every 10 chunks
-            {
-                SteamNetworkingSockets.FlushMessagesOnConnection(connection);
-                Thread.Sleep(10);
-            }
         }
         
         // send completion message
@@ -172,7 +238,7 @@ public static class NetworkWorldTransfer
     }
 
     /// <summary>
-    /// Transfers all tiles of <c>layer</c> to list of world chunks (max length = 100 tiles per chunk)
+    /// Transfers all tiles of <c>layer</c> to list of world chunks (max length = 25 tiles per chunk)
     /// </summary>
     /// <param name="tiles"></param>
     /// <param name="instances"></param>
@@ -245,13 +311,13 @@ public static class NetworkWorldTransfer
     /// <summary>
     /// Called whenever <c>WorldTransferStart</c> message is received (client-side)
     /// </summary>
-    public static void HandleWorldTransferStart(string worldDataJson, bool isHost)
+    public static void HandleWorldTransferStart(string worldDataBase64, bool isHost)
     {
         // client-side
         if (isHost) return;
         
-        var worldData = JsonConvert.DeserializeObject<WorldTransferData>(worldDataJson);
-        if (worldData == null) return;
+        var worldDataBytes = Convert.FromBase64String(worldDataBase64);
+        var worldData = DeserializeWorldTransferData(worldDataBytes);
         
         Console.WriteLine($"[NetworkWorldTransfer] Starting world transfer for '{worldData.WorldName}' with {worldData.TotalChunksToSend} chunks");
         

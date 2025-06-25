@@ -633,8 +633,10 @@ public class BlastiaGame : Game
 	public static void RequestWorldInitialization() => RequestWorldInitializationEvent?.Invoke();
 	private void InitializeWorld()
 	{
+		Console.WriteLine("TRinyg to initalize");
 		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
 		if (worldState == null) return;
+		Console.WriteLine("worlsd staste nt nll");
 		
 		World = new World(worldState, _entities.AsReadOnly());
 		//worldState.SetSpawnPoint(1600, 468);
