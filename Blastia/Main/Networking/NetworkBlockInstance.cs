@@ -35,4 +35,25 @@ public class NetworkBlockInstance
 
         return inst;
     }
+
+    public byte[] Serialize(MemoryStream stream, BinaryWriter writer)
+    {
+        writer.Write(Id);
+        writer.Write(Damage);
+        writer.Write(FlowLevel);
+        
+        return stream.ToArray();
+    }
+    
+    public NetworkBlockInstance Deserialize(BinaryReader reader)
+    {
+        var inst = new NetworkBlockInstance
+        {
+            Id = reader.ReadUInt16(),
+            Damage = reader.ReadSingle(),
+            FlowLevel = reader.ReadInt32()
+        };
+
+        return inst;
+    }
 }

@@ -11,6 +11,62 @@ namespace Blastia.Main.Utilities;
 public static class Saving
 {
     /// <summary>
+    /// Writes <c>Dictionary&lt;Vector2, ushort&gt;</c> to a binary writer
+    /// </summary>
+    /// <param name="dict"></param>
+    /// <param name="writer"></param>
+    /// <param name="debugLogs"></param>
+    public static void WriteTileDictionary(Dictionary<Vector2, ushort> dict, BinaryWriter writer, bool debugLogs = false)
+    {
+        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, ushort> with {dict.Count} items");
+                        
+        writer.Write(dict.Count);
+        foreach (var keyValuePair in dict)
+        {
+            Vector2 vector = keyValuePair.Key;
+            ushort id = keyValuePair.Value;
+                            
+            if (debugLogs)
+            {
+                Console.WriteLine(vector == default
+                    ? "Couldn't write Vector2"
+                    : $"Writing Dictionary<Vector2, ushort> entry: Position({vector.X}, {vector.Y}), ID: {id}");
+            }
+                            
+            writer.Write(vector.X);
+            writer.Write(vector.Y);
+            writer.Write(id);
+        }
+    }
+
+    public static Dictionary<Vector2, ushort> ReadTileDictionary(BinaryReader reader, bool debugLogs = false)
+    {
+        var tileDictionary = new Dictionary<Vector2, ushort>();
+        var count = reader.ReadInt32();
+        if (debugLogs) Console.WriteLine($"Reading dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
+            
+        for (int i = 0; i < count; i++)
+        {
+            var x = reader.ReadSingle();
+            var y = reader.ReadSingle();
+            var id = reader.ReadUInt16();
+                
+            if (float.IsInfinity(x) || float.IsNaN(x) ||
+                float.IsInfinity(y) || float.IsNaN(y))
+            {
+                if (debugLogs) Console.WriteLine($"Skipping invalid tile entry {i}: ({x}, {y})");
+                continue;
+            }
+                
+            if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), ID: {id}");
+            tileDictionary.Add(new Vector2(x, y), id);
+        }
+            
+        if (debugLogs) Console.WriteLine($"Successfully read {tileDictionary.Count} entries");
+        return tileDictionary;
+    }
+    
+    /// <summary>
     /// Writes to a file at filePath state's class data. Supports: <c> Dictionary&lt;Vector2, ushort&gt;</c>,
     /// <c> Vector2</c>, <c> ushort[]</c>, <c> enum values</c>, <c> byte</c>, <c> ushort</c>,
     /// <c> int</c>, <c> float</c>, <c> double</c>, <c> bool</c>, <c> string</c>
@@ -42,27 +98,7 @@ public static class Saving
                 switch (value)
                 {
                     case Dictionary<Vector2, ushort> tileDictionary:
-                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, ushort> with {tileDictionary.Count} items");
-                        
-                        writer.Write(tileDictionary.Count);
-                        foreach (var keyValuePair in tileDictionary)
-                        {
-                            Vector2 vector = keyValuePair.Key;
-                            ushort id = keyValuePair.Value;
-                            
-                            if (debugLogs)
-                            {
-                                Console.WriteLine(vector == default
-                                    ? "Couldn't write Vector2"
-                                    : $"Writing Dictionary<Vector2, ushort> entry: Position({vector.X}, {vector.Y}), ID: {id}");
-                            }
-                            
-                            writer.Write(vector.X);
-                            writer.Write(vector.Y);
-                            writer.Write(id);
-                        }
-                        
-                        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
+                        WriteTileDictionary(tileDictionary, writer, debugLogs);
                         break;
                     case Dictionary<Vector2, BlockInstance> blockInstanceDictionary:
                         if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, BlockInstance> with {blockInstanceDictionary.Count} items");
@@ -197,29 +233,7 @@ public static class Saving
 
         if (type == typeof(Dictionary<Vector2, ushort>))
         {
-            var tileDictionary = new Dictionary<Vector2, ushort>();
-            var count = reader.ReadInt32();
-            if (debugLogs) Console.WriteLine($"Reading dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
-            
-            for (int i = 0; i < count; i++)
-            {
-                var x = reader.ReadSingle();
-                var y = reader.ReadSingle();
-                var id = reader.ReadUInt16();
-                
-                if (float.IsInfinity(x) || float.IsNaN(x) ||
-                    float.IsInfinity(y) || float.IsNaN(y))
-                {
-                    if (debugLogs) Console.WriteLine($"Skipping invalid tile entry {i}: ({x}, {y})");
-                    continue;
-                }
-                
-                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), ID: {id}");
-                tileDictionary.Add(new Vector2(x, y), id);
-            }
-            
-            if (debugLogs) Console.WriteLine($"Successfully read {tileDictionary.Count} entries");
-            return tileDictionary;
+            return ReadTileDictionary(reader, debugLogs);
         }
         
         if (type == typeof(Dictionary<Vector2, BlockInstance>))

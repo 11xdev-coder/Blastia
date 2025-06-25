@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
@@ -17,7 +18,7 @@ public class WorldChunk
     public int TotalChunks { get; set; }
     public TileLayer Layer { get; set; }
     public Dictionary<Vector2, ushort> Tiles { get; set; } = [];
-    public Dictionary<Vector2, BlockInstance> Instances { get; set; } = [];
+    public Dictionary<Vector2, NetworkBlockInstance> Instances { get; set; } = [];
 }
 
 /// <summary>
@@ -38,12 +39,61 @@ public class WorldTransferData
 
 public static class NetworkWorldTransfer
 {
-    private const int MaxTilesAtOnce = 100;
+    private const int MaxTilesAtOnce = 25;
     private static WorldState? _clientWorldStateBuffer;
-    private static int _expectedChunks = 0;
-    private static int _receivedChunks = 0;
+    private static int _expectedChunks;
+    private static int _receivedChunks;
     private static Dictionary<int, WorldChunk> _receivedWorldChunks = [];
 
+    private static byte[] SerializeChunk(WorldChunk chunk)
+    {
+        using var stream = new MemoryStream();
+        using (var writer = new BinaryWriter(stream))
+        {
+            writer.Write(chunk.ChunkIndex);
+            writer.Write(chunk.TotalChunks);
+            writer.Write((byte) chunk.Layer);
+            Saving.WriteTileDictionary(chunk.Tiles, writer);
+            
+            writer.Write(chunk.Instances.Count);
+            foreach (var kvp in chunk.Instances)
+            {
+                writer.Write(kvp.Key.X);
+                writer.Write(kvp.Key.Y);
+                kvp.Value.Serialize(stream, writer);
+            }
+        }
+
+        return stream.ToArray();
+    }
+
+    private static WorldChunk DeserializeChunk(byte[] chunkBytes)
+    {
+        var chunk = new WorldChunk();
+            
+        using var stream = new MemoryStream(chunkBytes);
+        using (var reader = new BinaryReader(stream))
+        {
+            chunk.ChunkIndex = reader.ReadInt32();
+            chunk.TotalChunks = reader.ReadInt32();
+            chunk.Layer = (TileLayer) reader.ReadByte();
+            chunk.Tiles = Saving.ReadTileDictionary(reader);
+            
+            var instDict = new Dictionary<Vector2, NetworkBlockInstance>(reader.ReadInt32());
+            for (var i = 0; i < instDict.Count; i++)
+            {
+                var vector = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+                var inst = new NetworkBlockInstance().Deserialize(reader);
+                
+                instDict.Add(vector, inst);
+            }
+
+            chunk.Instances = instDict;
+        }
+
+        return chunk;
+    }
+    
     /// <summary>
     /// Called whenever <c>RequestUpdateWorldForClient</c> message is received and this is the host
     /// </summary>
@@ -102,8 +152,9 @@ public static class NetworkWorldTransfer
             chunk.ChunkIndex = i;
             chunk.TotalChunks = allChunks.Count;
             
-            var chunkJson = JsonConvert.SerializeObject(chunk);
-            sendMessage(connection, MessageType.WorldChunk, chunkJson);
+            var chunkBytes = SerializeChunk(chunk);
+            var chunkBase64 = Convert.ToBase64String(chunkBytes);
+            sendMessage(connection, MessageType.WorldChunk, chunkBase64);
             
             // add a small delay to prevent overwhelming the connection
             if (i % 10 == 0) // 10ms delay every 10 chunks
@@ -159,7 +210,11 @@ public static class NetworkWorldTransfer
 
             currentChunk.Tiles[position] = tileId;
             if (instances.TryGetValue(position, out var inst))
-                currentChunk.Instances[position] = inst;
+            {
+                var networkInst = new NetworkBlockInstance();
+                networkInst.FromBlockInstance(inst);
+                currentChunk.Instances[position] = networkInst;
+            }
 
             tilesInCurrentChunk += 1;
             
@@ -220,13 +275,13 @@ public static class NetworkWorldTransfer
     /// <summary>
     /// Called whenever <c>WorldChunk</c> message is received (client-side)
     /// </summary>
-    public static void HandleWorldChunk(string chunkJson, bool isHost)
+    public static void HandleWorldChunk(string chunkBase64, bool isHost)
     {
         // client-side
         if (isHost || _clientWorldStateBuffer == null) return;
         
-        var chunk = JsonConvert.DeserializeObject<WorldChunk>(chunkJson);
-        if (chunk == null) return;
+        var chunkBytes = Convert.FromBase64String(chunkBase64);
+        var chunk = DeserializeChunk(chunkBytes);
 
         // add chunk to buffer
         _receivedWorldChunks[chunk.ChunkIndex] = chunk;
@@ -259,21 +314,21 @@ public static class NetworkWorldTransfer
                             _clientWorldStateBuffer.GroundTiles[kvp.Key] = kvp.Value;
                         
                         foreach (var kvp in chunk.Instances)
-                            _clientWorldStateBuffer.GroundInstances[kvp.Key] = kvp.Value;
+                            _clientWorldStateBuffer.GroundInstances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
                         break;
                     case TileLayer.Liquid:
                         foreach (var kvp in chunk.Tiles)
                             _clientWorldStateBuffer.LiquidTiles[kvp.Key] = kvp.Value;
                         
                         foreach (var kvp in chunk.Instances)
-                            _clientWorldStateBuffer.LiquidInstances[kvp.Key] = kvp.Value;
+                            _clientWorldStateBuffer.LiquidInstances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
                         break;
                     case TileLayer.Furniture:
                         foreach (var kvp in chunk.Tiles)
                             _clientWorldStateBuffer.FurnitureTiles[kvp.Key] = kvp.Value;
                         
                         foreach (var kvp in chunk.Instances)
-                            _clientWorldStateBuffer.FurnitureInstances[kvp.Key] = kvp.Value;
+                            _clientWorldStateBuffer.FurnitureInstances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
                         break;
                 }
             }
