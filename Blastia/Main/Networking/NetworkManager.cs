@@ -25,6 +25,9 @@ public enum MessageType : byte
 /// </summary>
 public class NetworkManager
 {
+    // message pool
+    private readonly IntPtr[] _messageBuffer = new IntPtr[32];
+    
     public static NetworkManager? Instance { get; set; }
 
     private bool _isConnectedToHost;
@@ -423,6 +426,14 @@ public class NetworkManager
             }
         }
     }
+
+    /// <summary>
+    /// Called whenever 
+    /// </summary>
+    private void OnClientConnectedToHost()
+    {
+        
+    }
     
     private void ConnectToPlayer(CSteamID playerSteamId)
     {
@@ -498,12 +509,13 @@ public class NetworkManager
     {
         if (_pollGroup == HSteamNetPollGroup.Invalid) return;
 
-        var messages = new IntPtr[32];
-        var messageCount = SteamNetworkingSockets.ReceiveMessagesOnPollGroup(_pollGroup, messages, 32);
+        // reuse same array
+        Array.Clear(_messageBuffer, 0, _messageBuffer.Length);
+        var messageCount = SteamNetworkingSockets.ReceiveMessagesOnPollGroup(_pollGroup, _messageBuffer, 32);
 
         for (var i = 0; i < messageCount; i++)
         {
-            var message = SteamNetworkingMessage_t.FromIntPtr(messages[i]);
+            var message = SteamNetworkingMessage_t.FromIntPtr(_messageBuffer[i]);
 
             try
             {
@@ -550,7 +562,7 @@ public class NetworkManager
             }
             finally
             {
-                SteamNetworkingMessage_t.Release(messages[i]);
+                SteamNetworkingMessage_t.Release(_messageBuffer[i]);
             }
         }
     }
