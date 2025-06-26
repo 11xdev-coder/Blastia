@@ -213,6 +213,7 @@ public class NetworkManager
 
         if (string.IsNullOrEmpty(code) || code.Length != 6)
         {
+            BlastiaGame.JoinGameMenu?.UpdateStatusText("Invalid lobby code format");
             Console.WriteLine("[NetworkManager] Invalid lobby code format (must be 6 characters)");
             return;
         }
@@ -241,7 +242,8 @@ public class NetworkManager
         }
         else
         {
-            Console.WriteLine($"[NetworkManager] No lobbies was found (is the code correct?)");
+            BlastiaGame.JoinGameMenu?.UpdateStatusText("No lobbies found");
+            Console.WriteLine("[NetworkManager] No lobbies was found (is the code correct?)");
         }
     }
 

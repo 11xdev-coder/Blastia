@@ -186,6 +186,13 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 	{
 		SelectedWorld = worldState;
 		BlastiaGame.RequestWorldInitialization();
+		
+		// hide join game menu whenever in a world
+		if (BlastiaGame.JoinGameMenu != null)
+		{
+			BlastiaGame.JoinGameMenu.Active = false;
+			BlastiaGame.JoinGameMenu.ToggleStatusText(false);
+		}
 
 		if (host)
 		{
