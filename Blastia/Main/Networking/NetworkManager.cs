@@ -153,6 +153,8 @@ public class NetworkManager
     {
         if (!IsSteamInitialized) return;
         
+        NetworkMessageQueue.ProcessQueue();
+        
         SteamAPI.RunCallbacks();
         ReceiveNetworkMessages();
     }
@@ -413,8 +415,8 @@ public class NetworkManager
             if (!IsHost)
             {
                 _isConnectedToHost = true;
-                SendMessage(callback.m_hConn, MessageType.ClientHello, $"Hello from {SteamFriends.GetPersonaName()}");
-                SendMessage(callback.m_hConn, MessageType.RequestUpdateWorldForClient, "host send me the world!!!");
+                NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.ClientHello, $"Hello from {SteamFriends.GetPersonaName()}");
+                NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.RequestUpdateWorldForClient, "host send me the world!!!");
             }
         }
         else if (callback.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer ||
@@ -457,7 +459,14 @@ public class NetworkManager
         }
     }
     
-    private void SendMessage(HSteamNetConnection connection, MessageType type, string? content)
+    /// <summary>
+    /// Tries to send a message to connection
+    /// </summary>
+    /// <param name="connection"></param>
+    /// <param name="type"></param>
+    /// <param name="content"></param>
+    /// <returns><c>EResult</c> of the message. If the message was sent returns <c>EResult.k_EResultOK</c></returns>
+    public EResult TrySendMessage(HSteamNetConnection connection, MessageType type, string? content)
     {
         var messageTypeByte = (byte) type;
         var contentBytes = Encoding.UTF8.GetBytes(content ?? "");
@@ -477,10 +486,7 @@ public class NetworkManager
                 (uint) messageData.Length,
                 Constants.k_nSteamNetworkingSend_Reliable, out var messageNumber);
 
-            if (result != EResult.k_EResultOK)
-            {
-                Console.WriteLine($"[NetworkManager] Failed to send message: {result}");
-            }
+            return result;
         }
         finally
         {
@@ -498,7 +504,7 @@ public class NetworkManager
 
         foreach (var connection in _connections.Values)
         {
-            SendMessage(connection, MessageType.ChatMessage, fullMessage);
+            NetworkMessageQueue.QueueMessage(connection, MessageType.ChatMessage, fullMessage);
         }
         
         // show locally
@@ -536,14 +542,25 @@ public class NetworkManager
                     content = Encoding.UTF8.GetString(data, 1, data.Length - 1);
                 }
 
-                Console.WriteLine($"[NetworkManager] Received {type}: {content} from {message.m_conn}");
+                // log received message
+                switch (type)
+                {
+                    case MessageType.WorldTransferStart:
+                    case MessageType.WorldChunk:
+                        Console.WriteLine($"[NetworkManager] Received {type} from {message.m_conn} (not logging content)");
+                        break;
+                    default:
+                        Console.WriteLine($"[NetworkManager] Received {type}: {content} from {message.m_conn}");
+                        break;
+                }
 
+                // handle it
                 switch (type)
                 {
                     case MessageType.ClientHello:
                         Console.WriteLine($"[NetworkManager] Host received ClientHello: {content}");
                         // send welcome back
-                        SendMessage(message.m_conn, MessageType.HostWelcome, "Welcome to the game!");
+                        NetworkMessageQueue.QueueMessage(message.m_conn, MessageType.HostWelcome, "Welcome to the game!");
                         break;
                     case MessageType.HostWelcome:
                         Console.WriteLine($"[NetworkManager] Client received HostWelcome: {content}");
@@ -559,7 +576,7 @@ public class NetworkManager
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client
                         if (IsHost)
-                            NetworkWorldTransfer.SerializeWorldForConnection(message.m_conn, IsHost, SendMessage);
+                            NetworkWorldTransfer.SerializeWorldForConnection(message.m_conn, IsHost);
                         break;
                     case MessageType.WorldTransferStart:
                         NetworkWorldTransfer.HandleWorldTransferStart(content, IsHost);
@@ -595,7 +612,7 @@ public class NetworkManager
         {
             foreach (var connection in _connections.Values)
             {
-                SendMessage(connection, MessageType.PlayerLeftGame, "Host is leaving");
+                NetworkMessageQueue.QueueMessage(connection, MessageType.PlayerLeftGame, "Host is leaving");
                 // flush messages to ensure it gets sent
                 SteamNetworkingSockets.FlushMessagesOnConnection(connection);
             }
@@ -661,7 +678,7 @@ public class NetworkManager
         {
             if (kvp.Key != leavingPlayer)
             {
-                SendMessage(kvp.Value, MessageType.PlayerLeftGame, message);
+                NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerLeftGame, message);
                 SteamNetworkingSockets.FlushMessagesOnConnection(kvp.Value);
             }
         }

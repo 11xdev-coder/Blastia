@@ -40,7 +40,7 @@ public class WorldTransferData
 public static class NetworkWorldTransfer
 {
     // TODO: player pos sync
-    private const int MaxTilesAtOnce = 25;
+    private const int MaxTilesAtOnce = 150;
     private const int MaxChunkSizeBytes = 300 * 1024; // 300 KB max chunk size
     private const int EstimatedTileSize = 50;
     private const int MaxTilesForSafeSize = MaxChunkSizeBytes / EstimatedTileSize;
@@ -193,8 +193,7 @@ public static class NetworkWorldTransfer
     /// </summary>
     /// <param name="connection">Client that requested the world</param>
     /// <param name="isHost"></param>
-    /// <param name="sendMessage">Event to send the message to client containing world chunks</param>
-    public static void SerializeWorldForConnection(HSteamNetConnection connection, bool isHost, Action<HSteamNetConnection, MessageType, string?> sendMessage)
+    public static void SerializeWorldForConnection(HSteamNetConnection connection, bool isHost)
     {
         if (!isHost) return;
         
@@ -241,7 +240,7 @@ public static class NetworkWorldTransfer
         // send basic data
         var dataBytes = SerializeWorldTransferData(data);
         var dataBase64 = Convert.ToBase64String(dataBytes);
-        sendMessage(connection, MessageType.WorldTransferStart, dataBase64);
+        NetworkMessageQueue.QueueMessage(connection, MessageType.WorldTransferStart, dataBase64);
         
         Console.WriteLine($"[NetworkWorldTransfer] Sending {allChunks.Count} chunks total:");
         Console.WriteLine($"  - Ground: {groundChunks.Count} chunks");
@@ -255,7 +254,7 @@ public static class NetworkWorldTransfer
             if (ValidateChunkSize(chunk, out var chunkBytes))
             {
                 var chunkBase64 = Convert.ToBase64String(chunkBytes);
-                sendMessage(connection, MessageType.WorldChunk, chunkBase64);
+                NetworkMessageQueue.QueueMessage(connection, MessageType.WorldChunk, chunkBase64);
                 successfulChunks += 1;
                 Console.WriteLine($"[NetworkWorldTransfer] Sent chunk {chunk.ChunkIndex + 1}/{allChunks.Count} for layer {chunk.Layer}");
             }
@@ -263,19 +262,17 @@ public static class NetworkWorldTransfer
             {
                 Console.WriteLine($"[NetworkWorldTransfer] [WARNING] Failed to send chunk {chunk.ChunkIndex + 1}/{allChunks.Count} - too large!");
             }
-            
-            Thread.Sleep(50);
         }
         
         // send completion message
-        sendMessage(connection, MessageType.WorldTransferComplete, $"Sent {successfulChunks}/{allChunks.Count} chunks");
+        NetworkMessageQueue.QueueMessage(connection, MessageType.WorldTransferComplete, $"Sent {successfulChunks}/{allChunks.Count} chunks");
         SteamNetworkingSockets.FlushMessagesOnConnection(connection);
         
         Console.WriteLine($"[NetworkWorldTransfer] World transfer completed for client, sent {successfulChunks}/{allChunks.Count} chunks");
     }
 
     /// <summary>
-    /// Transfers all tiles of <c>layer</c> to list of world chunks (max length = 25 tiles per chunk)
+    /// Transfers all tiles of <c>layer</c> to list of world chunks (max length = 150 tiles per chunk)
     /// </summary>
     /// <param name="tiles"></param>
     /// <param name="instances"></param>
