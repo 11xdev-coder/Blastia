@@ -39,6 +39,7 @@ public class WorldTransferData
 
 public static class NetworkWorldTransfer
 {
+    // TODO: player pos sync
     private const int MaxTilesAtOnce = 25;
     private const int MaxChunkSizeBytes = 300 * 1024; // 300 KB max chunk size
     private const int EstimatedTileSize = 50;
@@ -47,10 +48,7 @@ public static class NetworkWorldTransfer
     private static WorldState? _clientWorldStateBuffer;
     private static int _expectedChunks;
     private static int _receivedChunks;
-    private static Dictionary<int, WorldChunk> _receivedWorldChunks = [];
-
-    private static readonly object _transferLock = new();
-    private static bool _isTransferInProgress;
+    private static readonly Dictionary<int, WorldChunk> ReceivedWorldChunks = [];
 
     private static byte[] SerializeWorldTransferData(WorldTransferData data)
     {
@@ -379,7 +377,7 @@ public static class NetworkWorldTransfer
         
         _expectedChunks = worldData.TotalChunksToSend;
         _receivedChunks = 0;
-        _receivedWorldChunks.Clear();
+        ReceivedWorldChunks.Clear();
     }
 
     /// <summary>
@@ -394,7 +392,7 @@ public static class NetworkWorldTransfer
         var chunk = DeserializeChunk(chunkBytes);
 
         // add chunk to buffer
-        _receivedWorldChunks[chunk.ChunkIndex] = chunk;
+        ReceivedWorldChunks[chunk.ChunkIndex] = chunk;
         _receivedChunks += 1;
 
         Console.WriteLine($"[NetworkWorldTransfer] Received chunk {chunk.ChunkIndex + 1}/{_expectedChunks} for layer {chunk.Layer}");
@@ -414,7 +412,7 @@ public static class NetworkWorldTransfer
 
         for (var i = 0; i < _expectedChunks; i++)
         {
-            if (_receivedWorldChunks.TryGetValue(i, out var chunk))
+            if (ReceivedWorldChunks.TryGetValue(i, out var chunk))
             {
                 // apply chunk data to appropriate layer
                 switch (chunk.Layer)
@@ -454,7 +452,7 @@ public static class NetworkWorldTransfer
         
         // cleanup
         _clientWorldStateBuffer = null;
-        _receivedWorldChunks.Clear();
+        ReceivedWorldChunks.Clear();
         _expectedChunks = 0;
         _receivedChunks = 0;
     }

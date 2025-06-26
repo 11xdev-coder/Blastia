@@ -41,11 +41,13 @@ public class MainMenu(SpriteFont font, bool isActive = true) : Menu(font, isActi
 	{
 		SwitchToMenu(BlastiaGame.PlayersMenu);
 		BlastiaGame.WorldsMenu?.ToggleMultiplayer(false);
+		BlastiaGame.PlayersMenu?.ToggleSwitchToJoinMenu(false);
 	}
 
 	private void OnClickMultiplayer()
 	{
 		SwitchToMenu(BlastiaGame.MultiplayerMenu);
+		BlastiaGame.WorldsMenu?.ToggleMultiplayer(true);
 	}
 
 	private void OnClickSettings()

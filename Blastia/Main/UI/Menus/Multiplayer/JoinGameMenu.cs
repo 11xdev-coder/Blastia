@@ -6,6 +6,11 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.UI.Menus.Multiplayer;
 
+/// <summary>
+/// Enter a code to join a game, then shows join status
+/// </summary>
+/// <param name="font"></param>
+/// <param name="isActive"></param>
 public class JoinGameMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
     private Input? _codeEntry;

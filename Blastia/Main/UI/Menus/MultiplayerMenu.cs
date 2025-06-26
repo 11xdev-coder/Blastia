@@ -34,13 +34,16 @@ public class MultiplayerMenu(SpriteFont font, bool isActive = false) : Menu(font
 
     private void HostGame()
     {
+        // select a player then world
         SwitchToMenu(BlastiaGame.PlayersMenu);
-        BlastiaGame.WorldsMenu?.ToggleMultiplayer(true);
+        BlastiaGame.PlayersMenu?.ToggleSwitchToJoinMenu(false);
     }
 
     private void JoinGame()
     {
-        SwitchToMenu(BlastiaGame.JoinGameMenu);
+        // select player (SwitchToJoinMenu flag) then enter code
+        SwitchToMenu(BlastiaGame.PlayersMenu);
+        BlastiaGame.PlayersMenu?.ToggleSwitchToJoinMenu(true);
     }
 
     private void Back()

@@ -3,6 +3,7 @@ using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
 using Blastia.Main.Physics;
+using Blastia.Main.UI;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
@@ -141,9 +142,18 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 	public bool PlayerExists(string playerName) => Exists(SaveFolder.Player, playerName, Extension.Player);
 	public List<PlayerState> LoadAllPlayers() => LoadAll<PlayerState>(SaveFolder.Player, Extension.Player);
 
-	public void SelectPlayer(PlayerState playerState)
+	/// <summary>
+	/// Selects the player state
+	/// </summary>
+	/// <param name="playerState"></param>
+	/// <param name="switchToJoinMenu">If true, after selecting will switch to <see cref="Blastia.Main.UI.Menus.Multiplayer.JoinGameMenu"/></param>
+	/// <param name="switchToMenu">Reference to <see cref="Blastia.Main.UI.Menu.SwitchToMenu"/> method</param>
+	public void SelectPlayer(PlayerState playerState, bool switchToJoinMenu, Action<Menu?> switchToMenu)
 	{
 		SelectedPlayer = playerState;
+
+		if (switchToJoinMenu)
+			switchToMenu(BlastiaGame.JoinGameMenu);
 	}
 	
 	public void UnselectPlayer() => SelectedPlayer = null;
@@ -167,6 +177,11 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 	public bool WorldExists(string worldName) => Exists(SaveFolder.World, worldName, Extension.World);
 	public List<WorldState> LoadAllWorlds() => LoadAll<WorldState>(SaveFolder.World, Extension.World);
 		
+	/// <summary>
+	/// Selects the world state
+	/// </summary>
+	/// <param name="worldState"></param>
+	/// <param name="host">If true, will tell <c>NetworkManager</c> to host the game</param>
 	public void SelectWorld(WorldState worldState, bool host)
 	{
 		SelectedWorld = worldState;
