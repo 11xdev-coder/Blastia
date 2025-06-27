@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.GameState;
+using Blastia.Main.Networking;
 using Blastia.Main.Physics;
 using Blastia.Main.Sounds;
 using Blastia.Main.Utilities;
@@ -36,11 +37,19 @@ public abstract class Entity : Object
     protected virtual bool FlipSpriteHorizontallyOnKeyPress { get; set; }
     
     // velocity
-    protected Vector2 MovementVector;
+    public Vector2 MovementVector;
     protected float MovementSpeed;
     protected float TimeToMaxSpeed;
     protected const float FixedTimeStep = 1 / 240f; // simulate velocity at 240 FPS
     
+    // networking
+    public Vector2 NetworkMovementVector;
+    public Vector2 NetworkPosition;
+    public float NetworkTimestamp;
+    public bool LocallyControlled { get; set; }
+    private const float InterpolationSpeed = 10f;
+    private const float MaxInterpolationDistance = 10f; // teleport if too far away
+
     /// <summary>
     /// How much friction entity has with surfaces. <c>1.0</c> is normal friction, <c>&lt; 1.0</c> is more slippery
     /// </summary>
@@ -57,11 +66,11 @@ public abstract class Entity : Object
     /// <summary>
     /// <c>True</c> if player touches the ground (1 pixel above ground)
     /// </summary>
-    protected bool IsGrounded { get; set; }
+    public bool IsGrounded { get; set; }
     /// <summary>
     /// <c>True</c> if player is a little above ground (5 pixels above ground)
     /// </summary>
-    protected bool CanJump { get; set; }
+    public bool CanJump { get; set; }
     
     // IMPULSE
     private Vector2 _totalImpulse;
@@ -180,18 +189,43 @@ public abstract class Entity : Object
     /// Call in constructor to set the ID
     /// </summary>
     /// <param name="id">EntityID</param>
-    protected void SetId(ushort id)
+    public void SetId(ushort id)
     {
         ID = id;
     }
 
-    protected ushort GetId() => ID;
+    public ushort GetId() => ID;
 
+    private void InterpolateNetworkPosition()
+    {
+        var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
+        
+        // distance to network position
+        var distance = Vector2.Distance(Position, NetworkPosition);
+
+        if (distance > MaxInterpolationDistance)
+        {
+            // teleport
+            Position = NetworkPosition;
+            MovementVector = NetworkMovementVector;
+            return;
+        }
+        
+        // else slowly interpolate
+        Position = Vector2.Lerp(Position, NetworkPosition, InterpolationSpeed * deltaTime);
+        MovementVector = Vector2.Lerp(MovementVector, NetworkMovementVector, InterpolationSpeed * deltaTime);
+    }
+    
     /// <summary>
     /// Updates position and adds all natural forces. Must be called AFTER all velocity changes.
     /// </summary>
     public override void Update()
     {
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected && !LocallyControlled)
+        {
+            InterpolateNetworkPosition();
+        }
+        
         if (ImmunityTimer > 0)
         {
             ImmunityTimer -= (float) BlastiaGame.GameTimeElapsedSeconds;

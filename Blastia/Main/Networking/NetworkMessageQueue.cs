@@ -21,12 +21,21 @@ public static class NetworkMessageQueue
     private static readonly TimeSpan MaxWaitTime = TimeSpan.FromMilliseconds(60);
     private static TimeSpan _currentWaitTime = MinWaitTime;
     
+    /// <summary>
+    /// Queues a message to be sent
+    /// </summary>
+    /// <param name="connection">Connection where to send this message</param>
+    /// <param name="type"></param>
+    /// <param name="content"></param>
     public static void QueueMessage(HSteamNetConnection connection, MessageType type, string? content)
     {
         var message = new QueuedMessage(connection, type, content);
         _messageQueue.Enqueue(message);
     }
 
+    /// <summary>
+    /// Call in <c>Update()</c> methods, processes all queued messages with delays
+    /// </summary>
     public static void ProcessQueue()
     {
         if (_messageQueue.Count <= 0 || NetworkManager.Instance == null) return;

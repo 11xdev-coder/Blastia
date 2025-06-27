@@ -9,17 +9,20 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using NAudio.Dsp;
+using Steamworks;
 
 namespace Blastia.Main.Entities.HumanLikeEntities;
 
 [Entity(Id = EntityID.Player)]
 public class Player : HumanLikeEntity
 {
+	public CSteamID SteamId;
+	public string Name = "";
+	
 	/// <summary>
 	/// If True, player will play walking animation and disable all other logic
 	/// </summary>
 	public bool IsPreview { get; set; }
-	public bool LocallyControlled { get; private set; }
 
 	private bool _isBlocked;
 	protected override bool FlipSpriteHorizontallyOnKeyPress => !_isBlocked;
@@ -56,7 +59,7 @@ public class Player : HumanLikeEntity
 	public const int InventoryColumns = 9;
 	public const int HotbarSlotsCount = 9;
 	private const int InventoryCapacity = InventoryRows * InventoryColumns;
-	private int _selectedHotbarSlot = -1;
+	public int SelectedHotbarSlot = -1;
 
 	public Player(Vector2 position, World? world, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
@@ -255,7 +258,7 @@ public class Player : HumanLikeEntity
 		// dont place blocks if we are hovered on ui
 		if (BlastiaGame.IsHoveredOnAnyUi) return;
 
-		var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
+		var selectedItem = PlayerInventory.GetItemAt(SelectedHotbarSlot);
 		var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
 		if (currentWorld == null) return;
 		
@@ -317,7 +320,7 @@ public class Player : HumanLikeEntity
 		
 		var placeableLayer = placeableBlock.GetLayer();
 		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
-		PlayerInventory.RemoveItem(_selectedHotbarSlot);
+		PlayerInventory.RemoveItem(SelectedHotbarSlot);
 		
 		// return empty bucket if specified
 		if (placeable.EmptyBucketId > 0)
@@ -347,7 +350,7 @@ public class Player : HumanLikeEntity
 			bool succeeded;
 			// only do right click logic for first found block
 			// clicked on liquid with empty bucket selected -> scoop it
-			var selectedItem = PlayerInventory.GetItemAt(_selectedHotbarSlot);
+			var selectedItem = PlayerInventory.GetItemAt(SelectedHotbarSlot);
 			if (selectedItem != null && selectedItem.Id == ItemId.EmptyBucket && 
 			    blockInstance.Block is LiquidBlock liquid && 
 			    liquid.FlowLevel >= 1 && liquid.BucketItemId > 0)
@@ -357,7 +360,7 @@ public class Player : HumanLikeEntity
 				if (liquidBucketItem != null)
 				{
 					// remove empty bucket, give bucket with liquid
-					PlayerInventory.RemoveItem(_selectedHotbarSlot);
+					PlayerInventory.RemoveItem(SelectedHotbarSlot);
 					PlayerInventory.AddItem(liquidBucketItem);
 					worldState.SetTile((int) position.X, (int) position.Y, 0, TileLayer.Liquid, this);
 				}
@@ -460,7 +463,7 @@ public class Player : HumanLikeEntity
 		{
 			if (KeyboardHelper.IsKeyJustPressed(hotbarKeys[i]))
 			{
-				_selectedHotbarSlot = i;
+				SelectedHotbarSlot = i;
 				return;
 			}
 		}
@@ -474,23 +477,23 @@ public class Player : HumanLikeEntity
 
 			if (scrollDelta < 0)
 			{
-				_selectedHotbarSlot += 1;
-				if (_selectedHotbarSlot >= hotbarSlots)
+				SelectedHotbarSlot += 1;
+				if (SelectedHotbarSlot >= hotbarSlots)
 				{
-					_selectedHotbarSlot = 0;
+					SelectedHotbarSlot = 0;
 				}
 			}
 			else if (scrollDelta > 0)
 			{
-				_selectedHotbarSlot -= 1;
-				if (_selectedHotbarSlot <= -1)
+				SelectedHotbarSlot -= 1;
+				if (SelectedHotbarSlot <= -1)
 				{
-					_selectedHotbarSlot = hotbarSlots - 1;
+					SelectedHotbarSlot = hotbarSlots - 1;
 				}
 			}
 		}
 		
-		BlastiaGame.PlayerInventoryUiMenu.SetSelectedHotbarSlotIndex(_selectedHotbarSlot);
+		BlastiaGame.PlayerInventoryUiMenu.SetSelectedHotbarSlotIndex(SelectedHotbarSlot);
 	}
 	
 	private void UpdateSignHoverText()
