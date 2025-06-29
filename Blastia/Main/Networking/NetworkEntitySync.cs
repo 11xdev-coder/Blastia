@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Entities.Common;
+﻿using Assimp.Configs;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Microsoft.Xna.Framework;
@@ -37,7 +38,7 @@ public static class NetworkEntitySync
             || _worldFactory == null || _addToPlayersListMethod == null || _playersFactory == null || _myPlayerFactory == null) return;
         
         // add a not locally controlled player
-        var clientPlayer = new Player(PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint(), _worldFactory())
+        var clientPlayer = new Player(PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint(), _worldFactory(), BlastiaGame.PlayerScale)
         {
             SteamId = clientId,
             LocallyControlled = false,
@@ -120,14 +121,16 @@ public static class NetworkEntitySync
     {
         if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _worldFactory == null || _addToPlayersListMethod == null) return;
 
-        using var stream = new MemoryStream();
+        var playerBase64 = Convert.FromBase64String(content);
+        using var stream = new MemoryStream(playerBase64);
         using var reader = new BinaryReader(stream);
+        
         var networkPlayer = new NetworkPlayer().Deserialize(reader);
         
         // dont create a player for ourselves
         if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
 
-        var player = new Player(Vector2.Zero, _worldFactory());
+        var player = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale);
         networkPlayer.ApplyToEntity(player);
         
         _addToPlayersListMethod(player);

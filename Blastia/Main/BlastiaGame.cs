@@ -150,7 +150,8 @@ public class BlastiaGame : Game
 	private const ushort EntityLimit = 256;
 
 	private Player? _myPlayer;
-	private readonly List<Player> Players;
+	private readonly List<Player> _players;
+	public const float PlayerScale = 0.15f;
 	public ushort PlayerLimit = 128;
 	private bool IsWorldInitialized { get; set; }
 	
@@ -174,7 +175,7 @@ public class BlastiaGame : Game
 		
 		_entities = new List<Entity>();
 		_entitiesToRemove = new List<Entity>();
-		Players = new List<Player>();
+		_players = new List<Player>();
 		
 		// root folder of all assets
 		Content.RootDirectory = "Main/Content";
@@ -211,7 +212,7 @@ public class BlastiaGame : Game
 		if (NetworkManager.Instance.InitializeSteam())
 		{
 			// steam initialized
-			NetworkEntitySync.Initialize(() => _myPlayer, () => Players, Players.Add, () => _entities, AddEntity, () => World);
+			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, AddEntity, () => World);
 		}
 	}
 
@@ -487,7 +488,7 @@ public class BlastiaGame : Game
 
 				// then update entities
 				_myPlayer?.Update();
-				foreach (var player in Players)
+				foreach (var player in _players)
 				{
 					player.Update();
 				}
@@ -577,6 +578,10 @@ public class BlastiaGame : Game
 			
 			// then entities
 			_myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
+			foreach (var player in _players)
+			{
+				_myPlayer?.Camera?.RenderEntity(SpriteBatch, player);
+			}
 			
 			foreach (var entity in _entities)
 			{
@@ -639,7 +644,7 @@ public class BlastiaGame : Game
 		
 		World = new World(worldState, _entities.AsReadOnly());
 		//worldState.SetSpawnPoint(1600, 468);
-		_myPlayer = new Player(worldState.GetSpawnPoint(), World, 0.15f, true);
+		_myPlayer = new Player(worldState.GetSpawnPoint(), World, PlayerScale, true);
 		World.SetPlayer(_myPlayer);
 		
 		if (LogoMenu != null) LogoMenu.Active = false;

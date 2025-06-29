@@ -1,5 +1,6 @@
 ﻿using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
+using Microsoft.Xna.Framework;
 using Steamworks;
 
 namespace Blastia.Main.Networking;
@@ -37,10 +38,19 @@ public class NetworkPlayer : NetworkEntity
 
     public override byte[] Serialize(MemoryStream stream, BinaryWriter writer)
     {
-        var baseData = base.Serialize(stream, writer);
-        writer.Write(baseData.Length);
-        writer.Write(baseData);
-        
+        stream.SetLength(0);
+        stream.Position = 0;
+    
+        writer.Write(Id);
+        writer.Write(Position.X);
+        writer.Write(Position.Y);
+        writer.Write(MovementVector.X);
+        writer.Write(MovementVector.Y);
+        writer.Write(Life);
+        writer.Write(IsGrounded);
+        writer.Write(CanJump);
+        writer.Write(NetworkTimestamp);
+    
         writer.Write(SteamId.m_SteamID);
         writer.Write(Name);
         writer.Write(SelectedSlot);
@@ -50,26 +60,21 @@ public class NetworkPlayer : NetworkEntity
 
     public override NetworkPlayer Deserialize(BinaryReader reader)
     {
-        var baseDataLength = reader.ReadInt32();
-        var baseData = reader.ReadBytes(baseDataLength);
-        
-        using var baseStream = new MemoryStream(baseData);
-        using var baseReader = new BinaryReader(baseStream);
-        var baseEntity = base.Deserialize(baseReader);
-        
-        var networkPlayer = new NetworkPlayer
+        return new NetworkPlayer
         {
-            Id = baseEntity.Id,
-            Position = baseEntity.Position,
-            MovementVector = baseEntity.MovementVector,
-            Life = baseEntity.Life,
-            IsGrounded = baseEntity.IsGrounded,
-            CanJump = baseEntity.CanJump,
-            NetworkTimestamp = baseEntity.NetworkTimestamp,
+            // Read base entity data
+            Id = reader.ReadUInt16(),
+            Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
+            MovementVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
+            Life = reader.ReadSingle(),
+            IsGrounded = reader.ReadBoolean(),
+            CanJump = reader.ReadBoolean(),
+            NetworkTimestamp = reader.ReadSingle(),
+        
+            // Read player-specific data
             SteamId = new CSteamID(reader.ReadUInt64()),
             Name = reader.ReadString(),
             SelectedSlot = reader.ReadInt32()
         };
-        return networkPlayer;
     }
 }

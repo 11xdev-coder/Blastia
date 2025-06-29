@@ -411,7 +411,15 @@ public class NetworkManager
         else if (callback.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected)
         {
             Console.WriteLine("[NetworkManager] Connection established");
-
+            
+            // send hello message
+            if (!IsHost)
+            {
+                _isConnectedToHost = true;
+                NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.ClientHello, $"Hello from {SteamFriends.GetPersonaName()}");
+                NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.RequestUpdateWorldForClient, "host send me the world!!!");
+            }
+            
             // spawn player if hosting
             if (IsHost)
             {
@@ -422,14 +430,6 @@ public class NetworkManager
                 {
                     NetworkEntitySync.OnClientJoined(remoteSteamId, callback.m_hConn);
                 }
-            }
-            
-            // send hello message
-            if (!IsHost)
-            {
-                _isConnectedToHost = true;
-                NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.ClientHello, $"Hello from {SteamFriends.GetPersonaName()}");
-                NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.RequestUpdateWorldForClient, "host send me the world!!!");
             }
         }
         else if (callback.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer ||

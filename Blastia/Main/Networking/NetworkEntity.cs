@@ -53,6 +53,9 @@ public class NetworkEntity
 
     public virtual byte[] Serialize(MemoryStream stream, BinaryWriter writer)
     {
+        stream.SetLength(0);
+        stream.Position = 0;
+        
         writer.Write(Id);
         
         writer.Write(Position.X);
