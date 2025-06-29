@@ -3,6 +3,7 @@ using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
+using Blastia.Main.Networking;
 using Blastia.Main.Sounds;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -80,6 +81,27 @@ public class Player : HumanLikeEntity
 		}
 		MovementSpeed = 80f;
 		TimeToMaxSpeed = 0.2f;
+	}
+
+	/// <summary>
+	/// Returns <c>NetworkPlayer</c> containing all basic information about this player
+	/// </summary>
+	/// <returns></returns>
+	public NetworkPlayer GetNetworkData()
+	{
+		return new NetworkPlayer
+		{
+			Id = GetId(),
+			Position = Position,
+			MovementVector = MovementVector,
+			Life = Life,
+			IsGrounded = IsGrounded,
+			CanJump = CanJump,
+			NetworkTimestamp = NetworkTimestamp,
+			SteamId = SteamId,
+			Name = Name,
+			SelectedSlot = SelectedHotbarSlot
+		};
 	}
 
 	protected override void OnLifeChanged()

@@ -48,9 +48,14 @@ public class NetworkPlayer : NetworkEntity
         return stream.ToArray();
     }
 
-    public override NetworkEntity Deserialize(BinaryReader reader)
+    public override NetworkPlayer Deserialize(BinaryReader reader)
     {
-        var baseEntity = base.Deserialize(reader);
+        var baseDataLength = reader.ReadInt32();
+        var baseData = reader.ReadBytes(baseDataLength);
+        
+        using var baseStream = new MemoryStream(baseData);
+        using var baseReader = new BinaryReader(baseStream);
+        var baseEntity = base.Deserialize(baseReader);
         
         var networkPlayer = new NetworkPlayer
         {

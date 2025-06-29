@@ -18,7 +18,8 @@ public enum MessageType : byte
     
     // game state messages
     RequestUpdateWorldForClient, // client -> host, requests world update
-    PlayerPositionUpdate,
+    PlayerSpawned, // host -> all clients, sends new player data
+    PlayerUpdate, // host -> all clients, sends all players to every connection
     BlockChanged,
     EntitySpawned,
     EntityKilled,
@@ -54,7 +55,7 @@ public class NetworkManager
     private CSteamID _currentLobbyId;
     
     // key: SteamId of the player, value: connection
-    private Dictionary<CSteamID, HSteamNetConnection> _connections = [];
+    public readonly Dictionary<CSteamID, HSteamNetConnection> Connections = [];
     private HSteamListenSocket _listenSocket;
     /// <summary>
     /// Groups all connections together
@@ -375,10 +376,10 @@ public class NetworkManager
                 NotifyPlayerLeft(userChanged, "disconnected");
             }
             
-            if (_connections.TryGetValue(userChanged, out var connection))
+            if (Connections.TryGetValue(userChanged, out var connection))
             {
                 SteamNetworkingSockets.CloseConnection(connection, 0, "User left lobby", false);
-                _connections.Remove(userChanged);
+                Connections.Remove(userChanged);
             }
         }
     }
@@ -404,12 +405,24 @@ public class NetworkManager
                 
                 // find which steam ID this connection belongs to
                 var remoteSteamId = callback.m_info.m_identityRemote.GetSteamID();
-                _connections[remoteSteamId] = callback.m_hConn;
+                Connections[remoteSteamId] = callback.m_hConn;
             }
         }
         else if (callback.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected)
         {
             Console.WriteLine("[NetworkManager] Connection established");
+
+            // spawn player if hosting
+            if (IsHost)
+            {
+                var remoteSteamId = callback.m_info.m_identityRemote.GetSteamID();
+
+                // only spawn if loaded in the world
+                if (PlayerNWorldManager.Instance.SelectedWorld != null)
+                {
+                    NetworkEntitySync.OnClientJoined(remoteSteamId, callback.m_hConn);
+                }
+            }
             
             // send hello message
             if (!IsHost)
@@ -426,14 +439,14 @@ public class NetworkManager
             
             // remove from connections
             var remoteSteamId = callback.m_info.m_identityRemote.GetSteamID();
-            if (IsHost && remoteSteamId != MySteamId && _connections.ContainsKey(remoteSteamId))
+            if (IsHost && remoteSteamId != MySteamId && Connections.ContainsKey(remoteSteamId))
             {
                 NotifyPlayerLeft(remoteSteamId, "lost connection");
             }
-            _connections.Remove(remoteSteamId);
+            Connections.Remove(remoteSteamId);
             
             // more reliable to check it here since connection is lost
-            if (!IsHost && _connections.Count == 0) // ensure no connections (connection lost)
+            if (!IsHost && Connections.Count == 0) // ensure no connections (connection lost)
             {
                 Console.WriteLine("[NetworkManager] Lost connection to host, leaving lobby");
                 _isConnectedToHost = false;
@@ -454,7 +467,7 @@ public class NetworkManager
 
         if (connection != HSteamNetConnection.Invalid)
         {
-            _connections[playerSteamId] = connection;
+            Connections[playerSteamId] = connection;
             SteamNetworkingSockets.SetConnectionPollGroup(connection, _pollGroup);
         }
     }
@@ -502,7 +515,7 @@ public class NetworkManager
         Console.WriteLine($"[NetworkManager] Sending chat: {chatMessage}");
         var fullMessage = $"{SteamFriends.GetPersonaName()}: {chatMessage}";
 
-        foreach (var connection in _connections.Values)
+        foreach (var connection in Connections.Values)
         {
             NetworkMessageQueue.QueueMessage(connection, MessageType.ChatMessage, fullMessage);
         }
@@ -573,6 +586,9 @@ public class NetworkManager
                         // OnConnectionStatusChanged handles host disconnect
                         ProcessPlayerLeftGameLocally(content);
                         break;
+                    case MessageType.PlayerSpawned:
+                        NetworkEntitySync.HandlePlayerSpawned(content);
+                        break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client
                         if (IsHost)
@@ -608,9 +624,9 @@ public class NetworkManager
         Console.WriteLine("[NetworkManager] Disconnecting from lobby...");
         
         // send msg to clients before leaving
-        if (IsHost && _connections.Count > 0)
+        if (IsHost && Connections.Count > 0)
         {
-            foreach (var connection in _connections.Values)
+            foreach (var connection in Connections.Values)
             {
                 NetworkMessageQueue.QueueMessage(connection, MessageType.PlayerLeftGame, "Host is leaving");
                 // flush messages to ensure it gets sent
@@ -621,12 +637,12 @@ public class NetworkManager
         }
         
         // close every connection
-        foreach (var connection in _connections.Values)
+        foreach (var connection in Connections.Values)
         {
             var reason = IsHost ? "Host left the game" : "Client disconnected";
             SteamNetworkingSockets.CloseConnection(connection, 0, reason, false);
         }
-        _connections.Clear();
+        Connections.Clear();
         
         // close listen socket
         if (_listenSocket != HSteamListenSocket.Invalid)
@@ -662,7 +678,7 @@ public class NetworkManager
     /// <param name="reason"></param>
     private void NotifyPlayerLeft(CSteamID leavingPlayer, string reason = "")
     {
-        if (!IsHost || _connections.Count == 0) return;
+        if (!IsHost || Connections.Count == 0) return;
         
         var playerName = SteamFriends.GetFriendPersonaName(leavingPlayer);
         var message = string.IsNullOrEmpty(reason)
@@ -674,7 +690,7 @@ public class NetworkManager
         // process on host locally too
         ProcessPlayerLeftGameLocally(reason);
         // send to all clients
-        foreach (var kvp in _connections.ToList())
+        foreach (var kvp in Connections.ToList())
         {
             if (kvp.Key != leavingPlayer)
             {

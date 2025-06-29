@@ -211,6 +211,7 @@ public class BlastiaGame : Game
 		if (NetworkManager.Instance.InitializeSteam())
 		{
 			// steam initialized
+			NetworkEntitySync.Initialize(() => _myPlayer, () => Players, Players.Add, () => _entities, AddEntity, () => World);
 		}
 	}
 

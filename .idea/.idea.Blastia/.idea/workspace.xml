@@ -8,12 +8,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntity.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkPlayer.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/Common/Entity.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkMessageQueue.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkMessageQueue.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
     </list>
@@ -279,15 +276,8 @@
       <workItem from="1750938476975" duration="313000" />
       <workItem from="1750940370584" duration="14293000" />
       <workItem from="1751018552562" duration="4093000" />
-      <workItem from="1751049441313" duration="2396000" />
-    </task>
-    <task id="LOCAL-00132" summary="block breaking sounds without overlapping">
-      <option name="closed" value="true" />
-      <created>1749932682120</created>
-      <option name="number" value="00132" />
-      <option name="presentableId" value="LOCAL-00132" />
-      <option name="project" value="LOCAL" />
-      <updated>1749932682121</updated>
+      <workItem from="1751049441313" duration="6119000" />
+      <workItem from="1751103122750" duration="4051000" />
     </task>
     <task id="LOCAL-00133" summary="block sound delays">
       <option name="closed" value="true" />
@@ -673,7 +663,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750972273672</updated>
     </task>
-    <option name="localTasksCounter" value="181" />
+    <task id="LOCAL-00181" summary="base network entity lightweight classes">
+      <option name="closed" value="true" />
+      <created>1751053537284</created>
+      <option name="number" value="00181" />
+      <option name="presentableId" value="LOCAL-00181" />
+      <option name="project" value="LOCAL" />
+      <updated>1751053537285</updated>
+    </task>
+    <option name="localTasksCounter" value="182" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -683,7 +681,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fps counter" />
     <MESSAGE value="spacial grid draw" />
     <MESSAGE value="collision simple grid" />
     <MESSAGE value="block update call optimizations" />
@@ -708,6 +705,7 @@
     <MESSAGE value="player selecting on joining server" />
     <MESSAGE value="status text while joining" />
     <MESSAGE value="network message queue" />
-    <option name="LAST_COMMIT_MESSAGE" value="network message queue" />
+    <MESSAGE value="base network entity lightweight classes" />
+    <option name="LAST_COMMIT_MESSAGE" value="base network entity lightweight classes" />
   </component>
 </project>
