@@ -42,7 +42,8 @@ public static class NetworkEntitySync
         {
             SteamId = clientId,
             LocallyControlled = false,
-            Name = SteamFriends.GetFriendPersonaName(clientId)
+            Name = SteamFriends.GetFriendPersonaName(clientId),
+            NetworkPosition = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint()
         };
         _addToPlayersListMethod(clientPlayer);
         

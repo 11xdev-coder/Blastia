@@ -9,11 +9,7 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntity.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkPlayer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -291,15 +287,8 @@
       <workItem from="1751049441313" duration="6119000" />
       <workItem from="1751103122750" duration="4051000" />
       <workItem from="1751201475220" duration="13755000" />
-      <workItem from="1751272806676" duration="7302000" />
-    </task>
-    <task id="LOCAL-00135" summary="liquid fix">
-      <option name="closed" value="true" />
-      <created>1750080951428</created>
-      <option name="number" value="00135" />
-      <option name="presentableId" value="LOCAL-00135" />
-      <option name="project" value="LOCAL" />
-      <updated>1750080951429</updated>
+      <workItem from="1751272806676" duration="7951000" />
+      <workItem from="1751307608150" duration="2129000" />
     </task>
     <task id="LOCAL-00136" summary="liquid and worldstate refactor">
       <option name="closed" value="true" />
@@ -685,7 +674,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751228555314</updated>
     </task>
-    <option name="localTasksCounter" value="184" />
+    <task id="LOCAL-00184" summary="basic player movement sync">
+      <option name="closed" value="true" />
+      <created>1751304661226</created>
+      <option name="number" value="00184" />
+      <option name="presentableId" value="LOCAL-00184" />
+      <option name="project" value="LOCAL" />
+      <updated>1751304661228</updated>
+    </task>
+    <option name="localTasksCounter" value="185" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -695,7 +692,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="block update call optimizations" />
     <MESSAGE value="collision fixes and optimizations" />
     <MESSAGE value="fps dependency fixes" />
     <MESSAGE value="draw collision grid command" />
@@ -720,6 +716,7 @@
     <MESSAGE value="base network entity lightweight classes" />
     <MESSAGE value="basic player connection handling" />
     <MESSAGE value="player join bug fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="player join bug fixes" />
+    <MESSAGE value="basic player movement sync" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic player movement sync" />
   </component>
 </project>
