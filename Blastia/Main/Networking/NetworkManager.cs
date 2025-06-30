@@ -20,6 +20,7 @@ public enum MessageType : byte
     RequestUpdateWorldForClient, // client -> host, requests world update
     PlayerSpawned, // host -> all clients, sends new player data
     PlayerUpdate, // host -> all clients, sends all players to every connection
+    PlayerInput, // client -> host, sends input state
     BlockChanged,
     EntitySpawned,
     EntityKilled,
@@ -70,6 +71,10 @@ public class NetworkManager
     private Callback<LobbyChatUpdate_t>? _lobbyChatUpdateCallback;
     private Callback<SteamNetConnectionStatusChangedCallback_t>? _connectionStatusChangedCallback;
     private Callback<LobbyMatchList_t>? _lobbyMatchListCallback;
+    
+    // entity syncing
+    private float _lastPlayerSync;
+    private const float PlayerSyncRate = 1f / 20f; // 20 times in 1 second
 
     public NetworkManager()
     {
@@ -153,6 +158,13 @@ public class NetworkManager
     public void Update()
     {
         if (!IsSteamInitialized) return;
+
+        _lastPlayerSync += (float) BlastiaGame.GameTimeElapsedSeconds;
+        if (_lastPlayerSync >= PlayerSyncRate)
+        {
+            NetworkEntitySync.SyncPlayers();
+            _lastPlayerSync = 0f;
+        }
         
         NetworkMessageQueue.ProcessQueue();
         
@@ -588,6 +600,21 @@ public class NetworkManager
                         break;
                     case MessageType.PlayerSpawned:
                         NetworkEntitySync.HandlePlayerSpawned(content);
+                        break;
+                    case MessageType.PlayerInput:
+                        if (IsHost)
+                        {
+                            var senderConnection = message.m_conn;
+                            var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
+                            NetworkEntitySync.HandleClientInput(content, senderId);
+                        }
+                        break;
+                    case MessageType.PlayerUpdate:
+                        if (!IsHost)
+                        {
+                            NetworkEntitySync.HandlePlayerUpdate(content);
+                        }
+
                         break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client

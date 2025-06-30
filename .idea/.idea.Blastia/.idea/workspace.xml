@@ -8,11 +8,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkPlayer.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfo.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/Blastia.sourcelink.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/apphost.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/ref/Blastia.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net8.0/refint/Blastia.dll" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -278,22 +290,8 @@
       <workItem from="1751018552562" duration="4093000" />
       <workItem from="1751049441313" duration="6119000" />
       <workItem from="1751103122750" duration="4051000" />
-    </task>
-    <task id="LOCAL-00133" summary="block sound delays">
-      <option name="closed" value="true" />
-      <created>1750001580727</created>
-      <option name="number" value="00133" />
-      <option name="presentableId" value="LOCAL-00133" />
-      <option name="project" value="LOCAL" />
-      <updated>1750001580728</updated>
-    </task>
-    <task id="LOCAL-00134" summary="liquid block">
-      <option name="closed" value="true" />
-      <created>1750022534961</created>
-      <option name="number" value="00134" />
-      <option name="presentableId" value="LOCAL-00134" />
-      <option name="project" value="LOCAL" />
-      <updated>1750022534961</updated>
+      <workItem from="1751201475220" duration="13755000" />
+      <workItem from="1751272806676" duration="7302000" />
     </task>
     <task id="LOCAL-00135" summary="liquid fix">
       <option name="closed" value="true" />
@@ -671,7 +669,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751053537285</updated>
     </task>
-    <option name="localTasksCounter" value="182" />
+    <task id="LOCAL-00182" summary="basic player connection handling">
+      <option name="closed" value="true" />
+      <created>1751223888322</created>
+      <option name="number" value="00182" />
+      <option name="presentableId" value="LOCAL-00182" />
+      <option name="project" value="LOCAL" />
+      <updated>1751223888322</updated>
+    </task>
+    <task id="LOCAL-00183" summary="player join bug fixes">
+      <option name="closed" value="true" />
+      <created>1751228555314</created>
+      <option name="number" value="00183" />
+      <option name="presentableId" value="LOCAL-00183" />
+      <option name="project" value="LOCAL" />
+      <updated>1751228555314</updated>
+    </task>
+    <option name="localTasksCounter" value="184" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -681,8 +695,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="spacial grid draw" />
-    <MESSAGE value="collision simple grid" />
     <MESSAGE value="block update call optimizations" />
     <MESSAGE value="collision fixes and optimizations" />
     <MESSAGE value="fps dependency fixes" />
@@ -706,6 +718,8 @@
     <MESSAGE value="status text while joining" />
     <MESSAGE value="network message queue" />
     <MESSAGE value="base network entity lightweight classes" />
-    <option name="LAST_COMMIT_MESSAGE" value="base network entity lightweight classes" />
+    <MESSAGE value="basic player connection handling" />
+    <MESSAGE value="player join bug fixes" />
+    <option name="LAST_COMMIT_MESSAGE" value="player join bug fixes" />
   </component>
 </project>

@@ -70,7 +70,7 @@ public class NetworkEntity
         return stream.ToArray();
     }
 
-    public virtual NetworkEntity Deserialize(BinaryReader reader)
+    public static NetworkEntity Deserialize(BinaryReader reader)
     {
         return new NetworkEntity
         {

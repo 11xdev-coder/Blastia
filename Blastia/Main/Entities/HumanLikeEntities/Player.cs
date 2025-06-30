@@ -138,6 +138,45 @@ public class Player : HumanLikeEntity
 		Position = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint();
 	}
 
+	public void ApplyNetworkInput(PlayerInputState input)
+	{
+		if (LocallyControlled) return;
+		
+		var timestamp = input.Timestamp;
+		
+		// movement input
+		Vector2 directionVector = input.MovementInput;
+
+		// same air multiplier
+		var airMultiplier = 1f;
+		if (!IsGrounded) airMultiplier = 0.4f;
+
+		var targetHorizontalSpeed = 0f;
+		if (directionVector != Vector2.Zero)
+		{
+			WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
+			targetHorizontalSpeed = directionVector.X * MovementSpeed * airMultiplier;
+		}
+		else
+		{
+			StopAnimations();
+		}
+		
+		// apply directly for networking players
+		MovementVector.X = targetHorizontalSpeed;
+
+		if (input.Jump && CanJump)
+		{
+			_jumpCharge = Math.Min(input.JumpCharge, MaxChargeTime);
+			var chargeRatio = _jumpCharge / MaxChargeTime;
+			var boostedJump = MathHelper.Lerp(MinJumpVelocity, MaxJumpVelocity, chargeRatio);
+			
+			var jumpHeight = boostedJump;
+			MovementVector.Y = -jumpHeight;
+			_jumpCharge = 0;
+		}
+	}
+	
 	private bool ShouldBlockInput()
 	{
 		// typing in sign edit menu:
@@ -243,7 +282,8 @@ public class Player : HumanLikeEntity
 				MovementVector.X += Math.Sign(speedDiff) * maxAccelThisStep;
 			}
 		}
-		
+
+		var jumped = false;
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump)
 		{
 			_jumpCharge += (float) BlastiaGame.GameTimeElapsedSeconds;
@@ -258,7 +298,12 @@ public class Player : HumanLikeEntity
 			var jumpHeight = boostedJump;
 			MovementVector.Y = -jumpHeight;
 			_jumpCharge = 0;
+			jumped = true;
 		}
+
+		var isMoving = MovementVector != Vector2.Zero || jumped;
+		if (isMoving)
+			NetworkEntitySync.SendClientInputToHost(directionVector, jumped, isMoving, _jumpCharge);
 	}
 
 	private Vector2 GetCoordsForBlockPlacement()

@@ -90,26 +90,65 @@ public static class NetworkEntitySync
 
         using var stream = new MemoryStream();
         using var writer = new BinaryWriter(stream);
+
+        var allPlayers = new List<Player>();
         
-        // send _myPlayer to every connection
         var myPlayer = _myPlayerFactory();
         if (myPlayer != null)
-        {
-            var myPlayerBytes = myPlayer.GetNetworkData().Serialize(stream, writer);
-            var myPlayerBase64 = Convert.ToBase64String(myPlayerBytes);
-
-            foreach (var kvp in NetworkManager.Instance.Connections)
-                NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerUpdate, myPlayerBase64);
-        }
-
-        // send every remote player to every connection
-        foreach (var player in _playersFactory())
+            allPlayers.Add(myPlayer);
+        
+        allPlayers.AddRange(_playersFactory());
+        // send every player to every connection
+        foreach (var player in allPlayers)
         {
             var playerBytes = player.GetNetworkData().Serialize(stream, writer);
             var playerBase64 = Convert.ToBase64String(playerBytes);
 
             foreach (var kvp in NetworkManager.Instance.Connections)
                 NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerUpdate, playerBase64);
+        }
+    }
+
+    /// <summary>
+    /// Handles <c>PlayerUpdate</c> message, updates player position from host (client only)
+    /// </summary>
+    public static void HandlePlayerUpdate(string playerBase64)
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _playersFactory == null 
+            || _worldFactory == null || _addToPlayersListMethod == null) return;
+        
+        try
+        {
+            var playerBytes = Convert.FromBase64String(playerBase64);
+            using var stream = new MemoryStream(playerBytes);
+            using var reader = new BinaryReader(stream);
+
+            var networkPlayer = NetworkPlayer.Deserialize(reader);
+            
+            // dont update our own player
+            if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
+            
+            // find first player with that steam ID
+            var allPlayers = _playersFactory();
+            var player = allPlayers.FirstOrDefault(p => p.SteamId == networkPlayer.SteamId);
+            if (player != null)
+            {
+                networkPlayer.ApplyToEntity(player);
+            }
+            else
+            {
+                Console.WriteLine($"[NetworkEntitySync] [WARNING] Player with Steam ID: {networkPlayer.SteamId} not found, creating new player");
+                var newPlayer = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale)
+                {
+                    LocallyControlled = false
+                };
+                networkPlayer.ApplyToEntity(newPlayer);
+                _addToPlayersListMethod(newPlayer);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[NetworkEntitySync] [ERROR] Error updating player: {ex.Message}");
         }
     }
 
@@ -125,7 +164,7 @@ public static class NetworkEntitySync
         using var stream = new MemoryStream(playerBase64);
         using var reader = new BinaryReader(stream);
         
-        var networkPlayer = new NetworkPlayer().Deserialize(reader);
+        var networkPlayer = NetworkPlayer.Deserialize(reader);
         
         // dont create a player for ourselves
         if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
@@ -134,5 +173,59 @@ public static class NetworkEntitySync
         networkPlayer.ApplyToEntity(player);
         
         _addToPlayersListMethod(player);
+    }
+
+    /// <summary>
+    /// Sends client input to host to process and broadcast to all clients (client only)
+    /// </summary>
+    /// <param name="movementInput"></param>
+    /// <param name="jumpPressed"></param>
+    /// <param name="isMoving"></param>
+    /// <param name="jumpCharge"></param>
+    public static void SendClientInputToHost(Vector2 movementInput, bool jumpPressed, bool isMoving, float jumpCharge)
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
+
+        var inputMessage = new PlayerInputState
+        {
+            MovementInput = movementInput,
+            Jump = jumpPressed,
+            IsMoving = isMoving,
+            JumpCharge = jumpCharge,
+            Timestamp = (float) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds,
+        };
+        var inputMessageBase64 = Convert.ToBase64String(inputMessage.Serialize());
+        
+        // send to host (first connection)
+        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+        if (hostConnection != HSteamNetConnection.Invalid)
+            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.PlayerInput, inputMessageBase64);
+    }
+
+    /// <summary>
+    /// Handles player input from client and broadcasts to all clients (host only)
+    /// </summary>
+    /// <param name="inputMessageBase64"></param>
+    /// <param name="clientId"></param>
+    public static void HandleClientInput(string inputMessageBase64, CSteamID clientId)
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null) return;
+
+        try
+        {
+            var inputMessageBytes = Convert.FromBase64String(inputMessageBase64);
+            var inputMessage = PlayerInputState.Deserialize(inputMessageBytes);
+            
+            // find player that sent this message
+            var clientPlayer = _playersFactory().FirstOrDefault(p => p.SteamId == clientId);
+            if (clientPlayer == null) return;
+
+            clientPlayer.ApplyNetworkInput(inputMessage);
+            // broadcast to all clients in SyncPlayers()
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[NetworkEntitySync] [ERROR] Error while host was handling client input: {ex.Message}");
+        }
     }
 }
