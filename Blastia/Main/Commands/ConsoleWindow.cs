@@ -10,11 +10,6 @@ namespace Blastia.Main.Commands;
 
 public class ConsoleWindow
 {
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool AllocConsole();
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool FreeConsole();
 
     private Thread? _consoleThread;
     private volatile bool _isRunning; // can be edited in any thread
@@ -42,7 +37,6 @@ public class ConsoleWindow
     
     public void Open(string title)
     {
-        AllocConsole();
         Console.Title = title;
         
         _isRunning = true;
@@ -57,8 +51,6 @@ public class ConsoleWindow
         {
             _consoleThread.Join();
         }
-        
-        FreeConsole();
     }
 
     /// <summary>

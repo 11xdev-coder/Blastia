@@ -218,8 +218,16 @@ public class BlastiaGame : Game
 
 	private void InitializeConsole()
 	{
-		ConsoleWindow = new ConsoleWindow();
-		ConsoleWindow.Open("Blastia Game Console");
+		try
+		{
+			ConsoleWindow = new ConsoleWindow();
+			ConsoleWindow.Open("Blastia Game Console");
+		}
+		catch (InvalidOperationException ex)
+		{
+			Console.WriteLine($"[BlastiaGame] Console initialization failed: {ex.Message}");
+			ConsoleWindow = null;
+		}
 	}
 
 	private void RedirectConsoleOutput()

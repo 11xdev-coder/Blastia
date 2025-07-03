@@ -9,7 +9,10 @@
   <component name="ChangeListManager">
     <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Entities/HumanLikeEntities/Player.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkEntitySync.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkPlayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/Networking/NetworkPlayer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.exe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net8.0/Blastia.pdb" afterDir="false" />
@@ -288,15 +291,10 @@
       <workItem from="1751103122750" duration="4051000" />
       <workItem from="1751201475220" duration="13755000" />
       <workItem from="1751272806676" duration="7951000" />
-      <workItem from="1751307608150" duration="2129000" />
-    </task>
-    <task id="LOCAL-00136" summary="liquid and worldstate refactor">
-      <option name="closed" value="true" />
-      <created>1750087233419</created>
-      <option name="number" value="00136" />
-      <option name="presentableId" value="LOCAL-00136" />
-      <option name="project" value="LOCAL" />
-      <updated>1750087233419</updated>
+      <workItem from="1751307608150" duration="8494000" />
+      <workItem from="1751366924898" duration="1931000" />
+      <workItem from="1751454144235" duration="2395000" />
+      <workItem from="1751465573512" duration="4895000" />
     </task>
     <task id="LOCAL-00137" summary="complete liquid refactor">
       <option name="closed" value="true" />
@@ -682,7 +680,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751304661228</updated>
     </task>
-    <option name="localTasksCounter" value="185" />
+    <task id="LOCAL-00185" summary="fixed player spawn point on host bug">
+      <option name="closed" value="true" />
+      <created>1751314536338</created>
+      <option name="number" value="00185" />
+      <option name="presentableId" value="LOCAL-00185" />
+      <option name="project" value="LOCAL" />
+      <updated>1751314536338</updated>
+    </task>
+    <option name="localTasksCounter" value="186" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -692,7 +698,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="collision fixes and optimizations" />
     <MESSAGE value="fps dependency fixes" />
     <MESSAGE value="draw collision grid command" />
     <MESSAGE value="liquid fix" />
@@ -717,6 +722,7 @@
     <MESSAGE value="basic player connection handling" />
     <MESSAGE value="player join bug fixes" />
     <MESSAGE value="basic player movement sync" />
-    <option name="LAST_COMMIT_MESSAGE" value="basic player movement sync" />
+    <MESSAGE value="fixed player spawn point on host bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed player spawn point on host bug" />
   </component>
 </project>

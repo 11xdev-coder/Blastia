@@ -36,7 +36,13 @@ public class FilteredTextWriter : TextWriter
     
     public override void WriteLine(string? value)
     {
-        if (value != null && _filter(value))
-            _originalWriter.WriteLine(value);
+        try 
+        {
+            if (value != null && _filter(value))
+                _originalWriter.WriteLine(value);
+        }
+        catch
+        {
+        }
     }
 }

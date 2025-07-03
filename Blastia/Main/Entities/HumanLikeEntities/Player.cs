@@ -62,6 +62,8 @@ public class Player : HumanLikeEntity
 	private const int InventoryCapacity = InventoryRows * InventoryColumns;
 	public int SelectedHotbarSlot = -1;
 
+	private NetworkPlayer? _lastSentData;
+
 	public Player(Vector2 position, World? world, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
@@ -137,45 +139,6 @@ public class Player : HumanLikeEntity
 		Life = MaxLife;
 		Position = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint();
 	}
-
-	public void ApplyNetworkInput(PlayerInputState input)
-	{
-		if (LocallyControlled) return;
-		
-		var timestamp = input.Timestamp;
-		
-		// movement input
-		Vector2 directionVector = input.MovementInput;
-
-		// same air multiplier
-		var airMultiplier = 1f;
-		if (!IsGrounded) airMultiplier = 0.4f;
-
-		var targetHorizontalSpeed = 0f;
-		if (directionVector != Vector2.Zero)
-		{
-			WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
-			targetHorizontalSpeed = directionVector.X * MovementSpeed * airMultiplier;
-		}
-		else
-		{
-			StopAnimations();
-		}
-		
-		// apply directly for networking players
-		MovementVector.X = targetHorizontalSpeed;
-
-		if (input.Jump && CanJump)
-		{
-			_jumpCharge = Math.Min(input.JumpCharge, MaxChargeTime);
-			var chargeRatio = _jumpCharge / MaxChargeTime;
-			var boostedJump = MathHelper.Lerp(MinJumpVelocity, MaxJumpVelocity, chargeRatio);
-			
-			var jumpHeight = boostedJump;
-			MovementVector.Y = -jumpHeight;
-			_jumpCharge = 0;
-		}
-	}
 	
 	private bool ShouldBlockInput()
 	{
@@ -222,6 +185,17 @@ public class Player : HumanLikeEntity
 			UpdateHotbarSelection();
 
 			UpdateSignHoverText();
+		}
+		else if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+		{
+			if (MovementVector != Vector2.Zero)
+			{
+				WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
+			}
+			else
+			{
+				StopAnimations();
+			}
 		}
 	}
 
@@ -302,8 +276,12 @@ public class Player : HumanLikeEntity
 		}
 
 		var isMoving = MovementVector != Vector2.Zero || jumped;
-		if (isMoving)
-			NetworkEntitySync.SendClientInputToHost(directionVector, jumped, isMoving, _jumpCharge);
+		var networkData = GetNetworkData(); // only send if network data changed
+		if (isMoving || _lastSentData != networkData)
+		{
+			NetworkEntitySync.SendClientStateToHost();
+			_lastSentData = networkData;
+		}
 	}
 
 	private Vector2 GetCoordsForBlockPlacement()

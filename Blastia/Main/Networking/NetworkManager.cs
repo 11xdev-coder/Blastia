@@ -20,7 +20,7 @@ public enum MessageType : byte
     RequestUpdateWorldForClient, // client -> host, requests world update
     PlayerSpawned, // host -> all clients, sends new player data
     PlayerUpdate, // host -> all clients, sends all players to every connection
-    PlayerInput, // client -> host, sends input state
+    NetworkPlayerUpdateFromClient, // client -> host, sends final position (NetworkPlayer)
     BlockChanged,
     EntitySpawned,
     EntityKilled,
@@ -74,7 +74,7 @@ public class NetworkManager
     
     // entity syncing
     private float _lastPlayerSync;
-    private const float PlayerSyncRate = 1f / 20f; // 20 times in 1 second
+    private const float PlayerSyncRate = 1f / 60f; // 60 times in 1 second
 
     public NetworkManager()
     {
@@ -601,12 +601,12 @@ public class NetworkManager
                     case MessageType.PlayerSpawned:
                         NetworkEntitySync.HandlePlayerSpawned(content);
                         break;
-                    case MessageType.PlayerInput:
+                    case MessageType.NetworkPlayerUpdateFromClient:
                         if (IsHost)
                         {
                             var senderConnection = message.m_conn;
                             var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
-                            NetworkEntitySync.HandleClientInput(content, senderId);
+                            NetworkEntitySync.HandleNetworkPlayerUpdate(content, senderId);
                         }
                         break;
                     case MessageType.PlayerUpdate:

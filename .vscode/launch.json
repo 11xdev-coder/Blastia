@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+   "configurations": [
+        {
+            "name": "Launch Blastia with Console",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/Blastia/bin/Debug/net8.0/Blastia.exe",
+            "args": [],
+            "cwd": "${workspaceFolder}/Blastia",
+            "console": "integratedTerminal",
+            "stopAtEntry": false,
+            "externalConsole": false
+        }
+    ]
+}

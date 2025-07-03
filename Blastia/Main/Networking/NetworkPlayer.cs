@@ -28,7 +28,7 @@ public class NetworkPlayer : NetworkEntity
     {
         base.ApplyToEntity(entity);
         
-        if (entity is Player player && entity.LocallyControlled)
+        if (entity is Player player)
         {
             player.SteamId = SteamId;
             player.Name = Name;

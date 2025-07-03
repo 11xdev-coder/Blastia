@@ -88,25 +88,35 @@ public static class NetworkEntitySync
     public static void SyncPlayers()
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null || _myPlayerFactory == null) return;
-
+        
+        if (NetworkManager.Instance.Connections.Count == 0) return; // No clients to sync to
+        
         using var stream = new MemoryStream();
         using var writer = new BinaryWriter(stream);
-
-        var allPlayers = new List<Player>();
         
+        var allPlayers = new List<Player>();
         var myPlayer = _myPlayerFactory();
         if (myPlayer != null)
             allPlayers.Add(myPlayer);
-        
         allPlayers.AddRange(_playersFactory());
-        // send every player to every connection
+        
+        // Send each player's data to all clients
         foreach (var player in allPlayers)
         {
-            var playerBytes = player.GetNetworkData().Serialize(stream, writer);
-            var playerBase64 = Convert.ToBase64String(playerBytes);
-
-            foreach (var kvp in NetworkManager.Instance.Connections)
-                NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerUpdate, playerBase64);
+            try
+            {
+                var playerBytes = player.GetNetworkData().Serialize(stream, writer);
+                var playerBase64 = Convert.ToBase64String(playerBytes);
+                
+                foreach (var kvp in NetworkManager.Instance.Connections)
+                {
+                    NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerUpdate, playerBase64);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[NetworkEntitySync] [ERROR] Error syncing player {player.Name}: {ex.Message}");
+            }
         }
     }
 
@@ -177,52 +187,58 @@ public static class NetworkEntitySync
     }
 
     /// <summary>
-    /// Sends client input to host to process and broadcast to all clients (client only)
+    /// Sends client network data to host to process and broadcast to all clients (client only)
     /// </summary>
-    /// <param name="movementInput"></param>
-    /// <param name="jumpPressed"></param>
-    /// <param name="isMoving"></param>
-    /// <param name="jumpCharge"></param>
-    public static void SendClientInputToHost(Vector2 movementInput, bool jumpPressed, bool isMoving, float jumpCharge)
+    public static void SendClientStateToHost()
     {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _myPlayerFactory == null) return;
 
-        var inputMessage = new PlayerInputState
-        {
-            MovementInput = movementInput,
-            Jump = jumpPressed,
-            IsMoving = isMoving,
-            JumpCharge = jumpCharge,
-            Timestamp = (float) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds,
-        };
-        var inputMessageBase64 = Convert.ToBase64String(inputMessage.Serialize());
+        var myPlayer = _myPlayerFactory();
+        if (myPlayer == null) return;
+
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
+        var networkPlayer = myPlayer.GetNetworkData();
+        var playerBytes = networkPlayer.Serialize(stream, writer);
+        var playerBase64 = Convert.ToBase64String(playerBytes);
         
         // send to host (first connection)
         var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
         if (hostConnection != HSteamNetConnection.Invalid)
-            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.PlayerInput, inputMessageBase64);
+            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.NetworkPlayerUpdateFromClient, playerBase64);
     }
 
     /// <summary>
-    /// Handles player input from client and broadcasts to all clients (host only)
+    /// Handles player network data from client and broadcasts to all clients (host only)
     /// </summary>
-    /// <param name="inputMessageBase64"></param>
+    /// <param name="networkPlayerBase64"></param>
     /// <param name="clientId"></param>
-    public static void HandleClientInput(string inputMessageBase64, CSteamID clientId)
+    public static void HandleNetworkPlayerUpdate(string networkPlayerBase64, CSteamID clientId)
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null) return;
-
         try
         {
-            var inputMessageBytes = Convert.FromBase64String(inputMessageBase64);
-            var inputMessage = PlayerInputState.Deserialize(inputMessageBytes);
+            var playerBytes = Convert.FromBase64String(networkPlayerBase64);
+            using var stream = new MemoryStream(playerBytes);
+            using var reader = new BinaryReader(stream);
+            var networkPlayer = NetworkPlayer.Deserialize(reader);
             
             // find player that sent this message
             var clientPlayer = _playersFactory().FirstOrDefault(p => p.SteamId == clientId);
             if (clientPlayer == null) return;
-
-            clientPlayer.ApplyNetworkInput(inputMessage);
-            // broadcast to all clients in SyncPlayers()
+            
+            networkPlayer.ApplyToEntity(clientPlayer);
+            
+            // Immediately broadcast this update to all clients (including sender for confirmation)
+            using var outStream = new MemoryStream();
+            using var outWriter = new BinaryWriter(outStream);
+            var updatedPlayerBytes = clientPlayer.GetNetworkData().Serialize(outStream, outWriter);
+            var updatedPlayerBase64 = Convert.ToBase64String(updatedPlayerBytes);
+            
+            foreach (var kvp in NetworkManager.Instance.Connections)
+            {
+                NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerUpdate, updatedPlayerBase64);
+            }
         }
         catch (Exception ex)
         {
