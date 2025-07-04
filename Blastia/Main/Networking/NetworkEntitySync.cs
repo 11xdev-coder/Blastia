@@ -3,6 +3,7 @@ using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Microsoft.Xna.Framework;
+using NAudio.MediaFoundation;
 using Steamworks;
 
 namespace Blastia.Main.Networking;
@@ -35,17 +36,29 @@ public static class NetworkEntitySync
     public static void OnClientJoined(CSteamID clientId, HSteamNetConnection clientConnection)
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || PlayerNWorldManager.Instance.SelectedWorld == null 
-            || _worldFactory == null || _addToPlayersListMethod == null || _playersFactory == null || _myPlayerFactory == null) return;
+        || _worldFactory == null || _addToPlayersListMethod == null || _playersFactory == null || _myPlayerFactory == null) return;
+    
+        var clientName = SteamFriends.GetFriendPersonaName(clientId);
         
-        // add a not locally controlled player
-        var clientPlayer = new Player(PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint(), _worldFactory(), BlastiaGame.PlayerScale)
+        // Create a not locally controlled player for the client
+        var clientPlayer = new Player(PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint(), _worldFactory(), BlastiaGame.PlayerScale, false)
         {
             SteamId = clientId,
             LocallyControlled = false,
-            Name = SteamFriends.GetFriendPersonaName(clientId),
+            Name = clientName,
             NetworkPosition = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint()
-        };
+        };        
         _addToPlayersListMethod(clientPlayer);
+        
+        Console.WriteLine($"[NetworkEntitySync] [HOST] Created client player '{clientPlayer.Name}' (ID: {clientPlayer.SteamId})");
+        
+        // list all players for debugging
+        var allPlayers = _playersFactory();
+        Console.WriteLine($"[NetworkEntitySync] [HOST] All players after adding client:");
+        foreach (var p in allPlayers)
+        {
+            Console.WriteLine($"  - Player '{p.Name}' (ID: {p.SteamId}, LocallyControlled: {p.LocallyControlled})");
+        }
         
         using var stream = new MemoryStream();
         using var writer = new BinaryWriter(stream);
@@ -62,8 +75,10 @@ public static class NetworkEntitySync
         }
         
         // send existing players to this connected client
-        foreach (var player in _playersFactory())
+        foreach (var player in _playersFactory().Where(p => !p.LocallyControlled))
         {
+            if (player.SteamId == clientId) continue; // skip own player
+            
             // create network data and serialize
             var playerBytes = player.GetNetworkData().Serialize(stream, writer);
             var playerBase64 = Convert.ToBase64String(playerBytes);
@@ -71,97 +86,98 @@ public static class NetworkEntitySync
             NetworkMessageQueue.QueueMessage(clientConnection, MessageType.PlayerSpawned, playerBase64);
         }
         
-        // send host's _myPlayer to this connected client
-        var myPlayer = _myPlayerFactory();
-        if (myPlayer != null)
+        // send host player new client
+        var hostPlayer = _myPlayerFactory?.Invoke();
+        if (hostPlayer != null)
         {
-            var myPlayerBytes = myPlayer.GetNetworkData().Serialize(stream, writer);
-            var myPlayerBase64 = Convert.ToBase64String(myPlayerBytes);
-            
-            NetworkMessageQueue.QueueMessage(clientConnection, MessageType.PlayerSpawned, myPlayerBase64);
+            var hostPlayerBytes = hostPlayer.GetNetworkData().Serialize(stream, writer);
+            var hostPlayerBase64 = Convert.ToBase64String(hostPlayerBytes);
+            NetworkMessageQueue.QueueMessage(clientConnection, MessageType.PlayerSpawned, hostPlayerBase64);
+            Console.WriteLine($"[NetworkEntitySync] [HOST] Sent host player {hostPlayer.Name} to client {SteamFriends.GetFriendPersonaName(clientId)}");
         }
+                
+        Console.WriteLine($"[NetworkEntitySync] [HOST] Client {SteamFriends.GetFriendPersonaName(clientId)} joined, sent existing players and created new player for them");
     }
 
     /// <summary>
-    /// Syncs all player states (host only)
+    /// Broadcasts host's player state to all players (host only)
     /// </summary>
-    public static void SyncPlayers()
+    public static void SyncHostPlayer()
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null || _myPlayerFactory == null) return;
         
-        if (NetworkManager.Instance.Connections.Count == 0) return; // No clients to sync to
+        if (NetworkManager.Instance.Connections.Count == 0) return; // no clients to sync to
         
         using var stream = new MemoryStream();
         using var writer = new BinaryWriter(stream);
-        
-        var allPlayers = new List<Player>();
-        var myPlayer = _myPlayerFactory();
-        if (myPlayer != null)
-            allPlayers.Add(myPlayer);
-        allPlayers.AddRange(_playersFactory());
-        
-        // Send each player's data to all clients
-        foreach (var player in allPlayers)
+
+        var hostPlayer = _myPlayerFactory?.Invoke();
+        if (hostPlayer != null) 
         {
-            try
+            try 
             {
-                var playerBytes = player.GetNetworkData().Serialize(stream, writer);
+                var playerBytes = hostPlayer.GetNetworkData().Serialize(stream, writer);
                 var playerBase64 = Convert.ToBase64String(playerBytes);
                 
-                foreach (var kvp in NetworkManager.Instance.Connections)
+                foreach (var kvp in NetworkManager.Instance.Connections) 
                 {
-                    NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerUpdate, playerBase64);
+                    NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerPositionUpdate, playerBase64);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
-                Console.WriteLine($"[NetworkEntitySync] [ERROR] Error syncing player {player.Name}: {ex.Message}");
+                Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Error syncing host player: {ex.Message}");
             }
         }
     }
 
     /// <summary>
-    /// Handles <c>PlayerUpdate</c> message, updates player position from host (client only)
+    /// Host receives position update from client and broadcasts it to all clients
     /// </summary>
-    public static void HandlePlayerUpdate(string playerBase64)
+    public static void HandleClientPositionUpdate(string playerBase64, CSteamID clientId)
     {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _playersFactory == null 
-            || _worldFactory == null || _addToPlayersListMethod == null) return;
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null) return;
         
-        try
+        try 
         {
             var playerBytes = Convert.FromBase64String(playerBase64);
             using var stream = new MemoryStream(playerBytes);
             using var reader = new BinaryReader(stream);
-
             var networkPlayer = NetworkPlayer.Deserialize(reader);
             
-            // dont update our own player
-            if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
-            
-            // find first player with that steam ID
             var allPlayers = _playersFactory();
-            var player = allPlayers.FirstOrDefault(p => p.SteamId == networkPlayer.SteamId);
-            if (player != null)
+                        
+            // find the client player that sent this message
+            var clientPlayer = allPlayers.FirstOrDefault(p => p.SteamId == clientId);
+            if (clientPlayer == null) 
             {
-                networkPlayer.ApplyToEntity(player);
+                Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Client player with ID {clientId} not found!");
+                Console.WriteLine($"[NetworkEntitySync] [HOST] Available players: {string.Join(", ", allPlayers.Select(p => $"{p.Name}({p.SteamId})"))}");
+                return;
             }
-            else
+            
+            // update client
+            var oldPosition = clientPlayer.Position;
+            networkPlayer.ApplyToEntity(clientPlayer);
+            
+            // broadcast to all clients
+            using var outStream = new MemoryStream();
+            using var outWriter = new BinaryWriter(outStream);
+            var updatedPlayerBytes = clientPlayer.GetNetworkData().Serialize(outStream, outWriter);
+            var updatedPlayerBase64 = Convert.ToBase64String(updatedPlayerBytes);
+            
+            foreach (var kvp in NetworkManager.Instance.Connections)
             {
-                Console.WriteLine($"[NetworkEntitySync] [WARNING] Player with Steam ID: {networkPlayer.SteamId} not found, creating new player");
-                var newPlayer = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale)
-                {
-                    LocallyControlled = false
-                };
-                networkPlayer.ApplyToEntity(newPlayer);
-                _addToPlayersListMethod(newPlayer);
+                NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerPositionUpdate, updatedPlayerBase64);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[NetworkEntitySync] [ERROR] Error updating player: {ex.Message}");
+            Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Error handling client position update: {ex.Message}");
+            Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Stack trace: {ex.StackTrace}");
         }
     }
+
 
     /// <summary>
     /// Handles the <c>PlayerSpawned</c> message (client only)
@@ -178,9 +194,21 @@ public static class NetworkEntitySync
         var networkPlayer = NetworkPlayer.Deserialize(reader);
         
         // dont create a player for ourselves
-        if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
+        if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) 
+        {
+            Console.WriteLine("[NetworkEntitySync] [WARNING] [CLIENT] Skipping creation of own player");
+            return;
+        }
 
-        var player = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale);
+        // check if already exists
+        var existingPlayer = _playersFactory?.Invoke().FirstOrDefault(p => p.SteamId == networkPlayer.SteamId);
+        if (existingPlayer != null) 
+        {
+            Console.WriteLine($"[NetworkEntitySync] [WARNING] [CLIENT] Player {networkPlayer.Name} already exists");
+            return;
+        }
+
+        var player = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale, false);
         networkPlayer.ApplyToEntity(player);
         
         _addToPlayersListMethod(player);
@@ -189,7 +217,7 @@ public static class NetworkEntitySync
     /// <summary>
     /// Sends client network data to host to process and broadcast to all clients (client only)
     /// </summary>
-    public static void SendClientStateToHost()
+    public static void SendClientPositionToHost()
     {
         if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _myPlayerFactory == null) return;
 
@@ -205,17 +233,18 @@ public static class NetworkEntitySync
         // send to host (first connection)
         var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
         if (hostConnection != HSteamNetConnection.Invalid)
-            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.NetworkPlayerUpdateFromClient, playerBase64);
+            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.PlayerPositionUpdate, playerBase64);
     }
 
     /// <summary>
-    /// Handles player network data from client and broadcasts to all clients (host only)
+    /// Client receives position update from host
     /// </summary>
     /// <param name="networkPlayerBase64"></param>
     /// <param name="clientId"></param>
-    public static void HandleNetworkPlayerUpdate(string networkPlayerBase64, CSteamID clientId)
+    public static void HandlePositionUpdateFromHost(string networkPlayerBase64)
     {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null) return;
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _playersFactory == null || _worldFactory == null || _addToPlayersListMethod == null) return;
+        // TODO: Remove console message received spam and add more logging
         try
         {
             var playerBytes = Convert.FromBase64String(networkPlayerBase64);
@@ -223,21 +252,29 @@ public static class NetworkEntitySync
             using var reader = new BinaryReader(stream);
             var networkPlayer = NetworkPlayer.Deserialize(reader);
             
-            // find player that sent this message
-            var clientPlayer = _playersFactory().FirstOrDefault(p => p.SteamId == clientId);
-            if (clientPlayer == null) return;
-            
-            networkPlayer.ApplyToEntity(clientPlayer);
-            
-            // Immediately broadcast this update to all clients (including sender for confirmation)
-            using var outStream = new MemoryStream();
-            using var outWriter = new BinaryWriter(outStream);
-            var updatedPlayerBytes = clientPlayer.GetNetworkData().Serialize(outStream, outWriter);
-            var updatedPlayerBase64 = Convert.ToBase64String(updatedPlayerBytes);
-            
-            foreach (var kvp in NetworkManager.Instance.Connections)
+            // dont update our own player
+            if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) 
             {
-                NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerUpdate, updatedPlayerBase64);
+                Console.WriteLine("[NetworkEntitySync] [WARNING] [CLIENT] Skipping update of own player");
+                return;
+            }
+        
+            // find player with that steam ID
+            var allPlayers = _playersFactory();
+            var player = allPlayers.FirstOrDefault(p => p.SteamId == networkPlayer.SteamId);
+            if (player != null)
+            {
+                networkPlayer.ApplyToEntity(player);
+            }
+            else
+            {
+                Console.WriteLine($"[NetworkEntitySync] [WARNING] Player with Steam ID: {networkPlayer.SteamId} not found, creating new player");
+                var newPlayer = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale)
+                {
+                    LocallyControlled = false
+                };
+                networkPlayer.ApplyToEntity(newPlayer);
+                _addToPlayersListMethod(newPlayer);
             }
         }
         catch (Exception ex)

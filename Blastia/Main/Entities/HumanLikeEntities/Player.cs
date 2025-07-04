@@ -62,25 +62,36 @@ public class Player : HumanLikeEntity
 	private const int InventoryCapacity = InventoryRows * InventoryColumns;
 	public int SelectedHotbarSlot = -1;
 
-	private NetworkPlayer? _lastSentData;
-
 	public Player(Vector2 position, World? world, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
 			new Vector2(10, 21))
 	{
+		SteamId = CSteamID.Nil;
 		World = world;
 		PlayerInventory = new Inventory(InventoryCapacity, this);
-		LocallyControlled = myPlayer;
 		
 		if (myPlayer)
 		{
+			LocallyControlled = true;
+			
+			if (NetworkManager.Instance != null && NetworkManager.Instance.IsSteamInitialized)
+			{
+				SteamId = NetworkManager.Instance.MySteamId;
+				Name = SteamFriends.GetPersonaName();
+			}
+			
 			Camera = new Camera(position)
 			{
 				DrawWidth = 240 * Block.Size,
 				DrawHeight = 135 * Block.Size
 			};
 		}
+		else 
+		{
+		    LocallyControlled = false;
+		}
+		
 		MovementSpeed = 80f;
 		TimeToMaxSpeed = 0.2f;
 	}
@@ -273,14 +284,6 @@ public class Player : HumanLikeEntity
 			MovementVector.Y = -jumpHeight;
 			_jumpCharge = 0;
 			jumped = true;
-		}
-
-		var isMoving = MovementVector != Vector2.Zero || jumped;
-		var networkData = GetNetworkData(); // only send if network data changed
-		if (isMoving || _lastSentData != networkData)
-		{
-			NetworkEntitySync.SendClientStateToHost();
-			_lastSentData = networkData;
 		}
 	}
 

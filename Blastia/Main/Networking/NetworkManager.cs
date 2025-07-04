@@ -19,8 +19,7 @@ public enum MessageType : byte
     // game state messages
     RequestUpdateWorldForClient, // client -> host, requests world update
     PlayerSpawned, // host -> all clients, sends new player data
-    PlayerUpdate, // host -> all clients, sends all players to every connection
-    NetworkPlayerUpdateFromClient, // client -> host, sends final position (NetworkPlayer)
+    PlayerPositionUpdate, // host -> all clients, player position update, client -> host
     BlockChanged,
     EntitySpawned,
     EntityKilled,
@@ -74,7 +73,7 @@ public class NetworkManager
     
     // entity syncing
     private float _lastPlayerSync;
-    private const float PlayerSyncRate = 1f / 60f; // 60 times in 1 second
+    private const float PlayerSyncRate = 1f / 20f; // 20 times in 1 second
 
     public NetworkManager()
     {
@@ -162,7 +161,14 @@ public class NetworkManager
         _lastPlayerSync += (float) BlastiaGame.GameTimeElapsedSeconds;
         if (_lastPlayerSync >= PlayerSyncRate)
         {
-            NetworkEntitySync.SyncPlayers();
+            if (IsHost) 
+            {
+                NetworkEntitySync.SyncHostPlayer();
+            }
+            else if (IsConnected) 
+            {
+                NetworkEntitySync.SendClientPositionToHost();
+            }
             _lastPlayerSync = 0f;
         }
         
@@ -574,6 +580,8 @@ public class NetworkManager
                     case MessageType.WorldChunk:
                         Console.WriteLine($"[NetworkManager] Received {type} from {message.m_conn} (not logging content)");
                         break;
+                    case MessageType.PlayerPositionUpdate:
+                        break;
                     default:
                         Console.WriteLine($"[NetworkManager] Received {type}: {content} from {message.m_conn}");
                         break;
@@ -601,20 +609,18 @@ public class NetworkManager
                     case MessageType.PlayerSpawned:
                         NetworkEntitySync.HandlePlayerSpawned(content);
                         break;
-                    case MessageType.NetworkPlayerUpdateFromClient:
+                    case MessageType.PlayerPositionUpdate:
                         if (IsHost)
                         {
                             var senderConnection = message.m_conn;
                             var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
-                            NetworkEntitySync.HandleNetworkPlayerUpdate(content, senderId);
+                            NetworkEntitySync.HandleClientPositionUpdate(content, senderId);
                         }
-                        break;
-                    case MessageType.PlayerUpdate:
-                        if (!IsHost)
+                        else 
                         {
-                            NetworkEntitySync.HandlePlayerUpdate(content);
+                            // client receives position update from host
+                            NetworkEntitySync.HandlePositionUpdateFromHost(content);
                         }
-
                         break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client
