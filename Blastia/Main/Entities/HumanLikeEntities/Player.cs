@@ -110,6 +110,7 @@ public class Player : HumanLikeEntity
 			Life = Life,
 			IsGrounded = IsGrounded,
 			CanJump = CanJump,
+			SpriteDirection = SpriteDirection,
 			NetworkTimestamp = NetworkTimestamp,
 			SteamId = SteamId,
 			Name = Name,

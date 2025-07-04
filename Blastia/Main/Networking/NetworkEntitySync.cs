@@ -244,20 +244,15 @@ public static class NetworkEntitySync
     public static void HandlePositionUpdateFromHost(string networkPlayerBase64)
     {
         if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _playersFactory == null || _worldFactory == null || _addToPlayersListMethod == null) return;
-        // TODO: Remove console message received spam and add more logging
         try
         {
             var playerBytes = Convert.FromBase64String(networkPlayerBase64);
             using var stream = new MemoryStream(playerBytes);
             using var reader = new BinaryReader(stream);
             var networkPlayer = NetworkPlayer.Deserialize(reader);
-            
+
             // dont update our own player
-            if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) 
-            {
-                Console.WriteLine("[NetworkEntitySync] [WARNING] [CLIENT] Skipping update of own player");
-                return;
-            }
+            if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
         
             // find player with that steam ID
             var allPlayers = _playersFactory();

@@ -368,16 +368,20 @@ public abstract class Entity : Object
 
     private void UpdateSprite()
     {
-        var horizontalDirection = Vector2.Zero;
-        KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref horizontalDirection);
-
-        if (FlipSpriteHorizontallyOnKeyPress)
+        // update sprite only if key pressed locally
+        if (LocallyControlled) 
         {
-            if (horizontalDirection.X > 0)
-                SpriteDirection = 1;
-            else if (horizontalDirection.X < 0)
-                SpriteDirection = -1;
-        }
+            var horizontalDirection = Vector2.Zero;
+            KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref horizontalDirection);
+
+            if (FlipSpriteHorizontallyOnKeyPress)
+            {
+                if (horizontalDirection.X > 0)
+                    SpriteDirection = 1;
+                else if (horizontalDirection.X < 0)
+                    SpriteDirection = -1;
+            }
+        }      
     }
 
     /// <summary>

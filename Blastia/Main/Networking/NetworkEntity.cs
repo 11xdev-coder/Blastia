@@ -15,6 +15,7 @@ public class NetworkEntity
     public float Life { get; set; }
     public bool IsGrounded;
     public bool CanJump;
+    public float SpriteDirection { get; set; }
     
     public float NetworkTimestamp { get; set; }
 
@@ -27,6 +28,7 @@ public class NetworkEntity
         Life = entity.Life;
         IsGrounded = entity.IsGrounded;
         CanJump = entity.CanJump;
+        SpriteDirection = entity.SpriteDirection;
         
         // for smooth interpolation
         NetworkTimestamp = (float) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
@@ -47,6 +49,7 @@ public class NetworkEntity
         entity.Life = Life;
         entity.IsGrounded = IsGrounded;
         entity.CanJump = CanJump;
+        entity.SpriteDirection = SpriteDirection;
         
         entity.NetworkTimestamp = NetworkTimestamp;
     }
@@ -65,6 +68,7 @@ public class NetworkEntity
         writer.Write(Life);
         writer.Write(IsGrounded);
         writer.Write(CanJump);
+        writer.Write(SpriteDirection);
         writer.Write(NetworkTimestamp);
         
         return stream.ToArray();
@@ -80,6 +84,7 @@ public class NetworkEntity
             Life = reader.ReadSingle(),
             IsGrounded = reader.ReadBoolean(),
             CanJump = reader.ReadBoolean(),
+            SpriteDirection = reader.ReadSingle(),
             NetworkTimestamp = reader.ReadSingle()
         };
     }

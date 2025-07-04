@@ -41,6 +41,7 @@ public class NetworkPlayer : NetworkEntity
         stream.SetLength(0);
         stream.Position = 0;
     
+        // entity
         writer.Write(Id);
         writer.Write(Position.X);
         writer.Write(Position.Y);
@@ -49,8 +50,10 @@ public class NetworkPlayer : NetworkEntity
         writer.Write(Life);
         writer.Write(IsGrounded);
         writer.Write(CanJump);
+        writer.Write(SpriteDirection);
         writer.Write(NetworkTimestamp);
     
+        // player
         writer.Write(SteamId.m_SteamID);
         writer.Write(Name);
         writer.Write(SelectedSlot);
@@ -62,59 +65,20 @@ public class NetworkPlayer : NetworkEntity
     {
         return new NetworkPlayer
         {
-            // Read base entity data
+            // entity
             Id = reader.ReadUInt16(),
             Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             MovementVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             Life = reader.ReadSingle(),
             IsGrounded = reader.ReadBoolean(),
             CanJump = reader.ReadBoolean(),
+            SpriteDirection = reader.ReadSingle(),
             NetworkTimestamp = reader.ReadSingle(),
         
-            // Read player-specific data
+            // player
             SteamId = new CSteamID(reader.ReadUInt64()),
             Name = reader.ReadString(),
             SelectedSlot = reader.ReadInt32()
-        };
-    }
-}
-
-[Serializable]
-public class PlayerInputState
-{
-    public Vector2 MovementInput { get; set; }
-    public bool Jump { get; set; }
-    public bool IsMoving { get; set; }
-    public float JumpCharge { get; set; }
-    public float Timestamp { get; set; }
-
-    public byte[] Serialize()
-    {
-        using var stream = new MemoryStream();
-        using var writer = new BinaryWriter(stream);
-        
-        writer.Write(MovementInput.X);
-        writer.Write(MovementInput.Y);
-        writer.Write(Jump);
-        writer.Write(IsMoving);
-        writer.Write(JumpCharge);
-        writer.Write(Timestamp);
-
-        return stream.ToArray();
-    }
-
-    public static PlayerInputState Deserialize(byte[] bytes)
-    {
-        using var stream = new MemoryStream(bytes);
-        using var reader = new BinaryReader(stream);
-
-        return new PlayerInputState
-        {
-            MovementInput = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
-            Jump = reader.ReadBoolean(),
-            IsMoving = reader.ReadBoolean(),
-            JumpCharge = reader.ReadSingle(),
-            Timestamp = reader.ReadSingle()
         };
     }
 }
