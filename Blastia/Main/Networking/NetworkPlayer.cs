@@ -45,6 +45,8 @@ public class NetworkPlayer : NetworkEntity
         writer.Write(Id);
         writer.Write(Position.X);
         writer.Write(Position.Y);
+        writer.Write(DirectionVector.X);
+        writer.Write(DirectionVector.Y);
         writer.Write(MovementVector.X);
         writer.Write(MovementVector.Y);
         writer.Write(Life);
@@ -68,6 +70,7 @@ public class NetworkPlayer : NetworkEntity
             // entity
             Id = reader.ReadUInt16(),
             Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
+            DirectionVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             MovementVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             Life = reader.ReadSingle(),
             IsGrounded = reader.ReadBoolean(),

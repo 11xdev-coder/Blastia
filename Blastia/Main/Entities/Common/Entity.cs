@@ -35,8 +35,12 @@ public abstract class Entity : Object
     /// </summary>
     public float SpriteDirection { get; set; } = 1;
     protected virtual bool FlipSpriteHorizontallyOnKeyPress { get; set; }
-    
+
     // velocity
+    /// <summary>
+    /// Direction where entity wants to move
+    /// </summary>
+    public Vector2 DirectionVector;
     public Vector2 MovementVector;
     protected float MovementSpeed;
     protected float TimeToMaxSpeed;

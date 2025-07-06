@@ -11,6 +11,7 @@ public class NetworkEntity
 {
     public ushort Id { get; set; }
     public Vector2 Position { get; set; }
+    public Vector2 DirectionVector { get; set; }
     public Vector2 MovementVector { get; set; }
     public float Life { get; set; }
     public bool IsGrounded;
@@ -24,6 +25,7 @@ public class NetworkEntity
         Id = entity.GetId();
         
         Position = entity.Position;
+        DirectionVector = entity.DirectionVector;
         MovementVector = entity.MovementVector;
         Life = entity.Life;
         IsGrounded = entity.IsGrounded;
@@ -46,6 +48,7 @@ public class NetworkEntity
         
         entity.NetworkPosition = Position;
         entity.NetworkMovementVector = MovementVector;
+        entity.DirectionVector = DirectionVector;
         entity.Life = Life;
         entity.IsGrounded = IsGrounded;
         entity.CanJump = CanJump;
@@ -63,6 +66,8 @@ public class NetworkEntity
         
         writer.Write(Position.X);
         writer.Write(Position.Y);
+        writer.Write(DirectionVector.X);
+        writer.Write(DirectionVector.Y);
         writer.Write(MovementVector.X);
         writer.Write(MovementVector.Y);
         writer.Write(Life);
@@ -80,6 +85,7 @@ public class NetworkEntity
         {
             Id = reader.ReadUInt16(),
             Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
+            DirectionVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             MovementVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             Life = reader.ReadSingle(),
             IsGrounded = reader.ReadBoolean(),

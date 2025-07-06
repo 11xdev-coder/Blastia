@@ -106,6 +106,7 @@ public class Player : HumanLikeEntity
 		{
 			Id = GetId(),
 			Position = Position,
+			DirectionVector = DirectionVector,
 			MovementVector = MovementVector,
 			Life = Life,
 			IsGrounded = IsGrounded,
@@ -198,16 +199,13 @@ public class Player : HumanLikeEntity
 
 			UpdateSignHoverText();
 		}
-		else if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+		else if (DirectionVector != Vector2.Zero) // not locally controlled -> play anim if moving
 		{
-			if (MovementVector != Vector2.Zero)
-			{
-				WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
-			}
-			else
-			{
-				StopAnimations();
-			}
+			WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
+		}
+		else 
+		{
+		    StopAnimations();
 		}
 	}
 
@@ -222,18 +220,18 @@ public class Player : HumanLikeEntity
 
 	private void HandleMovement()
 	{
-		Vector2 directionVector = Vector2.Zero;
-		KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref directionVector);
+		DirectionVector = Vector2.Zero;
+		KeyboardHelper.AccumulateValueFromMap(HorizontalMovementMap, ref DirectionVector);
 
 		// less speed when in air
 		var airMultiplier = 1f;
 		if (!IsGrounded) airMultiplier = 0.4f;
 
 		var targetHorizontalSpeed = 0f;
-		if (directionVector != Vector2.Zero)
+		if (DirectionVector != Vector2.Zero)
 		{
 			WalkingAnimation(ArmMaxAngle, LegMaxAngle, WalkingAnimationDuration);
-			targetHorizontalSpeed = directionVector.X * MovementSpeed * airMultiplier;
+			targetHorizontalSpeed = DirectionVector.X * MovementSpeed * airMultiplier;
 		}
 		else
 		{
