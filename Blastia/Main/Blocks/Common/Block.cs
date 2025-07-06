@@ -147,6 +147,7 @@ public class BlockInstance
 	public Block Block;
 	public float Damage;
 	private readonly BlockBreakingAnimation _breakingAnimation;
+	private bool _hasRequestedBreak;
 
 	public BlockInstance(Block block, float damage)
 	{
@@ -190,10 +191,11 @@ public class BlockInstance
 			        selectedWorld.SetTile((int) position.X, (int) position.Y, 0, Block.GetLayer(), player);
 					NetworkBlockSync.BroadcastBlockChangedToClients(position, 0, Block.GetLayer(), player);
 			    }
-			    else 
+			    else if (!_hasRequestedBreak)
 			    {
 			        // client: send request
 			        NetworkBlockSync.SendBlockChangedToHost(position, 0, Block.GetLayer(), player);
+					_hasRequestedBreak = true;
 			    }
 			}
 			else 
