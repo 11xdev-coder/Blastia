@@ -213,6 +213,7 @@ public class BlastiaGame : Game
 		{
 			// steam initialized
 			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, AddEntity, () => World);
+			NetworkBlockSync.Initialize(() => _players);
 		}
 	}
 

@@ -20,7 +20,7 @@ public enum MessageType : byte
     RequestUpdateWorldForClient, // client -> host, requests world update
     PlayerSpawned, // host -> all clients, sends new player data
     PlayerPositionUpdate, // host -> all clients, player position update, client -> host
-    BlockChanged,
+    BlockChanged, // client -> host (block change request), host -> all clients (confirms)
     EntitySpawned,
     EntityKilled,
     ChatMessage,
@@ -620,6 +620,18 @@ public class NetworkManager
                         {
                             // client receives position update from host
                             NetworkEntitySync.HandlePositionUpdateFromHost(content);
+                        }
+                        break;
+                    case MessageType.BlockChanged:
+                        if (IsHost) 
+                        {
+                            var senderConnection = message.m_conn;
+                            var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
+                            NetworkBlockSync.HandleClientBlockChanged(content, senderId);
+                        }
+                        else 
+                        {
+                            NetworkBlockSync.HandleBlockChangedFromHost(content);
                         }
                         break;
                     case MessageType.RequestUpdateWorldForClient:

@@ -352,7 +352,9 @@ public class Player : HumanLikeEntity
 			// can only break ground and furniture
 			var groundInst = currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y, TileLayer.Ground);
 			if (groundInst is {Block.IsBreakable: true})
+			{
 				groundInst.DoBreaking(pos, this);
+			}
 			
 			var furnitureInst = currentWorld.GetBlockInstance((int) pos.X, (int) pos.Y, TileLayer.Furniture);
 			if (furnitureInst is {Block.IsBreakable: true}) 
@@ -366,7 +368,27 @@ public class Player : HumanLikeEntity
 		if (placeableBlock == null) return;
 		
 		var placeableLayer = placeableBlock.GetLayer();
-		worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
+		
+		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
+		{
+		    if (NetworkManager.Instance.IsHost) 
+		    {
+				// host -> place block locally and broadcast
+		        worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
+				NetworkBlockSync.BroadcastBlockChangedToClients(position, placeable.BlockId, placeableLayer, this);
+		    }
+		    else 
+		    {
+				// client -> send placement request to host, dont process locally yet
+				NetworkBlockSync.SendBlockChangedToHost(position, placeable.BlockId, placeableLayer, this);
+		    }
+		}
+		else 
+		{
+		    // singleplayer -> place directly
+		    worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
+		}
+		
 		PlayerInventory.RemoveItem(SelectedHotbarSlot);
 		
 		// return empty bucket if specified

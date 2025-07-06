@@ -1,6 +1,7 @@
 using Blastia.Main.Entities;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.Networking;
 using Blastia.Main.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -59,7 +60,9 @@ public abstract class Block
 	}
 
 	// virtual methods for complex blocks
-	public virtual void OnPlace(World? world, Vector2 position, Player? player) {}
+	public virtual void OnPlace(World? world, Vector2 position, Player? player) 
+	{
+	}
 
 	public virtual void OnBreak(World? world, Vector2 position, Player? player)
 	{
@@ -179,7 +182,25 @@ public class BlockInstance
 		
 		if (Damage >= Block.Hardness)
 		{
-			selectedWorld.SetTile((int) position.X, (int) position.Y, 0, Block.GetLayer(), player);
+			if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
+			{
+			    if (NetworkManager.Instance.IsHost) 
+			    {
+					// host: handle locally and broadcast
+			        selectedWorld.SetTile((int) position.X, (int) position.Y, 0, Block.GetLayer(), player);
+					NetworkBlockSync.BroadcastBlockChangedToClients(position, 0, Block.GetLayer(), player);
+			    }
+			    else 
+			    {
+			        // client: send request
+			        NetworkBlockSync.SendBlockChangedToHost(position, 0, Block.GetLayer(), player);
+			    }
+			}
+			else 
+			{
+			    // singleplayer
+			    selectedWorld.SetTile((int) position.X, (int) position.Y, 0, Block.GetLayer(), player);
+			}
 		}
 	}
 
