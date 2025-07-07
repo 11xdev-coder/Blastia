@@ -20,7 +20,8 @@ public enum MessageType : byte
     RequestUpdateWorldForClient, // client -> host, requests world update
     PlayerSpawned, // host -> all clients, sends new player data
     PlayerPositionUpdate, // host -> all clients, player position update, client -> host
-    BlockChanged, // client -> host (block change request), host -> all clients (confirms)
+    BlockChanged, // client -> host (block change request), host -> all clients (broadcasts)
+    BlockUpdated, // client -> host (block updated), host -> all clients (broadcasts)
     EntitySpawned,
     EntityKilled,
     ChatMessage,

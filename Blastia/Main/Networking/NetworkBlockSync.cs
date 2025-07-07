@@ -159,4 +159,44 @@ public static class NetworkBlockSync
             Console.WriteLine($"[NetworkBlockSync] [CLIENT] Error: handling block changed {ex.Message}");
         }
     }
+    
+    /// <summary>
+    /// Sends blocks' positions that were updated this frame (host -> broadcasts to clients, client -> sends to host)
+    /// </summary>
+    /// <param name="updatedBlocksPositions"></param>
+    public static void SendBlockUpdatesToNetwork(HashSet<Vector2> updatedBlocksPositions) 
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected) return;
+        
+        try 
+        {
+            foreach (var position in updatedBlocksPositions) 
+            {
+                var update = new NetworkBlockUpdate
+                {
+                    Position = position
+                };
+                var updateBytes = update.Serialize();
+                var updateBase64 = Convert.ToBase64String(updateBytes);
+                
+                if (NetworkManager.Instance.IsHost) 
+                {
+                    // host -> broadcast
+                    foreach (var connection in NetworkManager.Instance.Connections.Values)
+                        NetworkMessageQueue.QueueMessage(connection, MessageType.BlockUpdated, updateBase64);
+                }
+                else 
+                {
+                    // client -> send to host
+                    var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+                    if (hostConnection != HSteamNetConnection.Invalid)
+                        NetworkMessageQueue.QueueMessage(hostConnection, MessageType.BlockUpdated, updateBase64);
+                }
+            }
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"[NetworkBlockSync] Error sending block updates: {ex.Message}");
+        }
+    }
 }

@@ -18,7 +18,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.IO; // for Path and File
 using Blastia.Main.Blocks.Common;
-using Blastia.Main.Physics; // for Block.Size
+using Blastia.Main.Physics;
+using Blastia.Main.Blocks; // for Block.Size
 
 namespace Blastia.Main;
 
@@ -473,13 +474,20 @@ public class BlastiaGame : Game
 						var tilesToUpdate = tuple?.Item2;
 
 						if (collisionBodies == null || tilesToUpdate == null) return;
-						
+
+						var blocksUpdatedThisFrame = new HashSet<Vector2>();
 						foreach (var (t, blockInstance) in tilesToUpdate)
 						{
 							var position = t.Item1;
 							try
 							{
+								var beforeUpdate = CaptureBlockState(blockInstance);
 								blockInstance.Update(World, position);
+
+								var afterUpdate = CaptureBlockState(blockInstance);
+								if (HasBlockStateChanged(beforeUpdate, afterUpdate))
+									blocksUpdatedThisFrame.Add(position); // add to updated blocks
+								
 								if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
 								{
 									Collision.AddObjectToGrid(box, true);
@@ -489,6 +497,11 @@ public class BlastiaGame : Game
 							{
 								Console.WriteLine($"Error updating block at {position}. Exception: {ex.Message}");
 							}
+						}
+						
+						if (blocksUpdatedThisFrame.Count > 0 && NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
+						{
+							NetworkBlockSync.SendBlockUpdatesToNetwork(blocksUpdatedThisFrame);
 						}
 					}
 
@@ -518,6 +531,36 @@ public class BlastiaGame : Game
 		{
 			LogError(ex, "Error in Update");
 		}
+	}
+	
+	/// <summary>
+	/// Returns tuple of <c>ID</c>, <c>Damage</c> and <c>FlowLevel</c> (0 if not liquid) properties of block instance
+	/// </summary>
+	/// <param name="inst"></param>
+	/// <returns></returns>
+	private (ushort blockId, float damage, int flowLevel) CaptureBlockState(BlockInstance inst) 
+	{
+		var flowLevel = 0;
+		if (inst.Block is LiquidBlock liquid)
+			flowLevel = liquid.FlowLevel;
+
+		return (inst.Id, inst.Damage, flowLevel);
+	}
+	
+	/// <summary>
+	/// Checks if <c>before</c> tuple changed enough from <c>after</c> tuple
+	/// </summary>
+	/// <returns></returns>
+	private bool HasBlockStateChanged((ushort blockId, float damage, int flowLevel) before, (ushort blockId, float damage, int flowLevel) after) 
+	{
+		if (before.blockId != after.blockId) return true;
+
+		// enough damage
+		if (Math.Abs(before.damage - after.damage) > 0.01f) return true;
+
+		if (before.flowLevel != after.flowLevel) return true;
+
+		return false;
 	}
 
 	private void UpdateColors()
