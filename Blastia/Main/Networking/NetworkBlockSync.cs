@@ -9,9 +9,11 @@ namespace Blastia.Main.Networking;
 public static class NetworkBlockSync
 {
     private static Func<List<Player>>? _playersFactory;
-    public static void Initialize(Func<List<Player>> playersFactory)
+    private static Func<World?>? _worldFactory;
+    public static void Initialize(Func<List<Player>> playersFactory, Func<World?> worldFactory)
     {
         _playersFactory = playersFactory;
+        _worldFactory = worldFactory;
     }
     
     /// <summary>
@@ -167,36 +169,120 @@ public static class NetworkBlockSync
     public static void SendBlockUpdatesToNetwork(HashSet<Vector2> updatedBlocksPositions) 
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected) return;
-        
+
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        if (worldState == null) return;   
+           
         try 
         {
             foreach (var position in updatedBlocksPositions) 
             {
-                var update = new NetworkBlockUpdate
+                foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer))) 
                 {
-                    Position = position
-                };
-                var updateBytes = update.Serialize();
-                var updateBase64 = Convert.ToBase64String(updateBytes);
+                    var currentBlockId = worldState.GetTile((int)position.X, (int)position.Y, layer);
+                    var inst = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
+
+                    if (currentBlockId == 0) continue;
+                    
+                    var update = new NetworkBlockUpdate
+                    {
+                        Position = position,
+                        NewBlockId = currentBlockId,
+                        Layer = layer
+                    };
+                    var updateBytes = update.Serialize();
+                    var updateBase64 = Convert.ToBase64String(updateBytes);
+                    
+                    if (NetworkManager.Instance.IsHost) 
+                    {
+                        // host -> broadcast
+                        foreach (var connection in NetworkManager.Instance.Connections.Values)
+                            NetworkMessageQueue.QueueMessage(connection, MessageType.BlockUpdated, updateBase64);
+                    }
+                    else 
+                    {
+                        // client -> send to host
+                        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+                        if (hostConnection != HSteamNetConnection.Invalid)
+                            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.BlockUpdated, updateBase64);
+                    }
+                }
                 
-                if (NetworkManager.Instance.IsHost) 
-                {
-                    // host -> broadcast
-                    foreach (var connection in NetworkManager.Instance.Connections.Values)
-                        NetworkMessageQueue.QueueMessage(connection, MessageType.BlockUpdated, updateBase64);
-                }
-                else 
-                {
-                    // client -> send to host
-                    var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
-                    if (hostConnection != HSteamNetConnection.Invalid)
-                        NetworkMessageQueue.QueueMessage(hostConnection, MessageType.BlockUpdated, updateBase64);
-                }
             }
         }
         catch (Exception ex) 
         {
             Console.WriteLine($"[NetworkBlockSync] Error sending block updates: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Called when <c>BlockUpdated</c> message is received (host only)
+    /// </summary>
+    public static void HandleClientBlockUpdate(string updateBase64, HSteamNetConnection senderConnection) 
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
+        
+        try 
+        {
+            var updateBytes = Convert.FromBase64String(updateBase64);
+            var update = NetworkBlockUpdate.Deserialize(updateBytes);
+
+            // apply locally
+            ApplyBlockUpdateLocally(update);
+            
+            // broadcast to all other clients (excluding the sender)
+            foreach (var connection in NetworkManager.Instance.Connections.Values) 
+            {
+                if (connection != senderConnection)
+                    NetworkMessageQueue.QueueMessage(connection, MessageType.BlockUpdated, updateBase64);
+            }
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"[NetworkBlockSync] [HOST] Error: failed to handle block update: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Called when <c>BlockUpdated</c> message is received (client only)
+    /// </summary>
+    public static void HandleBlockUpdateFromHost(string updateBase64) 
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
+        
+        try 
+        {
+            var updateBytes = Convert.FromBase64String(updateBase64);
+            var update = NetworkBlockUpdate.Deserialize(updateBytes);
+
+            // apply locally
+            ApplyBlockUpdateLocally(update);
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"[NetworkBlockSync] [CLIENT] Error: failed to handle block update: {ex.Message}");
+        }
+    }
+    
+    private static void ApplyBlockUpdateLocally(NetworkBlockUpdate update) 
+    {
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var world = _worldFactory?.Invoke();
+        if (worldState == null || world == null) return;
+        
+        try
+        {
+            // update properties
+            var blockInstance = worldState.GetBlockInstance((int)update.Position.X, (int)update.Position.Y, update.Layer);
+            if (blockInstance != null && worldState != null)
+            {
+                blockInstance.Update(world, update.Position);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[NetworkManager] Error applying block update at {update.Position}: {ex.Message}");
         }
     }
 }

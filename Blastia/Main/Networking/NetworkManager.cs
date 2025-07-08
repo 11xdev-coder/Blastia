@@ -635,6 +635,17 @@ public class NetworkManager
                             NetworkBlockSync.HandleBlockChangedFromHost(content);
                         }
                         break;
+                    case MessageType.BlockUpdated:
+                        if (IsHost) 
+                        {
+                            var senderConnection = message.m_conn;
+                            NetworkBlockSync.HandleClientBlockUpdate(content, senderConnection);
+                        }
+                        else 
+                        {
+                            NetworkBlockSync.HandleBlockUpdateFromHost(content);
+                        }
+                        break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client
                         if (IsHost)

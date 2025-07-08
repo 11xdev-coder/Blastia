@@ -214,7 +214,7 @@ public class BlastiaGame : Game
 		{
 			// steam initialized
 			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, AddEntity, () => World);
-			NetworkBlockSync.Initialize(() => _players);
+			NetworkBlockSync.Initialize(() => _players, () => World);
 		}
 	}
 
@@ -481,11 +481,11 @@ public class BlastiaGame : Game
 							var position = t.Item1;
 							try
 							{
-								var beforeUpdate = CaptureBlockState(blockInstance);
+								var beforeUpdate = CaptureBlockState(blockInstance, position);
 								blockInstance.Update(World, position);
-
-								var afterUpdate = CaptureBlockState(blockInstance);
-								if (HasBlockStateChanged(beforeUpdate, afterUpdate))
+								var afterUpdate = CaptureBlockState(blockInstance, position);
+								
+								if (HasBlockStateChanged(beforeUpdate, afterUpdate)) // if state changed
 									blocksUpdatedThisFrame.Add(position); // add to updated blocks
 								
 								if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
@@ -536,15 +536,19 @@ public class BlastiaGame : Game
 	/// <summary>
 	/// Returns tuple of <c>ID</c>, <c>Damage</c> and <c>FlowLevel</c> (0 if not liquid) properties of block instance
 	/// </summary>
-	/// <param name="inst"></param>
 	/// <returns></returns>
-	private (ushort blockId, float damage, int flowLevel) CaptureBlockState(BlockInstance inst) 
+	private (ushort blockId, float damage, int flowLevel) CaptureBlockState(BlockInstance inst, Vector2 position) 
 	{
+		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+    
+		// get the actual block ID from the world (this detects if block was created/destroyed during update)
+		var actualBlockId = worldState?.GetTile((int)position.X, (int)position.Y, inst.Block.GetLayer()) ?? 0;
+		
 		var flowLevel = 0;
 		if (inst.Block is LiquidBlock liquid)
 			flowLevel = liquid.FlowLevel;
 
-		return (inst.Id, inst.Damage, flowLevel);
+		return (actualBlockId, inst.Damage, flowLevel);
 	}
 	
 	/// <summary>
