@@ -181,8 +181,6 @@ public static class NetworkBlockSync
                 {
                     var currentBlockId = worldState.GetTile((int)position.X, (int)position.Y, layer);
                     var inst = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
-
-                    if (currentBlockId == 0) continue;
                     
                     var update = new NetworkBlockUpdate
                     {

@@ -484,8 +484,11 @@ public class BlastiaGame : Game
 								var beforeUpdate = CaptureBlockState(blockInstance, position);
 								blockInstance.Update(World, position);
 								var afterUpdate = CaptureBlockState(blockInstance, position);
+
+								var hasStateChanged = HasBlockStateChanged(beforeUpdate, afterUpdate);
+								var isLiquidChanged = blockInstance.Block is LiquidBlock liquid && liquid.HasChangedThisFrame; 
 								
-								if (HasBlockStateChanged(beforeUpdate, afterUpdate)) // if state changed
+								if (hasStateChanged || isLiquidChanged) // if state changed
 									blocksUpdatedThisFrame.Add(position); // add to updated blocks
 								
 								if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))

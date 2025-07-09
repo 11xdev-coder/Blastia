@@ -33,6 +33,8 @@ public abstract class LiquidBlock : Block
     /// Time between each <c>Update()</c> call. Less interval -> faster liquid flow
     /// </summary>
     public float FlowUpdateInterval { get; protected set; }
+    
+    public bool HasChangedThisFrame { get; set; }
 
     private float _flowTimer;
 
@@ -63,6 +65,9 @@ public abstract class LiquidBlock : Block
     {
         base.Update(world, position);
 
+        HasChangedThisFrame = false;
+
+        var previousFlowLevel = FlowLevel;
         _flowTimer += (float) BlastiaGame.GameTimeElapsedSeconds;
 
         if (_flowTimer >= FlowUpdateInterval)
@@ -76,6 +81,10 @@ public abstract class LiquidBlock : Block
             
             _flowTimer -= FlowUpdateInterval;
         }
+
+        // flow level changed
+        if (FlowLevel != previousFlowLevel)
+            HasChangedThisFrame = true;
         
         var rect = new Rectangle((int)position.X, (int)position.Y, Size, Size);
         var potentialEntities = Collision.GetPotentialEntitiesInRectangle(rect);
@@ -108,13 +117,19 @@ public abstract class LiquidBlock : Block
             {
                 // dont exceed max -> move all liquid down
                 belowLiquid.FlowLevel = combinedLevels;
+                belowLiquid.HasChangedThisFrame = true;
+
+                HasChangedThisFrame = true;
                 _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer()); // remove this liquid
             }
             else
             {
                 // combined levels exceed max -> max out below liquid and leave this on top
                 belowLiquid.FlowLevel = 8;
+                belowLiquid.HasChangedThisFrame = true;
+                
                 FlowLevel = combinedLevels - 8;
+                HasChangedThisFrame = true;
                 
                 // excess liquid -> flow horizontally
                 TryFlowingHorizontally(x, y);
@@ -169,6 +184,8 @@ public abstract class LiquidBlock : Block
     {
         // flow with enough levels
         if (FlowLevel < 2) return;
+
+        var previousFlowLevel = FlowLevel;
 
         var leftGroundInst = _currentWorldState.GetBlockInstance(x - Size, y, TileLayer.Ground);
         var leftLiquidInst = _currentWorldState.GetBlockInstance(x - Size, y, TileLayer.Liquid);
@@ -236,6 +253,7 @@ public abstract class LiquidBlock : Block
             if (leftLiquidInst?.Block is LiquidBlock existingLeft && existingLeft.Id == Id) 
             {
                 existingLeft.FlowLevel = newLeftLevel;
+                existingLeft.HasChangedThisFrame = true;
             } 
             else 
             {
@@ -250,6 +268,7 @@ public abstract class LiquidBlock : Block
             if (rightLiquidInst?.Block is LiquidBlock existingRight && existingRight.Id == Id) 
             {
                 existingRight.FlowLevel = newRightLevel;
+                existingRight.HasChangedThisFrame = true;
             } 
             else 
             {
@@ -260,15 +279,22 @@ public abstract class LiquidBlock : Block
         // remove if empty
         if (FlowLevel <= 0) 
         {
+            HasChangedThisFrame = true;
             _currentWorldState.SetTile(x, y, BlockId.Air, GetLayer());
         }
+
+        if (FlowLevel != previousFlowLevel)
+            HasChangedThisFrame = true;
     }
 
     private void CreateLiquidAt(int x, int y, int targetFlowLevel)
     {
         var liquid = CreateNewInstance();
         liquid.FlowLevel = targetFlowLevel;
+        liquid.HasChangedThisFrame = true;
         _currentWorldState.SetTile(x, y, new BlockInstance(liquid, 0), GetLayer());
+
+        HasChangedThisFrame = true;
     }
     
     public abstract LiquidBlock CreateNewInstance();
