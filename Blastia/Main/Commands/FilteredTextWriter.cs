@@ -24,8 +24,11 @@ public class FilteredTextWriter : TextWriter
         if (value == '\n')
         {
             var line = _lineBuffer.ToString();
-            if (_filter(line))
-                _originalWriter.WriteLine(line);
+            if (_filter(line)) 
+            {
+                var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+                _originalWriter.WriteLine($"[{timestamp}] {line}");
+            }
             _lineBuffer.Clear();
         }
         else if (value != '\r')
@@ -38,8 +41,11 @@ public class FilteredTextWriter : TextWriter
     {
         try 
         {
-            if (value != null && _filter(value))
-                _originalWriter.WriteLine(value);
+            if (value != null && _filter(value)) 
+            {
+                var timestamp = DateTime.Now.ToString("HH:mm:ss.fff");
+                _originalWriter.WriteLine($"[{timestamp}] {value}");
+            }
         }
         catch
         {

@@ -1,3 +1,5 @@
+using Blastia.Main.Blocks;
+using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
@@ -181,12 +183,17 @@ public static class NetworkBlockSync
                 {
                     var currentBlockId = worldState.GetTile((int)position.X, (int)position.Y, layer);
                     var inst = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
+
+                    var flowLevel = 0;
+                    if (inst?.Block is LiquidBlock liquid)
+                        flowLevel = liquid.FlowLevel;
                     
                     var update = new NetworkBlockUpdate
                     {
                         Position = position,
                         NewBlockId = currentBlockId,
-                        Layer = layer
+                        Layer = layer,
+                        FlowLevel = flowLevel
                     };
                     var updateBytes = update.Serialize();
                     var updateBase64 = Convert.ToBase64String(updateBytes);
@@ -271,11 +278,27 @@ public static class NetworkBlockSync
         
         try
         {
-            // update properties
-            var blockInstance = worldState.GetBlockInstance((int)update.Position.X, (int)update.Position.Y, update.Layer);
-            if (blockInstance != null && worldState != null)
+            if (update.NewBlockId == 0) 
             {
-                blockInstance.Update(world, update.Position);
+                // block removed
+                worldState.SetTile((int)update.Position.X, (int)update.Position.Y, 0, update.Layer, null);
+            }
+            else 
+            {
+                // block placed
+                var block = StuffRegistry.GetBlock(update.NewBlockId);
+                if (block != null)
+                {
+                    var blockInstance = new BlockInstance(block, 0);
+                    
+                    // set flow level from network
+                    if (blockInstance.Block is LiquidBlock liquid)
+                    {
+                        liquid.FlowLevel = update.FlowLevel;
+                    }
+                    
+                    worldState.SetTile((int)update.Position.X, (int)update.Position.Y, blockInstance, update.Layer, null);
+                }
             }
         }
         catch (Exception ex)

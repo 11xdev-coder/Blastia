@@ -8,6 +8,7 @@ public class NetworkBlockUpdate
     public Vector2 Position { get; set; }
     public ushort NewBlockId { get; set; }
     public TileLayer Layer { get; set; }
+    public int FlowLevel { get; set; }
         
     public byte[] Serialize() 
     {
@@ -18,6 +19,7 @@ public class NetworkBlockUpdate
         writer.Write(Position.Y);
         writer.Write(NewBlockId);
         writer.Write((byte)Layer);
+        writer.Write(FlowLevel);
 
         return stream.ToArray();
     }
@@ -31,7 +33,8 @@ public class NetworkBlockUpdate
         {
             Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             NewBlockId = reader.ReadUInt16(),
-            Layer = (TileLayer) reader.ReadByte()
+            Layer = (TileLayer) reader.ReadByte(),
+            FlowLevel = reader.ReadInt32()
         };
     }
 }

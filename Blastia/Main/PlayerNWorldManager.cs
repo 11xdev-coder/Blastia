@@ -341,12 +341,14 @@ public class WorldState
 	/// <param name="alignedY"></param>
 	/// <param name="block">New block instance, must not be empty</param>
 	/// <param name="layer"></param>
-	public void SetTile(int alignedX, int alignedY, BlockInstance block, TileLayer layer)
+	/// <param name="player">Player that set the tile</param>
+	public void SetTile(int alignedX, int alignedY, BlockInstance block, TileLayer layer, Player? player = null)
 	{
 		Vector2 pos = new(alignedX, alignedY);
 		var tileDict = GetTileDictionary(layer);
 		var instanceDict = GetInstanceDictionary(layer);
 		tileDict[pos] = block.Id;
+		block.OnPlace(player?.World, pos, player);
 		instanceDict[pos] = block;
 	}
 

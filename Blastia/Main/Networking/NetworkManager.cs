@@ -274,6 +274,7 @@ public class NetworkManager
         if (!SteamAPI.IsSteamRunning())
         {
             Console.WriteLine("[NetworkManager] Cannot join: Steam is not running");
+            BlastiaGame.JoinGameMenu?.UpdateStatusText("Steam is not running");
             return;
         }
 
