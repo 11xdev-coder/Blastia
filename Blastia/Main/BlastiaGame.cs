@@ -151,6 +151,7 @@ public class BlastiaGame : Game
 	private const ushort EntityLimit = 256;
 
 	private Player? _myPlayer;
+	private Dictionary<(Vector2, TileLayer), BlockInstance>? _myCachedTiles = []; // cached tiles to update for rendering
 	private readonly List<Player> _players;
 	public const float PlayerScale = 0.15f;
 	public ushort PlayerLimit = 128;
@@ -469,11 +470,20 @@ public class BlastiaGame : Game
 							Collision.AddObjectToGrid(rect, false, _myPlayer);
 						}
 						
-						if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost) 
+						// host or singleplayer
+						if ((NetworkManager.Instance != null && NetworkManager.Instance.IsHost) || NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected) 
 						{
-							var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
-							var collisionBodies = tuple?.Item1;
-							var tilesToUpdate = tuple?.Item2;
+							var hostTuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+							var hostCollisionBodies = hostTuple?.Item1;
+							var hostTilesToUpdate = hostTuple?.Item2;
+							
+							_myCachedTiles = new Dictionary<(Vector2, TileLayer), BlockInstance>(hostTilesToUpdate ?? new());
+
+							var allTilesToUpdate = new Dictionary<(Vector2, TileLayer), BlockInstance>();
+
+							if (hostTilesToUpdate == null || hostCollisionBodies == null) return;
+							foreach (var kvp in hostTilesToUpdate)
+								allTilesToUpdate.TryAdd(kvp.Key, kvp.Value);
 							
 						    // loop through each remote player and get their drawn tiles
 						    foreach (var p in _players) 
@@ -483,15 +493,13 @@ public class BlastiaGame : Game
 								{
 									foreach (var kvp in remotePlayerTuple.GetValueOrDefault().Item2)
 									{
-										tilesToUpdate?.TryAdd(kvp.Key, kvp.Value);
+										allTilesToUpdate.TryAdd(kvp.Key, kvp.Value);
 									}
 								}
 						    }
-						    
-						    if (collisionBodies == null || tilesToUpdate == null) return;
 
 							var blocksUpdatedThisFrame = new HashSet<Vector2>();
-							foreach (var (t, blockInstance) in tilesToUpdate)
+							foreach (var (t, blockInstance) in allTilesToUpdate)
 							{
 								var position = t.Item1;
 								try
@@ -501,12 +509,11 @@ public class BlastiaGame : Game
 									var afterUpdate = CaptureBlockState(blockInstance, position);
 
 									var hasStateChanged = HasBlockStateChanged(beforeUpdate, afterUpdate);
-									var isLiquidChanged = blockInstance.Block is LiquidBlock liquid && liquid.HasChangedThisFrame; 
 									
-									if (hasStateChanged || isLiquidChanged) // if state changed
+									if (hasStateChanged) // if state changed
 										blocksUpdatedThisFrame.Add(position); // add to updated blocks
 									
-									if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
+									if (blockInstance.Block.IsCollidable && hostCollisionBodies.TryGetValue(position, out var box))
 									{
 										Collision.AddObjectToGrid(box, true);
 									}
@@ -522,7 +529,7 @@ public class BlastiaGame : Game
 								NetworkBlockSync.BroadcastUpdatedBlocksToClients(blocksUpdatedThisFrame);
 							}
 						}
-						else if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected)
+						else if (NetworkManager.Instance != null && !NetworkManager.Instance.IsHost)
 						{
 						    // on client only set drawn tiles to render + handle collision
 						    // updates are received from host
@@ -673,6 +680,12 @@ public class BlastiaGame : Game
 
 		if (IsWorldInitialized && PlayerNWorldManager.Instance.SelectedWorld != null)
 		{
+			// reset camera to only what this player sees
+			if (_myPlayer?.Camera != null && _myCachedTiles != null)
+			{
+				_myPlayer.Camera.DrawnTiles = _myCachedTiles;
+			}
+			
 			// first ground
 			_myPlayer?.Camera?.RenderGroundTiles(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 			if (World is {DrawCollisionGrid: true}) _myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);

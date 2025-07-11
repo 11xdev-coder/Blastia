@@ -324,10 +324,6 @@ public static class NetworkBlockSync
                 blockInstance.Update(world, update.Position);
                 Console.WriteLine($"[NetworkBlockSync] [CLIENT] Updated block at {update.Position} on layer {update.Layer}");
             }
-            else
-            {
-                Console.WriteLine($"[NetworkBlockSync] [CLIENT] No block to update at {update.Position} on layer {update.Layer}");
-            }
         }
         catch (Exception ex) 
         {
