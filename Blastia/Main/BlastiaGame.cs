@@ -152,6 +152,7 @@ public class BlastiaGame : Game
 
 	private Player? _myPlayer;
 	private Dictionary<(Vector2, TileLayer), BlockInstance>? _myCachedTiles = []; // cached tiles to update for rendering
+	private static readonly HashSet<Vector2> _damagedBlockPositionsThisFrame = [];
 	private readonly List<Player> _players;
 	public const float PlayerScale = 0.15f;
 	public ushort PlayerLimit = 128;
@@ -404,6 +405,15 @@ public class BlastiaGame : Game
 		MusicEngine.UnloadMusic();
 	}
 
+	/// <summary>
+	/// Notifies that a block at <c>position</c> started breaking and updats it for all clients. Must be called for proper syncing
+	/// </summary>
+	/// <param name="position"></param>
+	public static void NotifyBlockDamaged(Vector2 position) 
+	{
+		_damagedBlockPositionsThisFrame.Add(position);
+	}
+
 	// UPDATE
 	protected override void Update(GameTime gameTime)
 	{
@@ -497,7 +507,7 @@ public class BlastiaGame : Game
 									}
 								}
 						    }
-
+							
 							var blocksUpdatedThisFrame = new HashSet<Vector2>();
 							foreach (var (t, blockInstance) in allTilesToUpdate)
 							{
@@ -506,12 +516,12 @@ public class BlastiaGame : Game
 								{
 									var beforeUpdate = CaptureBlockState(blockInstance, position);
 									blockInstance.Update(World, position);
+									
 									var afterUpdate = CaptureBlockState(blockInstance, position);
-
 									var hasStateChanged = HasBlockStateChanged(beforeUpdate, afterUpdate);
 									
 									if (hasStateChanged) // if state changed
-										blocksUpdatedThisFrame.Add(position); // add to updated blocks
+										blocksUpdatedThisFrame.Add(position); // add to updated blocks]
 									
 									if (blockInstance.Block.IsCollidable && hostCollisionBodies.TryGetValue(position, out var box))
 									{
@@ -523,6 +533,12 @@ public class BlastiaGame : Game
 									Console.WriteLine($"[HOST] Error updating block at {position}. Exception: {ex.Message}");
 								}
 							}
+							
+							foreach (var damagedPosition in _damagedBlockPositionsThisFrame)
+							{
+								blocksUpdatedThisFrame.Add(damagedPosition);
+							}
+							_damagedBlockPositionsThisFrame.Clear();
 							
 							if (blocksUpdatedThisFrame.Count > 0 && NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 							{
@@ -589,7 +605,7 @@ public class BlastiaGame : Game
 	/// Returns tuple of <c>ID</c>, <c>Damage</c> and <c>FlowLevel</c> (0 if not liquid) properties of block instance
 	/// </summary>
 	/// <returns></returns>
-	private (ushort blockId, float damage, int flowLevel) CaptureBlockState(BlockInstance inst, Vector2 position) 
+	private (ushort blockId, int flowLevel) CaptureBlockState(BlockInstance inst, Vector2 position) 
 	{
 		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
     
@@ -600,22 +616,18 @@ public class BlastiaGame : Game
 		if (inst.Block is LiquidBlock liquid)
 			flowLevel = liquid.FlowLevel;
 
-		return (actualBlockId, inst.Damage, flowLevel);
+		return (actualBlockId, flowLevel);
 	}
 	
 	/// <summary>
 	/// Checks if <c>before</c> tuple changed enough from <c>after</c> tuple
 	/// </summary>
 	/// <returns></returns>
-	private bool HasBlockStateChanged((ushort blockId, float damage, int flowLevel) before, (ushort blockId, float damage, int flowLevel) after) 
+	private bool HasBlockStateChanged((ushort blockId, int flowLevel) before, (ushort blockId, int flowLevel) after) 
 	{
 		if (before.blockId != after.blockId) return true;
 
-		// enough damage
-		if (Math.Abs(before.damage - after.damage) > 0.01f) return true;
-
 		if (before.flowLevel != after.flowLevel) return true;
-
 		return false;
 	}
 

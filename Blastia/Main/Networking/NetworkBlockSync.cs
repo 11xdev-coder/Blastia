@@ -207,9 +207,13 @@ public static class NetworkBlockSync
         
         foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer))) 
         {
+            var blockInstance = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
+            if (blockInstance == null) continue; 
+        
             var update = new NetworkBlockUpdate
             {
                 Position = position,
+                Damage = blockInstance.Damage,
                 Layer = layer
             };
             var updateBytes = update.Serialize();
@@ -218,44 +222,6 @@ public static class NetworkBlockSync
             foreach (var connection in NetworkManager.Instance.Connections.Values)
                 if (connection != senderConnection)
                     NetworkMessageQueue.QueueMessage(connection, MessageType.BlockUpdate, updateBase64);
-        }
-    }
-    
-    /// <summary>
-    /// Host receives <c>BlockUpdateAtPositions</c> message from client
-    /// </summary>
-    public static void HandleClientBlockPositions(string updateBase64, HSteamNetConnection senderConnection) 
-    {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
-        
-        try 
-        {
-            var positionBytes = Convert.FromBase64String(updateBase64);
-            var networkPositions = NetworkBlockUpdateAtPositions.Deserialize(positionBytes);
-            
-            var worldState = PlayerNWorldManager.Instance.SelectedWorld;
-            var world = _worldFactory?.Invoke();
-            if (worldState == null || world == null) return;
-            
-            Console.WriteLine($"[NetworkBlockSync] [HOST] Simulating {networkPositions.Positions.Count} blocks from client");
-            
-            foreach (var position in networkPositions.Positions)
-            {
-                foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer)))
-                {
-                    var blockInstance = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
-                    if (blockInstance != null)
-                    {
-                        blockInstance.Update(world, position);
-                    }
-                }
-                
-                BroadcastBlockUpdate(position, senderConnection);
-            }
-        }
-        catch (Exception ex) 
-        {
-            Console.WriteLine($"[NetworkBlockSync] [HOST] Error handling client block positions: {ex.Message}");
         }
     }
     
@@ -320,6 +286,7 @@ public static class NetworkBlockSync
                 {
                     liquid.ForceUpdate = true;
                 }
+                blockInstance.Damage = update.Damage;
                 
                 blockInstance.Update(world, update.Position);
                 Console.WriteLine($"[NetworkBlockSync] [CLIENT] Updated block at {update.Position} on layer {update.Layer}");

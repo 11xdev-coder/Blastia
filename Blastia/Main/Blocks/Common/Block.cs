@@ -147,12 +147,13 @@ public class BlockInstance
 	public Block Block;
 	public float Damage;
 	private readonly BlockBreakingAnimation _breakingAnimation;
-	private bool _hasRequestedBreak;
+	private bool _hasRequestedBreak; // network flag
 
 	public BlockInstance(Block block, float damage)
 	{
 		Block = block;
 		Damage = damage;
+		
 		_breakingAnimation = new BlockBreakingAnimation();
 	}
 
@@ -169,7 +170,19 @@ public class BlockInstance
 		if (selectedWorld == null) return;
 		
 		var deltaTime = (float) BlastiaGame.GameTime.ElapsedGameTime.TotalSeconds;
+		var previousDamage = Damage;
 		Damage += deltaTime;
+
+		// only notify when crossing visual damage thresholds
+		var oneSixth = Block.Hardness / 6f;
+		var previousStage = (int)(previousDamage / oneSixth);
+		var currentStage = (int)(Damage / oneSixth);
+		
+		// notify if we hit a new stage
+		if (currentStage > previousStage)
+		{
+			BlastiaGame.NotifyBlockDamaged(position);
+		}
 
 		if (SoundEngine.CanPlaySoundForBlock(position))
 		{
@@ -219,7 +232,7 @@ public class BlockInstance
 	public bool OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);
 	public void OnLeftClick(World world, Vector2 position, Player player) => Block.OnLeftClick(world, position, player);
 	public void Update(World world, Vector2 position)
-	{
+	{		
 		Block.Update(world, position);
 		_breakingAnimation.Update();
 	}

@@ -648,13 +648,6 @@ public class NetworkManager
                             NetworkBlockSync.HandleBlockUpdateFromHost(content);
                         }
                         break;
-                    case MessageType.BlockUpdateAtPositions:
-                        if (IsHost) 
-                        {
-                            var senderConnection = message.m_conn;
-                            NetworkBlockSync.HandleClientBlockPositions(content, senderConnection);
-                        }
-                        break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client
                         if (IsHost)
