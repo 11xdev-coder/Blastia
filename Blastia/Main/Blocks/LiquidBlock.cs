@@ -35,6 +35,11 @@ public abstract class LiquidBlock : Block
     public float FlowUpdateInterval { get; protected set; }
     
     public bool HasChangedThisFrame { get; set; }
+    
+    /// <summary>
+    /// Avoids timer calculations and updates liquid right away. Usually used when this block is updated via network
+    /// </summary>
+    public bool ForceUpdate { get; set; }
 
     private float _flowTimer;
 
@@ -70,7 +75,7 @@ public abstract class LiquidBlock : Block
         var previousFlowLevel = FlowLevel;
         _flowTimer += (float) BlastiaGame.GameTimeElapsedSeconds;
 
-        if (_flowTimer >= FlowUpdateInterval)
+        if (ForceUpdate || _flowTimer >= FlowUpdateInterval)
         {
             if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
             _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld;
@@ -80,6 +85,7 @@ public abstract class LiquidBlock : Block
             TryFlowingDown(blockX, blockY);
             
             _flowTimer -= FlowUpdateInterval;
+            ForceUpdate = false;
         }
 
         // flow level changed

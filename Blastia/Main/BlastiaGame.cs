@@ -214,7 +214,7 @@ public class BlastiaGame : Game
 		{
 			// steam initialized
 			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, AddEntity, () => World);
-			NetworkBlockSync.Initialize(() => _players, () => World);
+			NetworkBlockSync.Initialize(() => _players, () => World, () => _myPlayer);
 		}
 	}
 
@@ -469,42 +469,84 @@ public class BlastiaGame : Game
 							Collision.AddObjectToGrid(rect, false, _myPlayer);
 						}
 						
-						var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
-						var collisionBodies = tuple?.Item1;
-						var tilesToUpdate = tuple?.Item2;
-
-						if (collisionBodies == null || tilesToUpdate == null) return;
-
-						var blocksUpdatedThisFrame = new HashSet<Vector2>();
-						foreach (var (t, blockInstance) in tilesToUpdate)
+						if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost) 
 						{
-							var position = t.Item1;
-							try
-							{
-								var beforeUpdate = CaptureBlockState(blockInstance, position);
-								blockInstance.Update(World, position);
-								var afterUpdate = CaptureBlockState(blockInstance, position);
-
-								var hasStateChanged = HasBlockStateChanged(beforeUpdate, afterUpdate);
-								var isLiquidChanged = blockInstance.Block is LiquidBlock liquid && liquid.HasChangedThisFrame; 
-								
-								if (hasStateChanged || isLiquidChanged) // if state changed
-									blocksUpdatedThisFrame.Add(position); // add to updated blocks
-								
-								if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
+							var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+							var collisionBodies = tuple?.Item1;
+							var tilesToUpdate = tuple?.Item2;
+							
+						    // loop through each remote player and get their drawn tiles
+						    foreach (var p in _players) 
+						    {
+						        var remotePlayerTuple = p.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+								if (remotePlayerTuple?.Item2 != null)
 								{
-									Collision.AddObjectToGrid(box, true);
+									foreach (var kvp in remotePlayerTuple.GetValueOrDefault().Item2)
+									{
+										tilesToUpdate?.TryAdd(kvp.Key, kvp.Value);
+									}
+								}
+						    }
+						    
+						    if (collisionBodies == null || tilesToUpdate == null) return;
+
+							var blocksUpdatedThisFrame = new HashSet<Vector2>();
+							foreach (var (t, blockInstance) in tilesToUpdate)
+							{
+								var position = t.Item1;
+								try
+								{
+									var beforeUpdate = CaptureBlockState(blockInstance, position);
+									blockInstance.Update(World, position);
+									var afterUpdate = CaptureBlockState(blockInstance, position);
+
+									var hasStateChanged = HasBlockStateChanged(beforeUpdate, afterUpdate);
+									var isLiquidChanged = blockInstance.Block is LiquidBlock liquid && liquid.HasChangedThisFrame; 
+									
+									if (hasStateChanged || isLiquidChanged) // if state changed
+										blocksUpdatedThisFrame.Add(position); // add to updated blocks
+									
+									if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
+									{
+										Collision.AddObjectToGrid(box, true);
+									}
+								}
+								catch (Exception ex)
+								{
+									Console.WriteLine($"[HOST] Error updating block at {position}. Exception: {ex.Message}");
 								}
 							}
-							catch (Exception ex)
+							
+							if (blocksUpdatedThisFrame.Count > 0 && NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 							{
-								Console.WriteLine($"Error updating block at {position}. Exception: {ex.Message}");
+								NetworkBlockSync.BroadcastUpdatedBlocksToClients(blocksUpdatedThisFrame);
 							}
 						}
-						
-						if (blocksUpdatedThisFrame.Count > 0 && NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
+						else if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected)
 						{
-							NetworkBlockSync.SendBlockUpdatesToNetwork(blocksUpdatedThisFrame);
+						    // on client only set drawn tiles to render + handle collision
+						    // updates are received from host
+						    var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+						    var collisionBodies = tuple?.Item1;
+							var tilesToUpdate = tuple?.Item2;
+
+							if (collisionBodies == null || tilesToUpdate == null) return;
+
+							foreach (var (t, blockInstance) in tilesToUpdate)
+							{
+								var position = t.Item1;
+								try
+								{									
+									if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
+									{
+										Collision.AddObjectToGrid(box, true);
+									}
+								}
+								catch (Exception ex)
+								{
+									Console.WriteLine($"[CLIENT] Error handling block collision at {position}. Exception: {ex.Message}");
+								}
+							}
 						}
 					}
 

@@ -42,7 +42,7 @@ public class Camera : Object
 	public bool IsPlayerBlocked { get; set; }
 	
 	// world tile position -> block instance (only drawn ones)
-	private Dictionary<(Vector2, TileLayer), BlockInstance> _drawnTiles = new();
+	public Dictionary<(Vector2, TileLayer), BlockInstance> DrawnTiles = new();
 	private Dictionary<Vector2, Rectangle> _drawnBoxes = new();
 	private readonly TileLayer[] _layers;
 	
@@ -81,7 +81,7 @@ public class Camera : Object
 	public (Dictionary<Vector2, Rectangle>, Dictionary<(Vector2, TileLayer), BlockInstance>) SetDrawnTiles(WorldState worldState)
 	{
 		_drawnBoxes.Clear();
-		_drawnTiles.Clear();
+		DrawnTiles.Clear();
 		
 		int viewLeft = (int)Math.Floor(Position.X / Block.Size);
 		int viewTop = (int)Math.Floor(Position.Y / Block.Size);
@@ -114,7 +114,7 @@ public class Camera : Object
 					var blockInstance = worldState.GetBlockInstance(worldXCoord, worldYCoord, layer);
 					if (blockInstance == null) continue; // skip air
 					
-					_drawnTiles.Add((position, layer), blockInstance);
+					DrawnTiles.Add((position, layer), blockInstance);
 
 					if (!_drawnBoxes.ContainsKey(position))
 					{
@@ -125,14 +125,14 @@ public class Camera : Object
 			}
 		}
 
-		return (_drawnBoxes, _drawnTiles);
+		return (_drawnBoxes, DrawnTiles);
 	}
 	
 	public void RenderGroundTiles(SpriteBatch spriteBatch, WorldState worldState)
 	{
 		int scaledBlockSize = (int)(Block.Size * CameraScale);
 
-		var groundTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Ground);
+		var groundTiles = DrawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Ground);
 		
 		// ground 
 		RenderTileLayer(spriteBatch, worldState, groundTiles, scaledBlockSize);
@@ -142,8 +142,8 @@ public class Camera : Object
 	{
 		int scaledBlockSize = (int)(Block.Size * CameraScale);
 		
-		var furnitureTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Furniture);
-		var liquidTiles = _drawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Liquid);
+		var furnitureTiles = DrawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Furniture);
+		var liquidTiles = DrawnTiles.Where(kvp => kvp.Key.Item2 == TileLayer.Liquid);
 		
 		// furniture -> liquids
 		RenderTileLayer(spriteBatch, worldState, furnitureTiles, scaledBlockSize);

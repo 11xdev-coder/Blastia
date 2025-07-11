@@ -47,7 +47,8 @@ public static class NetworkEntitySync
             LocallyControlled = false,
             Name = clientName,
             NetworkPosition = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint()
-        };        
+        }; 
+        
         _addToPlayersListMethod(clientPlayer);
         
         Console.WriteLine($"[NetworkEntitySync] [HOST] Created client player '{clientPlayer.Name}' (ID: {clientPlayer.SteamId})");

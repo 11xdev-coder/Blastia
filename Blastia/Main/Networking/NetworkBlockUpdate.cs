@@ -6,9 +6,7 @@ namespace Blastia.Main.Networking;
 public class NetworkBlockUpdate 
 {
     public Vector2 Position { get; set; }
-    public ushort NewBlockId { get; set; }
     public TileLayer Layer { get; set; }
-    public int FlowLevel { get; set; }
         
     public byte[] Serialize() 
     {
@@ -17,9 +15,7 @@ public class NetworkBlockUpdate
 
         writer.Write(Position.X);
         writer.Write(Position.Y);
-        writer.Write(NewBlockId);
         writer.Write((byte)Layer);
-        writer.Write(FlowLevel);
 
         return stream.ToArray();
     }
@@ -32,9 +28,45 @@ public class NetworkBlockUpdate
         return new NetworkBlockUpdate
         {
             Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
-            NewBlockId = reader.ReadUInt16(),
             Layer = (TileLayer) reader.ReadByte(),
-            FlowLevel = reader.ReadInt32()
         };
+    }
+}
+
+[Serializable]
+public class NetworkBlockUpdateAtPositions
+{
+    public List<Vector2> Positions { get; set; } = [];
+        
+    public byte[] Serialize() 
+    {
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
+
+        writer.Write(Positions.Count);
+        foreach (var position in Positions) 
+        {
+            writer.Write(position.X);
+            writer.Write(position.Y);
+        }
+
+        return stream.ToArray();
+    }
+    
+    public static NetworkBlockUpdateAtPositions Deserialize(byte[] data) 
+    {
+        using var stream = new MemoryStream(data);
+        using var reader = new BinaryReader(stream);
+
+        var result = new NetworkBlockUpdateAtPositions();
+        var count = reader.ReadInt32();
+        
+        for (int i = 0; i < count; i++) 
+        {
+            var position = new Vector2(reader.ReadSingle(), reader.ReadSingle());
+            result.Positions.Add(position);
+        }
+
+        return result;
     }
 }

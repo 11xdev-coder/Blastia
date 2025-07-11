@@ -71,6 +71,13 @@ public class Player : HumanLikeEntity
 		World = world;
 		PlayerInventory = new Inventory(InventoryCapacity, this);
 		
+		// always create a camera
+		Camera = new Camera(position)
+		{
+			DrawWidth = 240 * Block.Size,
+			DrawHeight = 135 * Block.Size
+		};
+		
 		if (myPlayer)
 		{
 			LocallyControlled = true;
@@ -80,12 +87,6 @@ public class Player : HumanLikeEntity
 				SteamId = NetworkManager.Instance.MySteamId;
 				Name = SteamFriends.GetPersonaName();
 			}
-			
-			Camera = new Camera(position)
-			{
-				DrawWidth = 240 * Block.Size,
-				DrawHeight = 135 * Block.Size
-			};
 		}
 		else 
 		{
