@@ -171,7 +171,7 @@ public static class NetworkBlockSync
     /// Sends blocks' positions that were updated this frame(host -> broadcasts to clients)
     /// </summary>
     /// <param name="updatedBlocksPositions"></param>
-    public static void BroadcastUpdatedBlocksToClients(HashSet<Vector2> updatedBlocksPositions) 
+    public static void BroadcastUpdatedBlocksToClients(HashSet<(Vector2 original, Vector2 newPos)> updatedBlocksPositions) 
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected) return;
 
@@ -182,8 +182,8 @@ public static class NetworkBlockSync
         {
             if (NetworkManager.Instance.IsHost) 
             {
-                foreach (var position in updatedBlocksPositions)
-                    BroadcastBlockUpdate(position, HSteamNetConnection.Invalid);
+                foreach (var t in updatedBlocksPositions)
+                    BroadcastBlockUpdate(t.original, t.newPos, HSteamNetConnection.Invalid);
                 Console.WriteLine("[NetworkBlockSync] [HOST] Broadcasted block updates to all clients");
             }
         }
@@ -196,9 +196,7 @@ public static class NetworkBlockSync
     /// <summary>
     /// Broadcasts a single block update to every connection except <c>senderConnection</c> if not nil (host only)
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="senderConnection"></param>
-    private static void BroadcastBlockUpdate(Vector2 position, HSteamNetConnection senderConnection) 
+    private static void BroadcastBlockUpdate(Vector2 originalPosition, Vector2 newPosition, HSteamNetConnection senderConnection) 
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
 
@@ -207,15 +205,25 @@ public static class NetworkBlockSync
         
         foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer))) 
         {
-            var blockInstance = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
-            if (blockInstance == null) continue; 
+            var newBlock = worldState.GetBlockInstance((int)newPosition.X, (int)newPosition.Y, layer);
         
-            var update = new NetworkBlockUpdate
+            NetworkBlockUpdate update;
+            if (newBlock == null) 
             {
-                Position = position,
-                Damage = blockInstance.Damage,
-                Layer = layer
-            };
+                // tile not found
+                Console.WriteLine($"[NetworkBlockSync] [HOST] Error: tile at {newPosition} {layer} not found");
+                return;
+            }
+            else 
+            {
+                update = new NetworkBlockUpdate
+                {
+                    OriginalPosition = originalPosition,
+                    NewPosition = newPosition,
+                    Damage = newBlock.Damage,
+                    Layer = layer
+                };
+            }
             var updateBytes = update.Serialize();
             var updateBase64 = Convert.ToBase64String(updateBytes);
 
@@ -228,9 +236,7 @@ public static class NetworkBlockSync
     /// <summary>
     /// Sends a block update to host (client only)
     /// </summary>
-    /// <param name="position"></param>
-    /// <param name="senderConnection"></param>
-    public static void SendBlockUpdateToHost(Vector2 position) 
+    public static void SendBlockUpdateToHost(Vector2 originalPosition, Vector2 newPosition) 
     {
         if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
 
@@ -242,12 +248,13 @@ public static class NetworkBlockSync
         
         foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer))) 
         {
-            var blockInstance = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
+            var blockInstance = worldState.GetBlockInstance((int)originalPosition.X, (int)originalPosition.Y, layer);
             if (blockInstance == null) continue; 
         
             var update = new NetworkBlockUpdate
             {
-                Position = position,
+                OriginalPosition = originalPosition,
+                NewPosition = newPosition,
                 Damage = blockInstance.Damage,
                 Layer = layer
             };
@@ -313,7 +320,7 @@ public static class NetworkBlockSync
         if (worldState == null || world == null) return;
         
         // update the block
-        var blockInstance = worldState.GetBlockInstance((int)update.Position.X, (int)update.Position.Y, update.Layer);
+        var blockInstance = worldState.GetBlockInstance((int)update.OriginalPosition.X, (int)update.OriginalPosition.Y, update.Layer);
         if (blockInstance != null)
         {
             if (blockInstance.Block is LiquidBlock liquid) 
@@ -322,43 +329,10 @@ public static class NetworkBlockSync
             }
             blockInstance.Damage = update.Damage;
             
-            blockInstance.Update(world, update.Position);
-            
-            if (isClient) 
-            {
-                // force neighbouring updates
-                TriggerNeighborLiquidUpdates(worldState, world, update.Position);
-            }
+            blockInstance.Update(world, update.OriginalPosition);
             
             var output = isClient ? "[CLIENT]" : "[HOST]";
-            Console.WriteLine($"[NetworkBlockSync] {output} Updated block at {update.Position} on layer {update.Layer}");
-        }
-    }
-    
-    /// <summary>
-    /// Force calls <c>Update</c> on neighbouring liquids at <c>position</c>
-    /// </summary>
-    /// <param name="worldState"></param>
-    /// <param name="world"></param>
-    /// <param name="position"></param>
-    private static void TriggerNeighborLiquidUpdates(WorldState worldState, World world, Vector2 position)
-    {
-        // update neighbouring blocks
-        Vector2[] neighbors = {
-            new(position.X, position.Y - 8), // top
-            new(position.X, position.Y + 8), // bottom  
-            new(position.X - 8, position.Y), // left
-            new(position.X + 8, position.Y)  // right
-        };
-        
-        foreach (var neighborPos in neighbors)
-        {
-            var neighborInstance = worldState.GetBlockInstance((int)neighborPos.X, (int)neighborPos.Y, TileLayer.Liquid);
-            if (neighborInstance?.Block is LiquidBlock neighborLiquid)
-            {
-                neighborLiquid.ForceUpdate = true;
-                neighborInstance.Update(world, neighborPos);
-            }
+            Console.WriteLine($"[NetworkBlockSync] {output} Updated block at {update.OriginalPosition} on layer {update.Layer}");
         }
     }
 }

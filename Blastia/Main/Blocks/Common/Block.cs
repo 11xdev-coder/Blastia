@@ -92,6 +92,13 @@ public abstract class Block
 	{
 		return TileLayer.Ground;
 	}
+
+	/// <summary>
+	/// Is this block a moving block? Should be set to <c>true</c> if block can change positions during <c>Update</c>.
+	/// Used for better networking
+	/// </summary>
+	/// <returns></returns>
+	public virtual bool IsMovingBlock() => false;
 	
 	/// <summary>
 	/// Returns source rectangle for drawing depending on neighbouring blocks

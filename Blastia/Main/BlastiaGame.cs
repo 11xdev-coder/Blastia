@@ -20,7 +20,8 @@ using System.IO; // for Path and File
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Physics;
 using Blastia.Main.Blocks;
-using Steamworks; // for Block.Size
+using Steamworks;
+using System.ComponentModel.Design; // for Block.Size
 
 namespace Blastia.Main;
 
@@ -469,7 +470,8 @@ public class BlastiaGame : Game
 						if (KeyboardHelper.IsKeyJustPressed(Keys.G)) World.DrawRulerLine();
 					}
 
-					if (PlayerNWorldManager.Instance.SelectedWorld != null)
+					var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+					if (worldState != null)
 					{
 						// then add tiles and update tiles
 						Collision.ClearGrid();
@@ -484,7 +486,7 @@ public class BlastiaGame : Game
 						// host or singleplayer
 						if ((NetworkManager.Instance != null && NetworkManager.Instance.IsHost) || NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected) 
 						{
-							var hostTuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+							var hostTuple = _myPlayer?.Camera?.SetDrawnTiles(worldState);
 							var hostCollisionBodies = hostTuple?.Item1;
 							var hostTilesToUpdate = hostTuple?.Item2;
 							
@@ -499,7 +501,7 @@ public class BlastiaGame : Game
 						    // loop through each remote player and get their drawn tiles
 						    foreach (var p in _players) 
 						    {
-						        var remotePlayerTuple = p.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+						        var remotePlayerTuple = p.Camera?.SetDrawnTiles(worldState);
 								if (remotePlayerTuple?.Item2 != null)
 								{
 									foreach (var kvp in remotePlayerTuple.GetValueOrDefault().Item2)
@@ -509,9 +511,10 @@ public class BlastiaGame : Game
 								}
 						    }
 							
-							var blocksUpdatedThisFrame = new HashSet<Vector2>();
+							var blocksUpdatedThisFrame = new HashSet<(Vector2 original, Vector2 newPos)>();
 							foreach (var (t, blockInstance) in allTilesToUpdate)
 							{
+								var layer = t.Item2;
 								var position = t.Item1;
 								try
 								{
@@ -522,7 +525,34 @@ public class BlastiaGame : Game
 									var hasStateChanged = HasBlockStateChanged(beforeUpdate, afterUpdate);
 									
 									if (hasStateChanged) // if state changed
-										blocksUpdatedThisFrame.Add(position); // add to updated blocks]
+									{
+										// only check neighbors if this is a moving block
+										if (blockInstance.Block.IsMovingBlock())
+										{
+											var neighborPositionsToCheck = new HashSet<Vector2>
+											{
+												new(position.X, position.Y + Block.Size),
+												new(position.X, position.Y - Block.Size),
+												new(position.X - Block.Size, position.Y),
+												new(position.X + Block.Size, position.Y)
+											};
+
+											foreach (var neighborPos in neighborPositionsToCheck)
+											{
+												var inst = worldState.GetBlockInstance((int)neighborPos.X, (int)neighborPos.Y, layer);
+												if (inst?.Block.IsMovingBlock() == true)
+												{
+													// if neighbor position was found, send the actual original position to the client
+													// first -> pos before update, second -> pos after update (found neighbor)
+													blocksUpdatedThisFrame.Add((position, neighborPos));
+												}
+											}
+										}
+										else // not a moving block -> just add initial pos
+										{
+											blocksUpdatedThisFrame.Add((position, position));
+										}
+									}
 									
 									if (blockInstance.Block.IsCollidable && hostCollisionBodies.TryGetValue(position, out var box))
 									{
@@ -537,7 +567,7 @@ public class BlastiaGame : Game
 							
 							foreach (var damagedPosition in _damagedBlockPositionsThisFrame)
 							{
-								blocksUpdatedThisFrame.Add(damagedPosition);
+								blocksUpdatedThisFrame.Add((damagedPosition, damagedPosition));
 							}
 							_damagedBlockPositionsThisFrame.Clear();
 							
@@ -550,7 +580,7 @@ public class BlastiaGame : Game
 						{
 						    // on client only set drawn tiles to render + handle collision
 						    // updates are received from host
-						    var tuple = _myPlayer?.Camera?.SetDrawnTiles(PlayerNWorldManager.Instance.SelectedWorld);
+						    var tuple = _myPlayer?.Camera?.SetDrawnTiles(worldState);
 						    var collisionBodies = tuple?.Item1;
 							var tilesToUpdate = tuple?.Item2;
 
@@ -574,7 +604,7 @@ public class BlastiaGame : Game
 
 							foreach (var damagedPosition in _damagedBlockPositionsThisFrame) 
 							{
-								NetworkBlockSync.SendBlockUpdateToHost(damagedPosition);
+								NetworkBlockSync.SendBlockUpdateToHost(damagedPosition, damagedPosition);
 							}
 							_damagedBlockPositionsThisFrame.Clear();							
 						}

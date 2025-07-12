@@ -93,7 +93,7 @@ public class NetworkManager
         try
         {
             Environment.SetEnvironmentVariable("SteamAppId", AppId.ToString());
-            
+
             if (SteamAPI.InitEx(out var msg) != ESteamAPIInitResult.k_ESteamAPIInitResult_OK)
             {
                 Console.WriteLine($"[NetworkManager] SteamAPI.InitEx() failed! {msg}");

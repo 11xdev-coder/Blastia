@@ -59,6 +59,8 @@ public abstract class LiquidBlock : Block
 
     public override TileLayer GetLayer() => TileLayer.Liquid;
 
+    public override bool IsMovingBlock() => true;
+
     protected virtual void OnEntityEnter(Entity entity)
     {
         
@@ -67,7 +69,6 @@ public abstract class LiquidBlock : Block
     public override void Update(World world, Vector2 position)
     {
         base.Update(world, position);
-        var previousFlowLevel = FlowLevel;
         _flowTimer += (float) BlastiaGame.GameTimeElapsedSeconds;
 
         if (ForceUpdate || _flowTimer >= FlowUpdateInterval)
