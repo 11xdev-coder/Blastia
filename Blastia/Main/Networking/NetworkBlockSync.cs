@@ -226,6 +226,38 @@ public static class NetworkBlockSync
     }
     
     /// <summary>
+    /// Sends a block update to host (client only)
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="senderConnection"></param>
+    public static void SendBlockUpdateToHost(Vector2 position) 
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
+
+        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+        if (hostConnection == HSteamNetConnection.Invalid) return;
+        
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        if (worldState == null) return;
+        
+        foreach (TileLayer layer in Enum.GetValues(typeof(TileLayer))) 
+        {
+            var blockInstance = worldState.GetBlockInstance((int)position.X, (int)position.Y, layer);
+            if (blockInstance == null) continue; 
+        
+            var update = new NetworkBlockUpdate
+            {
+                Position = position,
+                Damage = blockInstance.Damage,
+                Layer = layer
+            };
+            var updateBytes = update.Serialize();
+            var updateBase64 = Convert.ToBase64String(updateBytes);
+            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.BlockUpdate, updateBase64);
+        }
+    }
+    
+    /// <summary>
     /// Called when <c>BlockUpdated</c> message is received (host only)
     /// </summary>
     public static void HandleClientBlockUpdate(string updateBase64, HSteamNetConnection senderConnection) 
@@ -239,15 +271,7 @@ public static class NetworkBlockSync
             var update = NetworkBlockUpdate.Deserialize(updateBytes);
 
             // apply locally
-            var worldState = PlayerNWorldManager.Instance.SelectedWorld;
-            var world = _worldFactory?.Invoke();
-            if (worldState == null || world == null) return;
-            
-            var blockInstance = worldState.GetBlockInstance((int)update.Position.X, (int)update.Position.Y, update.Layer);
-            if (blockInstance != null)
-            {
-                blockInstance.Update(world, update.Position);
-            }
+            ApplyBlockUpdateLocally(update, false);
             
             // broadcast to all other clients (excluding the sender)
             foreach (var connection in NetworkManager.Instance.Connections.Values) 
@@ -274,27 +298,33 @@ public static class NetworkBlockSync
             var updateBytes = Convert.FromBase64String(updateBase64);
             var update = NetworkBlockUpdate.Deserialize(updateBytes);
 
-            var worldState = PlayerNWorldManager.Instance.SelectedWorld;
-            var world = _worldFactory?.Invoke();
-            if (worldState == null || world == null) return;
-            
-            // update the block
-            var blockInstance = worldState.GetBlockInstance((int)update.Position.X, (int)update.Position.Y, update.Layer);
-            if (blockInstance != null)
-            {
-                if (blockInstance.Block is LiquidBlock liquid) 
-                {
-                    liquid.ForceUpdate = true;
-                }
-                blockInstance.Damage = update.Damage;
-                
-                blockInstance.Update(world, update.Position);
-                Console.WriteLine($"[NetworkBlockSync] [CLIENT] Updated block at {update.Position} on layer {update.Layer}");
-            }
+            ApplyBlockUpdateLocally(update, true);
         }
         catch (Exception ex) 
         {
             Console.WriteLine($"[NetworkBlockSync] [CLIENT] Error handling block update from host: {ex.Message}");
+        }
+    }
+    
+    private static void ApplyBlockUpdateLocally(NetworkBlockUpdate update, bool isClient) 
+    {
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var world = _worldFactory?.Invoke();
+        if (worldState == null || world == null) return;
+        
+        // update the block
+        var blockInstance = worldState.GetBlockInstance((int)update.Position.X, (int)update.Position.Y, update.Layer);
+        if (blockInstance != null)
+        {
+            if (blockInstance.Block is LiquidBlock liquid) 
+            {
+                liquid.ForceUpdate = true;
+            }
+            blockInstance.Damage = update.Damage;
+            
+            blockInstance.Update(world, update.Position);
+            var output = isClient ? "[CLIENT]" : "[HOST]";
+            Console.WriteLine($"[NetworkBlockSync] {output} Updated block at {update.Position} on layer {update.Layer}");
         }
     }
 }

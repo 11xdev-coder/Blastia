@@ -19,7 +19,8 @@ using Microsoft.Xna.Framework.Input;
 using System.IO; // for Path and File
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Physics;
-using Blastia.Main.Blocks; // for Block.Size
+using Blastia.Main.Blocks;
+using Steamworks; // for Block.Size
 
 namespace Blastia.Main;
 
@@ -570,6 +571,12 @@ public class BlastiaGame : Game
 									Console.WriteLine($"[CLIENT] Error handling block collision at {position}. Exception: {ex.Message}");
 								}
 							}
+
+							foreach (var damagedPosition in _damagedBlockPositionsThisFrame) 
+							{
+								NetworkBlockSync.SendBlockUpdateToHost(damagedPosition);
+							}
+							_damagedBlockPositionsThisFrame.Clear();							
 						}
 					}
 
