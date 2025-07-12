@@ -323,8 +323,42 @@ public static class NetworkBlockSync
             blockInstance.Damage = update.Damage;
             
             blockInstance.Update(world, update.Position);
+            
+            if (isClient) 
+            {
+                // force neighbouring updates
+                TriggerNeighborLiquidUpdates(worldState, world, update.Position);
+            }
+            
             var output = isClient ? "[CLIENT]" : "[HOST]";
             Console.WriteLine($"[NetworkBlockSync] {output} Updated block at {update.Position} on layer {update.Layer}");
+        }
+    }
+    
+    /// <summary>
+    /// Force calls <c>Update</c> on neighbouring liquids at <c>position</c>
+    /// </summary>
+    /// <param name="worldState"></param>
+    /// <param name="world"></param>
+    /// <param name="position"></param>
+    private static void TriggerNeighborLiquidUpdates(WorldState worldState, World world, Vector2 position)
+    {
+        // update neighbouring blocks
+        Vector2[] neighbors = {
+            new(position.X, position.Y - 8), // top
+            new(position.X, position.Y + 8), // bottom  
+            new(position.X - 8, position.Y), // left
+            new(position.X + 8, position.Y)  // right
+        };
+        
+        foreach (var neighborPos in neighbors)
+        {
+            var neighborInstance = worldState.GetBlockInstance((int)neighborPos.X, (int)neighborPos.Y, TileLayer.Liquid);
+            if (neighborInstance?.Block is LiquidBlock neighborLiquid)
+            {
+                neighborLiquid.ForceUpdate = true;
+                neighborInstance.Update(world, neighborPos);
+            }
         }
     }
 }
