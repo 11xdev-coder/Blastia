@@ -34,6 +34,11 @@ public abstract class Block
 	public int ItemDropAmount { get; } = 1;
 	public int LightLevel { get; }
 	public SoundID[]? BreakingSounds { get; }
+    
+    /// <summary>
+    /// Avoids timer calculations and updates liquid right away. Usually used when this block is updated via network
+    /// </summary>
+    public bool ForceUpdate { get; set; }
 
 	protected Block()
 	{

@@ -529,24 +529,29 @@ public class BlastiaGame : Game
 										// only check neighbors if this is a moving block
 										if (blockInstance.Block.IsMovingBlock())
 										{
-											var neighborPositionsToCheck = new HashSet<Vector2>
+											if (afterUpdate.blockId != beforeUpdate.blockId) 
 											{
-												new(position.X, position.Y + Block.Size),
-												new(position.X, position.Y - Block.Size),
-												new(position.X - Block.Size, position.Y),
-												new(position.X + Block.Size, position.Y)
-											};
-
-											foreach (var neighborPos in neighborPositionsToCheck)
-											{
-												var inst = worldState.GetBlockInstance((int)neighborPos.X, (int)neighborPos.Y, layer);
-												if (inst?.Block.IsMovingBlock() == true)
+											    var neighborPositionsToCheck = new HashSet<Vector2>
 												{
-													// if neighbor position was found, send the actual original position to the client
-													// first -> pos before update, second -> pos after update (found neighbor)
-													blocksUpdatedThisFrame.Add((position, neighborPos));
+													new(position.X, position.Y + Block.Size),
+													new(position.X, position.Y - Block.Size),
+													new(position.X - Block.Size, position.Y),
+													new(position.X + Block.Size, position.Y)
+												};
+
+												foreach (var neighborPos in neighborPositionsToCheck)
+												{
+													var inst = worldState.GetBlockInstance((int)neighborPos.X, (int)neighborPos.Y, layer);
+													if (inst?.Block.IsMovingBlock() == true && inst.Id == blockInstance.Id)
+													{
+														// if neighbor position was found, send the actual original position to the client
+														// first -> pos before update, second -> pos after update (found neighbor)
+														blocksUpdatedThisFrame.Add((position, neighborPos));
+													}
 												}
 											}
+											else
+												blocksUpdatedThisFrame.Add((position, position));
 										}
 										else // not a moving block -> just add initial pos
 										{

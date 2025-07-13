@@ -33,11 +33,6 @@ public abstract class LiquidBlock : Block
     /// Time between each <c>Update()</c> call. Less interval -> faster liquid flow
     /// </summary>
     public float FlowUpdateInterval { get; protected set; }
-    
-    /// <summary>
-    /// Avoids timer calculations and updates liquid right away. Usually used when this block is updated via network
-    /// </summary>
-    public bool ForceUpdate { get; set; }
 
     private float _flowTimer;
 

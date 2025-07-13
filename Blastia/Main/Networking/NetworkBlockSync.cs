@@ -211,8 +211,7 @@ public static class NetworkBlockSync
             if (newBlock == null) 
             {
                 // tile not found
-                Console.WriteLine($"[NetworkBlockSync] [HOST] Error: tile at {newPosition} {layer} not found");
-                return;
+                continue;
             }
             else 
             {
@@ -323,10 +322,7 @@ public static class NetworkBlockSync
         var blockInstance = worldState.GetBlockInstance((int)update.OriginalPosition.X, (int)update.OriginalPosition.Y, update.Layer);
         if (blockInstance != null)
         {
-            if (blockInstance.Block is LiquidBlock liquid) 
-            {
-                liquid.ForceUpdate = true;
-            }
+            blockInstance.Block.ForceUpdate = true;
             blockInstance.Damage = update.Damage;
             
             blockInstance.Update(world, update.OriginalPosition);
