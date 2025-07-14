@@ -19,9 +19,9 @@ public enum MessageType : byte
     // game state messages
     RequestUpdateWorldForClient, // client -> host, requests world update
     PlayerSpawned, // host -> all clients, sends new player data
-    PlayerPositionUpdate, // host -> all clients, player position update, client -> host
+    PlayerPositionUpdate, // new player state -> host received: applies & broadcasts to all clients; client received: applies
     BlockChanged, // client -> host (block change request), host -> all clients (broadcasts)
-    BlockUpdateAtPositions, // client -> host (list of all updated blocks), host -> all clients (broadcasts)
+    SignEditedAt, // new sign text (from client or host) at position
     BlockUpdate, // host -> all clients (single block updated)
     EntitySpawned,
     EntityKilled,
@@ -646,6 +646,17 @@ public class NetworkManager
                         else 
                         {
                             NetworkBlockSync.HandleBlockUpdateFromHost(content);
+                        }
+                        break;
+                    case MessageType.SignEditedAt:
+                        if (IsHost) 
+                        {
+                            var senderConnection = message.m_conn;
+                            NetworkBlockSync.HandleClientSignEdited(content, senderConnection);
+                        }
+                        else 
+                        {
+                            NetworkBlockSync.HandleSignEditedFromHost(content);
                         }
                         break;
                     case MessageType.RequestUpdateWorldForClient:

@@ -45,7 +45,7 @@ public static class NetworkBlockSync
             playerId = player.SteamId.m_SteamID;
         }
 
-        var blockChange = new NetworkBlockChange
+        var blockChange = new NetworkBlockChangeMessage
         {
             Position = position,
             BlockId = newId,
@@ -86,7 +86,7 @@ public static class NetworkBlockSync
             playerId = player.SteamId.m_SteamID;
         }
         
-        var blockChange = new NetworkBlockChange
+        var blockChange = new NetworkBlockChangeMessage
         {
             Position = position,
             BlockId = newId,
@@ -115,7 +115,7 @@ public static class NetworkBlockSync
         try 
         {
             var blockChangeBytes = Convert.FromBase64String(blockChange64);
-            var blockChange = NetworkBlockChange.Deserialize(blockChangeBytes);
+            var blockChange = NetworkBlockChangeMessage.Deserialize(blockChangeBytes);
 
             // find client 
             var clientPlayer = _playersFactory?.Invoke().FirstOrDefault(p => p.SteamId == clientId);
@@ -151,7 +151,7 @@ public static class NetworkBlockSync
         try 
         {
             var blockChangeBytes = Convert.FromBase64String(blockChange64);
-            var blockChange = NetworkBlockChange.Deserialize(blockChangeBytes);
+            var blockChange = NetworkBlockChangeMessage.Deserialize(blockChangeBytes);
 
             // apply locally
             var worldState = PlayerNWorldManager.Instance.SelectedWorld;
@@ -207,7 +207,7 @@ public static class NetworkBlockSync
         {
             var newBlock = worldState.GetBlockInstance((int)newPosition.X, (int)newPosition.Y, layer);
         
-            NetworkBlockUpdate update;
+            NetworkBlockUpdateMessage update;
             if (newBlock == null) 
             {
                 // tile not found
@@ -215,7 +215,7 @@ public static class NetworkBlockSync
             }
             else 
             {
-                update = new NetworkBlockUpdate
+                update = new NetworkBlockUpdateMessage
                 {
                     OriginalPosition = originalPosition,
                     NewPosition = newPosition,
@@ -250,7 +250,7 @@ public static class NetworkBlockSync
             var blockInstance = worldState.GetBlockInstance((int)originalPosition.X, (int)originalPosition.Y, layer);
             if (blockInstance == null) continue; 
         
-            var update = new NetworkBlockUpdate
+            var update = new NetworkBlockUpdateMessage
             {
                 OriginalPosition = originalPosition,
                 NewPosition = newPosition,
@@ -274,7 +274,7 @@ public static class NetworkBlockSync
         try 
         {
             var updateBytes = Convert.FromBase64String(updateBase64);
-            var update = NetworkBlockUpdate.Deserialize(updateBytes);
+            var update = NetworkBlockUpdateMessage.Deserialize(updateBytes);
 
             // apply locally
             ApplyBlockUpdateLocally(update, false);
@@ -302,7 +302,7 @@ public static class NetworkBlockSync
         try 
         {
             var updateBytes = Convert.FromBase64String(updateBase64);
-            var update = NetworkBlockUpdate.Deserialize(updateBytes);
+            var update = NetworkBlockUpdateMessage.Deserialize(updateBytes);
 
             ApplyBlockUpdateLocally(update, true);
         }
@@ -312,7 +312,7 @@ public static class NetworkBlockSync
         }
     }
     
-    private static void ApplyBlockUpdateLocally(NetworkBlockUpdate update, bool isClient) 
+    private static void ApplyBlockUpdateLocally(NetworkBlockUpdateMessage update, bool isClient) 
     {
         var worldState = PlayerNWorldManager.Instance.SelectedWorld;
         var world = _worldFactory?.Invoke();
@@ -329,6 +329,103 @@ public static class NetworkBlockSync
             
             var output = isClient ? "[CLIENT]" : "[HOST]";
             Console.WriteLine($"[NetworkBlockSync] {output} Updated block at {update.OriginalPosition} on layer {update.Layer}");
+        }
+    }
+    
+    /// <summary>
+    /// Broadcasts sign edit at <c>position</c> with new text to all clients except <c>senderConnection</c> (connection to client that sent this message to host) (host only)
+    /// </summary>
+    public static void BroadcastSignEditedToClients(Vector2 position, string newText, HSteamNetConnection senderConnection) 
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
+        
+        try 
+        {
+            var edit = new NetworkSignEditedMessage
+            {
+                Position = position,
+                NewText = newText
+            };
+            var editBytes = edit.Serialize();
+            var editBase64 = Convert.ToBase64String(editBytes);
+
+            foreach (var connection in NetworkManager.Instance.Connections.Values)
+                if (connection != senderConnection)
+                    NetworkMessageQueue.QueueMessage(connection, MessageType.SignEditedAt, editBase64);
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"[NetworkBlockSync] Error broadcasting sign edit message: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Sends sign edit at <c>position</c> with new text to host (client only)
+    /// </summary>
+    public static void SendSignEditedToHost(Vector2 position, string newText) 
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
+        
+        try 
+        {
+            var edit = new NetworkSignEditedMessage
+            {
+                Position = position,
+                NewText = newText
+            };
+            var editBytes = edit.Serialize();
+            var editBase64 = Convert.ToBase64String(editBytes);
+
+            var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+            if (hostConnection != HSteamNetConnection.Invalid)
+                NetworkMessageQueue.QueueMessage(hostConnection, MessageType.SignEditedAt, editBase64);
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"[NetworkBlockSync] Error sending sign edit message: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Handles <c>SignEdtedAt</c> message (host only)
+    /// </summary>
+    public static void HandleClientSignEdited(string editBase64, HSteamNetConnection senderConnection) 
+    {
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || worldState == null) return;
+        
+        try 
+        {
+            var editBytes = Convert.FromBase64String(editBase64);
+            var edit = NetworkSignEditedMessage.Deserialize(editBytes);
+
+            worldState.SignTexts[edit.Position] = edit.NewText;
+            BroadcastSignEditedToClients(edit.Position, edit.NewText, senderConnection);
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"[NetworkBlockSync] Error handling sign edit message: {ex.Message}");
+        }
+    }
+    
+    /// <summary>
+    /// Handles <c>SignEdtedAt</c> message (client only)
+    /// </summary>
+    public static void HandleSignEditedFromHost(string editBase64) 
+    {
+        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || worldState == null) return;
+        
+        try 
+        {
+            var editBytes = Convert.FromBase64String(editBase64);
+            var edit = NetworkSignEditedMessage.Deserialize(editBytes);
+
+            worldState.SignTexts[edit.Position] = edit.NewText;
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"[NetworkBlockSync] Error handling sign edit message: {ex.Message}");
         }
     }
 }

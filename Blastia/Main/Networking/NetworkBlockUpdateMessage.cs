@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 namespace Blastia.Main.Networking;
 
 [Serializable]
-public class NetworkBlockUpdate 
+public class NetworkBlockUpdateMessage 
 {
     /// <summary>
     /// Position before updating the block
@@ -31,12 +31,12 @@ public class NetworkBlockUpdate
         return stream.ToArray();
     }
     
-    public static NetworkBlockUpdate Deserialize(byte[] data) 
+    public static NetworkBlockUpdateMessage Deserialize(byte[] data) 
     {
         using var stream = new MemoryStream(data);
         using var reader = new BinaryReader(stream);
 
-        return new NetworkBlockUpdate
+        return new NetworkBlockUpdateMessage
         {
             OriginalPosition = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             NewPosition = new Vector2(reader.ReadSingle(), reader.ReadSingle()),

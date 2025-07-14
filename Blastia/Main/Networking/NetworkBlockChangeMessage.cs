@@ -4,7 +4,7 @@ using Steamworks;
 namespace Blastia.Main.Networking;
 
 [Serializable]
-public class NetworkBlockChange 
+public class NetworkBlockChangeMessage 
 {
     public Vector2 Position { get; set; }
     public ushort BlockId { get; set; }
@@ -27,12 +27,12 @@ public class NetworkBlockChange
         return stream.ToArray();
     }
     
-    public static NetworkBlockChange Deserialize(byte[] data) 
+    public static NetworkBlockChangeMessage Deserialize(byte[] data) 
     {
         using var stream = new MemoryStream(data);
         using var reader = new BinaryReader(stream);
 
-        return new NetworkBlockChange
+        return new NetworkBlockChangeMessage
         {
             Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             BlockId = reader.ReadUInt16(),

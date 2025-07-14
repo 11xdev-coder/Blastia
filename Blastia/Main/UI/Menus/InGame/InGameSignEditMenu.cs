@@ -1,6 +1,8 @@
-﻿using Blastia.Main.UI.Buttons;
+﻿using Blastia.Main.Networking;
+using Blastia.Main.UI.Buttons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Steamworks;
 
 namespace Blastia.Main.UI.Menus.InGame;
 
@@ -47,9 +49,24 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
     {
         var worldState = PlayerNWorldManager.Instance.SelectedWorld;
         if (worldState == null || SignPosition == Vector2.Zero || SignText == null) return;
+
         // set world state sign text
-        worldState.SignTexts[SignPosition] = SignText.StringBuilder.ToString();
+        var newText = SignText.StringBuilder.ToString();
+        worldState.SignTexts[SignPosition] = newText; // set locally
         Active = false;
+        
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost) // host
+        {
+            // broadcast to all clients
+            NetworkBlockSync.BroadcastSignEditedToClients(SignPosition, newText, HSteamNetConnection.Invalid);
+            
+        }
+        else if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected && !NetworkManager.Instance.IsHost) // client
+        {
+            // send to host to broadcast
+            NetworkBlockSync.SendSignEditedToHost(SignPosition, newText);            
+        }
+        // singleplayer dont do anything more
     }
 
     private void CloseMenu()
