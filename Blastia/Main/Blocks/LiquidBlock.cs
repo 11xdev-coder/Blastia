@@ -78,7 +78,13 @@ public abstract class LiquidBlock : Block
             _flowTimer -= FlowUpdateInterval;
             ForceUpdate = false;
         }
+    }
+
+    public override void ClientUpdate(World world, Vector2 position)
+    {
+        base.ClientUpdate(world, position);
         
+        // OnEntityEnter calculation
         var rect = new Rectangle((int)position.X, (int)position.Y, Size, Size);
         var potentialEntities = Collision.GetPotentialEntitiesInRectangle(rect);
         foreach (var entity in potentialEntities)

@@ -558,7 +558,8 @@ public class BlastiaGame : Game
 											blocksUpdatedThisFrame.Add((position, position));
 										}
 									}
-									
+
+									blockInstance.ClientUpdate(World, position);
 									if (blockInstance.Block.IsCollidable && hostCollisionBodies.TryGetValue(position, out var box))
 									{
 										Collision.AddObjectToGrid(box, true);
@@ -595,7 +596,8 @@ public class BlastiaGame : Game
 							{
 								var position = t.Item1;
 								try
-								{									
+								{
+									blockInstance.ClientUpdate(World, position);						
 									if (blockInstance.Block.IsCollidable && collisionBodies.TryGetValue(position, out var box))
 									{
 										Collision.AddObjectToGrid(box, true);

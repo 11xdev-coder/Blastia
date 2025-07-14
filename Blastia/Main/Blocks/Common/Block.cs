@@ -86,7 +86,14 @@ public abstract class Block
 	public virtual float GetBreakTime() => Math.Max(0.05f, Hardness);
 	public virtual bool OnRightClick(World world, Vector2 position, Player player) => false;
 	public virtual void OnLeftClick(World world, Vector2 position, Player player) {}
+	/// <summary>
+	/// Update called only on HOST every frame
+	/// </summary>
 	public virtual void Update(World world, Vector2 position) {}
+	/// <summary>
+	/// Update called both on HOST and on CLIENT every frame
+	/// </summary>
+	public virtual void ClientUpdate(World world, Vector2 position) {}
 	public virtual void OnNeighbourChanged(World world, Vector2 position, Vector2 neighbourPosition) {}
 
 	/// <summary>
@@ -243,9 +250,19 @@ public class BlockInstance
 	public float GetBreakTime() => Block.GetBreakTime();
 	public bool OnRightClick(World world, Vector2 position, Player player) => Block.OnRightClick(world, position, player);
 	public void OnLeftClick(World world, Vector2 position, Player player) => Block.OnLeftClick(world, position, player);
-	public void Update(World world, Vector2 position)
-	{		
-		Block.Update(world, position);
+	/// <summary>
+	/// Update called only on HOST every frame
+	/// </summary>
+	public virtual void Update(World world, Vector2 position) 
+	{
+	    Block.Update(world, position);
+	}
+	/// <summary>
+	/// Update called both on HOST and on CLIENT every frame
+	/// </summary>
+	public virtual void ClientUpdate(World world, Vector2 position) 
+	{
+		Block.ClientUpdate(world, position);
 		_breakingAnimation.Update();
 	}
 	public void OnNeighbourChanged(World world, Vector2 position, Vector2 neighbourPosition) => Block.OnNeighbourChanged(world, position, neighbourPosition);
