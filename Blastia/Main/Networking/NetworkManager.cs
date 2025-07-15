@@ -23,7 +23,8 @@ public enum MessageType : byte
     BlockChanged, // client -> host (block change request), host -> all clients (broadcasts)
     SignEditedAt, // new sign text (from client or host) at position
     BlockUpdate, // host -> all clients (single block updated)
-    EntitySpawned,
+    EntitySpawned, // host -> clients (when new entity spawned)
+    EntityPositionUpdate, // new NetworkEntity -> client received: applies
     EntityKilled,
     ChatMessage,
     
@@ -76,6 +77,8 @@ public class NetworkManager
     // entity syncing
     private float _lastPlayerSync;
     private const float PlayerSyncRate = 1f / 20f; // 20 times in 1 second
+    private float _lastEntitySync;
+    private const float EntitySyncRate = 1f / 10f; // 10 times in 1 second
 
     public NetworkManager()
     {
@@ -172,6 +175,16 @@ public class NetworkManager
                 NetworkEntitySync.SendClientPositionToHost();
             }
             _lastPlayerSync = 0f;
+        }
+        
+        _lastEntitySync += (float) BlastiaGame.GameTimeElapsedSeconds;
+        if (_lastEntitySync >= EntitySyncRate)
+        {
+            if (IsHost) 
+            {
+                NetworkEntitySync.SyncEntitiesToClients();
+            }
+            _lastEntitySync = 0f;
         }
         
         NetworkMessageQueue.ProcessQueue();
@@ -610,7 +623,7 @@ public class NetworkManager
                         ProcessPlayerLeftGameLocally(content);
                         break;
                     case MessageType.PlayerSpawned:
-                        NetworkEntitySync.HandlePlayerSpawned(content);
+                        NetworkEntitySync.HandlePlayerSpawnedFromHost(content);
                         break;
                     case MessageType.PlayerPositionUpdate:
                         if (IsHost)

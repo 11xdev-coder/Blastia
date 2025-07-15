@@ -6,4 +6,5 @@ public static class EntityID
     public const ushort MutantScavenger = 1;
     public const ushort DebugPoint = 2;
     public const ushort DroppedItem = 3;
+    public const ushort BasicEntity = 4;
 }

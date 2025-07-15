@@ -10,6 +10,10 @@ namespace Blastia.Main.Networking;
 public class NetworkEntity
 {
     public ushort Id { get; set; }
+    /// <summary>
+    /// Players use steam IDs instead of GUIDs
+    /// </summary>
+    public Guid NetworkId { get; set; } = Guid.Empty;
     public Vector2 Position { get; set; }
     public Vector2 DirectionVector { get; set; }
     public Vector2 MovementVector { get; set; }
@@ -23,6 +27,7 @@ public class NetworkEntity
     public virtual void FromEntity(Entity entity)
     {
         Id = entity.GetId();
+        NetworkId = entity.NetworkId;
         
         Position = entity.Position;
         DirectionVector = entity.DirectionVector;
@@ -45,6 +50,7 @@ public class NetworkEntity
         if (entity.LocallyControlled) return;
         
         entity.SetId(Id);
+        entity.NetworkId = NetworkId;
         
         entity.NetworkPosition = Position;
         entity.NetworkMovementVector = MovementVector;
@@ -57,12 +63,13 @@ public class NetworkEntity
         entity.NetworkTimestamp = NetworkTimestamp;
     }
 
-    public virtual byte[] Serialize(MemoryStream stream, BinaryWriter writer)
+    public virtual byte[] Serialize()
     {
-        stream.SetLength(0);
-        stream.Position = 0;
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
         
         writer.Write(Id);
+        writer.Write(NetworkId.ToByteArray());
         
         writer.Write(Position.X);
         writer.Write(Position.Y);
@@ -81,9 +88,15 @@ public class NetworkEntity
 
     public static NetworkEntity Deserialize(BinaryReader reader)
     {
+        var id = reader.ReadUInt16();
+
+        var guidBytes = reader.ReadBytes(16);
+        var networkId = new Guid(guidBytes);
+        
         return new NetworkEntity
         {
-            Id = reader.ReadUInt16(),
+            Id = id,
+            NetworkId = networkId,
             Position = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             DirectionVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),
             MovementVector = new Vector2(reader.ReadSingle(), reader.ReadSingle()),

@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
 using Blastia.Main.Physics;
@@ -53,6 +54,7 @@ public abstract class Entity : Object
     public bool LocallyControlled { get; set; }
     private const float InterpolationSpeed = 10f;
     private const float MaxInterpolationDistance = 10f; // teleport if too far away
+    public Guid NetworkId { get; set; } = Guid.Empty;
 
     /// <summary>
     /// How much friction entity has with surfaces. <c>1.0</c> is normal friction, <c>&lt; 1.0</c> is more slippery
@@ -118,12 +120,24 @@ public abstract class Entity : Object
     
     protected virtual ushort ID { get; set; }
     
+    public void AssignNetworkId() 
+    {
+        if (NetworkId == Guid.Empty && NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+            NetworkId = Guid.NewGuid();
+    }
+    
     protected Entity(Vector2 position, float initialScaleFactor)
     {
         Position = position;
+        NetworkPosition = position;
         Scale = initialScaleFactor;
         
         InitializeLife();
+        AssignNetworkId();
+
+        // every other entity treat as locally controlled
+        if (this is not Player)
+            LocallyControlled = true;
     }
 
     private void InitializeLife()
@@ -188,6 +202,13 @@ public abstract class Entity : Object
     }
     
     #endregion
+    
+    public virtual NetworkEntity GetNetworkData() 
+    {
+        var networkEntity = new NetworkEntity();
+        networkEntity.FromEntity(this);
+        return networkEntity;
+    }
 
     /// <summary>
     /// Call in constructor to set the ID

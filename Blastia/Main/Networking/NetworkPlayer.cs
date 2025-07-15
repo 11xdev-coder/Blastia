@@ -36,7 +36,7 @@ public class NetworkPlayer : NetworkEntity
         }
     }
 
-    public override byte[] Serialize(MemoryStream stream, BinaryWriter writer)
+    public byte[] Serialize(MemoryStream stream, BinaryWriter writer)
     {
         stream.SetLength(0);
         stream.Position = 0;

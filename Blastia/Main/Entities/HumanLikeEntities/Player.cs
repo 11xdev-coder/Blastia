@@ -101,7 +101,7 @@ public class Player : HumanLikeEntity
 	/// Returns <c>NetworkPlayer</c> containing all basic information about this player
 	/// </summary>
 	/// <returns></returns>
-	public NetworkPlayer GetNetworkData()
+	public override NetworkPlayer GetNetworkData()
 	{
 		return new NetworkPlayer
 		{
@@ -268,7 +268,6 @@ public class Player : HumanLikeEntity
 			}
 		}
 
-		var jumped = false;
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump)
 		{
 			_jumpCharge += (float) BlastiaGame.GameTimeElapsedSeconds;
@@ -283,7 +282,6 @@ public class Player : HumanLikeEntity
 			var jumpHeight = boostedJump;
 			MovementVector.Y = -jumpHeight;
 			_jumpCharge = 0;
-			jumped = true;
 		}
 	}
 
