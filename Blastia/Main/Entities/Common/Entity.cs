@@ -134,10 +134,21 @@ public abstract class Entity : Object
         
         InitializeLife();
         AssignNetworkId();
-
-        // every other entity treat as locally controlled
-        if (this is not Player)
-            LocallyControlled = true;
+    }
+    
+    /// <summary>
+    /// Returns new entity of <c>id</c> ID (except <c>Player</c>)
+    /// </summary>
+    /// <returns>New fresh entity of <c>id</c></returns>
+    public static Entity? CreateEntity(ushort id, Vector2 position, World world) 
+    {
+        return id switch
+        {
+            EntityID.Player => null,
+            EntityID.MutantScavenger => new MutantScavenger(position, 1f),
+            EntityID.DroppedItem => new DroppedItem(position, 1f, world),
+            _ => null
+        };
     }
 
     private void InitializeLife()

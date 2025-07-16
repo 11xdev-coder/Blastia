@@ -47,11 +47,9 @@ public class NetworkEntity
     /// <param name="entity">Entity to apply values to</param>
     public virtual void ApplyToEntity(Entity entity)
     {
-        if (entity.LocallyControlled) return;
-        
         entity.SetId(Id);
         entity.NetworkId = NetworkId;
-        
+
         entity.NetworkPosition = Position;
         entity.NetworkMovementVector = MovementVector;
         entity.DirectionVector = DirectionVector;

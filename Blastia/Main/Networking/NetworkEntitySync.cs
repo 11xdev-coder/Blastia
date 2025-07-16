@@ -102,6 +102,9 @@ public static class NetworkEntitySync
         // send every entity to new client
         foreach (var entity in _entitiesFactory())
         {
+            if (entity.NetworkId == Guid.Empty)
+                entity.AssignNetworkId();
+                
             var entityBytes = entity.GetNetworkData().Serialize();
             var entityBase64 = Convert.ToBase64String(entityBytes);
 
@@ -253,7 +256,7 @@ public static class NetworkEntitySync
     /// </summary>
     /// <param name="networkPlayerBase64"></param>
     /// <param name="clientId"></param>
-    public static void HandlePositionUpdateFromHost(string networkPlayerBase64)
+    public static void HandlePlayerUpdateFromHost(string networkPlayerBase64)
     {
         if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _playersFactory == null || _worldFactory == null || _addToPlayersListMethod == null) return;
         try
@@ -296,7 +299,7 @@ public static class NetworkEntitySync
     /// <param name="entityBase64"></param>
     public static void HandleEntitySpawnedFromHost(string entityBase64)
     {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null) return;
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
 
         var entityBytes = Convert.FromBase64String(entityBase64);
         using var stream = new MemoryStream(entityBytes);
@@ -310,9 +313,88 @@ public static class NetworkEntitySync
             return;
         }
 
-        var entity = new BasicEntity(networkEntity.Position, 1f);
+        var world = _worldFactory();
+        if (world == null) return;
+        
+        var entity = Entity.CreateEntity(networkEntity.Id, networkEntity.Position, world);
+        if (entity == null) return;
+        
         networkEntity.ApplyToEntity(entity);
         _addToEntitiesListMethod(entity);
+    }
+    
+    /// <summary>
+    /// Handles <c>EntitySpawned</c> message (host only)
+    /// </summary>
+    public static void HandleClientEntitySpawned(string entityBase64, HSteamNetConnection senderConnection) 
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
+
+        var entityBytes = Convert.FromBase64String(entityBase64);
+        using var stream = new MemoryStream(entityBytes);
+        using var reader = new BinaryReader(stream);
+        var networkEntity = NetworkEntity.Deserialize(reader);
+
+        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkEntity.NetworkId);
+        if (existingEntity != null) 
+        {
+            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {networkEntity.NetworkId} already exists!");
+            return;
+        }
+
+        var world = _worldFactory();
+        if (world == null) return;
+        
+        var entity = Entity.CreateEntity(networkEntity.Id, networkEntity.Position, world);
+        if (entity == null) return;
+        
+        networkEntity.ApplyToEntity(entity);
+        _addToEntitiesListMethod(entity);
+
+        BroadcastNewEntityToClients(entity, senderConnection);
+    }
+    
+    /// <summary>
+    /// Broadcasts <c>EntitySpawned</c> message for new entity to all clients except <c>senderConnection</c> (host only)
+    /// </summary>
+    public static void BroadcastNewEntityToClients(Entity entity, HSteamNetConnection senderConnection) 
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
+        
+        if (entity.NetworkId == Guid.Empty)
+        {
+            entity.AssignNetworkId();
+        }
+        
+        var entityBytes = entity.GetNetworkData().Serialize();
+        var entityBase64 = Convert.ToBase64String(entityBytes);
+        
+        // send to every connection
+        foreach (var connection in NetworkManager.Instance.Connections.Values)
+        {
+            if (connection != senderConnection)
+                NetworkMessageQueue.QueueMessage(connection, MessageType.EntitySpawned, entityBase64);
+        }
+    }
+    
+    /// <summary>
+    /// Sends <c>EntitySpawned</c> message for new entity to host (client only)
+    /// </summary>
+    public static void SendNewEntityToHost(Entity entity) 
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
+        
+        if (entity.NetworkId == Guid.Empty)
+        {
+            entity.AssignNetworkId();
+        }
+        
+        var entityBytes = entity.GetNetworkData().Serialize();
+        var entityBase64 = Convert.ToBase64String(entityBytes);
+
+        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+        if (hostConnection != HSteamNetConnection.Invalid)
+            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.EntitySpawned, entityBase64);
     }
     
     /// <summary>
@@ -341,6 +423,51 @@ public static class NetworkEntitySync
             {
                 Console.WriteLine($"[NetworkEntitySync] [HOST] Error syncing entity with ID: {entity.GetId()} (network ID: {entity.NetworkId}): {ex.Message}");
             }
+        }
+    }
+    
+    /// <summary>
+    /// Handles <c>EntityPositionUpdate</c> message (client only)
+    /// </summary>
+    public static void HandleEntityUpdateFromHost(string entityBase64) 
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
+        try
+        {
+            var entityBytes = Convert.FromBase64String(entityBase64);
+            using var stream = new MemoryStream(entityBytes);
+            using var reader = new BinaryReader(stream);
+            var networkEntity = NetworkEntity.Deserialize(reader);
+
+            // find entity with same network GUID
+            var allEntities = _entitiesFactory();
+            var entity = allEntities.FirstOrDefault(e => e.NetworkId == networkEntity.NetworkId);
+            if (entity != null)
+            {
+                networkEntity.ApplyToEntity(entity);
+            }
+            else
+            {
+                Console.WriteLine($"[NetworkEntitySync] [WARNING] Entity with ID: {networkEntity.Id} (network ID: {networkEntity.NetworkId}) not found");
+
+                var world = _worldFactory();
+                if (world == null) return;
+
+                var newEntity = Entity.CreateEntity(networkEntity.Id, networkEntity.Position, world);
+                if (newEntity != null) 
+                {               
+                    newEntity.NetworkId = networkEntity.NetworkId;
+                    
+                    networkEntity.ApplyToEntity(newEntity);
+                    _addToEntitiesListMethod(newEntity);
+                    
+                    Console.WriteLine($"[NetworkEntitySync] Created entity with ID: {newEntity.GetId()} and network ID: {newEntity.NetworkId}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[NetworkEntitySync] [HOST] Error while handling EntityPositionUpdate message: {ex.Message}");
         }
     }
 }

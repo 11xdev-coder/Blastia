@@ -635,7 +635,7 @@ public class NetworkManager
                         else 
                         {
                             // client receives position update from host
-                            NetworkEntitySync.HandlePositionUpdateFromHost(content);
+                            NetworkEntitySync.HandlePlayerUpdateFromHost(content);
                         }
                         break;
                     case MessageType.BlockChanged:
@@ -671,6 +671,21 @@ public class NetworkManager
                         {
                             NetworkBlockSync.HandleSignEditedFromHost(content);
                         }
+                        break;
+                    case MessageType.EntitySpawned:
+                        if (IsHost)
+                        {
+                            var senderConnection = message.m_conn;
+                            NetworkEntitySync.HandleClientEntitySpawned(content, senderConnection);
+                        }
+                        else 
+                        {
+                            NetworkEntitySync.HandleEntitySpawnedFromHost(content);
+                        }
+                        break;
+                    case MessageType.EntityPositionUpdate:
+                        if (!IsHost)
+                            NetworkEntitySync.HandleEntityUpdateFromHost(content);
                         break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client

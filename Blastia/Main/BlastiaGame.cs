@@ -217,7 +217,7 @@ public class BlastiaGame : Game
 		if (NetworkManager.Instance.InitializeSteam())
 		{
 			// steam initialized
-			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, AddEntity, () => World);
+			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, _entities.Add, () => World);
 			NetworkBlockSync.Initialize(() => _players, () => World, () => _myPlayer);
 		}
 	}
@@ -627,10 +627,14 @@ public class BlastiaGame : Game
 					player.Update();
 				}
 
-				foreach (var entity in _entities)
+				// update only on host (or singleplayer) and send updates to clients
+				if (NetworkManager.Instance != null && (!NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)) 
 				{
-					entity.Update();
-				}
+				    foreach (var entity in _entities)
+					{
+						entity.Update();
+					}
+				}				
 			}
 
 			TooltipDisplay?.SetPlayerCamera(_myPlayer?.Camera);
@@ -911,6 +915,20 @@ public class BlastiaGame : Game
 	private void AddEntity(Entity entity)
 	{
 		_entities.Add(entity);
+		
+		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
+		{
+		    if (NetworkManager.Instance.IsHost) 
+		    {
+				// host -> broadcast new entity to all clients
+				NetworkEntitySync.BroadcastNewEntityToClients(entity, HSteamNetConnection.Invalid);
+		    }
+		    else 
+		    {
+				// client -> send new entity to host
+				NetworkEntitySync.SendNewEntityToHost(entity);
+		    }
+		}	
 	}
 	
 	// REMOVE ENTITY
