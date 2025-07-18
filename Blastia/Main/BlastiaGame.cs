@@ -216,7 +216,7 @@ public class BlastiaGame : Game
 		if (NetworkManager.Instance.InitializeSteam())
 		{
 			// steam initialized
-			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, _entities.Add, () => World);
+			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, _entities.Add, () => World, _entitiesToRemove.Add);
 			NetworkBlockSync.Initialize(() => _players, () => World, () => _myPlayer);
 		}
 	}
@@ -935,6 +935,18 @@ public class BlastiaGame : Game
 	private void RemoveEntity(Entity entity)
 	{
 		_entitiesToRemove.Add(entity);
+		
+		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
+		{
+		    if (NetworkManager.Instance.IsHost) 
+		    {
+				NetworkEntitySync.BroadcastEntityRemovedToClients(entity.NetworkId, HSteamNetConnection.Invalid);
+		    }
+		    else 
+		    {
+				NetworkEntitySync.SendEntityRemovedToHost(entity);
+		    }
+		}
 	}
 
 	// DRAW DEBUG POINT

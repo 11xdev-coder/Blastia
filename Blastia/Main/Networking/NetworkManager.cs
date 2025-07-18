@@ -688,6 +688,17 @@ public class NetworkManager
                         if (!IsHost)
                             NetworkEntitySync.HandleEntityUpdateFromHost(content);
                         break;
+                    case MessageType.EntityKilled:
+                        if (IsHost)
+                        {
+                            var senderConnection = message.m_conn;
+                            NetworkEntitySync.HandleClientEntityRemoved(content, senderConnection);
+                        }
+                        else 
+                        {
+                            NetworkEntitySync.HandleEntityRemovedFromHost(content);
+                        }
+                        break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client
                         if (IsHost)

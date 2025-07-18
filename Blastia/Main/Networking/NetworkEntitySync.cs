@@ -16,9 +16,10 @@ public static class NetworkEntitySync
     private static Func<List<Entity>>? _entitiesFactory;
     private static Action<Entity>? _addToEntitiesListMethod;
     private static Func<World?>? _worldFactory;
+    private static Action<Entity>? _removeEntityAction;
 
     public static void Initialize(Func<Player?> myPlayerFactory, Func<List<Player>> playersFactory, Action<Player> addToPlayersAction, Func<List<Entity>> entitiesFactory,
-        Action<Entity> addToEntitiesAction, Func<World?> getWorldFactory)
+        Action<Entity> addToEntitiesAction, Func<World?> getWorldFactory, Action<Entity> removeEntityAction)
     {
         _myPlayerFactory = myPlayerFactory;
         _playersFactory = playersFactory;
@@ -26,6 +27,7 @@ public static class NetworkEntitySync
         _entitiesFactory = entitiesFactory;
         _addToEntitiesListMethod = addToEntitiesAction;
         _worldFactory = getWorldFactory;
+        _removeEntityAction = removeEntityAction;
     }
 
     /// <summary>
@@ -469,5 +471,83 @@ public static class NetworkEntitySync
         {
             Console.WriteLine($"[NetworkEntitySync] [HOST] Error while handling EntityPositionUpdate message: {ex.Message}");
         }
+    }
+    
+    /// <summary>
+    /// Broadcasts <c>EntityKilled</c> message to all clients except <c>senderConnection</c> (host only)
+    /// </summary>
+    public static void BroadcastEntityRemovedToClients(Guid entityNetworkId, HSteamNetConnection senderConnection) 
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
+        
+        var networkIdBytes = entityNetworkId.ToByteArray();
+        var networkIdBase64 = Convert.ToBase64String(networkIdBytes);
+        
+        // send to every connection
+        foreach (var connection in NetworkManager.Instance.Connections.Values)
+        {
+            if (connection != senderConnection)
+                NetworkMessageQueue.QueueMessage(connection, MessageType.EntityKilled, networkIdBase64);
+        }
+    }
+    
+    /// <summary>
+    /// Sends <c>EntityKilled</c> message to host (client only)
+    /// </summary>
+    public static void SendEntityRemovedToHost(Entity entity) 
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
+        
+        var networkIdBytes = entity.NetworkId.ToByteArray();
+        var networkIdBase64 = Convert.ToBase64String(networkIdBytes);
+
+        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+        if (hostConnection != HSteamNetConnection.Invalid)
+            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.EntityKilled, networkIdBase64);
+    }
+    
+    /// <summary>
+    /// Handles <c>EntityKilled</c> message (client only)
+    /// </summary>
+    public static void HandleEntityRemovedFromHost(string networkIdBase64)
+    {
+        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _removeEntityAction == null || _entitiesFactory == null) return;
+
+        var networkIdBytes = Convert.FromBase64String(networkIdBase64);
+        var networkId = new Guid(networkIdBytes);
+
+        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkId);
+        if (existingEntity == null) 
+        {
+            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {networkId} not found (nothing to remove)");
+            return;
+        }
+        else 
+        {
+            _removeEntityAction(existingEntity);
+        }
+    }
+    
+    /// <summary>
+    /// Handles <c>EntityKilled</c> message (host only)
+    /// </summary>
+    public static void HandleClientEntityRemoved(string networkIdBase64, HSteamNetConnection senderConnection) 
+    {
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _entitiesFactory == null || _removeEntityAction == null) return;
+
+        var networkIdBytes = Convert.FromBase64String(networkIdBase64);
+        var networkId = new Guid(networkIdBytes);
+
+        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkId);
+        if (existingEntity == null) 
+        {
+            Console.WriteLine($"[NetworkEntitySync] [HOST] Error: entity with network ID: {networkId} not found (nothing to remove)");
+            return;
+        }
+        else 
+        {
+            _removeEntityAction(existingEntity);
+            BroadcastEntityRemovedToClients(networkId, senderConnection);
+        }        
     }
 }
