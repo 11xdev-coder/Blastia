@@ -136,6 +136,7 @@ public abstract class Entity : Object
         AssignNetworkId();
     }
     
+    #region Networking
     /// <summary>
     /// Returns new entity of <c>id</c> ID (except <c>Player</c>)
     /// </summary>
@@ -150,6 +151,18 @@ public abstract class Entity : Object
             _ => null
         };
     }
+
+    public virtual Dictionary<string, object> GetDataForNetwork() => [];
+
+    /// <summary>
+    /// Used in <see cref="NetworkEntity.ApplyToEntity(Entity)"/> to apply additional data to this entity
+    /// </summary>
+    public virtual void ApplyFromNetwork(Dictionary<string, object> data)
+    {
+        
+    }
+    
+    #endregion
 
     private void InitializeLife()
     {

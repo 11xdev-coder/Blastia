@@ -1,4 +1,6 @@
-﻿using Blastia.Main.Entities.Common;
+﻿using Blastia.Main.Entities;
+using Blastia.Main.Entities.Common;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.Networking;
@@ -24,6 +26,11 @@ public class NetworkEntity
     
     public float NetworkTimestamp { get; set; }
 
+    /// <summary>
+    /// Additional data to serialize if needed
+    /// </summary>
+    public Dictionary<string, object> Data { get; set; } = [];
+
     public virtual void FromEntity(Entity entity)
     {
         Id = entity.GetId();
@@ -39,6 +46,13 @@ public class NetworkEntity
         
         // for smooth interpolation
         NetworkTimestamp = (float) DateTime.UtcNow.Subtract(DateTime.UnixEpoch).TotalSeconds;
+
+        var data = entity.GetDataForNetwork();
+        foreach (var kvp in data) 
+        {
+            // copy to our dict
+            Data[kvp.Key] = kvp.Value;
+        }
     }
 
     /// <summary>
@@ -59,6 +73,8 @@ public class NetworkEntity
         entity.SpriteDirection = SpriteDirection;
         
         entity.NetworkTimestamp = NetworkTimestamp;
+
+        entity.ApplyFromNetwork(Data);
     }
 
     public virtual byte[] Serialize()
@@ -80,6 +96,21 @@ public class NetworkEntity
         writer.Write(CanJump);
         writer.Write(SpriteDirection);
         writer.Write(NetworkTimestamp);
+
+        // write additional data
+        writer.Write(Data.Count);
+        foreach (var kvp in Data) 
+        {
+            writer.Write(kvp.Key); // key string
+
+            var typeCode = Saving.GetTypeCode(kvp.Value);
+            writer.Write(typeCode); // type identifier
+            
+            if (typeCode != 0) // know type 
+            {
+                Saving.WriteObject(writer, kvp.Value);
+            }
+        }
         
         return stream.ToArray();
     }
@@ -91,7 +122,7 @@ public class NetworkEntity
         var guidBytes = reader.ReadBytes(16);
         var networkId = new Guid(guidBytes);
         
-        return new NetworkEntity
+        var networkEntity = new NetworkEntity
         {
             Id = id,
             NetworkId = networkId,
@@ -104,5 +135,21 @@ public class NetworkEntity
             SpriteDirection = reader.ReadSingle(),
             NetworkTimestamp = reader.ReadSingle()
         };
+
+        var dataCount = reader.ReadInt32();
+        for (int i = 0; i < dataCount; i++) 
+        {
+            var key = reader.ReadString();
+            var typeCode = reader.ReadByte();
+            var type = Saving.GetTypeFromCode(typeCode);
+            
+            if (type != null) 
+            {
+                var value = Saving.ReadObject(reader, type);
+                networkEntity.Data[key] = value;
+            }
+        }
+
+        return networkEntity;
     }
 }

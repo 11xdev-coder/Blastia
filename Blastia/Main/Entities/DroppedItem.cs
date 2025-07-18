@@ -227,4 +227,30 @@ public class DroppedItem : Entity
             visual.Draw(spriteBatch, scaledPosition, scale * Scale);
         }
     }
+
+    public override Dictionary<string, object> GetDataForNetwork()
+    {
+        if (Item == null) return [];
+        
+        return new Dictionary<string, object>
+        {
+            {"ItemId", Item.Id},
+            {"Amount", Amount},
+            {"PickupTime", PickupTime}
+        };
+    }
+
+    public override void ApplyFromNetwork(Dictionary<string, object> data)
+    {
+        base.ApplyFromNetwork(data);
+
+        ushort itemId = (ushort) data["ItemId"];
+        var item = StuffRegistry.GetItem(itemId);
+        Item = item;
+
+        Amount = (int)data["Amount"];
+        PickupTime = (float)data["PickupTime"];
+
+        RefreshStackVisuals();
+    }
 }
