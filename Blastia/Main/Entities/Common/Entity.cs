@@ -149,7 +149,7 @@ public abstract class Entity : Object
         {
             EntityID.Player => null,
             EntityID.MutantScavenger => new MutantScavenger(position, 1f),
-            EntityID.DroppedItem => new DroppedItem(position, 1f, world),
+            EntityID.DroppedItem => new DroppedItem(position, DroppedItemScale, world),
             _ => null
         };
     }
