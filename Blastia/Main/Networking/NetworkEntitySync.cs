@@ -41,7 +41,7 @@ public static class NetworkEntitySync
         var clientName = SteamFriends.GetFriendPersonaName(clientId);
 
         // Create a not locally controlled player for the client
-        var clientPlayer = new Player(PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint(), _worldFactory(), BlastiaGame.PlayerScale, false)
+        var clientPlayer = new Player(PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint(), _worldFactory(), Entity.PlayerScale, false)
         {
             SteamId = clientId,
             LocallyControlled = false,
@@ -223,7 +223,7 @@ public static class NetworkEntitySync
             return;
         }
 
-        var player = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale, false);
+        var player = new Player(Vector2.Zero, _worldFactory(), Entity.PlayerScale, false);
         networkPlayer.ApplyToEntity(player);
 
         _addToPlayersListMethod(player);
@@ -279,7 +279,7 @@ public static class NetworkEntitySync
             else
             {
                 Console.WriteLine($"[NetworkEntitySync] [WARNING] Player with Steam ID: {networkPlayer.SteamId} not found, creating new player");
-                var newPlayer = new Player(Vector2.Zero, _worldFactory(), BlastiaGame.PlayerScale)
+                var newPlayer = new Player(Vector2.Zero, _worldFactory(), Entity.PlayerScale)
                 {
                     LocallyControlled = false
                 };

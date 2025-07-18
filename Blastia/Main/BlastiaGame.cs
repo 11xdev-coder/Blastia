@@ -156,7 +156,6 @@ public class BlastiaGame : Game
 	private Dictionary<(Vector2, TileLayer), BlockInstance>? _myCachedTiles = []; // cached tiles to update for rendering
 	private static readonly HashSet<Vector2> _damagedBlockPositionsThisFrame = [];
 	private readonly List<Player> _players;
-	public const float PlayerScale = 0.15f;
 	public ushort PlayerLimit = 128;
 	private bool IsWorldInitialized { get; set; }
 	
@@ -818,7 +817,7 @@ public class BlastiaGame : Game
 		
 		World = new World(worldState, _entities.AsReadOnly());
 		//worldState.SetSpawnPoint(1600, 468);
-		_myPlayer = new Player(worldState.GetSpawnPoint(), World, PlayerScale, true);
+		_myPlayer = new Player(worldState.GetSpawnPoint(), World, Entity.PlayerScale, true);
 		World.SetPlayer(_myPlayer);
 		
 		if (LogoMenu != null) LogoMenu.Active = false;

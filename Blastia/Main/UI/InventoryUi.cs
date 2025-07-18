@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Entities;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
 using Blastia.Main.Sounds;
@@ -250,19 +251,18 @@ public class InventoryUi : Menu
     private void HandleItemDrop()
     {
         if (_playerInventory.CursorItem == null) return;
-        var iconScale = 0.25f;
         
         var playerHalfWidth = _playerInventory.Player.Width * 0.5f;
         var playerHalfHeight = _playerInventory.Player.Height * 0.5f;
         var direction = _playerInventory.Player.SpriteDirection;
         
-        var itemIconHalfWidth = _playerInventory.CursorItem.Icon.Width * 0.5f * iconScale;
-        var itemIconHalfHeight = _playerInventory.CursorItem.Icon.Height * 0.5f * iconScale;
+        var itemIconHalfWidth = _playerInventory.CursorItem.Icon.Width * 0.5f * Entity.DroppedItemScale;
+        var itemIconHalfHeight = _playerInventory.CursorItem.Icon.Height * 0.5f * Entity.DroppedItemScale;
         
         var posX = _playerInventory.Player.Position.X - playerHalfWidth - itemIconHalfWidth;
         var posY = _playerInventory.Player.Position.Y - playerHalfHeight - itemIconHalfHeight;
         
-        var droppedItem = new DroppedItem(new Vector2(posX, posY), iconScale, _world);
+        var droppedItem = new DroppedItem(new Vector2(posX, posY), Entity.DroppedItemScale, _world);
         droppedItem.Launch(_playerInventory.CursorItem.BaseItem, _playerInventory.CursorItem.Amount, (int) direction);
         BlastiaGame.RequestAddEntity(droppedItem);
         BlastiaGame.NotificationDisplay?.AddNotification($"(-) {_playerInventory.CursorItem.Amount} {_playerInventory.CursorItem.Name}", Color.IndianRed);

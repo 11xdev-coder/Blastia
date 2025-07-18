@@ -597,6 +597,7 @@ public class NetworkManager
                         Console.WriteLine($"[NetworkManager] Received {type} from {message.m_conn} (not logging content)");
                         break;
                     case MessageType.PlayerPositionUpdate:
+                    case MessageType.EntityPositionUpdate:
                         break;
                     default:
                         Console.WriteLine($"[NetworkManager] Received {type}: {content} from {message.m_conn}");
