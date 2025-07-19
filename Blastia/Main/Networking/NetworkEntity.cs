@@ -63,7 +63,7 @@ public class NetworkEntity
     {
         entity.SetId(Id);
         entity.NetworkId = NetworkId;
-
+        
         entity.NetworkPosition = Position;
         entity.NetworkMovementVector = MovementVector;
         entity.DirectionVector = DirectionVector;

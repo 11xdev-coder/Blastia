@@ -447,24 +447,11 @@ public static class NetworkEntitySync
             if (entity != null)
             {
                 networkEntity.ApplyToEntity(entity);
+                Console.WriteLine($"UPDATED POSITION FROM HOST : {entity.Position}, NETWORK: {entity.NetworkPosition}, Locally Controlled: {entity.LocallyControlled}");
             }
             else
             {
                 Console.WriteLine($"[NetworkEntitySync] [WARNING] Entity with ID: {networkEntity.Id} (network ID: {networkEntity.NetworkId}) not found");
-
-                var world = _worldFactory();
-                if (world == null) return;
-
-                var newEntity = Entity.CreateEntity(networkEntity.Id, networkEntity.Position, world);
-                if (newEntity != null) 
-                {               
-                    newEntity.NetworkId = networkEntity.NetworkId;
-                    
-                    networkEntity.ApplyToEntity(newEntity);
-                    _addToEntitiesListMethod(newEntity);
-                    
-                    Console.WriteLine($"[NetworkEntitySync] Created entity with ID: {newEntity.GetId()} and network ID: {newEntity.NetworkId}");
-                }
             }
         }
         catch (Exception ex)

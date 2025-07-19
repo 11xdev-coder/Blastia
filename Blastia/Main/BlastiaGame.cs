@@ -626,14 +626,11 @@ public class BlastiaGame : Game
 					player.Update();
 				}
 
-				// update only on host (or singleplayer) and send updates to clients
-				if (NetworkManager.Instance != null && (!NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)) 
+				// LocallyControlled will handle everything
+				foreach (var entity in _entities)
 				{
-				    foreach (var entity in _entities)
-					{
-						entity.Update();
-					}
-				}				
+					entity.Update();
+				}			
 			}
 
 			TooltipDisplay?.SetPlayerCamera(_myPlayer?.Camera);

@@ -53,6 +53,9 @@ public abstract class Entity : Object
     public Vector2 NetworkMovementVector;
     public Vector2 NetworkPosition;
     public float NetworkTimestamp;
+    /// <summary>
+    /// Is entity controlled for this client? Players have authority over their own player, and host has authority over all entities
+    /// </summary>
     public bool LocallyControlled { get; set; }
     private const float InterpolationSpeed = 10f;
     private const float MaxInterpolationDistance = 10f; // teleport if too far away
@@ -136,6 +139,15 @@ public abstract class Entity : Object
         
         InitializeLife();
         AssignNetworkId();
+        
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)
+        {
+            LocallyControlled = true; // host or singleplayer controls physics
+        }
+        else
+        {
+            LocallyControlled = false; // client doesn't control physics
+        }
     }
     
     #region Networking
@@ -275,7 +287,7 @@ public abstract class Entity : Object
         if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected && !LocallyControlled)
         {
             InterpolateNetworkPosition();
-        }
+        }       
         
         if (ImmunityTimer > 0)
         {
@@ -288,6 +300,12 @@ public abstract class Entity : Object
         
         UpdatePosition();
         UpdateSprite();
+        
+        // on host update network position
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)
+        {
+            NetworkPosition = Position;
+        }
     }
 
     public Rectangle GetBounds()
