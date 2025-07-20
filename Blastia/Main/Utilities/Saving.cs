@@ -141,7 +141,66 @@ public static class Saving
                     Console.WriteLine($"Property type: {property.PropertyType.FullName}");
                 }
 
-                WriteObject(writer, value);
+                switch (value)
+                {
+                    case Dictionary<Vector2, ushort> tileDictionary:
+                        WriteTileDictionary(tileDictionary, writer, debugLogs);
+                        break;
+                    case Dictionary<Vector2, BlockInstance> blockInstanceDictionary:
+                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, BlockInstance> with {blockInstanceDictionary.Count} items");
+
+                        writer.Write(blockInstanceDictionary.Count);
+                        foreach (var keyValuePair in blockInstanceDictionary)
+                        {
+                            var vector = keyValuePair.Key;
+                            var block = keyValuePair.Value;
+
+                            if (debugLogs)
+                            {
+                                Console.WriteLine(vector == default
+                                    ? "Couldn't write Vector2"
+                                    : $"Writing Dictionary<Vector2, BlockInstance> entry: Position({vector.X}, {vector.Y}), Block ID: {block.Id}");
+                            }
+
+                            writer.Write(vector.X);
+                            writer.Write(vector.Y);
+                            // write blocks ID, reconstruct later from StuffRegistry
+                            writer.Write(block.Id);
+                            if (keyValuePair.Value.Block is LiquidBlock liquid)
+                            {
+                                writer.Write(liquid.FlowLevel);
+                            }
+                        }
+
+                        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
+                        break;
+                    case Dictionary<Vector2, string> stringDictionary:
+                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, string> with {stringDictionary.Count} items");
+
+                        writer.Write(stringDictionary.Count);
+                        foreach (var keyValuePair in stringDictionary)
+                        {
+                            var vector = keyValuePair.Key;
+                            var str = keyValuePair.Value;
+
+                            if (debugLogs)
+                            {
+                                Console.WriteLine(vector == default
+                                    ? "Couldn't write Vector2"
+                                    : $"Writing Dictionary<Vector2, string> entry: Position({vector.X}, {vector.Y}), String: {str}");
+                            }
+
+                            writer.Write(vector.X);
+                            writer.Write(vector.Y);
+                            writer.Write(str);
+                        }
+
+                        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
+                        break;
+                    default:
+                        WriteObject(writer, value);
+                        break;
+                }    
             }
         }
     }
