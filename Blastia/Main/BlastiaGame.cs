@@ -626,11 +626,21 @@ public class BlastiaGame : Game
 					player.Update();
 				}
 
-				// LocallyControlled will handle everything
-				foreach (var entity in _entities)
+				// host -> update physics
+				if (NetworkManager.Instance != null && (!NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)) 
 				{
-					entity.Update();
-				}			
+				    foreach (var entity in _entities)
+					{
+						entity.Update();
+					}
+				}
+				else // client -> only interpolate position from network
+				{
+				    foreach (var entity in _entities) 
+				    {
+						entity.InterpolateNetworkPosition();
+				    }
+				}		
 			}
 
 			TooltipDisplay?.SetPlayerCamera(_myPlayer?.Camera);
@@ -812,7 +822,7 @@ public class BlastiaGame : Game
 		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
 		if (worldState == null) return;
 		
-		World = new World(worldState, _entities.AsReadOnly());
+		World = new World(worldState, _entities.AsReadOnly(), _players.AsReadOnly());
 		//worldState.SetSpawnPoint(1600, 468);
 		_myPlayer = new Player(worldState.GetSpawnPoint(), World, Entity.PlayerScale, true);
 		World.SetPlayer(_myPlayer);

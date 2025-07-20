@@ -40,7 +40,7 @@ public class LogoImageElement : Image
         _hintText.Scale = new Vector2(currentScale);
 
 		var size = Font.MeasureString(_hintText.Text);
-		_hintText.Position = new Vector2(Bounds.Right - size.X - 20, Bounds.Bottom - size.Y - 45);
+		_hintText.Position = new Vector2(Bounds.Right - size.X - 20, Bounds.Bottom - size.Y);
 		_hintText?.Update();
     }
 

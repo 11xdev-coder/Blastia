@@ -259,7 +259,7 @@ public abstract class Entity : Object
 
     public ushort GetId() => ID;
 
-    private void InterpolateNetworkPosition()
+    public void InterpolateNetworkPosition()
     {
         var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
         

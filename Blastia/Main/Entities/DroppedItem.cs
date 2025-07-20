@@ -5,6 +5,7 @@ using Blastia.Main.Items;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Steamworks;
 
 namespace Blastia.Main.Entities;
 
@@ -236,7 +237,9 @@ public class DroppedItem : Entity
         {
             {"ItemId", Item.Id},
             {"Amount", Amount},
-            {"PickupTime", PickupTime}
+            {"PickupTime", PickupTime},
+            {"IsBeingPulled", IsBeingPulled},
+            {"PullerId", PullTargetPlayer == null ? 0 : PullTargetPlayer.SteamId.m_SteamID}
         };
     }
 
@@ -250,6 +253,17 @@ public class DroppedItem : Entity
 
         Amount = (int)data["Amount"];
         PickupTime = (float)data["PickupTime"];
+
+        IsBeingPulled = (bool)data["IsBeingPulled"];
+        if (IsBeingPulled) 
+        {
+            var pullerId = (ulong)data["PullerId"];
+            if (pullerId != 0) 
+            {
+                var player = _world.GetPlayers().FirstOrDefault(p => p.SteamId.m_SteamID == pullerId);
+                PullTargetPlayer = player;
+            }
+        }
 
         RefreshStackVisuals();
     }

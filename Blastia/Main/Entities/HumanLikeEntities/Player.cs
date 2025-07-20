@@ -190,7 +190,7 @@ public class Player : HumanLikeEntity
 				StopAnimations();
 			}
 			
-			HandleItemInteraction();
+			HandleItemPickup();
 			
 			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null)
 			{
@@ -446,7 +446,7 @@ public class Player : HumanLikeEntity
 		
 	}
 
-	private void HandleItemInteraction()
+	private void HandleItemPickup()
 	{
 		if (World == null) return;
 		

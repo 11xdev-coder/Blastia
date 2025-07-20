@@ -19,6 +19,10 @@ public class World
 	/// Read only list of <c>BlastiaGame._entities</c>, managed by <c>BlastiaGame</c>. <c>World</c> contains public methods to access entities
 	/// </summary>
 	public readonly IReadOnlyList<Entity> Entities;
+	/// <summary>
+	/// Read only list of <c>BlastiaGame._players</c>, managed by <c>BlastiaGame</c>. <c>World</c> contains public methods to access entities
+	/// </summary>
+	public readonly IReadOnlyList<Player> Players;
 
 	private bool _rulerMode;
 	public bool RulerMode
@@ -34,10 +38,11 @@ public class World
 	private readonly RulerHighlight _rulerStartHighlight;
 	private readonly RulerHighlight _rulerEndHighlight;
 
-	public World(WorldState state, IReadOnlyList<Entity> entities)
+	public World(WorldState state, IReadOnlyList<Entity> entities, IReadOnlyList<Player> players)
 	{
 		_state = state;
 		Entities = entities;
+		Players = players;
 
 		_rulerStartHighlight = new RulerHighlight();
 		_rulerEndHighlight = new RulerHighlight();
@@ -171,6 +176,8 @@ public class World
 	}
 
 	public IEnumerable<DroppedItem> GetDroppedItems() => Entities.OfType<DroppedItem>();
+
+	public IEnumerable<Player> GetPlayers() => Players;
 	
 	public void Update()
 	{

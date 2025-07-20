@@ -106,6 +106,9 @@ public static class Saving
             case string stringValue:
                 writer.Write(stringValue);
                 break;
+            case ulong ulongValue:
+                writer.Write(ulongValue);
+                break;
         }
     }
     
@@ -218,6 +221,7 @@ public static class Saving
             case TypeCode.Double: return reader.ReadDouble();
             case TypeCode.Boolean: return reader.ReadBoolean();
             case TypeCode.String: return reader.ReadString();
+            case TypeCode.UInt64: return reader.ReadUInt64();
         }
 
         throw new ArgumentException($"Unsupported type: {type.Name} (Full name: {type.FullName})");
@@ -330,6 +334,7 @@ public static class Saving
             double => 5,
             bool => 6,
             string => 7,
+            ulong => 8,
             _ => 0 // unknown
         };
     }
@@ -352,6 +357,7 @@ public static class Saving
             5 => typeof(double),
             6 => typeof(bool),
             7 => typeof(string),
+            8 => typeof(ulong),
             _ => null
         };
     }

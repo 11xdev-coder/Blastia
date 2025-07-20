@@ -447,11 +447,10 @@ public static class NetworkEntitySync
             if (entity != null)
             {
                 networkEntity.ApplyToEntity(entity);
-                Console.WriteLine($"UPDATED POSITION FROM HOST : {entity.Position}, NETWORK: {entity.NetworkPosition}, Locally Controlled: {entity.LocallyControlled}");
             }
             else
             {
-                Console.WriteLine($"[NetworkEntitySync] [WARNING] Entity with ID: {networkEntity.Id} (network ID: {networkEntity.NetworkId}) not found");
+                Console.WriteLine($"[NetworkEntitySync] [WARNING] Entity with ID: {networkEntity.Id} (network ID: {networkEntity.NetworkId}) not found, nothing to update!");
             }
         }
         catch (Exception ex)
@@ -506,7 +505,7 @@ public static class NetworkEntitySync
         var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkId);
         if (existingEntity == null) 
         {
-            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {networkId} not found (nothing to remove)");
+            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {networkId} not found, nothing to remove!");
             return;
         }
         else 
@@ -528,7 +527,7 @@ public static class NetworkEntitySync
         var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkId);
         if (existingEntity == null) 
         {
-            Console.WriteLine($"[NetworkEntitySync] [HOST] Error: entity with network ID: {networkId} not found (nothing to remove)");
+            Console.WriteLine($"[NetworkEntitySync] [HOST] Error: entity with network ID: {networkId} not found, nothing to remove!");
             return;
         }
         else 
