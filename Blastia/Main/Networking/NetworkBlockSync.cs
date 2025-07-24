@@ -333,60 +333,6 @@ public static class NetworkBlockSync
     }
     
     /// <summary>
-    /// Broadcasts sign edit at <c>position</c> with new text to all clients except <c>senderConnection</c> (connection to client that sent this message to host) (host only)
-    /// </summary>
-    public static void BroadcastSignEditedToClients(Vector2 position, string newText, HSteamNetConnection senderConnection) 
-    {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
-        
-        try 
-        {
-            var edit = new NetworkSignEditedMessage
-            {
-                Position = position,
-                NewText = newText
-            };
-            var editBytes = edit.Serialize();
-            var editBase64 = Convert.ToBase64String(editBytes);
-
-            foreach (var connection in NetworkManager.Instance.Connections.Values)
-                if (connection != senderConnection)
-                    NetworkMessageQueue.QueueMessage(connection, MessageType.SignEditedAt, editBase64);
-        }
-        catch (Exception ex) 
-        {
-            Console.WriteLine($"[NetworkBlockSync] Error broadcasting sign edit message: {ex.Message}");
-        }
-    }
-    
-    /// <summary>
-    /// Sends sign edit at <c>position</c> with new text to host (client only)
-    /// </summary>
-    public static void SendSignEditedToHost(Vector2 position, string newText) 
-    {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
-        
-        try 
-        {
-            var edit = new NetworkSignEditedMessage
-            {
-                Position = position,
-                NewText = newText
-            };
-            var editBytes = edit.Serialize();
-            var editBase64 = Convert.ToBase64String(editBytes);
-
-            var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
-            if (hostConnection != HSteamNetConnection.Invalid)
-                NetworkMessageQueue.QueueMessage(hostConnection, MessageType.SignEditedAt, editBase64);
-        }
-        catch (Exception ex) 
-        {
-            Console.WriteLine($"[NetworkBlockSync] Error sending sign edit message: {ex.Message}");
-        }
-    }
-    
-    /// <summary>
     /// Handles <c>SignEdtedAt</c> message (host only)
     /// </summary>
     public static void HandleClientSignEdited(string editBase64, HSteamNetConnection senderConnection) 
@@ -400,7 +346,13 @@ public static class NetworkBlockSync
             var edit = NetworkSignEditedMessage.Deserialize(editBytes);
 
             worldState.SignTexts[edit.Position] = edit.NewText;
-            BroadcastSignEditedToClients(edit.Position, edit.NewText, senderConnection);
+
+            var signEdited = new NetworkSignEditedMessage
+            {
+                Position = edit.Position,
+                NewText = edit.NewText
+            };
+            NetworkSync.Sync(signEdited, MessageType.SignEditedAt, SyncMode.Auto, senderConnection);
         }
         catch (Exception ex) 
         {

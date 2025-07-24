@@ -255,6 +255,7 @@ public class DroppedItem : Entity
         PickupTime = (float)data["PickupTime"];
 
         IsBeingPulled = (bool)data["IsBeingPulled"];
+        Console.WriteLine($"IS PULLING: {IsBeingPulled}");
         if (IsBeingPulled) 
         {
             var pullerId = (ulong)data["PullerId"];
@@ -262,6 +263,8 @@ public class DroppedItem : Entity
             {
                 var player = _world.GetPlayers().FirstOrDefault(p => p.SteamId.m_SteamID == pullerId);
                 PullTargetPlayer = player;
+
+                Console.WriteLine($"NEW PULLER ID: {pullerId} NAME: {player?.Name}");
             }
         }
 

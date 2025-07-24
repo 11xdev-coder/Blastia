@@ -54,19 +54,14 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
         var newText = SignText.StringBuilder.ToString();
         worldState.SignTexts[SignPosition] = newText; // set locally
         Active = false;
-        
-        if (NetworkManager.Instance != null && NetworkManager.Instance.IsHost) // host
+
+        // sync the sign edit
+        var signEdited = new NetworkSignEditedMessage
         {
-            // broadcast to all clients
-            NetworkBlockSync.BroadcastSignEditedToClients(SignPosition, newText, HSteamNetConnection.Invalid);
-            
-        }
-        else if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected && !NetworkManager.Instance.IsHost) // client
-        {
-            // send to host to broadcast
-            NetworkBlockSync.SendSignEditedToHost(SignPosition, newText);            
-        }
-        // singleplayer dont do anything more
+            Position = SignPosition,
+            NewText = newText
+        };
+        NetworkSync.Sync(signEdited, MessageType.SignEditedAt, SyncMode.Auto);
     }
 
     private void CloseMenu()
