@@ -624,7 +624,7 @@ public class NetworkManager
                         {
                             var senderConnection = message.m_conn;
                             var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
-                            NetworkEntitySync.HandleClientPositionUpdate(content, senderId);
+                            NetworkEntitySync.HandleClientPositionUpdate(content, senderId, senderConnection);
                         }
                         else 
                         {

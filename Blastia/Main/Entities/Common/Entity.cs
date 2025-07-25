@@ -140,14 +140,18 @@ public abstract class Entity : Object
         InitializeLife();
         AssignNetworkId();
         
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)
+        // dont update authority on players
+        if (this is not Player) 
         {
-            LocallyControlled = true; // host or singleplayer controls physics
-        }
-        else
-        {
-            LocallyControlled = false; // client doesn't control physics
-        }
+            if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)
+            {
+                LocallyControlled = true; // host or singleplayer controls physics
+            }
+            else
+            {
+                LocallyControlled = false; // client doesn't control physics
+            }
+        }        
     }
     
     #region Networking
@@ -301,8 +305,8 @@ public abstract class Entity : Object
         UpdatePosition();
         UpdateSprite();
         
-        // on host update network position
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost)
+        // on host update network position (only for entities, not players)
+        if ((NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost) && this is not Player)
         {
             NetworkPosition = Position;
         }

@@ -116,7 +116,7 @@ public static class NetworkEntitySync
     /// <summary>
     /// Host receives position update from client and broadcasts it to all clients
     /// </summary>
-    public static void HandleClientPositionUpdate(string playerBase64, CSteamID clientId)
+    public static void HandleClientPositionUpdate(string playerBase64, CSteamID clientId, HSteamNetConnection senderConnection)
     {
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null) return;
 
@@ -139,17 +139,11 @@ public static class NetworkEntitySync
             }
 
             // update client
-            var oldPosition = clientPlayer.Position;
             networkPlayer.ApplyToEntity(clientPlayer);
 
-            // broadcast to all clients
-            var updatedPlayerBytes = clientPlayer.GetNetworkData().Serialize();
-            var updatedPlayerBase64 = Convert.ToBase64String(updatedPlayerBytes);
-
             foreach (var kvp in NetworkManager.Instance.Connections)
-            {
-                NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerPositionUpdate, updatedPlayerBase64);
-            }
+                if (kvp.Value != senderConnection)
+                    NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerPositionUpdate, playerBase64);
         }
         catch (Exception ex)
         {
