@@ -217,16 +217,16 @@ public class BlockInstance
 		{
 			if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 			{
+				// send network message
+				NetworkBlockSync.SyncBlockChange(position, 0, Block.GetLayer(), player);
 			    if (NetworkManager.Instance.IsHost) 
 			    {
-					// host: handle locally and broadcast
+					// host: handle locally
 			        selectedWorld.SetTile((int) position.X, (int) position.Y, 0, Block.GetLayer(), player);
-					NetworkBlockSync.BroadcastBlockChangedToClients(position, 0, Block.GetLayer(), player);
 			    }
 			    else if (!_hasRequestedBreak)
 			    {
-			        // client: send request
-			        NetworkBlockSync.SendBlockChangedToHost(position, 0, Block.GetLayer(), player);
+			        // client: set requested flag (block will be removed when received the message)
 					_hasRequestedBreak = true;
 			    }
 			}

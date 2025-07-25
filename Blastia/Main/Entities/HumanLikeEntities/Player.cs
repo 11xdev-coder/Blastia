@@ -370,17 +370,14 @@ public class Player : HumanLikeEntity
 		
 		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 		{
+			// send network message
+			NetworkBlockSync.SyncBlockChange(position, placeable.BlockId, placeableLayer, this);
 		    if (NetworkManager.Instance.IsHost) 
 		    {
 				// host -> place block locally and broadcast
 		        worldState.SetTile((int) position.X, (int) position.Y, placeable.BlockId, placeableLayer, this);
-				NetworkBlockSync.BroadcastBlockChangedToClients(position, placeable.BlockId, placeableLayer, this);
 		    }
-		    else 
-		    {
-				// client -> send placement request to host, dont process locally yet
-				NetworkBlockSync.SendBlockChangedToHost(position, placeable.BlockId, placeableLayer, this);
-		    }
+		    // client -> dont process locally yet
 		}
 		else 
 		{

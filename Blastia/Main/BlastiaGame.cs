@@ -21,7 +21,8 @@ using Blastia.Main.Blocks.Common;
 using Blastia.Main.Physics;
 using Blastia.Main.Blocks;
 using Steamworks;
-using System.ComponentModel.Design; // for Block.Size
+using System.ComponentModel.Design;
+using Vortice.Direct3D11.Debug; // for Block.Size
 
 namespace Blastia.Main;
 
@@ -526,31 +527,26 @@ public class BlastiaGame : Game
 									if (hasStateChanged) // if state changed
 									{
 										// only check neighbors if this is a moving block
-										if (blockInstance.Block.IsMovingBlock())
+										if (blockInstance.Block.IsMovingBlock() && afterUpdate.blockId != beforeUpdate.blockId)
 										{
-											if (afterUpdate.blockId != beforeUpdate.blockId) 
+											var neighborPositionsToCheck = new HashSet<Vector2>
 											{
-											    var neighborPositionsToCheck = new HashSet<Vector2>
-												{
-													new(position.X, position.Y + Block.Size),
-													new(position.X, position.Y - Block.Size),
-													new(position.X - Block.Size, position.Y),
-													new(position.X + Block.Size, position.Y)
-												};
+												new(position.X, position.Y + Block.Size),
+												new(position.X, position.Y - Block.Size),
+												new(position.X - Block.Size, position.Y),
+												new(position.X + Block.Size, position.Y)
+											};
 
-												foreach (var neighborPos in neighborPositionsToCheck)
+											foreach (var neighborPos in neighborPositionsToCheck)
+											{
+												var inst = worldState.GetBlockInstance((int)neighborPos.X, (int)neighborPos.Y, layer);
+												if (inst?.Block.IsMovingBlock() == true && inst.Id == blockInstance.Id)
 												{
-													var inst = worldState.GetBlockInstance((int)neighborPos.X, (int)neighborPos.Y, layer);
-													if (inst?.Block.IsMovingBlock() == true && inst.Id == blockInstance.Id)
-													{
-														// if neighbor position was found, send the actual original position to the client
-														// first -> pos before update, second -> pos after update (found neighbor)
-														blocksUpdatedThisFrame.Add((position, neighborPos));
-													}
+													// if neighbor position was found, send the actual original position to the client
+													// first -> pos before update, second -> pos after update (found neighbor)
+													blocksUpdatedThisFrame.Add((position, neighborPos));
 												}
 											}
-											else
-												blocksUpdatedThisFrame.Add((position, position));
 										}
 										else // not a moving block -> just add initial pos
 										{
@@ -576,9 +572,11 @@ public class BlastiaGame : Game
 							}
 							_damagedBlockPositionsThisFrame.Clear();
 							
+							// sync
 							if (blocksUpdatedThisFrame.Count > 0 && NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 							{
-								NetworkBlockSync.BroadcastUpdatedBlocksToClients(blocksUpdatedThisFrame);
+								foreach (var t in blocksUpdatedThisFrame)
+									NetworkBlockSync.SyncBlockUpdate(worldState, t.newPos, t.original);
 							}
 						}
 						else if (NetworkManager.Instance != null && !NetworkManager.Instance.IsHost)
@@ -608,9 +606,10 @@ public class BlastiaGame : Game
 								}
 							}
 
+							// on client doesnt matter (original or new position)
 							foreach (var damagedPosition in _damagedBlockPositionsThisFrame) 
 							{
-								NetworkBlockSync.SendBlockUpdateToHost(damagedPosition, damagedPosition);
+								NetworkBlockSync.SyncBlockUpdate(worldState, damagedPosition, damagedPosition);
 							}
 							_damagedBlockPositionsThisFrame.Clear();							
 						}
