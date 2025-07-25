@@ -36,10 +36,10 @@ public class NetworkPlayer : NetworkEntity
         }
     }
 
-    public byte[] Serialize(MemoryStream stream, BinaryWriter writer)
+    public new byte[] Serialize()
     {
-        stream.SetLength(0);
-        stream.Position = 0;
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
     
         // entity
         writer.Write(Id);

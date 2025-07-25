@@ -166,14 +166,7 @@ public class NetworkManager
         _lastPlayerSync += (float) BlastiaGame.GameTimeElapsedSeconds;
         if (_lastPlayerSync >= PlayerSyncRate)
         {
-            if (IsHost) 
-            {
-                NetworkEntitySync.SyncHostPlayer();
-            }
-            else if (IsConnected) 
-            {
-                NetworkEntitySync.SendClientPositionToHost();
-            }
+            NetworkEntitySync.SyncMyPlayerPosition();
             _lastPlayerSync = 0f;
         }
         

@@ -63,11 +63,8 @@ public static class NetworkEntitySync
             Console.WriteLine($"  - Player '{p.Name}' (ID: {p.SteamId}, LocallyControlled: {p.LocallyControlled})");
         }
 
-        using var stream = new MemoryStream();
-        using var writer = new BinaryWriter(stream);
-
         // serialize
-        var clientPlayerBytes = clientPlayer.GetNetworkData().Serialize(stream, writer);
+        var clientPlayerBytes = clientPlayer.GetNetworkData().Serialize();
         var clientPlayerBase64 = Convert.ToBase64String(clientPlayerBytes);
 
         // tell all players that new client joined
@@ -83,7 +80,7 @@ public static class NetworkEntitySync
             if (player.SteamId == clientId) continue; // skip own player
 
             // create network data and serialize
-            var playerBytes = player.GetNetworkData().Serialize(stream, writer);
+            var playerBytes = player.GetNetworkData().Serialize();
             var playerBase64 = Convert.ToBase64String(playerBytes);
 
             NetworkMessageQueue.QueueMessage(clientConnection, MessageType.PlayerSpawned, playerBase64);
@@ -93,7 +90,7 @@ public static class NetworkEntitySync
         var hostPlayer = _myPlayerFactory?.Invoke();
         if (hostPlayer != null)
         {
-            var hostPlayerBytes = hostPlayer.GetNetworkData().Serialize(stream, writer);
+            var hostPlayerBytes = hostPlayer.GetNetworkData().Serialize();
             var hostPlayerBase64 = Convert.ToBase64String(hostPlayerBytes);
             NetworkMessageQueue.QueueMessage(clientConnection, MessageType.PlayerSpawned, hostPlayerBase64);
             Console.WriteLine($"[NetworkEntitySync] [HOST] Sent host player {hostPlayer.Name} to client {SteamFriends.GetFriendPersonaName(clientId)}");
@@ -114,38 +111,6 @@ public static class NetworkEntitySync
         }
 
         Console.WriteLine($"[NetworkEntitySync] [HOST] Client {SteamFriends.GetFriendPersonaName(clientId)} joined, sent existing entities");
-    }
-
-    /// <summary>
-    /// Broadcasts host's player state to all players (host only)
-    /// </summary>
-    public static void SyncHostPlayer()
-    {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null || _myPlayerFactory == null) return;
-
-        if (NetworkManager.Instance.Connections.Count == 0) return; // no clients to sync to
-
-        using var stream = new MemoryStream();
-        using var writer = new BinaryWriter(stream);
-
-        var hostPlayer = _myPlayerFactory?.Invoke();
-        if (hostPlayer != null)
-        {
-            try
-            {
-                var playerBytes = hostPlayer.GetNetworkData().Serialize(stream, writer);
-                var playerBase64 = Convert.ToBase64String(playerBytes);
-
-                foreach (var kvp in NetworkManager.Instance.Connections)
-                {
-                    NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerPositionUpdate, playerBase64);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Error syncing host player: {ex.Message}");
-            }
-        }
     }
 
     /// <summary>
@@ -178,9 +143,7 @@ public static class NetworkEntitySync
             networkPlayer.ApplyToEntity(clientPlayer);
 
             // broadcast to all clients
-            using var outStream = new MemoryStream();
-            using var outWriter = new BinaryWriter(outStream);
-            var updatedPlayerBytes = clientPlayer.GetNetworkData().Serialize(outStream, outWriter);
+            var updatedPlayerBytes = clientPlayer.GetNetworkData().Serialize();
             var updatedPlayerBase64 = Convert.ToBase64String(updatedPlayerBytes);
 
             foreach (var kvp in NetworkManager.Instance.Connections)
@@ -231,26 +194,15 @@ public static class NetworkEntitySync
         _addToPlayersListMethod(player);
     }
 
-    /// <summary>
-    /// Sends client network data to host to process and broadcast to all clients (client only)
-    /// </summary>
-    public static void SendClientPositionToHost()
+    public static void SyncMyPlayerPosition() 
     {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _myPlayerFactory == null) return;
+        if (NetworkManager.Instance == null || _myPlayerFactory == null) return;
 
         var myPlayer = _myPlayerFactory();
         if (myPlayer == null) return;
 
-        using var stream = new MemoryStream();
-        using var writer = new BinaryWriter(stream);
-        var networkPlayer = myPlayer.GetNetworkData();
-        var playerBytes = networkPlayer.Serialize(stream, writer);
-        var playerBase64 = Convert.ToBase64String(playerBytes);
-
-        // send to host (first connection)
-        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
-        if (hostConnection != HSteamNetConnection.Invalid)
-            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.PlayerPositionUpdate, playerBase64);
+        var data = myPlayer.GetNetworkData();
+        NetworkSync.Sync(data, MessageType.PlayerPositionUpdate, SyncMode.Auto);
     }
 
     /// <summary>
@@ -353,50 +305,18 @@ public static class NetworkEntitySync
         networkEntity.ApplyToEntity(entity);
         _addToEntitiesListMethod(entity);
 
-        BroadcastNewEntityToClients(entity, senderConnection);
+        SyncNewEntity(entity, senderConnection);
     }
     
-    /// <summary>
-    /// Broadcasts <c>EntitySpawned</c> message for new entity to all clients except <c>senderConnection</c> (host only)
-    /// </summary>
-    public static void BroadcastNewEntityToClients(Entity entity, HSteamNetConnection senderConnection) 
+    public static void SyncNewEntity(Entity entity, HSteamNetConnection senderConnection) 
     {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
-        
-        if (entity.NetworkId == Guid.Empty)
-        {
-            entity.AssignNetworkId();
-        }
-        
-        var entityBytes = entity.GetNetworkData().Serialize();
-        var entityBase64 = Convert.ToBase64String(entityBytes);
-        
-        // send to every connection
-        foreach (var connection in NetworkManager.Instance.Connections.Values)
-        {
-            if (connection != senderConnection)
-                NetworkMessageQueue.QueueMessage(connection, MessageType.EntitySpawned, entityBase64);
-        }
-    }
-    
-    /// <summary>
-    /// Sends <c>EntitySpawned</c> message for new entity to host (client only)
-    /// </summary>
-    public static void SendNewEntityToHost(Entity entity) 
-    {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
-        
-        if (entity.NetworkId == Guid.Empty)
-        {
-            entity.AssignNetworkId();
-        }
-        
-        var entityBytes = entity.GetNetworkData().Serialize();
-        var entityBase64 = Convert.ToBase64String(entityBytes);
+        if (NetworkManager.Instance == null) return;
 
-        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
-        if (hostConnection != HSteamNetConnection.Invalid)
-            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.EntitySpawned, entityBase64);
+        if (NetworkManager.Instance.IsHost && entity.NetworkId == Guid.Empty)
+            entity.AssignNetworkId();
+
+        var data = entity.GetNetworkData();
+        NetworkSync.Sync(data, MessageType.EntitySpawned, SyncMode.Auto, senderConnection);
     }
     
     /// <summary>
@@ -459,37 +379,11 @@ public static class NetworkEntitySync
         }
     }
     
-    /// <summary>
-    /// Broadcasts <c>EntityKilled</c> message to all clients except <c>senderConnection</c> (host only)
-    /// </summary>
-    public static void BroadcastEntityRemovedToClients(Guid entityNetworkId, HSteamNetConnection senderConnection) 
+    public static void SyncEntityRemoved(Guid entityNetworkId, HSteamNetConnection senderConnection) 
     {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost) return;
-        
-        var networkIdBytes = entityNetworkId.ToByteArray();
-        var networkIdBase64 = Convert.ToBase64String(networkIdBytes);
-        
-        // send to every connection
-        foreach (var connection in NetworkManager.Instance.Connections.Values)
-        {
-            if (connection != senderConnection)
-                NetworkMessageQueue.QueueMessage(connection, MessageType.EntityKilled, networkIdBase64);
-        }
-    }
-    
-    /// <summary>
-    /// Sends <c>EntityKilled</c> message to host (client only)
-    /// </summary>
-    public static void SendEntityRemovedToHost(Entity entity) 
-    {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost) return;
-        
-        var networkIdBytes = entity.NetworkId.ToByteArray();
-        var networkIdBase64 = Convert.ToBase64String(networkIdBytes);
+        if (NetworkManager.Instance == null) return;
 
-        var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
-        if (hostConnection != HSteamNetConnection.Invalid)
-            NetworkMessageQueue.QueueMessage(hostConnection, MessageType.EntityKilled, networkIdBase64);
+        NetworkSync.Sync(entityNetworkId, MessageType.EntityKilled, SyncMode.Auto, senderConnection);
     }
     
     /// <summary>
@@ -533,7 +427,7 @@ public static class NetworkEntitySync
         else 
         {
             _removeEntityAction(existingEntity);
-            BroadcastEntityRemovedToClients(networkId, senderConnection);
+            SyncEntityRemoved(networkId, senderConnection);
         }        
     }
 }

@@ -923,16 +923,7 @@ public class BlastiaGame : Game
 		
 		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 		{
-		    if (NetworkManager.Instance.IsHost) 
-		    {
-				// host -> broadcast new entity to all clients
-				NetworkEntitySync.BroadcastNewEntityToClients(entity, HSteamNetConnection.Invalid);
-		    }
-		    else 
-		    {
-				// client -> send new entity to host
-				NetworkEntitySync.SendNewEntityToHost(entity);
-		    }
+			NetworkEntitySync.SyncNewEntity(entity, HSteamNetConnection.Invalid);
 		}	
 	}
 	
@@ -944,14 +935,7 @@ public class BlastiaGame : Game
 		
 		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 		{
-		    if (NetworkManager.Instance.IsHost) 
-		    {
-				NetworkEntitySync.BroadcastEntityRemovedToClients(entity.NetworkId, HSteamNetConnection.Invalid);
-		    }
-		    else 
-		    {
-				NetworkEntitySync.SendEntityRemovedToHost(entity);
-		    }
+			NetworkEntitySync.SyncEntityRemoved(entity.NetworkId, HSteamNetConnection.Invalid);
 		}
 	}
 
