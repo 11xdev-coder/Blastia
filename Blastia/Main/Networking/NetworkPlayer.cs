@@ -63,8 +63,11 @@ public class NetworkPlayer : NetworkEntity
         return stream.ToArray();
     }
 
-    public new static NetworkPlayer Deserialize(BinaryReader reader)
+    public new static NetworkPlayer Deserialize(byte[] bytes)
     {
+        using var stream = new MemoryStream(bytes);
+        using var reader = new BinaryReader(stream);
+        
         return new NetworkPlayer
         {
             // entity

@@ -115,8 +115,11 @@ public class NetworkEntity
         return stream.ToArray();
     }
 
-    public static NetworkEntity Deserialize(BinaryReader reader)
+    public static NetworkEntity Deserialize(byte[] bytes)
     {
+        using var stream = new MemoryStream(bytes);
+        using var reader = new BinaryReader(stream);
+        
         var id = reader.ReadUInt16();
 
         var guidBytes = reader.ReadBytes(16);

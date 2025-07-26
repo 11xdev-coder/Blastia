@@ -112,7 +112,7 @@ public static class NetworkEntitySync
 
         Console.WriteLine($"[NetworkEntitySync] [HOST] Client {SteamFriends.GetFriendPersonaName(clientId)} joined, sent existing entities");
     }
-
+    
     /// <summary>
     /// Host receives position update from client and broadcasts it to all clients
     /// </summary>
@@ -123,9 +123,7 @@ public static class NetworkEntitySync
         try
         {
             var playerBytes = Convert.FromBase64String(playerBase64);
-            using var stream = new MemoryStream(playerBytes);
-            using var reader = new BinaryReader(stream);
-            var networkPlayer = NetworkPlayer.Deserialize(reader);
+            var networkPlayer = NetworkPlayer.Deserialize(playerBytes);
 
             var allPlayers = _playersFactory();
 
@@ -152,7 +150,6 @@ public static class NetworkEntitySync
         }
     }
 
-
     /// <summary>
     /// Handles the <c>PlayerSpawned</c> message (client only)
     /// </summary>
@@ -162,10 +159,7 @@ public static class NetworkEntitySync
         if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _worldFactory == null || _addToPlayersListMethod == null) return;
 
         var playerBase64 = Convert.FromBase64String(content);
-        using var stream = new MemoryStream(playerBase64);
-        using var reader = new BinaryReader(stream);
-
-        var networkPlayer = NetworkPlayer.Deserialize(reader);
+        var networkPlayer = NetworkPlayer.Deserialize(playerBase64);
 
         // dont create a player for ourselves
         if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId)
@@ -210,9 +204,7 @@ public static class NetworkEntitySync
         try
         {
             var playerBytes = Convert.FromBase64String(networkPlayerBase64);
-            using var stream = new MemoryStream(playerBytes);
-            using var reader = new BinaryReader(stream);
-            var networkPlayer = NetworkPlayer.Deserialize(reader);
+            var networkPlayer = NetworkPlayer.Deserialize(playerBytes);
 
             // dont update our own player
             if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
@@ -250,9 +242,7 @@ public static class NetworkEntitySync
         if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
 
         var entityBytes = Convert.FromBase64String(entityBase64);
-        using var stream = new MemoryStream(entityBytes);
-        using var reader = new BinaryReader(stream);
-        var networkEntity = NetworkEntity.Deserialize(reader);
+        var networkEntity = NetworkEntity.Deserialize(entityBytes);
 
         var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkEntity.NetworkId);
         if (existingEntity != null) 
@@ -279,9 +269,7 @@ public static class NetworkEntitySync
         if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
 
         var entityBytes = Convert.FromBase64String(entityBase64);
-        using var stream = new MemoryStream(entityBytes);
-        using var reader = new BinaryReader(stream);
-        var networkEntity = NetworkEntity.Deserialize(reader);
+        var networkEntity = NetworkEntity.Deserialize(entityBytes);
 
         var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkEntity.NetworkId);
         if (existingEntity != null) 
@@ -351,9 +339,7 @@ public static class NetworkEntitySync
         try
         {
             var entityBytes = Convert.FromBase64String(entityBase64);
-            using var stream = new MemoryStream(entityBytes);
-            using var reader = new BinaryReader(stream);
-            var networkEntity = NetworkEntity.Deserialize(reader);
+            var networkEntity = NetworkEntity.Deserialize(entityBytes);
 
             // find entity with same network GUID
             var allEntities = _entitiesFactory();

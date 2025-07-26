@@ -598,6 +598,7 @@ public class NetworkManager
                 }
 
                 // handle it
+                var senderConnection = message.m_conn;
                 switch (type)
                 {
                     case MessageType.ClientHello:
@@ -622,7 +623,6 @@ public class NetworkManager
                     case MessageType.PlayerPositionUpdate:
                         if (IsHost)
                         {
-                            var senderConnection = message.m_conn;
                             var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
                             NetworkEntitySync.HandleClientPositionUpdate(content, senderId, senderConnection);
                         }
@@ -633,43 +633,17 @@ public class NetworkManager
                         }
                         break;
                     case MessageType.BlockChanged:
-                        if (IsHost) 
-                        {
-                            var senderConnection = message.m_conn;
-                            var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
-                            NetworkBlockSync.HandleClientBlockChanged(content, senderId);
-                        }
-                        else 
-                        {
-                            NetworkBlockSync.HandleBlockChangedFromHost(content);
-                        }
+                        NetworkBlockSync.HandleBlockChanged(content, senderConnection);
                         break;
                     case MessageType.BlockUpdate:
-                        if (IsHost) 
-                        {
-                            var senderConnection = message.m_conn;
-                            NetworkBlockSync.HandleClientBlockUpdate(content, senderConnection);
-                        }
-                        else 
-                        {
-                            NetworkBlockSync.HandleBlockUpdateFromHost(content);
-                        }
+                        NetworkBlockSync.HandleBlockUpdated(content, senderConnection);
                         break;
                     case MessageType.SignEditedAt:
-                        if (IsHost) 
-                        {
-                            var senderConnection = message.m_conn;
-                            NetworkBlockSync.HandleClientSignEdited(content, senderConnection);
-                        }
-                        else 
-                        {
-                            NetworkBlockSync.HandleSignEditedFromHost(content);
-                        }
+                        NetworkBlockSync.HandleSignEdited(content, senderConnection);
                         break;
                     case MessageType.EntitySpawned:
                         if (IsHost)
                         {
-                            var senderConnection = message.m_conn;
                             NetworkEntitySync.HandleClientEntitySpawned(content, senderConnection);
                         }
                         else 
@@ -684,7 +658,6 @@ public class NetworkManager
                     case MessageType.EntityKilled:
                         if (IsHost)
                         {
-                            var senderConnection = message.m_conn;
                             NetworkEntitySync.HandleClientEntityRemoved(content, senderConnection);
                         }
                         else 

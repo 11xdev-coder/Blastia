@@ -86,4 +86,36 @@ public class NetworkSync
 
         return Convert.ToBase64String(bytes);
     }
+    
+    public static void HandleNetworkMessage<T>(string contentBase64, MessageType messageType, 
+        Action<T> clientAction, Action<T, HSteamNetConnection?>? hostAction = null, HSteamNetConnection? senderConnection = null) 
+    {
+        if (NetworkManager.Instance == null) return;
+        
+        T message = DeserializeData<T>(contentBase64);
+        
+        if (NetworkManager.Instance.IsHost && hostAction != null) 
+        {
+            hostAction(message, senderConnection);
+            BroadcastToClients(contentBase64, messageType, senderConnection);
+        }
+        else if (!NetworkManager.Instance.IsHost) 
+        {
+            clientAction(message);
+        }
+    }
+    
+    private static T DeserializeData<T>(string base64) 
+    {
+        var bytes = Convert.FromBase64String(base64);
+        
+        if (typeof(T) == typeof(NetworkPlayer)) return (T)(object)NetworkPlayer.Deserialize(bytes);
+        if (typeof(T) == typeof(NetworkEntity)) return (T)(object)NetworkEntity.Deserialize(bytes);
+        if (typeof(T) == typeof(NetworkBlockChangeMessage)) return (T)(object)NetworkBlockChangeMessage.Deserialize(bytes);
+        if (typeof(T) == typeof(NetworkBlockUpdateMessage)) return (T)(object)NetworkBlockUpdateMessage.Deserialize(bytes);
+        if (typeof(T) == typeof(NetworkSignEditedMessage)) return (T)(object)NetworkSignEditedMessage.Deserialize(bytes);
+        if (typeof(T) == typeof(Guid)) return (T)(object)new Guid(bytes);
+        
+        throw new NotSupportedException($"Deserialization not supported for type {typeof(T)}");
+    }
 }
