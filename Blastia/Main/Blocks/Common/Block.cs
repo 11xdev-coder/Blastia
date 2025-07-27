@@ -166,7 +166,10 @@ public class BlockInstance
 	public Block Block;
 	public float Damage;
 	private readonly BlockBreakingAnimation _breakingAnimation;
-	private bool _hasRequestedBreak; // network flag
+	/// <summary>
+	/// Network flag updated only for clients. True when the block is broken but still exists (waits for host response)
+	/// </summary>
+	public bool HasRequestedBreak; // network flag
 
 	public BlockInstance(Block block, float damage)
 	{
@@ -218,16 +221,20 @@ public class BlockInstance
 			if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 			{
 				// send network message
-				NetworkBlockSync.SyncBlockChange(position, 0, Block.GetLayer(), player);
+				if (!HasRequestedBreak) // only one time
+				{
+				    NetworkBlockSync.SyncBlockChange(position, 0, Block.GetLayer(), player);
+				}
+				
 			    if (NetworkManager.Instance.IsHost) 
 			    {
 					// host: handle locally
 			        selectedWorld.SetTile((int) position.X, (int) position.Y, 0, Block.GetLayer(), player);
 			    }
-			    else if (!_hasRequestedBreak)
+			    else if (!HasRequestedBreak)
 			    {
 			        // client: set requested flag (block will be removed when received the message)
-					_hasRequestedBreak = true;
+					HasRequestedBreak = true;
 			    }
 			}
 			else 

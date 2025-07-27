@@ -87,8 +87,18 @@ public class NetworkSync
         return Convert.ToBase64String(bytes);
     }
     
+    /// <summary>
+    /// Generic method for handling different message types
+    /// </summary>
+    /// <typeparam name="T">Network message class</typeparam>
+    /// <param name="contentBase64"></param>
+    /// <param name="messageType"></param>
+    /// <param name="clientAction">How client handles this message</param>
+    /// <param name="hostAction">How host handles this message (+ broadcast if <c>forceBroadcastToSender</c> is true)</param>
+    /// <param name="senderConnection"></param>
+    /// <param name="forceBroadcastToSender">Should be true if message is not processed locally on clients and waits for host to send back</param>
     public static void HandleNetworkMessage<T>(string contentBase64, MessageType messageType, 
-        Action<T> clientAction, Action<T, HSteamNetConnection?>? hostAction = null, HSteamNetConnection? senderConnection = null) 
+        Action<T> clientAction, Action<T, HSteamNetConnection?>? hostAction = null, HSteamNetConnection? senderConnection = null, bool forceBroadcastToSender = false) 
     {
         if (NetworkManager.Instance == null) return;
         
@@ -97,7 +107,9 @@ public class NetworkSync
         if (NetworkManager.Instance.IsHost && hostAction != null) 
         {
             hostAction(message, senderConnection);
-            BroadcastToClients(contentBase64, messageType, senderConnection);
+
+            var senderConn = forceBroadcastToSender ? HSteamNetConnection.Invalid : senderConnection;
+            BroadcastToClients(contentBase64, messageType, senderConn);
         }
         else if (!NetworkManager.Instance.IsHost) 
         {

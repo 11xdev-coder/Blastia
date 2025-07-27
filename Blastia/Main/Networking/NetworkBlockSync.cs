@@ -61,7 +61,7 @@ public static class NetworkBlockSync
             var clientId = NetworkManager.Instance.Connections.FirstOrDefault(kvp => kvp.Value == sender).Key;
             var clientPlayer = _playersFactory?.Invoke().FirstOrDefault(p => p.SteamId == clientId);
             worldState.SetTile((int)update.Position.X, (int)update.Position.Y, update.BlockId, update.Layer, clientPlayer);
-        }, senderConnection);
+        }, senderConnection, true); // force broadcast to sender
     }
     
     /// <summary>
@@ -80,7 +80,8 @@ public static class NetworkBlockSync
             else // client -> old block position
                 inst = worldState.GetBlockInstance((int)originalPos.X, (int)originalPos.Y, layer);
 
-            if (inst == null) continue;
+            // dont send updates if block should break
+            if (inst == null || inst.HasRequestedBreak) continue;
             var update = new NetworkBlockUpdateMessage
             {
                 OriginalPosition = originalPos,
