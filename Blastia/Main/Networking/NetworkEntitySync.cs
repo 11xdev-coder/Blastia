@@ -113,73 +113,52 @@ public static class NetworkEntitySync
         Console.WriteLine($"[NetworkEntitySync] [HOST] Client {SteamFriends.GetFriendPersonaName(clientId)} joined, sent existing entities");
     }
     
-    /// <summary>
-    /// Host receives position update from client and broadcasts it to all clients
-    /// </summary>
-    public static void HandleClientPositionUpdate(string playerBase64, CSteamID clientId, HSteamNetConnection senderConnection)
+    private static void ApplyToPlayer(NetworkPlayer player, CSteamID clientId) 
     {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _playersFactory == null) return;
-
-        try
+        if (NetworkManager.Instance == null || _playersFactory == null || player.SteamId == NetworkManager.Instance.MySteamId) return;
+        
+        var allPlayers = _playersFactory();
+        var existingPlayer = allPlayers.FirstOrDefault(p => p.SteamId == clientId);
+        if (existingPlayer == null) 
         {
-            var playerBytes = Convert.FromBase64String(playerBase64);
-            var networkPlayer = NetworkPlayer.Deserialize(playerBytes);
+            var str = NetworkManager.Instance.IsHost ? "HOST" : "CLIENT";
+            Console.WriteLine($"[NetworkEntitySync] [{str}] Client player with ID {clientId} (name '{player.Name}) not found");
+            return;
+        }
+
+        player.ApplyToEntity(existingPlayer);
+    }
+    
+    public static void HandlePlayerPositionUpdate(string playerBase64, CSteamID clientId, HSteamNetConnection senderConnection) 
+    {
+        if (NetworkManager.Instance == null || _playersFactory == null) return;
+        
+        NetworkSync.HandleNetworkMessage<NetworkPlayer>(playerBase64, MessageType.PlayerPositionUpdate,
+            (player) => ApplyToPlayer(player, clientId),
+            (player, _) => ApplyToPlayer(player, clientId));
+    }
+
+    public static void HandlePlayerSpawned(string playerBase64) 
+    {
+        if (NetworkManager.Instance == null || _playersFactory == null || _worldFactory == null || _addToPlayersListMethod == null) return;
+
+        NetworkSync.HandleNetworkMessage<NetworkPlayer>(playerBase64, MessageType.None,
+        (player) =>
+        {
+            if (player.SteamId == NetworkManager.Instance.MySteamId) return;
 
             var allPlayers = _playersFactory();
-
-            // find the client player that sent this message
-            var clientPlayer = allPlayers.FirstOrDefault(p => p.SteamId == clientId);
-            if (clientPlayer == null)
+            var existingPlayer = allPlayers.FirstOrDefault(p => p.SteamId == player.SteamId);
+            if (existingPlayer != null)
             {
-                Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Client player with ID {clientId} not found!");
-                Console.WriteLine($"[NetworkEntitySync] [HOST] Available players: {string.Join(", ", allPlayers.Select(p => $"{p.Name}({p.SteamId})"))}");
+                Console.WriteLine($"[NetworkEntitySync] [CLIENT] Player {player.Name} already exists");
                 return;
             }
 
-            // update client
-            networkPlayer.ApplyToEntity(clientPlayer);
-
-            foreach (var kvp in NetworkManager.Instance.Connections)
-                if (kvp.Value != senderConnection)
-                    NetworkMessageQueue.QueueMessage(kvp.Value, MessageType.PlayerPositionUpdate, playerBase64);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Error handling client position update: {ex.Message}");
-            Console.WriteLine($"[NetworkEntitySync] [ERROR] [HOST] Stack trace: {ex.StackTrace}");
-        }
-    }
-
-    /// <summary>
-    /// Handles the <c>PlayerSpawned</c> message (client only)
-    /// </summary>
-    /// <param name="content"></param>
-    public static void HandlePlayerSpawnedFromHost(string content)
-    {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _worldFactory == null || _addToPlayersListMethod == null) return;
-
-        var playerBase64 = Convert.FromBase64String(content);
-        var networkPlayer = NetworkPlayer.Deserialize(playerBase64);
-
-        // dont create a player for ourselves
-        if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId)
-        {
-            Console.WriteLine("[NetworkEntitySync] [WARNING] [CLIENT] Skipping creation of own player");
-            return;
-        }
-
-        // check if already exists
-        var existingPlayer = _playersFactory?.Invoke().FirstOrDefault(p => p.SteamId == networkPlayer.SteamId);
-        if (existingPlayer != null)
-        {
-            Console.WriteLine($"[NetworkEntitySync] [WARNING] [CLIENT] Player {networkPlayer.Name} already exists");
-            return;
-        }
-
-        var player = new Player(Vector2.Zero, _worldFactory(), Entity.PlayerScale, false);
-        networkPlayer.ApplyToEntity(player);
-
-        _addToPlayersListMethod(player);
+            var newPlayer = new Player(Vector2.Zero, _worldFactory(), Entity.PlayerScale, false);
+            player.ApplyToEntity(newPlayer);
+            _addToPlayersListMethod(newPlayer);
+        });
     }
 
     public static void SyncMyPlayerPosition() 
@@ -192,102 +171,33 @@ public static class NetworkEntitySync
         var data = myPlayer.GetNetworkData();
         NetworkSync.Sync(data, MessageType.PlayerPositionUpdate, SyncMode.Auto);
     }
-
-    /// <summary>
-    /// Client receives position update from host
-    /// </summary>
-    /// <param name="networkPlayerBase64"></param>
-    /// <param name="clientId"></param>
-    public static void HandlePlayerUpdateFromHost(string networkPlayerBase64)
+    
+    private static void CreateEntity(NetworkEntity entity) 
     {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _playersFactory == null || _worldFactory == null || _addToPlayersListMethod == null) return;
-        try
-        {
-            var playerBytes = Convert.FromBase64String(networkPlayerBase64);
-            var networkPlayer = NetworkPlayer.Deserialize(playerBytes);
-
-            // dont update our own player
-            if (networkPlayer.SteamId == NetworkManager.Instance.MySteamId) return;
-
-            // find player with that steam ID
-            var allPlayers = _playersFactory();
-            var player = allPlayers.FirstOrDefault(p => p.SteamId == networkPlayer.SteamId);
-            if (player != null)
-            {
-                networkPlayer.ApplyToEntity(player);
-            }
-            else
-            {
-                Console.WriteLine($"[NetworkEntitySync] [WARNING] Player with Steam ID: {networkPlayer.SteamId} not found, creating new player");
-                var newPlayer = new Player(Vector2.Zero, _worldFactory(), Entity.PlayerScale)
-                {
-                    LocallyControlled = false
-                };
-                networkPlayer.ApplyToEntity(newPlayer);
-                _addToPlayersListMethod(newPlayer);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[NetworkEntitySync] [ERROR] Error while host was handling client input: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Handles <c>EntitySpawned</c> message (client only)
-    /// </summary>
-    /// <param name="entityBase64"></param>
-    public static void HandleEntitySpawnedFromHost(string entityBase64)
-    {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
-
-        var entityBytes = Convert.FromBase64String(entityBase64);
-        var networkEntity = NetworkEntity.Deserialize(entityBytes);
-
-        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkEntity.NetworkId);
+        if (NetworkManager.Instance == null || _entitiesFactory == null || _worldFactory == null || _addToEntitiesListMethod == null) return;
+        
+        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == entity.NetworkId);
         if (existingEntity != null) 
         {
-            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {networkEntity.NetworkId} already exists!");
+            var str = NetworkManager.Instance.IsHost ? "HOST" : "CLIENT";
+            Console.WriteLine($"[NetworkEntitySync] [{str}] Error: entity with network ID: {entity.NetworkId} already exists!");
             return;
         }
 
         var world = _worldFactory();
         if (world == null) return;
-        
-        var entity = Entity.CreateEntity(networkEntity.Id, networkEntity.Position, world);
-        if (entity == null) return;
-        
-        networkEntity.ApplyToEntity(entity);
-        _addToEntitiesListMethod(entity);
+
+        var newEntity = Entity.CreateEntity(entity.Id, entity.Position, world);
+        if (newEntity == null) return;
+
+        entity.ApplyToEntity(newEntity);
+        _addToEntitiesListMethod(newEntity);
     }
     
-    /// <summary>
-    /// Handles <c>EntitySpawned</c> message (host only)
-    /// </summary>
-    public static void HandleClientEntitySpawned(string entityBase64, HSteamNetConnection senderConnection) 
+    public static void HandleEntitySpawned(string entityBase64) 
     {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
-
-        var entityBytes = Convert.FromBase64String(entityBase64);
-        var networkEntity = NetworkEntity.Deserialize(entityBytes);
-
-        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkEntity.NetworkId);
-        if (existingEntity != null) 
-        {
-            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {networkEntity.NetworkId} already exists!");
-            return;
-        }
-
-        var world = _worldFactory();
-        if (world == null) return;
-        
-        var entity = Entity.CreateEntity(networkEntity.Id, networkEntity.Position, world);
-        if (entity == null) return;
-        
-        networkEntity.ApplyToEntity(entity);
-        _addToEntitiesListMethod(entity);
-
-        SyncNewEntity(entity, senderConnection);
+        NetworkSync.HandleNetworkMessage<NetworkEntity>(entityBase64, MessageType.EntitySpawned,
+        CreateEntity, (entity, _) => CreateEntity(entity));
     }
     
     public static void SyncNewEntity(Entity entity, HSteamNetConnection senderConnection) 
@@ -330,33 +240,24 @@ public static class NetworkEntitySync
         }
     }
     
-    /// <summary>
-    /// Handles <c>EntityPositionUpdate</c> message (client only)
-    /// </summary>
-    public static void HandleEntityUpdateFromHost(string entityBase64) 
+    public static void HandleEntityPositionUpdate(string entityBase64) 
     {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _entitiesFactory == null || _addToEntitiesListMethod == null || _worldFactory == null) return;
-        try
+        if (_entitiesFactory == null) return;
+        
+        NetworkSync.HandleNetworkMessage<NetworkEntity>(entityBase64, MessageType.EntityPositionUpdate,
+        (entity) => 
         {
-            var entityBytes = Convert.FromBase64String(entityBase64);
-            var networkEntity = NetworkEntity.Deserialize(entityBytes);
-
-            // find entity with same network GUID
             var allEntities = _entitiesFactory();
-            var entity = allEntities.FirstOrDefault(e => e.NetworkId == networkEntity.NetworkId);
-            if (entity != null)
+            var existingEntity = allEntities.FirstOrDefault(e => e.NetworkId == entity.NetworkId);
+            if (existingEntity != null)
             {
-                networkEntity.ApplyToEntity(entity);
+                entity.ApplyToEntity(existingEntity);
             }
             else
             {
-                Console.WriteLine($"[NetworkEntitySync] [WARNING] Entity with ID: {networkEntity.Id} (network ID: {networkEntity.NetworkId}) not found, nothing to update!");
+                Console.WriteLine($"[NetworkEntitySync] [CLIENT] Warning: Entity with ID: {entity.Id} (network ID: {entity.NetworkId}) not found, nothing to update!");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[NetworkEntitySync] [HOST] Error while handling EntityPositionUpdate message: {ex.Message}");
-        }
+        });
     }
     
     public static void SyncEntityRemoved(Guid entityNetworkId, HSteamNetConnection senderConnection) 
@@ -366,20 +267,14 @@ public static class NetworkEntitySync
         NetworkSync.Sync(entityNetworkId, MessageType.EntityKilled, SyncMode.Auto, senderConnection);
     }
     
-    /// <summary>
-    /// Handles <c>EntityKilled</c> message (client only)
-    /// </summary>
-    public static void HandleEntityRemovedFromHost(string networkIdBase64)
+    private static void RemoveEntity(Guid entityGuid) 
     {
-        if (NetworkManager.Instance == null || NetworkManager.Instance.IsHost || _removeEntityAction == null || _entitiesFactory == null) return;
-
-        var networkIdBytes = Convert.FromBase64String(networkIdBase64);
-        var networkId = new Guid(networkIdBytes);
-
-        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkId);
+        if (NetworkManager.Instance == null || _removeEntityAction == null || _entitiesFactory == null) return;
+        
+        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == entityGuid);
         if (existingEntity == null) 
         {
-            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {networkId} not found, nothing to remove!");
+            Console.WriteLine($"[NetworkEntitySync] [CLIENT] Error: entity with network ID: {entityGuid} not found, nothing to remove!");
             return;
         }
         else 
@@ -388,26 +283,10 @@ public static class NetworkEntitySync
         }
     }
     
-    /// <summary>
-    /// Handles <c>EntityKilled</c> message (host only)
-    /// </summary>
-    public static void HandleClientEntityRemoved(string networkIdBase64, HSteamNetConnection senderConnection) 
+    public static void HandleEntityKilled(string guidBase64) 
     {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || _entitiesFactory == null || _removeEntityAction == null) return;
-
-        var networkIdBytes = Convert.FromBase64String(networkIdBase64);
-        var networkId = new Guid(networkIdBytes);
-
-        var existingEntity = _entitiesFactory().FirstOrDefault(e => e.NetworkId == networkId);
-        if (existingEntity == null) 
-        {
-            Console.WriteLine($"[NetworkEntitySync] [HOST] Error: entity with network ID: {networkId} not found, nothing to remove!");
-            return;
-        }
-        else 
-        {
-            _removeEntityAction(existingEntity);
-            SyncEntityRemoved(networkId, senderConnection);
-        }        
+        NetworkSync.HandleNetworkMessage<Guid>(guidBase64, MessageType.EntityKilled,
+        RemoveEntity, (guid, _) => RemoveEntity(guid));
     }
+    
 }

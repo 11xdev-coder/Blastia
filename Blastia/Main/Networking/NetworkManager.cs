@@ -10,6 +10,7 @@ namespace Blastia.Main.Networking;
 
 public enum MessageType : byte
 {
+    None,
     // basic connection messages
     ClientHello, // client -> host
     HostWelcome, // host -> client welcome message
@@ -618,19 +619,11 @@ public class NetworkManager
                         ProcessPlayerLeftGameLocally(content);
                         break;
                     case MessageType.PlayerSpawned:
-                        NetworkEntitySync.HandlePlayerSpawnedFromHost(content);
+                        NetworkEntitySync.HandlePlayerSpawned(content);
                         break;
                     case MessageType.PlayerPositionUpdate:
-                        if (IsHost)
-                        {
-                            var senderId = Connections.FirstOrDefault(c => c.Value == senderConnection).Key;
-                            NetworkEntitySync.HandleClientPositionUpdate(content, senderId, senderConnection);
-                        }
-                        else 
-                        {
-                            // client receives position update from host
-                            NetworkEntitySync.HandlePlayerUpdateFromHost(content);
-                        }
+                        var senderId = Connections.FirstOrDefault(k => k.Value == senderConnection).Key;
+                        NetworkEntitySync.HandlePlayerPositionUpdate(content, senderId, senderConnection);
                         break;
                     case MessageType.BlockChanged:
                         NetworkBlockSync.HandleBlockChanged(content, senderConnection);
@@ -642,28 +635,13 @@ public class NetworkManager
                         NetworkBlockSync.HandleSignEdited(content, senderConnection);
                         break;
                     case MessageType.EntitySpawned:
-                        if (IsHost)
-                        {
-                            NetworkEntitySync.HandleClientEntitySpawned(content, senderConnection);
-                        }
-                        else 
-                        {
-                            NetworkEntitySync.HandleEntitySpawnedFromHost(content);
-                        }
+                        NetworkEntitySync.HandleEntitySpawned(content);
                         break;
                     case MessageType.EntityPositionUpdate:
-                        if (!IsHost)
-                            NetworkEntitySync.HandleEntityUpdateFromHost(content);
+                        NetworkEntitySync.HandleEntityPositionUpdate(content);
                         break;
                     case MessageType.EntityKilled:
-                        if (IsHost)
-                        {
-                            NetworkEntitySync.HandleClientEntityRemoved(content, senderConnection);
-                        }
-                        else 
-                        {
-                            NetworkEntitySync.HandleEntityRemovedFromHost(content);
-                        }
+                        NetworkEntitySync.HandleEntityKilled(content);
                         break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client
