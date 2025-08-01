@@ -919,7 +919,8 @@ public class BlastiaGame : Game
 	public static void RequestAddEntity(Entity entity) => RequestAddEntityEvent?.Invoke(entity);
 	private void AddEntity(Entity entity)
 	{
-		_entities.Add(entity);
+		if (NetworkManager.Instance?.IsHost == true)
+			_entities.Add(entity);
 		
 		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 		{

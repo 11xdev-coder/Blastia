@@ -194,10 +194,10 @@ public static class NetworkEntitySync
         _addToEntitiesListMethod(newEntity);
     }
     
-    public static void HandleEntitySpawned(string entityBase64) 
+    public static void HandleEntitySpawned(string entityBase64, HSteamNetConnection senderConnection) 
     {
         NetworkSync.HandleNetworkMessage<NetworkEntity>(entityBase64, MessageType.EntitySpawned,
-        CreateEntity, (entity, _) => CreateEntity(entity));
+        CreateEntity, (entity, _) => CreateEntity(entity), senderConnection, true);
     }
     
     public static void SyncNewEntity(Entity entity, HSteamNetConnection senderConnection) 

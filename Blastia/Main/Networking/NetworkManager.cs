@@ -635,7 +635,7 @@ public class NetworkManager
                         NetworkBlockSync.HandleSignEdited(content, senderConnection);
                         break;
                     case MessageType.EntitySpawned:
-                        NetworkEntitySync.HandleEntitySpawned(content);
+                        NetworkEntitySync.HandleEntitySpawned(content, senderConnection);
                         break;
                     case MessageType.EntityPositionUpdate:
                         NetworkEntitySync.HandleEntityPositionUpdate(content);
