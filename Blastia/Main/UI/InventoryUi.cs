@@ -262,8 +262,9 @@ public class InventoryUi : Menu
         var posX = _playerInventory.Player.Position.X - playerHalfWidth - itemIconHalfWidth;
         var posY = _playerInventory.Player.Position.Y - playerHalfHeight - itemIconHalfHeight;
         
-        var droppedItem = new DroppedItem(new Vector2(posX, posY), Entity.DroppedItemScale, _world);
-        droppedItem.Launch(_playerInventory.CursorItem.BaseItem, _playerInventory.CursorItem.Amount, (int) direction);
+        // item launch constructor
+        var droppedItem = new DroppedItem(new Vector2(posX, posY), Entity.DroppedItemScale, _world, 
+            _playerInventory.CursorItem.BaseItem, _playerInventory.CursorItem.Amount, (int) direction);
         BlastiaGame.RequestAddEntity(droppedItem);
         BlastiaGame.NotificationDisplay?.AddNotification($"(-) {_playerInventory.CursorItem.Amount} {_playerInventory.CursorItem.Name}", Color.IndianRed);
         

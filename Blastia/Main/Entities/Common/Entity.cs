@@ -245,6 +245,14 @@ public abstract class Entity : Object
     
     #endregion
     
+    /// <summary>
+    /// Called whenever entity is added to <c>Entities</c> list
+    /// </summary>
+    public virtual void OnSpawn() 
+    {
+        
+    }
+    
     public virtual NetworkEntity GetNetworkData() 
     {
         var networkEntity = new NetworkEntity();
@@ -309,6 +317,7 @@ public abstract class Entity : Object
         if ((NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected || NetworkManager.Instance.IsHost) && this is not Player)
         {
             NetworkPosition = Position;
+            NetworkMovementVector = MovementVector;
         }
     }
 

@@ -46,11 +46,40 @@ public class DroppedItem : Entity
     protected override float FrictionMultiplier => 0.3f;
     protected override float Bounciness => 0.5f;
 
+    private int _launchDirection = 1;
+    private float _horizontalSpeed = 115f;
+    private float _verticalSpeed = -100f;
+    private float _launchPickupTime = 1.6f;
+    private bool _hasLaunchParams;
+
     public DroppedItem(Vector2 position, float initialScaleFactor, World world) : base(position, initialScaleFactor)
     {
         SetId(EntityID.DroppedItem);
 
         _world = world;
+    }
+
+    /// <summary>
+    /// Constructor that launches this dropped item in a direction
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="amount"></param>
+    /// <param name="launchDirection"><c>-1</c> launches to the left, <c>1</c> launches to the right</param>
+    /// <param name="horizontalSpeed"></param>
+    /// <param name="verticalSpeed"></param>
+    /// <param name="pickupTime">How much to wait until item can be picked up</param>
+
+    public DroppedItem(Vector2 position, float initialScaleFactor, World world, Item? item, int amount, int launchDirection, 
+        float horizontalSpeed = 115f, float verticalSpeed = -100f, float pickupTime = 1.6f) : this(position, initialScaleFactor, world)
+    {
+        Item = item;
+        Amount = amount;
+
+        _launchDirection = launchDirection;
+        _horizontalSpeed = horizontalSpeed;
+        _verticalSpeed = verticalSpeed;
+        _launchPickupTime = pickupTime;
+        _hasLaunchParams = true;
     }
 
     /// <summary>
@@ -104,6 +133,14 @@ public class DroppedItem : Entity
         if (Item == null || Amount <= 0) return false;
         
         return (!IsBeingPulled || PullTargetPlayer == attemptingPlayer) && PickupTime >= MaxPickupTime;
+    }
+
+    public override void OnSpawn()
+    {
+        base.OnSpawn();
+
+        if (_hasLaunchParams && Item != null)
+            Launch(Item, Amount, _launchDirection, _horizontalSpeed, _verticalSpeed, _launchPickupTime);
     }
 
     /// <summary>
@@ -239,7 +276,12 @@ public class DroppedItem : Entity
             {"Amount", Amount},
             {"PickupTime", PickupTime},
             {"IsBeingPulled", IsBeingPulled},
-            {"PullerId", PullTargetPlayer == null ? 0 : PullTargetPlayer.SteamId.m_SteamID}
+            {"PullerId", PullTargetPlayer == null ? 0 : PullTargetPlayer.SteamId.m_SteamID},
+            {"HasLaunchParams", _hasLaunchParams},
+            {"LaunchDirection", _launchDirection},
+            {"HorizontalSpeed", _horizontalSpeed},
+            {"VerticalSpeed", _verticalSpeed},
+            {"LaunchPickupTime", _launchPickupTime}
         };
     }
 
@@ -266,6 +308,17 @@ public class DroppedItem : Entity
 
                 Console.WriteLine($"NEW PULLER ID: {pullerId} NAME: {player?.Name}");
             }
+        }
+
+        var hasLaunchParams = (bool)data["HasLaunchParams"];
+        if (hasLaunchParams) 
+        {
+            _hasLaunchParams = true;
+            _launchDirection = (int)data["LaunchDirection"];
+            _horizontalSpeed = (float)data["HorizontalSpeed"];
+            _verticalSpeed = (float)data["VerticalSpeed"];
+            _launchPickupTime = (float)data["LaunchPickupTime"];
+            // OnSpawn will handle the rest
         }
 
         RefreshStackVisuals();

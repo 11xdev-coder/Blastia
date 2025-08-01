@@ -217,7 +217,7 @@ public class BlastiaGame : Game
 		if (NetworkManager.Instance.InitializeSteam())
 		{
 			// steam initialized
-			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, _entities.Add, () => World, _entitiesToRemove.Add);
+			NetworkEntitySync.Initialize(() => _myPlayer, () => _players, _players.Add, () => _entities, AddEntityWithoutBroadcasting, () => World, _entitiesToRemove.Add);
 			NetworkBlockSync.Initialize(() => _players, () => World, () => _myPlayer);
 		}
 	}
@@ -917,15 +917,29 @@ public class BlastiaGame : Game
 
 	// ADD ENTITY
 	public static void RequestAddEntity(Entity entity) => RequestAddEntityEvent?.Invoke(entity);
+	/// <summary>
+	/// Does everything in <c>AddEntityWithoutBroadcasting</c> but syncs the new entity with other clients. Used for sending the message initially (entity was added first time)
+	/// </summary>
+	/// <param name="entity"></param>
 	private void AddEntity(Entity entity)
 	{
-		if (NetworkManager.Instance?.IsHost == true)
-			_entities.Add(entity);
+		AddEntityWithoutBroadcasting(entity);
 		
 		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 		{
 			NetworkEntitySync.SyncNewEntity(entity, HSteamNetConnection.Invalid);
 		}	
+	}
+	
+	/// <summary>
+	/// Used for adding an entity locally, without sending messages to other clients and calling <c>OnSpawn</c> if host. Used for handling a message since handling messages already broadcasts a message
+	/// </summary>
+	/// <param name="entity"></param>
+	private void AddEntityWithoutBroadcasting(Entity entity) 
+	{
+	    if (NetworkManager.Instance?.IsHost == true)
+			entity.OnSpawn();
+		_entities.Add(entity);
 	}
 	
 	// REMOVE ENTITY

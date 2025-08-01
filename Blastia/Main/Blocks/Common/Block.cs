@@ -77,9 +77,11 @@ public abstract class Block
 		var randomDirection = rand.Next(2) == 0 ? -1 : 1;
 		
 		var correctPosition = new Vector2(position.X + Size * 0.5f, position.Y + Size * 0.5f);
-		var droppedItem = new DroppedItem(correctPosition, 0.25f, world);
 		var item = StuffRegistry.GetItem(ItemIdDrop);
-		droppedItem.Launch(item, ItemDropAmount, randomDirection, 10f, 15f, 0f);
+		
+		// item launch constructor
+		var droppedItem = new DroppedItem(correctPosition, 0.25f, world, 
+			item, ItemDropAmount, randomDirection, 10f, 15f, 0f);		
 		BlastiaGame.RequestAddEntity(droppedItem);
 	}
 
