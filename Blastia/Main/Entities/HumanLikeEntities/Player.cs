@@ -461,9 +461,6 @@ public class Player : HumanLikeEntity
 				if (!droppedItem.IsBeingPulled || droppedItem.PullTargetPlayer == null)
 				{
 					droppedItem.StartPull(this);
-
-					if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected)
-						NetworkEntitySync.SyncItemPull(droppedItem.NetworkId, SteamId.m_SteamID, true);
 				}
 				else if (droppedItem.IsBeingPulled && droppedItem.PullTargetPlayer != this) // pulled by another player
 				{
@@ -472,9 +469,6 @@ public class Player : HumanLikeEntity
 				else if (droppedItem.IsBeingPulled && droppedItem.PullTargetPlayer == this) // pulled by this player
 				{
 					droppedItem.StartPull(this);
-					
-					if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected)
-						NetworkEntitySync.SyncItemPull(droppedItem.NetworkId, SteamId.m_SteamID, true);
 				}
 			}
 			else
@@ -483,9 +477,6 @@ public class Player : HumanLikeEntity
 				if (droppedItem.IsBeingPulled && droppedItem.PullTargetPlayer == this)
 				{
 					droppedItem.StopPull();
-					
-					if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected)
-						NetworkEntitySync.SyncItemPull(droppedItem.NetworkId, SteamId.m_SteamID, false);
 				}
 			}
 

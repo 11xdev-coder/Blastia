@@ -2,6 +2,7 @@
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
+using Blastia.Main.Networking;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -89,11 +90,14 @@ public class DroppedItem : Entity
     public void StartPull(Player target)
     {
         // start pulling only when can pickup
-        if (PickupTime < MaxPickupTime) return;
+        if (PickupTime < MaxPickupTime || IsBeingPulled) return;
         
         IsBeingPulled = true;
         PullTargetPlayer = target;
         ApplyGravity = false;
+        
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected)
+            NetworkEntitySync.SyncItemPull(NetworkId, target.SteamId.m_SteamID, true);
     }
 
     /// <summary>
@@ -101,9 +105,15 @@ public class DroppedItem : Entity
     /// </summary>
     public void StopPull()
     {
+        if (!IsBeingPulled) return;
+        
         IsBeingPulled = false;
-        PullTargetPlayer = null;
         ApplyGravity = true;
+        
+        if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected && PullTargetPlayer != null)
+            NetworkEntitySync.SyncItemPull(NetworkId, PullTargetPlayer.SteamId.m_SteamID, false);
+        
+        PullTargetPlayer = null;
     }
     
     /// <summary>
@@ -275,8 +285,6 @@ public class DroppedItem : Entity
             {"ItemId", Item.Id},
             {"Amount", Amount},
             {"PickupTime", PickupTime},
-            {"IsBeingPulled", IsBeingPulled},
-            {"PullerId", PullTargetPlayer == null ? 0 : PullTargetPlayer.SteamId.m_SteamID},
             {"HasLaunchParams", _hasLaunchParams},
             {"LaunchDirection", _launchDirection},
             {"HorizontalSpeed", _horizontalSpeed},
@@ -295,20 +303,6 @@ public class DroppedItem : Entity
 
         Amount = (int)data["Amount"];
         PickupTime = (float)data["PickupTime"];
-
-        IsBeingPulled = (bool)data["IsBeingPulled"];
-        Console.WriteLine($"IS PULLING: {IsBeingPulled}");
-        if (IsBeingPulled) 
-        {
-            var pullerId = (ulong)data["PullerId"];
-            if (pullerId != 0) 
-            {
-                var player = _world.GetPlayers().FirstOrDefault(p => p.SteamId.m_SteamID == pullerId);
-                PullTargetPlayer = player;
-
-                Console.WriteLine($"NEW PULLER ID: {pullerId} NAME: {player?.Name}");
-            }
-        }
 
         var hasLaunchParams = (bool)data["HasLaunchParams"];
         if (hasLaunchParams) 
