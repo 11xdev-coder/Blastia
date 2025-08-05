@@ -916,14 +916,25 @@ public class BlastiaGame : Game
 	}
 
 	// ADD ENTITY
+	/// <summary>
+	/// Adds entity on server-side and notifies the clients
+	/// </summary>
+	/// <param name="entity"></param>
 	public static void RequestAddEntity(Entity entity) => RequestAddEntityEvent?.Invoke(entity);
 	/// <summary>
-	/// Does everything in <c>AddEntityWithoutBroadcasting</c> but syncs the new entity with other clients. Used for sending the message initially (entity was added first time)
+	/// Adds entity on server-side and notifies the clients
 	/// </summary>
 	/// <param name="entity"></param>
 	private void AddEntity(Entity entity)
 	{
-		AddEntityWithoutBroadcasting(entity);
+		if (entity.NetworkId == Guid.Empty)
+			entity.AssignNetworkId();
+		
+		if (NetworkManager.Instance?.IsHost == true) 
+		{
+		    entity.OnSpawn();
+			_entities.Add(entity);
+		}
 		
 		if (NetworkManager.Instance != null && NetworkManager.Instance.IsConnected) 
 		{
@@ -932,11 +943,14 @@ public class BlastiaGame : Game
 	}
 	
 	/// <summary>
-	/// Used for adding an entity locally, without sending messages to other clients and calling <c>OnSpawn</c> if host. Used for handling a message since handling messages already broadcasts a message
+	/// Creates an entity locally. Used when receiving message from host to add an entity
 	/// </summary>
 	/// <param name="entity"></param>
 	private void AddEntityWithoutBroadcasting(Entity entity) 
 	{
+		if (entity.NetworkId == Guid.Empty)
+			entity.AssignNetworkId();
+			
 	    if (NetworkManager.Instance?.IsHost == true)
 			entity.OnSpawn();
 		_entities.Add(entity);

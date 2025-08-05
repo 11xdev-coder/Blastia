@@ -127,7 +127,7 @@ public abstract class Entity : Object
     
     public void AssignNetworkId() 
     {
-        if (NetworkId == Guid.Empty && NetworkManager.Instance != null && NetworkManager.Instance.IsHost)
+        if (NetworkId == Guid.Empty)
             NetworkId = Guid.NewGuid();
     }
     
