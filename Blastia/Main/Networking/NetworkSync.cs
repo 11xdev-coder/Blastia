@@ -81,6 +81,7 @@ public class NetworkSync
             NetworkBlockUpdateMessage blockUpdate => blockUpdate.Serialize(),
             NetworkSignEditedMessage signEdited => signEdited.Serialize(),
             Guid networkId => networkId.ToByteArray(),
+            NetworkItemPullMessage itemPull => itemPull.Serialize(),
             _ => System.Text.Encoding.UTF8.GetBytes(data?.ToString() ?? "")
         };
 
@@ -127,6 +128,7 @@ public class NetworkSync
         if (typeof(T) == typeof(NetworkBlockUpdateMessage)) return (T)(object)NetworkBlockUpdateMessage.Deserialize(bytes);
         if (typeof(T) == typeof(NetworkSignEditedMessage)) return (T)(object)NetworkSignEditedMessage.Deserialize(bytes);
         if (typeof(T) == typeof(Guid)) return (T)(object)new Guid(bytes);
+        if (typeof(T) == typeof(NetworkItemPullMessage)) return (T)(object)NetworkItemPullMessage.Deserialize(bytes);
         
         throw new NotSupportedException($"Deserialization not supported for type {typeof(T)}");
     }

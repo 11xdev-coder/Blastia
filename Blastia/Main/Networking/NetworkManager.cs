@@ -26,7 +26,8 @@ public enum MessageType : byte
     BlockUpdate, // host -> all clients (single block updated)
     EntitySpawned, // host -> clients (when new entity spawned)
     EntityPositionUpdate, // new NetworkEntity -> client received: applies
-    EntityKilled,
+    EntityKilled, // GUID of entity removed
+    ItemPull,
     ChatMessage,
     
     // world transfer
@@ -642,6 +643,9 @@ public class NetworkManager
                         break;
                     case MessageType.EntityKilled:
                         NetworkEntitySync.HandleEntityKilled(content);
+                        break;
+                    case MessageType.ItemPull:
+                        NetworkEntitySync.HandleItemPull(content);
                         break;
                     case MessageType.RequestUpdateWorldForClient:
                         // if this is the host, send the world to client

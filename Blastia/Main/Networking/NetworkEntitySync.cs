@@ -1,4 +1,5 @@
 ﻿using Assimp.Configs;
+using Blastia.Main.Entities;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
@@ -289,4 +290,43 @@ public static class NetworkEntitySync
         RemoveEntity, (guid, _) => RemoveEntity(guid));
     }
     
+    public static void SyncItemPull(Guid droppedItemId, ulong pullerId, bool isPulling) 
+    {
+        var itemPull = new NetworkItemPullMessage
+        {
+            DroppedItemNetworkId = droppedItemId,
+            PullerId = pullerId,
+            IsPulling = isPulling
+        };
+
+        NetworkSync.Sync(itemPull, MessageType.ItemPull, SyncMode.Auto);
+    }
+    
+    private static void ApplyItemPull(NetworkItemPullMessage itemPull) 
+    {
+        if (_entitiesFactory == null || _playersFactory == null) return;
+        
+        var droppedItems = _entitiesFactory().OfType<DroppedItem>();
+        var droppedItem = droppedItems.FirstOrDefault(e => e.NetworkId == itemPull.DroppedItemNetworkId);
+        if (droppedItem == null) return;
+
+        if (itemPull.IsPulling)
+        {
+            var players = _playersFactory();
+            var puller = players.FirstOrDefault(p => p.SteamId.m_SteamID == itemPull.PullerId);
+            if (puller == null) return;
+
+            droppedItem.StartPull(puller);
+        }
+        else
+        {
+            droppedItem.StopPull();
+        }       
+    }
+    
+    public static void HandleItemPull(string itemPullBase64) 
+    {
+        NetworkSync.HandleNetworkMessage<NetworkItemPullMessage>(itemPullBase64, MessageType.ItemPull,
+        ApplyItemPull, (itemPull, _) => ApplyItemPull(itemPull));
+    }
 }
