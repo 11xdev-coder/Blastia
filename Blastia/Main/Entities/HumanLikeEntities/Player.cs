@@ -156,9 +156,10 @@ public class Player : HumanLikeEntity
 	
 	private bool ShouldBlockInput()
 	{
-		// typing in sign edit menu:
-		return BlastiaGame.InGameSignEditMenu != null && BlastiaGame.InGameSignEditMenu.Active
-			&& BlastiaGame.InGameSignEditMenu.SignText != null && BlastiaGame.InGameSignEditMenu.SignText.IsFocused;
+		// typing in sign edit menu OR typing in chat
+		return (BlastiaGame.InGameSignEditMenu != null && BlastiaGame.InGameSignEditMenu.Active
+			&& BlastiaGame.InGameSignEditMenu.SignText != null && BlastiaGame.InGameSignEditMenu.SignText.IsFocused) ||
+			(BlastiaGame.InGameMenu?.ChatInput != null && BlastiaGame.InGameMenu.ChatInput.IsFocused);
 	}
 
 	public override void Update()
@@ -192,7 +193,8 @@ public class Player : HumanLikeEntity
 			
 			HandleItemPickup();
 			
-			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null)
+			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null 
+				&& BlastiaGame.InGameMenu != null && !BlastiaGame.InGameMenu.WasChatActivePreviousFrame()) // if chat is not active (escape turns off chat first)
 			{
 				BlastiaGame.PlayerInventoryUiMenu.ToggleFullInventoryDisplay();
 			}
