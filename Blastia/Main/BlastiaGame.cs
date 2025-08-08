@@ -930,7 +930,7 @@ public class BlastiaGame : Game
 		if (entity.NetworkId == Guid.Empty)
 			entity.AssignNetworkId();
 		
-		if (NetworkManager.Instance?.IsHost == true) 
+		if (NetworkManager.Instance?.IsHost == true || NetworkManager.Instance == null || !NetworkManager.Instance.IsConnected) 
 		{
 		    entity.OnSpawn();
 			_entities.Add(entity);
