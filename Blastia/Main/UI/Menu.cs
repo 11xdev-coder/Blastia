@@ -34,6 +34,11 @@ public class Menu
     /// </summary>
     public virtual bool CameraUpdate { get; set; }
 
+    /// <summary>
+    /// If true, will set <c>IsAnyBlockEscapeMenuActive</c> flag when this menu is active. Used for not opening/closing inventory when escape is pressed on this menu
+    /// </summary>
+    public virtual bool BlockEscape { get; set; }
+
     private bool _menuSwitched;
 
     /// <summary>

@@ -6,6 +6,7 @@ namespace Blastia.Main.UI.Menus.InGame;
 
 public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
+    public override bool BlockEscape => true;
     private TabGroup? _tabGroup;
     protected override void AddElements()
     {
@@ -27,7 +28,7 @@ public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(f
         VideoManager.Instance.SaveStateToFile<VideoManagerState>();
         AudioManager.Instance.SaveStateToFile<AudioManagerState>();
         _tabGroup?.DeselectAll();
-        SwitchToMenu(BlastiaGame.InGameMenu);
+        SwitchToMenu(BlastiaGame.InGameSettingsButtonMenu);
     }
 
     private void ExitToMenu()

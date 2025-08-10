@@ -99,7 +99,7 @@ public class BlastiaGame : Game
 	public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
 	public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
 	public static RulerMenu? RulerMenu { get; private set; }
-	public static InGameMenu? InGameMenu { get; private set; }
+	public static InGameSettingsButtonMenu? InGameSettingsButtonMenu { get; private set; }
 	public static FpsCounterMenu? FpsCounterMenu { get; private set; }
 	public static InGameSettingsMenu? InGameSettingsMenu { get; private set; }
 	public static InGameVideoSettingsMenu? InGameVideoSettingsMenu { get; private set; }
@@ -107,8 +107,10 @@ public class BlastiaGame : Game
 	public static InGameSignEditMenu? InGameSignEditMenu { get; private set; }
 	public static InventoryUi? PlayerInventoryUiMenu { get; private set; }
 	public static PlayerStatsMenu? PlayerStatsMenu { get; private set; }
+	public static InGameChatMenu? InGameChatMenu { get; private set; }
 	private readonly List<Menu> _menus = [];
 	private readonly List<Menu> _menusToAdd = [];
+	public static bool IsAnyBlockEscapeMenuActive;
 
 	/// <summary>
 	/// Event triggered when a request to exit the game is made.
@@ -365,8 +367,8 @@ public class BlastiaGame : Game
 			RulerMenu = new RulerMenu(MainFont);
 			AddMenu(RulerMenu);
 
-			InGameMenu = new InGameMenu(MainFont);
-			AddMenu(InGameMenu);
+			InGameSettingsButtonMenu = new InGameSettingsButtonMenu(MainFont);
+			AddMenu(InGameSettingsButtonMenu);
 			
 			FpsCounterMenu = new FpsCounterMenu(MainFont);
 			AddMenu(FpsCounterMenu);
@@ -385,6 +387,9 @@ public class BlastiaGame : Game
 			
 			PlayerStatsMenu = new PlayerStatsMenu(MainFont);
 			AddMenu(PlayerStatsMenu);
+			
+			InGameChatMenu = new InGameChatMenu(MainFont);
+			AddMenu(InGameChatMenu);
 			
 			TooltipDisplay = new TooltipDisplay(MainFont);
 			NotificationDisplay = new NotificationDisplay(MainFont);
@@ -730,6 +735,9 @@ public class BlastiaGame : Game
 	{
 		_previousMouseState = _currentMouseState;
 		PreviousKeyboardState = KeyboardState;
+
+		// any menu with BlockEscape is active
+		IsAnyBlockEscapeMenuActive = _menus.Where(m => m.Active && m.BlockEscape).ToList().Count > 0;
 	}
 
 	// DRAW
@@ -829,7 +837,7 @@ public class BlastiaGame : Game
 		if (LogoMenu != null) LogoMenu.Active = false;
 		if (WorldsMenu != null) WorldsMenu.Active = false;
 		if (RulerMenu != null) RulerMenu.Active = World.RulerMode;
-		if (InGameMenu != null) InGameMenu.Active = true;
+		if (InGameSettingsButtonMenu != null) InGameSettingsButtonMenu.Active = true;
 		if (PlayerStatsMenu != null) PlayerStatsMenu.Active = true;
 		
 		ConsoleWindow?.InitializeWorldCommands(World);

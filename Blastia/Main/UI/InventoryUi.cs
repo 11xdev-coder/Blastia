@@ -24,7 +24,7 @@ public class InventoryUi : Menu
     
     // hotbar
     public int HotbarSlotsCount { get; private set; }
-    private int _selectedHotbarSlotIndex = -1;
+    private int _selectedHotbarSlotIndex = 1;
     private Text _selectedItemText;
     
     /// <summary>
