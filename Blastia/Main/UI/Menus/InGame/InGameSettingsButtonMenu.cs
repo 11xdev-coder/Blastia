@@ -25,7 +25,7 @@ public class InGameSettingsButtonMenu(SpriteFont font, bool isActive = false) : 
         base.Update();
 
         if (KeyboardHelper.IsKeyJustPressed(Keys.Enter))
-            SwitchToMenu(BlastiaGame.InGameChatMenu);
+            SwitchToMenu(BlastiaGame.ChatInputMenu);
     }
 
     private void OpenSettings()

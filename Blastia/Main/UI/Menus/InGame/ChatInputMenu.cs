@@ -6,24 +6,15 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Blastia.Main.UI.Menus.InGame;
 
-public class InGameChatMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
+public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
     private Text? _chatSayText;
     public Input? ChatInput;
-    private ScrollableArea? _chat;
 
     public override bool BlockEscape => true;
     
     protected override void AddElements()
     {
-        Viewport chatViewport = new Viewport(2000, 200);
-        _chat = new ScrollableArea(Vector2.Zero, chatViewport)
-        {
-            HAlign = 0.01f,
-            VAlign = 0.98f
-        };
-        Elements.Add(_chat);
-        _chat.AddChild(new Text(Vector2.Zero, "testastadsadfS", Font));
         
         _chatSayText = new Text(Vector2.Zero, "Say:", Font)
         {
@@ -50,11 +41,11 @@ public class InGameChatMenu(SpriteFont font, bool isActive = false) : Menu(font,
         // enter pressed
         if (KeyboardHelper.IsKeyJustPressed(Keys.Enter)) 
         {
+            // send message
+            BlastiaGame.ChatMessagesMenu?.AddMessage("n", ChatInput?.StringBuilder.ToString());
+            
             // turn chat off
             TurnChatOff();
-            
-            // send message
-            
         }
         else if (KeyboardHelper.IsKeyJustPressed(Keys.Escape)) 
         {

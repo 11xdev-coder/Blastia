@@ -3,6 +3,12 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI;
 
+public enum AlignmentType 
+{
+    Left,
+    Center
+}
+
 public class ScrollableArea : UIElement
 {
     private List<UIElement> _children;
@@ -10,6 +16,7 @@ public class ScrollableArea : UIElement
     // position offset
     private float _scrolledOffset;
     private float _startingScrolledOffset;
+    private AlignmentType _alignment;
     
     // spacing
     private float _currentSpacing;
@@ -24,12 +31,13 @@ public class ScrollableArea : UIElement
     
     public float Spacing { get; set; }
     
-    public ScrollableArea(Vector2 position, Viewport viewport, float spacing = 0f,
-        float scrolledOffset = 0f) : 
+    public ScrollableArea(Vector2 position, Viewport viewport, AlignmentType alignmentType = AlignmentType.Center, 
+        float spacing = 0f, float scrolledOffset = 0f) : 
         base(position, BlastiaGame.InvisibleTexture)
     {
         ViewportWidth = viewport.Width;
         ViewportHeight = viewport.Height;
+        _alignment = alignmentType;
         Spacing = spacing;
         
         _children = new List<UIElement>();
@@ -84,8 +92,16 @@ public class ScrollableArea : UIElement
         // update every child
         foreach (var child in _children)
         {
-            // center X
-            child.Position.X = Bounds.Center.X - child.Bounds.Width * 0.5f;
+            // align
+            switch (_alignment) 
+            {
+                case AlignmentType.Center:
+                    child.Position.X = Bounds.Center.X - child.Bounds.Width * 0.5f;
+                    break;
+                case AlignmentType.Left:
+                    child.Position.X = Bounds.Left;
+                    break;
+            }            
             
             // for each new element add spacing + height
             child.Position.Y = _scrolledOffset + _currentSpacing;

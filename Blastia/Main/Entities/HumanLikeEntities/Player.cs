@@ -159,7 +159,7 @@ public class Player : HumanLikeEntity
 		// typing in sign edit menu OR typing in chat
 		return (BlastiaGame.InGameSignEditMenu != null && BlastiaGame.InGameSignEditMenu.Active
 			&& BlastiaGame.InGameSignEditMenu.SignText != null && BlastiaGame.InGameSignEditMenu.SignText.IsFocused) ||
-			(BlastiaGame.InGameChatMenu?.ChatInput?.IsFocused == true);
+			(BlastiaGame.ChatInputMenu?.ChatInput?.IsFocused == true);
 	}
 
 	public override void Update()

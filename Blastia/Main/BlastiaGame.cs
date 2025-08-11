@@ -107,7 +107,8 @@ public class BlastiaGame : Game
 	public static InGameSignEditMenu? InGameSignEditMenu { get; private set; }
 	public static InventoryUi? PlayerInventoryUiMenu { get; private set; }
 	public static PlayerStatsMenu? PlayerStatsMenu { get; private set; }
-	public static InGameChatMenu? InGameChatMenu { get; private set; }
+	public static ChatInputMenu? ChatInputMenu { get; private set; }
+	public static  ChatMessagesMenu? ChatMessagesMenu { get; private set; }
 	private readonly List<Menu> _menus = [];
 	private readonly List<Menu> _menusToAdd = [];
 	public static bool IsAnyBlockEscapeMenuActive;
@@ -388,8 +389,11 @@ public class BlastiaGame : Game
 			PlayerStatsMenu = new PlayerStatsMenu(MainFont);
 			AddMenu(PlayerStatsMenu);
 			
-			InGameChatMenu = new InGameChatMenu(MainFont);
-			AddMenu(InGameChatMenu);
+			ChatInputMenu = new ChatInputMenu(MainFont);
+			AddMenu(ChatInputMenu);
+			
+			ChatMessagesMenu = new ChatMessagesMenu(MainFont);
+			AddMenu(ChatMessagesMenu);
 			
 			TooltipDisplay = new TooltipDisplay(MainFont);
 			NotificationDisplay = new NotificationDisplay(MainFont);
