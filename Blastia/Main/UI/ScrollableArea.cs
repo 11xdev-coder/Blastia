@@ -81,13 +81,42 @@ public class ScrollableArea : UIElement
         
         _currentSpacing = 0; // reset spacing
         float delta = BlastiaGame.ScrollWheelDelta * ScrollSpeed;
-        
-        // cant scroll past top/bottom
-        if ((delta > 0 && GetTop() >= Bounds.Top) || 
-            (delta < 0 && GetBottom() <= Bounds.Bottom))
+
+        // calculate total content height
+        float totalContentHeight = 0;
+        foreach (var child in _children)
         {
-            _scrolledOffset -= delta;
+            totalContentHeight += child.Bounds.Height + Spacing;
         }
+        totalContentHeight -= Spacing; // remove last spacing
+        
+        // only apply scroll limits if content overflows viewport
+        if (totalContentHeight > ViewportHeight)
+        {
+            var scrollingUp = delta > 0;
+            var scrollingDown = delta < 0;
+            
+            // calculate scroll limits
+            float topLimit = Bounds.Top; // first element's top can go to viewport top
+            float bottomLimit = Bounds.Bottom - totalContentHeight; // last element's bottom matches viewport bottom
+            
+            // check bounds and apply scroll
+            float newScrollOffset = _scrolledOffset + delta;
+            
+            if (scrollingDown && newScrollOffset < bottomLimit)
+            {
+                _scrolledOffset = bottomLimit; // clamp to bottom limit
+            }
+            else if (scrollingUp && newScrollOffset > topLimit)
+            {
+                _scrolledOffset = topLimit; // clamp to top limit
+            }
+            else
+            {
+                _scrolledOffset = newScrollOffset; // normal scroll
+            }
+        }
+    
         
         // update every child
         foreach (var child in _children)
