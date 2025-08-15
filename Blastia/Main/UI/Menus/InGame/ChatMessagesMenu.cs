@@ -29,7 +29,8 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
     {
         if (_chat == null) return;
 
-        var newText = new Text(Vector2.Zero, $"<{senderName}>: {text}", Font);
+        var newText = new ColoredText(Vector2.Zero, $"<{senderName}>: {text}", Font);
+        newText.UpdateBounds(); // force update
         _chat.AddChild(newText);
 
         // scroll to bottom

@@ -151,7 +151,7 @@ public abstract class UIElement
     /// Thickness of the Border. Only used when rendering text (<c>UseTexture = false</c>). Defaults to <c>1.4f</c>
     /// </summary>
     public float BorderOffsetFactor { get; set; } = 2f;
-    private readonly Vector2[] _borderOffsets =
+    protected readonly Vector2[] _borderOffsets =
     [
         new(-1, 0),
         new(1, 0),
