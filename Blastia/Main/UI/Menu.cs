@@ -7,6 +7,14 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.UI;
 
+public enum ActivationMethod 
+{
+    Default,
+    OnlyInGame,
+    OnlyInMenu,
+    HideWhenInGame
+}
+
 public class Menu
 {
     private float _hAlignOffset;
@@ -38,6 +46,14 @@ public class Menu
     /// If true, will set <c>IsAnyBlockEscapeMenuActive</c> flag when this menu is active. Used for not opening/closing inventory when escape is pressed on this menu
     /// </summary>
     public virtual bool BlockEscape { get; set; }
+    
+    /// <summary>
+    /// <para>Default -> default activation by hand</para>
+    /// <para>OnlyInGame -> activation when loaded into the world, deactivation when in main menu</para>
+    /// <para>OnlyInMenu -> activation when in main menu, deactivation when loaded into the world</para>
+    /// <para>HideInGame -> only hide when loaded into the world/para>
+    /// </summary>
+    public virtual ActivationMethod ActivationType { get; set; }
 
     private bool _menuSwitched;
 

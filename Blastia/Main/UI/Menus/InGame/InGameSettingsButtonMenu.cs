@@ -9,6 +9,8 @@ namespace Blastia.Main.UI.Menus.InGame;
 public class InGameSettingsButtonMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
     private Button? _settingsButton;
+
+    public override ActivationMethod ActivationType => ActivationMethod.OnlyInGame;
     
     protected override void AddElements()
     {

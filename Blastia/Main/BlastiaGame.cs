@@ -838,11 +838,15 @@ public class BlastiaGame : Game
 		_myPlayer = new Player(worldState.GetSpawnPoint(), World, Entity.PlayerScale, true);
 		World.SetPlayer(_myPlayer);
 		
-		if (LogoMenu != null) LogoMenu.Active = false;
-		if (WorldsMenu != null) WorldsMenu.Active = false;
+		foreach (var menu in _menus) 
+		{
+			if (menu.ActivationType == ActivationMethod.OnlyInMenu || menu.ActivationType == ActivationMethod.HideWhenInGame)
+				menu.Active = false;
+			else if (menu.ActivationType == ActivationMethod.OnlyInGame)
+				menu.Active = true;
+		}
+		
 		if (RulerMenu != null) RulerMenu.Active = World.RulerMode;
-		if (InGameSettingsButtonMenu != null) InGameSettingsButtonMenu.Active = true;
-		if (PlayerStatsMenu != null) PlayerStatsMenu.Active = true;
 		
 		ConsoleWindow?.InitializeWorldCommands(World);
 		
@@ -905,8 +909,13 @@ public class BlastiaGame : Game
 			Saving.Save(savePath, worldState);
 		}
 		
-		if (LogoMenu != null) LogoMenu.Active = true;
-		if (PlayerStatsMenu != null) PlayerStatsMenu.Active = false;
+		foreach (var menu in _menus) 
+		{
+			if (menu.ActivationType == ActivationMethod.OnlyInGame)
+				menu.Active = false;
+			else if (menu.ActivationType == ActivationMethod.OnlyInMenu)
+				menu.Active = true;
+		}
 		
 		ConsoleWindow?.UnloadWorldCommands();
 		

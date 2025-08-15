@@ -3,7 +3,9 @@
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
 public class WorldsMenu : CollectionMenu
-{    
+{
+	public override ActivationMethod ActivationType => ActivationMethod.HideWhenInGame;
+	
 	private bool Host { get; set; }
 	
 	public WorldsMenu(SpriteFont font, bool isActive = false) : base(font, isActive)

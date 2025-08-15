@@ -7,6 +7,8 @@ public class PlayerStatsMenu(SpriteFont font, bool isActive = false) : Menu(font
 {
     private Progressbar? _playerHealth;
 
+    public override ActivationMethod ActivationType => ActivationMethod.OnlyInGame;
+    
     protected override void AddElements()
     {
         _playerHealth = new Progressbar(Vector2.Zero, BlastiaGame.ProgressBarBackground)
