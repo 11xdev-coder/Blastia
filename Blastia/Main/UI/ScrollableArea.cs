@@ -12,6 +12,7 @@ public enum AlignmentType
 public class ScrollableArea : UIElement
 {
     private List<UIElement> _children;
+    public IReadOnlyList<UIElement> Children => _children; // readonly getter
     
     // position offset
     private float _scrolledOffset;
