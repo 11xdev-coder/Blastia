@@ -32,6 +32,9 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
         var newText = new Text(Vector2.Zero, $"<{senderName}>: {text}", Font);
         _chat.AddChild(newText);
 
+        // scroll to bottom
+        _chat.ScrollToBottom();
+        
         // setup timer
         _startFadingTimer = SecondsToStartFadingOut;
         _isFading = false;

@@ -83,13 +83,7 @@ public class ScrollableArea : UIElement
         _currentSpacing = 0; // reset spacing
         float delta = BlastiaGame.ScrollWheelDelta * ScrollSpeed;
 
-        // calculate total content height
-        float totalContentHeight = 0;
-        foreach (var child in _children)
-        {
-            totalContentHeight += child.Bounds.Height + Spacing;
-        }
-        totalContentHeight -= Spacing; // remove last spacing
+        var totalContentHeight = GetTotalContentHeight();
         
         // only apply scroll limits if content overflows viewport
         if (totalContentHeight > ViewportHeight)
@@ -99,7 +93,7 @@ public class ScrollableArea : UIElement
             
             // calculate scroll limits
             float topLimit = Bounds.Top; // first element's top can go to viewport top
-            float bottomLimit = Bounds.Bottom - totalContentHeight; // last element's bottom matches viewport bottom
+            float bottomLimit = GetBottomLimit(totalContentHeight);
             
             // check bounds and apply scroll
             float newScrollOffset = _scrolledOffset + delta;
@@ -140,26 +134,22 @@ public class ScrollableArea : UIElement
             child.Update();
         }
     }
-
-    private float GetTop()
+    
+    private float GetTotalContentHeight() 
     {
-        var firstChild = _children.FirstOrDefault();
+        // calculate total content height
+        float totalContentHeight = 0;
+        foreach (var child in _children)
+        {
+            totalContentHeight += child.Bounds.Height + Spacing;
+        }
+        totalContentHeight -= Spacing; // remove last spacing
 
-        if (firstChild != null) 
-            return firstChild.Bounds.Top;
-
-        return 0;
+        return totalContentHeight;
     }
+    private float GetBottomLimit(float totalContentHeight) => Bounds.Bottom - totalContentHeight; // last element's bottom matches viewport bottom
 
-    private float GetBottom()
-    {
-        var lastChild = _children.LastOrDefault();
-
-        if (lastChild != null) 
-            return lastChild.Bounds.Bottom;
-
-        return 0;
-    }
+    public void ScrollToBottom() => _scrolledOffset = GetBottomLimit(GetTotalContentHeight());
 
     public override void Draw(SpriteBatch spriteBatch)
     {
