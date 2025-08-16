@@ -1,0 +1,83 @@
+using Blastia.Main.Utilities;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Blastia.Main.UI;
+
+public class AnimatedGif : UIElement 
+{
+    private Texture2D[] _frames = [];
+    private float[] _frameDurations = [];
+    private readonly string _url;
+    private readonly bool _loop;
+    private int _currentFrame;
+    private float _frameTimer;
+    private bool _hasLoadedGif;
+    public AnimatedGif(Vector2 position, string url, bool loop = true) : base(position, BlastiaGame.InvisibleTexture)
+    {
+        _url = url;
+        _loop = loop;
+        _currentFrame = 0;
+        _frameTimer = 0f;
+        Init();
+    }
+    
+    private async void Init() 
+    {
+        var gifData = await Util.DownloadAndProcessGif(_url);
+        if (gifData.HasValue) 
+        {
+            _frames = gifData.Value.Frames;
+            _frameDurations = gifData.Value.Durations;
+            _hasLoadedGif = true;
+            
+            if (_frames.Length > 0) 
+            {
+                Texture = _frames[0];
+                UpdateBounds();
+            }
+            else 
+            {
+                Console.WriteLine("No frames found for AnimatedGif");
+            }
+        }
+    }
+
+    public override void UpdateBounds()
+    {
+        if (Texture == null) return;
+        UpdateBoundsBase(Texture.Width, Texture.Height);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (_frames.Length <= 1 || !_hasLoadedGif) return;
+
+        var delta = (float)BlastiaGame.GameTimeElapsedSeconds;
+        _frameTimer += delta;
+        
+        if (_frameTimer >= _frameDurations[_currentFrame]) 
+        {
+            _frameTimer = 0f;
+            _currentFrame += 1;
+            
+            if (_currentFrame >= _frames.Length) 
+            {
+                if (_loop)
+                    _currentFrame = 0; // start over
+                else
+                    _currentFrame = _frames.Length - 1; // last frame
+            }
+        }
+
+        // update texture
+        var newTexture = _frames[_currentFrame];
+        if (newTexture != Texture) 
+        {
+            Texture = newTexture;
+            UpdateBounds();
+        }
+    }
+}

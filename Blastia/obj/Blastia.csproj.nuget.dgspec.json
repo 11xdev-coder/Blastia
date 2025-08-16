@@ -80,6 +80,10 @@
               "target": "Package",
               "version": "[2.2.1, )"
             },
+            "SixLabors.ImageSharp": {
+              "target": "Package",
+              "version": "[3.1.11, )"
+            },
             "Steamworks.NET": {
               "target": "Package",
               "version": "[2024.8.0, )"

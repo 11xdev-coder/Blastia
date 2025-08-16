@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "IC8bZAl0oBE=",
+  "dgSpecHash": "I7vELvnH/H4=",
   "success": true,
   "projectFilePath": "D:\\Projects\\Blastia\\Blastia\\Blastia.csproj",
   "expectedPackageFiles": [
@@ -48,6 +48,7 @@
     "C:\\Users\\matvei\\.nuget\\packages\\sharpdx.d3dcompiler\\4.0.1\\sharpdx.d3dcompiler.4.0.1.nupkg.sha512",
     "C:\\Users\\matvei\\.nuget\\packages\\sharpgen.runtime\\2.0.0-beta.13\\sharpgen.runtime.2.0.0-beta.13.nupkg.sha512",
     "C:\\Users\\matvei\\.nuget\\packages\\sharpgen.runtime.com\\2.0.0-beta.13\\sharpgen.runtime.com.2.0.0-beta.13.nupkg.sha512",
+    "C:\\Users\\matvei\\.nuget\\packages\\sixlabors.imagesharp\\3.1.11\\sixlabors.imagesharp.3.1.11.nupkg.sha512",
     "C:\\Users\\matvei\\.nuget\\packages\\steamworks.net\\2024.8.0\\steamworks.net.2024.8.0.nupkg.sha512",
     "C:\\Users\\matvei\\.nuget\\packages\\system.appcontext\\4.1.0\\system.appcontext.4.1.0.nupkg.sha512",
     "C:\\Users\\matvei\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",

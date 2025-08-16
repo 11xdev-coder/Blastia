@@ -275,7 +275,8 @@ public class BlastiaGame : Game
 	}
 
 	private void LoadTextures()
-	{		
+	{
+		Util.Init(() => GraphicsDevice);
 		CursorTexture = Util.LoadTexture(GraphicsDevice, 
 			Paths.CursorTexturePath);
 		
