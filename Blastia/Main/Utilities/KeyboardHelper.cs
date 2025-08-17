@@ -297,6 +297,9 @@ public static class KeyboardHelper
     private static bool HandleCharacter(ref int index, Keys key, StringBuilder stringBuilder,
         bool isShiftDown = false)
     {
+        // dont process when control is held
+        if (BlastiaGame.KeyboardState.IsKeyDown(Keys.LeftControl) || BlastiaGame.KeyboardState.IsKeyDown(Keys.RightControl)) return false;
+        
         (char, char) pair;
         if (IsRussianKeyboardLayout()) 
             RussianKeyMapping.TryGetValue(key, out pair);

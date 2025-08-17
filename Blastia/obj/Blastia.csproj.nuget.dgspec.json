@@ -92,6 +92,10 @@
               "target": "Package",
               "version": "[9.0.1, )"
             },
+            "TextCopy": {
+              "target": "Package",
+              "version": "[6.2.1, )"
+            },
             "Veldrid": {
               "target": "Package",
               "version": "[4.9.0, )"

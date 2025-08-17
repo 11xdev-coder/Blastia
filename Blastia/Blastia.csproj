@@ -37,6 +37,7 @@
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
       <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
       <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
+      <PackageReference Include="TextCopy" Version="6.2.1" />
       <PackageReference Include="Veldrid" Version="4.9.0" />
       <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
     </ItemGroup>

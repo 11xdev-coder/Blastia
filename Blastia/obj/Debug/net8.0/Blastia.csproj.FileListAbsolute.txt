@@ -351,3 +351,5 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\linux-x64\native\libfreety
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\osx\native\libfreetype.dylib
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\win-x64\native\freetype.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\SixLabors.ImageSharp.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\TextCopy.dll

@@ -34,6 +34,8 @@ public class Input : UIElement
     public int CharacterLimit { get; set; } = 144;
     public int WrapLength { get; set; } = 36;
 
+    private bool _ctrlVPressedLastFrame;
+
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
         double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
         int cursorWidth = 2, int cursorHeight = 30, string defaultText = "Text here...") : base(position, "", font)
@@ -73,7 +75,7 @@ public class Input : UIElement
                 _cursorIndex = StringBuilder.Length;
             }
         }
-
+        
         if (IsSignEditing)
         {
             // clamp length and cursor
@@ -125,6 +127,61 @@ public class Input : UIElement
         {
             UpdateBounds();
         }
+        
+        // Ctrl V
+		var ctrlPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.LeftControl) || BlastiaGame.KeyboardState.IsKeyDown(Keys.RightControl);
+		var vPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.V);
+		if (ctrlPressed && vPressed) 
+		{
+			if (!_ctrlVPressedLastFrame) 
+			{
+			    _ctrlVPressedLastFrame = true;
+                PasteText();
+			}
+		}
+		else 
+		{
+			_ctrlVPressedLastFrame = false;
+		}
+    }
+    
+    private void PasteText() 
+    {
+        var clipboardText = TextCopy.ClipboardService.GetText();
+        if (string.IsNullOrEmpty(clipboardText)) return;
+        var filtered = FilterText(clipboardText);
+        
+        if (StringBuilder.Length + filtered.Length > CharacterLimit) 
+        {
+            // cut to fit the limit
+            int maxLength = CharacterLimit - StringBuilder.Length; // space to fit in
+            if (maxLength > 0)
+                filtered = clipboardText.Substring(0, Math.Min(filtered.Length, maxLength)); // cut the text
+            else
+                return; // no space left
+        }
+
+        // paste
+        StringBuilder.Insert(_cursorIndex, filtered);
+        _cursorIndex += filtered.Length;
+    }
+    
+    private string FilterText(string input) 
+    {
+        var filtered = new StringBuilder();
+        foreach (var c in input) 
+        {
+            // character that performs an action (like \n or \r)
+            if (char.IsControl(c))
+            {
+                if (c == '\n' || c == '\r')
+                    filtered.Append(IsSignEditing ? '\n' : ' ');
+            }
+            else
+                filtered.Append(c);
+        }
+
+        return filtered.ToString();
     }
 
     private void HandleArrows()
@@ -178,25 +235,25 @@ public class Input : UIElement
             for (int i = 0; i < lines.Length; i++)
             {
                 var pos = new Vector2(Bounds.Left, Bounds.Top + i * lineHeight);
-                spriteBatch.DrawString(Font, lines[i], pos, DrawColor * (Alpha), 0f, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+                spriteBatch.DrawString(Font, lines[i], pos, DrawColor * Alpha, 0f, Vector2.Zero, Scale, SpriteEffects.None, 0f);
             }
             // draw cursor at end of text
             if (_shouldDrawCursor && IsFocused)
             {
                 // calculate cursor position in wrapped text
-                int idx = _cursorIndex;
+                int safeCursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
                 int acc = 0;
                 int lineIdx = 0;
                 foreach (var ln in lines)
                 {
-                    if (idx <= acc + ln.Length)
+                    if (safeCursorIndex <= acc + ln.Length)
                     {
-                        int posInLine = idx - acc;
+                        int posInLine = safeCursorIndex - acc;
                         var substr = ln[..Math.Min(posInLine, ln.Length)];
                         var size = Font.MeasureString(substr) * Scale;
                         var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIdx * lineHeight);
                         var rect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, CursorWidth, CursorHeight);
-                        spriteBatch.Draw(BlastiaGame.WhitePixel, rect, CursorColor * (Alpha));
+                        spriteBatch.Draw(BlastiaGame.WhitePixel, rect, CursorColor * Alpha);
                         break;
                     }
                     acc += ln.Length;
@@ -210,11 +267,14 @@ public class Input : UIElement
             if (Font == null || Text == null) return;
             if (_shouldDrawCursor && IsFocused)
             {
+                int safeCursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
+                var safeText = StringBuilder.Length > 0 ? StringBuilder.ToString() : " "; // use StringBuilder content
+                
                 float yOffset = string.IsNullOrEmpty(Text) ? 10 : 0;
-                var textSize = Font.MeasureString(Text[.._cursorIndex]);
+                var textSize = Font.MeasureString(safeText[..safeCursorIndex]);
                 var cursorPosition = new Vector2(Bounds.Left + textSize.X, Bounds.Center.Y - CursorHeight * 0.5f - yOffset);
                 var cursorRectangle = new Rectangle((int)cursorPosition.X, (int)cursorPosition.Y, CursorWidth, CursorHeight);
-                spriteBatch.Draw(BlastiaGame.WhitePixel, cursorRectangle, CursorColor * (Alpha));
+                spriteBatch.Draw(BlastiaGame.WhitePixel, cursorRectangle, CursorColor * Alpha);
             }
         }
     }
