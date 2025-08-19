@@ -472,6 +472,29 @@ public abstract class UIElement
             DrawTexture(spriteBatch);
         }
     }
+    
+    /// <summary>
+    /// Draws specified string at position
+    /// </summary>
+    public virtual void Draw(SpriteBatch spriteBatch, Vector2 pos, string str, Vector2 origin = default) 
+    {
+        if (Font == null) return;
+
+        // if origin is not specified, fallback to Vector2.Zero
+        var textOrigin = origin == default ? Vector2.Zero : origin;
+        
+        if (BorderColor.A > 0)
+        {
+            foreach (var offset in _borderOffsets)
+            {
+                spriteBatch.DrawString(Font, str, pos + offset * BorderOffsetFactor, BorderColor * Alpha, 
+                    Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+            }
+        }
+        
+        spriteBatch.DrawString(Font, str, pos, DrawColor * Alpha, 
+            Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+    }
 
     private void DrawText(SpriteBatch spriteBatch)
     {

@@ -30,9 +30,16 @@ public class Input : UIElement
     private Color _defaultTextColor = Color.Wheat;
     private Color _normalTextColor = Color.White;
     
+    /// <summary>
+    /// Allows multi-line input and doesn't try to center this element (keeps in one place)
+    /// </summary>
     public bool IsSignEditing { get; set; }
     public int CharacterLimit { get; set; } = 144;
     public int WrapLength { get; set; } = 36;
+    /// <summary>
+    /// If true, when <c>WrapLength</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
+    /// </summary>
+    public bool MoveInsteadOfWrapping { get; set; }
 
     private bool _ctrlVPressedLastFrame;
 
@@ -223,25 +230,51 @@ public class Input : UIElement
         IsFocused = false; // unfocus
         Update(); // no text in next draw
     }
+    
+    /// <summary>
+    /// using StringBuilder is more safe (Text can differ from actual user input)
+    /// </summary>
+    /// <returns></returns>
+    private string GetSafeText() => StringBuilder.Length > 0 ? StringBuilder.ToString() : " ";
+    /// <summary>
+    /// Clamps cursor index to not be out of bounds
+    /// </summary>
+    /// <returns></returns>
+    private int GetSafeCursorIndex() => Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         if (IsSignEditing)
         {
             if (Font == null || Text == null) return;
+            
+            if (MoveInsteadOfWrapping) 
+            {
+                // draw from StringBuilder.Length - WrapLength (but clamp to 0)
+                var start = Math.Max(StringBuilder.Length - WrapLength, 0);
+                var length = Math.Min(WrapLength, StringBuilder.Length);
+
+                var safeText = GetSafeText();
+                var substring = safeText.Substring(start, length);
+
+                var pos = new Vector2(Bounds.Left, Bounds.Top);
+                base.Draw(spriteBatch, pos, substring);
+                return;
+            }
+            
             var lines = Text.Split('\n');
             float lineHeight = Font.LineSpacing * Scale.Y;
             // draw each line left-aligned
             for (int i = 0; i < lines.Length; i++)
             {
                 var pos = new Vector2(Bounds.Left, Bounds.Top + i * lineHeight);
-                spriteBatch.DrawString(Font, lines[i], pos, DrawColor * Alpha, 0f, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+                base.Draw(spriteBatch, pos, lines[i]);
             }
             // draw cursor at end of text
             if (_shouldDrawCursor && IsFocused)
             {
                 // calculate cursor position in wrapped text
-                int safeCursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
+                int safeCursorIndex = GetSafeCursorIndex();
                 int acc = 0;
                 int lineIdx = 0;
                 foreach (var ln in lines)
@@ -267,8 +300,8 @@ public class Input : UIElement
             if (Font == null || Text == null) return;
             if (_shouldDrawCursor && IsFocused)
             {
-                int safeCursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
-                var safeText = StringBuilder.Length > 0 ? StringBuilder.ToString() : " "; // use StringBuilder content
+                int safeCursorIndex = GetSafeCursorIndex();
+                var safeText = GetSafeText();
                 
                 float yOffset = string.IsNullOrEmpty(Text) ? 10 : 0;
                 var textSize = Font.MeasureString(safeText[..safeCursorIndex]);
@@ -287,7 +320,8 @@ public class Input : UIElement
             var charSize = Font.MeasureString("W") * Scale;
             float width = charSize.X * WrapLength;
             float lineHeight = Font.LineSpacing * Scale.Y;
-            int maxLines = (CharacterLimit + WrapLength - 1) / WrapLength;
+            // if MoveInsteadOfWrapping is true, only 1 line is max
+            int maxLines = MoveInsteadOfWrapping ? 1 : (CharacterLimit + WrapLength - 1) / WrapLength;
             float height = lineHeight * maxLines;
 
             // apply alignment
