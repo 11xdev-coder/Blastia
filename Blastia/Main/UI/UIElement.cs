@@ -488,17 +488,17 @@ public abstract class UIElement
             foreach (var offset in _borderOffsets)
             {
                 spriteBatch.DrawString(Font, str, pos + offset * BorderOffsetFactor, BorderColor * Alpha, 
-                    Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+                    Rotation, textOrigin, Scale, SpriteEffects.None, 0f);
             }
         }
         
         spriteBatch.DrawString(Font, str, pos, DrawColor * Alpha, 
-            Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+            Rotation, textOrigin, Scale, SpriteEffects.None, 0f);
     }
 
     private void DrawText(SpriteBatch spriteBatch)
     {
-        if (Font == null) return;
+        if (Font == null || string.IsNullOrEmpty(Text)) return;
         
         Vector2 textSize = Font.MeasureString(Text);
         
@@ -506,17 +506,7 @@ public abstract class UIElement
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
 
-        if (BorderColor.A > 0)
-        {
-            foreach (var offset in _borderOffsets)
-            {
-                spriteBatch.DrawString(Font, Text, position + offset * BorderOffsetFactor, BorderColor * Alpha, 
-                    Rotation, origin, Scale, SpriteEffects.None, 0f);
-            }
-        }
-        
-        spriteBatch.DrawString(Font, Text, position, DrawColor * Alpha, 
-            Rotation, origin, Scale, SpriteEffects.None, 0f);
+        Draw(spriteBatch, position, Text, origin);
     }
 
     private void DrawTexture(SpriteBatch spriteBatch)

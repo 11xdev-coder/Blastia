@@ -43,14 +43,17 @@ public class ColoredText : UIElement
                 ParseColoredText(value);
         }
     }
+    private float _wrapThreshold;
     
-    public ColoredText(Vector2 position, string text, SpriteFont font) : base(position, text, font) 
+    public ColoredText(Vector2 position, string text, SpriteFont font, float wrapThreshold = default) : base(position, text, font) 
     {
+        _wrapThreshold = wrapThreshold == default ? VideoManager.Instance.TargetResolution.X : wrapThreshold;
         ParseColoredText(text);
     }
     
     private void ParseColoredText(string text) 
     {
+        if (Font == null) return;
         _segments.Clear();
 
         if (string.IsNullOrEmpty(text))
@@ -58,12 +61,13 @@ public class ColoredText : UIElement
 
         var currentColor = DrawColor;
         var currentText = "";
+        var currentWidth = 0f;
         
         for (int i = 0; i < text.Length; i++) 
         {
             // i + 1 wont be out of bounds
             if (i + 1 < text.Length && text[i] == _colorCodeSymbol) 
-            {
+            {                    
                 char colorCode = char.ToLower(text[i + 1]);
                 
                 if (_colorCodes.ContainsKey(colorCode)) 
@@ -85,7 +89,15 @@ public class ColoredText : UIElement
                     continue;
                 }
             }
-
+            
+            var symbolSize = Font.MeasureString(text[i].ToString());
+            currentWidth += symbolSize.X;
+            if (currentWidth >= _wrapThreshold - symbolSize.X - 5) 
+            {
+                currentWidth = 0f;
+                currentText += '\n';
+            }
+            
             currentText += text[i];
         }
         
