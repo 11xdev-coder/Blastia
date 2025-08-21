@@ -51,6 +51,24 @@ public class ColoredText : UIElement
         ParseColoredText(text);
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="color"></param>
+    /// <param name="clearText">If not null, action that will be executed after adding this segment</param>
+    private void AddTextSegment(string text, Color color, Action? clearText = null) 
+    {
+        if (string.IsNullOrEmpty(text)) return;
+
+        _segments.Add(new TextSegment
+        {
+            Text = text,
+            Color = color
+        });
+        clearText?.Invoke();
+    }
+    
     private void ParseColoredText(string text) 
     {
         if (Font == null) return;
@@ -73,15 +91,7 @@ public class ColoredText : UIElement
                 if (_colorCodes.ContainsKey(colorCode)) 
                 {
                     // add this segment if it had text
-                    if (!string.IsNullOrEmpty(currentText)) 
-                    {
-                        _segments.Add(new TextSegment
-                        {
-                            Text = currentText,
-                            Color = currentColor
-                        });
-                        currentText = "";
-                    }
+                    AddTextSegment(currentText, currentColor, () => currentText = "");
                     
                     // update color for new segment
                     currentColor = _colorCodes[colorCode];
@@ -90,55 +100,73 @@ public class ColoredText : UIElement
                 }
             }
             
+            // check this symbol size            
             var symbolSize = Font.MeasureString(text[i].ToString());
-            currentWidth += symbolSize.X;
-            if (currentWidth >= _wrapThreshold - symbolSize.X - 5) 
+            // if adding this char will exceed threshold
+            if (currentWidth + symbolSize.X >= _wrapThreshold - 5) 
             {
+                // add segment before wrapping
+                AddTextSegment(currentText, currentColor, () => currentText = "");
+                // add newline segment
+                AddTextSegment("\n", currentColor);
                 currentWidth = 0f;
-                currentText += '\n';
             }
             
             currentText += text[i];
+            currentWidth += symbolSize.X;
         }
-        
+
         // add last segment
-        if (!string.IsNullOrEmpty(currentText)) 
-        {
-            _segments.Add(new TextSegment
-            {
-                Text = currentText,
-                Color = currentColor
-            });
-        }
+        AddTextSegment(currentText, currentColor);
     }
 
     public override void UpdateBounds()
     {
         if (Font == null || _segments.Count == 0) return;
-        
-        float totalWidth = 0;
-        float maxHeight = 0;
+
+        float maxWidth = 0f;
+        float currentWidth = 0f;
+        float currentHeight = Font.LineSpacing * Scale.Y; // at least one line
         
         foreach (var segment in _segments) 
         {
-            var segmentSize = Font.MeasureString(segment.Text);
-            totalWidth += segmentSize.X;
-            maxHeight = Math.Max(maxHeight, segmentSize.Y);
+            if (segment.Text == "\n") 
+            {
+                maxWidth = Math.Max(currentWidth, maxWidth);
+                currentWidth = 0f;
+                currentHeight += Font.LineSpacing * Scale.Y;
+            }
+            else 
+            {
+                // add segment width
+                currentWidth += Font.MeasureString(segment.Text).X * Scale.X;
+            }
         }
 
-        UpdateBoundsBase(totalWidth, maxHeight);
+        // last line
+        maxWidth = Math.Max(currentWidth, maxWidth);
+        UpdateBoundsBase(maxWidth, currentHeight);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         if (Font == null || _segments.Count == 0) return;
 
-        Vector2 currentPosition = new Vector2(Bounds.X, Bounds.Y);
+        var currentPosition = new Vector2(Bounds.X, Bounds.Y);
+        var lineStartPos = currentPosition;
+        var lineSpacing = Font.LineSpacing * Scale.Y;
 
         foreach (var segment in _segments)
         {
-            var segmentSize = Font.MeasureString(segment.Text);
             var segmentColor = segment.Color * Alpha;
+            
+            // handle new line segments
+            if (segment.Text == "\n") 
+            {
+                currentPosition.Y += lineSpacing;
+                currentPosition.X = lineStartPos.X;
+                continue;
+            }
 
             // draw border
             if (BorderColor.A > 0)
@@ -154,6 +182,7 @@ public class ColoredText : UIElement
             spriteBatch.DrawString(Font, segment.Text, currentPosition, segmentColor, Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0f);
 
             // move positon for next segment
+            var segmentSize = Font.MeasureString(segment.Text);
             currentPosition.X += segmentSize.X * Scale.X;
         }
     }
