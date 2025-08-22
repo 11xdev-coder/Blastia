@@ -35,7 +35,10 @@ public class Input : UIElement
     /// </summary>
     public bool IsSignEditing { get; set; }
     public int CharacterLimit { get; set; } = 144;
-    public int WrapLength { get; set; } = 36;
+    /// <summary>
+    /// Horizontal line size which when exceeded will start a new line
+    /// </summary>
+    public float WrapTextSize { get; set; } = 120;
     /// <summary>
     /// If true, when <c>WrapLength</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
     /// </summary>
@@ -62,6 +65,8 @@ public class Input : UIElement
     public override void Update()
     {
         base.Update();
+
+        if (Font == null) return;
 
         if (IsSignEditing)
         {
@@ -102,11 +107,19 @@ public class Input : UIElement
                 // wrap text
                 var plain = StringBuilder.ToString();
                 var wrapped = new StringBuilder();
-                for (int i = 0; i < plain.Length; i += WrapLength)
+                var currentWidth = 0f;
+                for (int i = 0; i < plain.Length; i++)
                 {
-                    int len = Math.Min(WrapLength, plain.Length - i);
-                    wrapped.Append(plain.Substring(i, len));
-                    if (i + len < plain.Length) wrapped.Append('\n');
+                    var symbolSize = Font.MeasureString(plain[i].ToString());
+                    
+                    if (currentWidth + symbolSize.X >= WrapTextSize - symbolSize.X - 10) 
+                    {
+                        wrapped.Append('\n');
+                        currentWidth = 0f;
+                    }
+
+                    wrapped.Append(plain[i]);
+                    currentWidth += symbolSize.X;
                 }
                 Text = wrapped.ToString();
                 DrawColor = _normalTextColor;
@@ -163,7 +176,7 @@ public class Input : UIElement
             // cut to fit the limit
             int maxLength = CharacterLimit - StringBuilder.Length; // space to fit in
             if (maxLength > 0)
-                filtered = clipboardText.Substring(0, Math.Min(filtered.Length, maxLength)); // cut the text
+                filtered = filtered.Substring(0, Math.Min(filtered.Length, maxLength)); // cut the text
             else
                 return; // no space left
         }
@@ -242,57 +255,95 @@ public class Input : UIElement
     /// <returns></returns>
     private int GetSafeCursorIndex() => Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
 
+    /// <summary>
+    /// Calculates cursor position depending on <c>_cursorIndex</c> and draws it
+    /// </summary>
+    /// <param name="lines">Splitted text lines</param>
+    /// <param name="lineHeight"></param>
+    private void DrawCursor(SpriteBatch spriteBatch, string[] lines, float lineHeight) 
+    {
+        if (Font == null) return;
+        
+        // draw cursor at end of text
+        if (_shouldDrawCursor && IsFocused)
+        {
+            // calculate cursor position in wrapped text
+            int safeCursorIndex = GetSafeCursorIndex();
+            int acc = 0;
+            int lineIdx = 0;
+            foreach (var ln in lines)
+            {
+                if (safeCursorIndex <= acc + ln.Length)
+                {
+                    int posInLine = safeCursorIndex - acc;
+                    var substr = ln[..Math.Min(posInLine, ln.Length)];
+                    var size = Font.MeasureString(substr) * Scale;
+                    var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIdx * lineHeight);
+                    var rect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, CursorWidth, CursorHeight);
+                    spriteBatch.Draw(BlastiaGame.WhitePixel, rect, CursorColor * Alpha);
+                    break;
+                }
+                acc += ln.Length;
+                lineIdx++;
+            }
+        }
+    }
+
     public override void Draw(SpriteBatch spriteBatch)
     {
         if (IsSignEditing)
         {
             if (Font == null || Text == null) return;
             
+            var lines = Text.Split('\n');
+            float lineHeight = Font.LineSpacing * Scale.Y;
+            
+            // imitate moving text to the left instead of starting new line
             if (MoveInsteadOfWrapping) 
             {
-                // draw from StringBuilder.Length - WrapLength (but clamp to 0)
-                var start = Math.Max(StringBuilder.Length - WrapLength, 0);
-                var length = Math.Min(WrapLength, StringBuilder.Length);
-
                 var safeText = GetSafeText();
-                var substring = safeText.Substring(start, length);
+                var start = 0;
+                
+                if (StringBuilder.Length > 0) 
+                {
+                    // binary serach to earliest start
+                    var low = 0;
+                    var high = StringBuilder.Length;
+                    
+                    while (low <= high) 
+                    {
+                        var mid = (low + high) / 2;
+                        var substring = safeText.Substring(mid); // from mid to end
+                        var textWidth = Font.MeasureString(substring);
+                        
+                        // this start works, try finding earlier one
+                        if (textWidth.X <= WrapTextSize) 
+                        {  
+                            start = mid;
+                            high = mid - 1;                            
+                        }
+                        else // doesnt work, try later position 
+                        {
+                            low = mid + 1;
+                        }
+                    }
+                }
 
+                var displayText = safeText.Substring(start);
                 var pos = new Vector2(Bounds.Left, Bounds.Top);
-                base.Draw(spriteBatch, pos, substring);
+                base.Draw(spriteBatch, pos, displayText); // draw text
+                DrawCursor(spriteBatch, lines, lineHeight); // draw cursor before exiting
                 return;
             }
             
-            var lines = Text.Split('\n');
-            float lineHeight = Font.LineSpacing * Scale.Y;
+            
             // draw each line left-aligned
             for (int i = 0; i < lines.Length; i++)
             {
                 var pos = new Vector2(Bounds.Left, Bounds.Top + i * lineHeight);
                 base.Draw(spriteBatch, pos, lines[i]);
             }
-            // draw cursor at end of text
-            if (_shouldDrawCursor && IsFocused)
-            {
-                // calculate cursor position in wrapped text
-                int safeCursorIndex = GetSafeCursorIndex();
-                int acc = 0;
-                int lineIdx = 0;
-                foreach (var ln in lines)
-                {
-                    if (safeCursorIndex <= acc + ln.Length)
-                    {
-                        int posInLine = safeCursorIndex - acc;
-                        var substr = ln[..Math.Min(posInLine, ln.Length)];
-                        var size = Font.MeasureString(substr) * Scale;
-                        var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIdx * lineHeight);
-                        var rect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, CursorWidth, CursorHeight);
-                        spriteBatch.Draw(BlastiaGame.WhitePixel, rect, CursorColor * Alpha);
-                        break;
-                    }
-                    acc += ln.Length;
-                    lineIdx++;
-                }
-            }
+            DrawCursor(spriteBatch, lines, lineHeight);
         }
         else
         {
@@ -314,18 +365,40 @@ public class Input : UIElement
 
     public override void UpdateBounds()
     {
-        if (IsSignEditing && Font != null)
+        if (IsSignEditing && Font != null && Text != null)
         {
-            // fixed hitbox width based on wrap length, supports placeholder click
-            var charSize = Font.MeasureString("W") * Scale;
-            float width = charSize.X * WrapLength;
-            float lineHeight = Font.LineSpacing * Scale.Y;
-            // if MoveInsteadOfWrapping is true, only 1 line is max
-            int maxLines = MoveInsteadOfWrapping ? 1 : (CharacterLimit + WrapLength - 1) / WrapLength;
-            float height = lineHeight * maxLines;
+            if (MoveInsteadOfWrapping) 
+            {
+                // single line mode -> width is wrap length and height is 1 line
+                // entered text width or wrap size
+                var width = Math.Min(WrapTextSize, Font.MeasureString(GetSafeText()).X * Scale.X);
+                var height = Font.LineSpacing * Scale.Y;
+                UpdateBoundsBase(width, height);
+            }
+            else 
+            {
+                // empty string -> 1f size
+                if (string.IsNullOrEmpty(Text)) 
+                {
+                    UpdateBoundsBase(1f, 1f);
+                    return;
+                }
+                
+                // get max possible width out of all lines
+                var lines = Text.Split('\n');
+                var maxWidth = 0f;
+                
+                foreach (var line in lines) 
+                {
+                    var lineWidth = Font.MeasureString(line);
+                    maxWidth = Math.Max(maxWidth, lineWidth.X);
+                }
+                
+                float height = Font.LineSpacing * lines.Length * Scale.Y;
 
-            // apply alignment
-            UpdateBoundsBase(width, height);
+                // apply alignment
+                UpdateBoundsBase(maxWidth, height);
+            }           
         }
         else
         {

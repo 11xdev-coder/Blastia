@@ -56,7 +56,7 @@ public class ColoredText : UIElement
     /// </summary>
     /// <param name="text"></param>
     /// <param name="color"></param>
-    /// <param name="clearText">If not null, action that will be executed after adding this segment</param>
+    /// <param name="clearText">If specified, action that will be executed after adding this segment</param>
     private void AddTextSegment(string text, Color color, Action? clearText = null) 
     {
         if (string.IsNullOrEmpty(text)) return;
@@ -102,8 +102,8 @@ public class ColoredText : UIElement
             
             // check this symbol size            
             var symbolSize = Font.MeasureString(text[i].ToString());
-            // if adding this char will exceed threshold
-            if (currentWidth + symbolSize.X >= _wrapThreshold - 5) 
+            // at least one more same char should fit
+            if (currentWidth + symbolSize.X >= _wrapThreshold - symbolSize.X - 10) 
             {
                 // add segment before wrapping
                 AddTextSegment(currentText, currentColor, () => currentText = "");
@@ -157,9 +157,7 @@ public class ColoredText : UIElement
         var lineSpacing = Font.LineSpacing * Scale.Y;
 
         foreach (var segment in _segments)
-        {
-            var segmentColor = segment.Color * Alpha;
-            
+        {            
             // handle new line segments
             if (segment.Text == "\n") 
             {
@@ -168,18 +166,7 @@ public class ColoredText : UIElement
                 continue;
             }
 
-            // draw border
-            if (BorderColor.A > 0)
-            {
-                foreach (var offset in _borderOffsets)
-                {
-                    spriteBatch.DrawString(Font, segment.Text, currentPosition + offset * BorderOffsetFactor, BorderColor * Alpha,
-                        Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0f);
-                }
-            }
-
-            // draw text segment
-            spriteBatch.DrawString(Font, segment.Text, currentPosition, segmentColor, Rotation, Vector2.Zero, Scale, SpriteEffects.None, 0f);
+            base.Draw(spriteBatch, currentPosition, segment.Text, default, segment.Color);
 
             // move positon for next segment
             var segmentSize = Font.MeasureString(segment.Text);
