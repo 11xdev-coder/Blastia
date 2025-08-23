@@ -38,7 +38,7 @@ public class Input : UIElement
     /// <summary>
     /// Horizontal line size which when exceeded will start a new line
     /// </summary>
-    public float WrapTextSize { get; set; } = 120;
+    public float WrapTextSize { get; set; } = 1200;
     /// <summary>
     /// If true, when <c>WrapLength</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
     /// </summary>
@@ -112,7 +112,7 @@ public class Input : UIElement
                 {
                     var symbolSize = Font.MeasureString(plain[i].ToString());
                     
-                    if (currentWidth + symbolSize.X >= WrapTextSize - symbolSize.X - 10) 
+                    if (currentWidth + symbolSize.X >= WrapTextSize - symbolSize.X - 10 && !MoveInsteadOfWrapping) 
                     {
                         wrapped.Append('\n');
                         currentWidth = 0f;
@@ -260,22 +260,20 @@ public class Input : UIElement
     /// </summary>
     /// <param name="lines">Splitted text lines</param>
     /// <param name="lineHeight"></param>
-    private void DrawCursor(SpriteBatch spriteBatch, string[] lines, float lineHeight) 
+    private void DrawCursor(SpriteBatch spriteBatch, int cursorIndex, string[] lines, float lineHeight) 
     {
         if (Font == null) return;
         
         // draw cursor at end of text
         if (_shouldDrawCursor && IsFocused)
         {
-            // calculate cursor position in wrapped text
-            int safeCursorIndex = GetSafeCursorIndex();
             int acc = 0;
             int lineIdx = 0;
             foreach (var ln in lines)
             {
-                if (safeCursorIndex <= acc + ln.Length)
+                if (cursorIndex <= acc + ln.Length)
                 {
-                    int posInLine = safeCursorIndex - acc;
+                    int posInLine = cursorIndex - acc;
                     var substr = ln[..Math.Min(posInLine, ln.Length)];
                     var size = Font.MeasureString(substr) * Scale;
                     var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIdx * lineHeight);
@@ -304,7 +302,8 @@ public class Input : UIElement
                 var safeText = GetSafeText();
                 var start = 0;
                 
-                if (StringBuilder.Length > 0) 
+                // exceeded wrap size
+                if (StringBuilder.Length > 0 && Font.MeasureString(safeText).X >= WrapTextSize) 
                 {
                     // binary serach to earliest start
                     var low = 0;
@@ -328,11 +327,17 @@ public class Input : UIElement
                         }
                     }
                 }
+                // start from _cursorIndex if we are scrolling before start
+                start = Math.Min(_cursorIndex, start);
 
+                // get cursor index relative to this substring
                 var displayText = safeText.Substring(start);
+                var displayLines = displayText.Split('\n');
+                var cursorIndex = Math.Clamp(_cursorIndex - start, 0, displayText.Length);
+                
                 var pos = new Vector2(Bounds.Left, Bounds.Top);
                 base.Draw(spriteBatch, pos, displayText); // draw text
-                DrawCursor(spriteBatch, lines, lineHeight); // draw cursor before exiting
+                DrawCursor(spriteBatch, cursorIndex, displayLines, lineHeight); // draw cursor before exiting
                 return;
             }
             
@@ -343,7 +348,7 @@ public class Input : UIElement
                 var pos = new Vector2(Bounds.Left, Bounds.Top + i * lineHeight);
                 base.Draw(spriteBatch, pos, lines[i]);
             }
-            DrawCursor(spriteBatch, lines, lineHeight);
+            DrawCursor(spriteBatch, GetSafeCursorIndex(), lines, lineHeight);
         }
         else
         {

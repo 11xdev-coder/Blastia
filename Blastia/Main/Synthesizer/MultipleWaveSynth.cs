@@ -6,7 +6,6 @@ namespace Blastia.Main.Synthesizer;
 public class MultipleWaveSynth(float sampleRate = 44100) : ISampleProvider
 {
     private float _sampleRate = sampleRate;
-    private double _phase;
     public List<WaveData> Waves = [];
     private Dictionary<int, double> _wavePhases = [];
 

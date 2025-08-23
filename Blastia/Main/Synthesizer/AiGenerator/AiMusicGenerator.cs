@@ -3929,7 +3929,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
                 "Blastia AI", 
                 $"{track.Name}.{format}");
                 
-            Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath) ?? "");
             
             // Create an in-memory audio renderer
             WaveFormat waveFormat = new WaveFormat(48000, 16, 2);

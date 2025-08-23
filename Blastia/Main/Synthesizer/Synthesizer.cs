@@ -28,9 +28,9 @@ public class Synthesizer
     private static float[] _waveFormPoints = new float[600];
     
     // audio
-    private static MultipleWaveSynth _synth;
+    private static MultipleWaveSynth? _synth;
     private static List<WaveData> _waves = [];
-    private static WaveOutEvent _waveOut;
+    private static WaveOutEvent? _waveOut;
     private static uint _time;
     private static IntPtr _fontTexture;
     private static double _timeWindow = 0.015; // 15ms window to visualize
@@ -136,8 +136,8 @@ public class Synthesizer
     {
         AiMusicGenerator.Cleanup();
         
-        _waveOut.Stop();
-        _waveOut.Dispose();
+        _waveOut?.Stop();
+        _waveOut?.Dispose();
         
         if (_fontTexture != IntPtr.Zero)
         {
@@ -726,14 +726,14 @@ public class Synthesizer
             {
                 // Start playing and trigger Note On
                 _isPlaying = true;
-                _waveOut.Play();
-                _synth.NoteOn();
+                _waveOut?.Play();
+                _synth?.NoteOn();
             }
             else
             {
                 // Trigger Note Off but keep audio device running
                 _isPlaying = false;
-                _synth.NoteOff();
+                _synth?.NoteOff();
             }
         }
         
@@ -748,11 +748,14 @@ public class Synthesizer
         
         ImGui.EndGroup();
 
-        bool useAntiAliasing = _synth.UseAntiAliasing;
-        if (ImGui.Checkbox("Use anti-aliasing", ref useAntiAliasing))
+        if (_synth != null) 
         {
-            _synth.UseAntiAliasing = useAntiAliasing;
-        }
+            bool useAntiAliasing = _synth.UseAntiAliasing;
+            if (ImGui.Checkbox("Use anti-aliasing", ref useAntiAliasing))
+            {
+                _synth.UseAntiAliasing = useAntiAliasing;
+            }
+        }       
         
         // Update synth if any parameters changed
         if (wavesChanged)
@@ -943,6 +946,8 @@ public class Synthesizer
     
     private static void UpdateSynthesizer()
     {
+        if (_synth == null) return;
+        
         while (_synth.Waves.Count < _waves.Count)
         {
             // Add any missing waves
@@ -986,7 +991,7 @@ public class Synthesizer
                 // Calculate phase based on frequency and time
                 double phase = 2 * Math.PI * wave.Frequency * timePosition;
                 
-                sample += _synth.GenerateWaveSample(phase, wave.Frequency, wave.Amplitude, wave.WaveType);
+                sample += (float)(_synth?.GenerateWaveSample(phase, wave.Frequency, wave.Amplitude, wave.WaveType) ?? 0f);
             }
             
             _waveFormPoints[i] = sample;

@@ -29,7 +29,7 @@ public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, 
             VAlign = 0.98f,
             IsSignEditing = true,
             CharacterLimit = 999,
-            WrapTextSize = 120,
+            WrapTextSize = 1800,
             MoveInsteadOfWrapping = true
         };
         Elements.Add(ChatInput);
