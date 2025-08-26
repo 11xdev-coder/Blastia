@@ -43,6 +43,14 @@ public class Input : UIElement
     /// If true, when <c>WrapLength</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
     /// </summary>
     public bool MoveInsteadOfWrapping { get; set; }
+    /// <summary>
+    /// Used when <c>MoveInsteadOfWrapping</c> is true for better horizontal cursor scrolling
+    /// </summary>
+    private int _cachedDisplayStart;
+    /// <summary>
+    /// Used when <c>MoveInsteadOfWrapping</c> is true. If this is true, will recalculate the start of display text (visible part not whole text)
+    /// </summary>
+    private bool _shouldRecalcOptimalStart;
 
     private bool _ctrlVPressedLastFrame;
 
@@ -73,6 +81,9 @@ public class Input : UIElement
             // clamp cursor index to valid range
             _cursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
         }
+
+        var previousLength = StringBuilder.Length;
+        var previousCursorIndex = _cursorIndex;
 
         // handle input if focused
         if (IsFocused)
@@ -124,19 +135,23 @@ public class Input : UIElement
                 Text = wrapped.ToString();
                 DrawColor = _normalTextColor;
             }
+            
+            // optimal start recalc
+            if (MoveInsteadOfWrapping) 
+            {
+                var charsAdded = StringBuilder.Length - previousLength;
+                if (charsAdded > 0 && previousLength == previousCursorIndex) // added text at the end
+                {
+                    // just recalculate start
+                    _shouldRecalcOptimalStart = true;
+                }
+            }
         }
         else
         {
-            if (!IsFocused && StringBuilder.Length <= 0)
-            {
-                Text = DefaultText;
-                DrawColor = _defaultTextColor;
-            }
-            else
-            {
-                Text = StringBuilder.ToString();
-                DrawColor = _normalTextColor;
-            }
+            var setDefaultText = !IsFocused && StringBuilder.Length <= 0;
+            Text = setDefaultText ? DefaultText : StringBuilder.ToString();
+            DrawColor = setDefaultText ? _defaultTextColor : _normalTextColor;
         }
 
         // blink if cursor is visible + focused
@@ -218,11 +233,15 @@ public class Input : UIElement
     private void LeftArrowPress()
     {
         if (_cursorIndex > 0) _cursorIndex -= 1;
+        if (_cursorIndex < _cachedDisplayStart) _cachedDisplayStart = _cursorIndex;
     }
     
     private void RightArrowPress()
     {
         if (_cursorIndex < StringBuilder.Length) _cursorIndex += 1;
+        
+        var displayLength = GetSafeText().Substring(_cachedDisplayStart).Length;
+        if (_cursorIndex > displayLength) _cachedDisplayStart = _cursorIndex - displayLength; 
     }
 
     private void Blink()
@@ -300,36 +319,52 @@ public class Input : UIElement
             if (MoveInsteadOfWrapping) 
             {
                 var safeText = GetSafeText();
-                var start = 0;
+                var start = _cachedDisplayStart;
                 
                 // exceeded wrap size
                 if (StringBuilder.Length > 0 && Font.MeasureString(safeText).X >= WrapTextSize) 
                 {
-                    // binary serach to earliest start
-                    var low = 0;
-                    var high = StringBuilder.Length;
-                    
-                    while (low <= high) 
+                    // only if we need to recalc
+                    if (_shouldRecalcOptimalStart) 
                     {
-                        var mid = (low + high) / 2;
-                        var substring = safeText.Substring(mid); // from mid to end
-                        var textWidth = Font.MeasureString(substring);
+                        // binary serach to earliest start
+                        var low = 0;
+                        var high = StringBuilder.Length;
                         
-                        // this start works, try finding earlier one
-                        if (textWidth.X <= WrapTextSize) 
-                        {  
-                            start = mid;
-                            high = mid - 1;                            
-                        }
-                        else // doesnt work, try later position 
+                        while (low <= high) 
                         {
-                            low = mid + 1;
+                            var mid = (low + high) / 2;
+                            var substring = safeText.Substring(mid); // from mid to end
+                            var textWidth = Font.MeasureString(substring);
+                            
+                            // this start works, try finding earlier one
+                            if (textWidth.X <= WrapTextSize) 
+                            {  
+                                _cachedDisplayStart = mid;
+                                high = mid - 1;                            
+                            }
+                            else // doesnt work, try later position 
+                            {
+                                low = mid + 1;
+                            }
                         }
+
+                        _cachedDisplayStart = start; // update cached (but only when recalculating)
+                        _shouldRecalcOptimalStart = false;
+                    }
+                    else 
+                    {
+                        // dont need recalc
+                        start = _cachedDisplayStart; // else use cached value (when text is typed in the middle)
                     }
                 }
-                // start from _cursorIndex if we are scrolling before start
-                start = Math.Min(_cursorIndex, start);
-
+                else 
+                {
+                    // entire text fits
+                    start = 0;
+                    _cachedDisplayStart = 0;
+                }
+                
                 // get cursor index relative to this substring
                 var displayText = safeText.Substring(start);
                 var displayLines = displayText.Split('\n');
