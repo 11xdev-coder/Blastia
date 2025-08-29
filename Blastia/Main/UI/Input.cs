@@ -239,9 +239,9 @@ public class Input : UIElement
     private void RightArrowPress()
     {
         if (_cursorIndex < StringBuilder.Length) _cursorIndex += 1;
-        
-        var displayLength = GetSafeText().Substring(_cachedDisplayStart).Length;
-        if (_cursorIndex > displayLength) _cachedDisplayStart = _cursorIndex - displayLength; 
+
+        var displayText = GetDisplayText(GetSafeText(), _cachedDisplayStart);
+        if (_cursorIndex > displayText.Length) _cachedDisplayStart = _cursorIndex - displayText.Length; 
     }
 
     private void Blink()
@@ -319,7 +319,7 @@ public class Input : UIElement
             if (MoveInsteadOfWrapping) 
             {
                 var safeText = GetSafeText();
-                var start = _cachedDisplayStart;
+                var start = 0;
                 
                 // exceeded wrap size
                 if (StringBuilder.Length > 0 && Font.MeasureString(safeText).X >= WrapTextSize) 
@@ -340,7 +340,7 @@ public class Input : UIElement
                             // this start works, try finding earlier one
                             if (textWidth.X <= WrapTextSize) 
                             {  
-                                _cachedDisplayStart = mid;
+                                start = mid;
                                 high = mid - 1;                            
                             }
                             else // doesnt work, try later position 
@@ -364,9 +364,9 @@ public class Input : UIElement
                     start = 0;
                     _cachedDisplayStart = 0;
                 }
-                
+
                 // get cursor index relative to this substring
-                var displayText = safeText.Substring(start);
+                var displayText = GetDisplayText(safeText, start);;
                 var displayLines = displayText.Split('\n');
                 var cursorIndex = Math.Clamp(_cursorIndex - start, 0, displayText.Length);
                 
@@ -403,6 +403,30 @@ public class Input : UIElement
         }
     }
 
+    /// <summary>
+    /// Returns a substring from <c>originalText</c> starting from <c>start</c> that fits into <c>WrapTextSize</c>
+    /// </summary>
+    private string GetDisplayText(string originalText, int start)
+    {
+        if (Font == null) return "";
+        
+        for (int i = start + 1; i <= originalText.Length; i++) 
+        {
+            var substring = originalText.Substring(start, i - start);
+            var size = Font.MeasureString(substring);
+            
+            if (size.X > WrapTextSize) 
+            {
+                // dont go before start + 1
+                i = Math.Max(start + 1, i - 1);
+                return originalText.Substring(start, i - start);
+            }
+        }
+
+        // whole text fits
+        return originalText.Substring(start);
+    }
+    
     public override void UpdateBounds()
     {
         if (IsSignEditing && Font != null && Text != null)
@@ -411,8 +435,8 @@ public class Input : UIElement
             {
                 // single line mode -> width is wrap length and height is 1 line
                 // entered text width or wrap size
-                var width = Math.Min(WrapTextSize, Font.MeasureString(GetSafeText()).X * Scale.X);
-                var height = Font.LineSpacing * Scale.Y;
+                var width = Math.Min(WrapTextSize, Font.MeasureString(GetSafeText()).X);
+                var height = Font.LineSpacing;
                 UpdateBoundsBase(width, height);
             }
             else 
@@ -433,8 +457,8 @@ public class Input : UIElement
                     var lineWidth = Font.MeasureString(line);
                     maxWidth = Math.Max(maxWidth, lineWidth.X);
                 }
-                
-                float height = Font.LineSpacing * lines.Length * Scale.Y;
+
+                float height = Font.LineSpacing * lines.Length;
 
                 // apply alignment
                 UpdateBoundsBase(maxWidth, height);
