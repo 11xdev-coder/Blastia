@@ -135,15 +135,29 @@ public class Input : UIElement
                 Text = wrapped.ToString();
                 DrawColor = _normalTextColor;
             }
-            
+
             // optimal start recalc
-            if (MoveInsteadOfWrapping) 
+            var safeText = GetSafeText();
+            if (MoveInsteadOfWrapping && Font.MeasureString(safeText).X >= WrapTextSize) 
             {
                 var charsAdded = StringBuilder.Length - previousLength;
                 if (charsAdded > 0 && previousLength == previousCursorIndex) // added text at the end
                 {
                     // just recalculate start
                     _shouldRecalcOptimalStart = true;
+                }
+                else if (charsAdded > 0) // in the middle + exceed wrap size
+                {
+                    // if cursor exceeds display text length
+                    var displayText = GetDisplayText(safeText, _cachedDisplayStart);
+                    var cursorRelativeToStart = _cursorIndex - _cachedDisplayStart;
+                    
+                    if (cursorRelativeToStart > displayText.Length)
+                    {
+                        // how many characters dont fit
+                        var charactersOverflow = cursorRelativeToStart - displayText.Length;
+                        _cachedDisplayStart += charactersOverflow;
+                    }
                 }
             }
         }

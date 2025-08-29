@@ -4090,7 +4090,7 @@ namespace Blastia.Main.Synthesizer.AiGenerator
         public bool[] CrashSteps { get; set; } = [];
         public bool[] TomSteps { get; set; } = [];
         public bool[] PercussionSteps { get; set; } = [];
-        public int[,] Velocities { get; set; } // [step, instrument]
+        public int[,] Velocities { get; set; } = new int[,] {}; // [step, instrument]
     }
 
     public class ArpeggioPattern : Pattern
