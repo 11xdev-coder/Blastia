@@ -21,10 +21,9 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
         };
         Elements.Add(background);
 
-        SignText = new Input(Vector2.Zero, Font, true)
+        // use pos instead of alignment for keeping in the same place
+        SignText = new Input(new Vector2(710, 270), Font, true)
         {
-            HAlign = 0.62f,
-            VAlign = 0.28f,
             IsSignEditing = true,
             Scale = new Vector2(0.8f, 0.8f)
         };

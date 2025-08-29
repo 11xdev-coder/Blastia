@@ -34,11 +34,11 @@ public class Input : UIElement
     /// Allows multi-line input and doesn't try to center this element (keeps in one place)
     /// </summary>
     public bool IsSignEditing { get; set; }
-    public int CharacterLimit { get; set; } = 144;
+    public int CharacterLimit { get; set; } = 280;
     /// <summary>
     /// Horizontal line size which when exceeded will start a new line
     /// </summary>
-    public float WrapTextSize { get; set; } = 1200;
+    public float WrapTextSize { get; set; } = 650;
     /// <summary>
     /// If true, when <c>WrapLength</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
     /// </summary>
@@ -84,6 +84,22 @@ public class Input : UIElement
 
         var previousLength = StringBuilder.Length;
         var previousCursorIndex = _cursorIndex;
+        
+        // Ctrl V first
+		var ctrlPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.LeftControl) || BlastiaGame.KeyboardState.IsKeyDown(Keys.RightControl);
+		var vPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.V);
+		if (ctrlPressed && vPressed) 
+		{
+			if (!_ctrlVPressedLastFrame) 
+			{
+			    _ctrlVPressedLastFrame = true;
+                PasteText();
+			}
+		}
+		else 
+		{
+			_ctrlVPressedLastFrame = false;
+		}
 
         // handle input if focused
         if (IsFocused)
@@ -176,22 +192,6 @@ public class Input : UIElement
         {
             UpdateBounds();
         }
-        
-        // Ctrl V
-		var ctrlPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.LeftControl) || BlastiaGame.KeyboardState.IsKeyDown(Keys.RightControl);
-		var vPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.V);
-		if (ctrlPressed && vPressed) 
-		{
-			if (!_ctrlVPressedLastFrame) 
-			{
-			    _ctrlVPressedLastFrame = true;
-                PasteText();
-			}
-		}
-		else 
-		{
-			_ctrlVPressedLastFrame = false;
-		}
     }
     
     private void PasteText() 
