@@ -175,6 +175,7 @@ public class ColoredText : UIElement
         float maxWidth = 0f;
         float currentWidth = 0f;
         float currentHeight = Font.LineSpacing * Scale.Y; // at least one line
+        var gifIndex = 0;
         
         foreach (var segment in _segments) 
         {
@@ -188,6 +189,14 @@ public class ColoredText : UIElement
             {
                 // add segment width
                 currentWidth += Font.MeasureString(segment.Text).X * Scale.X;
+            }
+            
+            // if this is a gif
+            if (segment.Text == " "  && gifIndex < _gifSegments.Count)  
+            {
+                // add its height
+                var gif = _gifSegments[gifIndex].Gif;
+                if (gif.Texture != null) currentHeight += gif.Texture.Height;
             }
         }
 
