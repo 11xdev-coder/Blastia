@@ -9,9 +9,15 @@ public struct TextSegment
     public Color Color;
 }
 
+public struct GifSegment 
+{
+    public AnimatedGif Gif;
+}
+
 public class ColoredText : UIElement
 {
     private List<TextSegment> _segments = [];
+    private List<GifSegment> _gifSegments = [];
     private static readonly Dictionary<char, Color> _colorCodes = new()
     {
         {'0', Color.Black},
@@ -83,6 +89,37 @@ public class ColoredText : UIElement
         
         for (int i = 0; i < text.Length; i++) 
         {
+            // check for gif
+            // gif: can fit
+            if (text[i] == '[' && i + 5 < text.Length && text.Substring(i, 5) == "[gif:") 
+            {
+                var closingBracketIndex = text.IndexOf(']', i);
+                if (closingBracketIndex != -1) 
+                {
+                    var gifTag = text.Substring(i, closingBracketIndex - i + 1);
+                    if (gifTag.StartsWith("[gif:") && gifTag.EndsWith("]")) 
+                    {
+                        // add text segment before GIF
+                        AddTextSegment(currentText, currentColor, () => currentText = "");
+
+                        var gifUrl = gifTag.Substring(5, gifTag.Length - 6); // remove [gif: and ]
+                        var animatedGif = new AnimatedGif(Vector2.Zero, gifUrl);
+
+                        _gifSegments.Add(new GifSegment()
+                        {
+                            Gif = animatedGif
+                        });
+
+                        // add placeholder text
+                        AddTextSegment(" ", currentColor);
+
+                        // skip to the end
+                        i = closingBracketIndex;
+                        continue;
+                    }
+                }
+            }
+            
             // i + 1 wont be out of bounds
             if (i + 1 < text.Length && text[i] == _colorCodeSymbol) 
             {                    
@@ -155,6 +192,7 @@ public class ColoredText : UIElement
         var currentPosition = new Vector2(Bounds.X, Bounds.Y);
         var lineStartPos = currentPosition;
         var lineSpacing = Font.LineSpacing * Scale.Y;
+        var gifIndex = 0;
 
         foreach (var segment in _segments)
         {            
@@ -163,6 +201,23 @@ public class ColoredText : UIElement
             {
                 currentPosition.Y += lineSpacing;
                 currentPosition.X = lineStartPos.X;
+                continue;
+            }
+            
+            // check if this is a gif placeholder
+            if (segment.Text == " "  && gifIndex < _gifSegments.Count) 
+            {
+                var gifSegment = _gifSegments[gifIndex];
+                gifSegment.Gif.Position = currentPosition;
+                gifSegment.Gif.Draw(spriteBatch);
+
+                // move text
+                if (gifSegment.Gif.Texture != null) 
+                {
+                    currentPosition.X += gifSegment.Gif.Texture.Width * gifSegment.Gif.Scale.X;
+                }
+
+                gifIndex += 1;
                 continue;
             }
 
