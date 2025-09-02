@@ -157,6 +157,17 @@ public class ColoredText : UIElement
         AddTextSegment(currentText, currentColor);
     }
 
+    public override void Update()
+    {
+        base.Update();
+        
+        foreach (var gif in _gifSegments) 
+        {
+            gif.Gif.Update();
+            gif.Gif.Alpha = Alpha; // copy alpha
+        }
+    }
+
     public override void UpdateBounds()
     {
         if (Font == null || _segments.Count == 0) return;
