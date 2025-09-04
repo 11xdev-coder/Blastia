@@ -177,6 +177,7 @@ public class ColoredText : UIElement
         float currentHeight = Font.LineSpacing * Scale.Y; // at least one line
         var gifIndex = 0;
         
+        // TODO: dont download the gif, immediatly push the message up, multi-line support
         foreach (var segment in _segments) 
         {
             if (segment.Text == "\n") 

@@ -58,15 +58,12 @@ public static class Util
             if (_loadedGifs.TryGetValue(url, out var loadedGif))
                 return loadedGif;
 
-            Console.WriteLine($"Downloading GIF from URL: {url}");
+            Console.WriteLine($"Retrieving GIF from URL: {url}");
 
             // download
-            byte[] gifData = await _httpClient.GetByteArrayAsync(url);
-            // save
-            var gifPath = Path.Combine(_gifSavePath, $"gif_{Guid.NewGuid()}.gif");
-            await File.WriteAllBytesAsync(gifPath, gifData);
+            byte[] gifData = await _httpClient.GetByteArrayAsync(url);            
             // extract frames
-            var result = ProcessGif(_graphicsDeviceFactory(), gifPath);
+            var result = ProcessGif(_graphicsDeviceFactory(), gifData);
             
             if (result.HasValue) 
             {
@@ -77,16 +74,16 @@ public static class Util
         }
         catch (Exception ex) 
         {
-            Console.WriteLine($"Error downloading GIF: {ex.Message}");
+            Console.WriteLine($"Error retrieving GIF: {ex.Message}");
             return null;
         }
     }
     
-    private static GifData? ProcessGif(GraphicsDevice graphicsDevice, string gifPath) 
+    private static GifData? ProcessGif(GraphicsDevice graphicsDevice, byte[] bytes) 
     {
         try 
         {
-            using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(gifPath);
+            using var image = SixLabors.ImageSharp.Image.Load<Rgba32>(bytes);
             var frames = new List<Texture2D>();
             var durations = new List<float>();
 
