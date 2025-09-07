@@ -24,6 +24,10 @@ public class ScrollableArea : UIElement
 
     public int ViewportWidth;
     public int ViewportHeight;
+    /// <summary>
+    /// True = scroll doesn't work
+    /// </summary>
+    public bool ScrollLocked;
 
     /// <summary>
     /// Number of pixels scrolled per wheel tick
@@ -80,38 +84,40 @@ public class ScrollableArea : UIElement
     {
         base.Update();
         
-        _currentSpacing = 0; // reset spacing
-        float delta = BlastiaGame.ScrollWheelDelta * ScrollSpeed;
-
-        var totalContentHeight = GetTotalContentHeight();
-        
-        // only apply scroll limits if content overflows viewport
-        if (totalContentHeight > ViewportHeight)
+        if (!ScrollLocked) 
         {
-            var scrollingUp = delta > 0;
-            var scrollingDown = delta < 0;
+            _currentSpacing = 0; // reset spacing
+            float delta = BlastiaGame.ScrollWheelDelta * ScrollSpeed;
+
+            var totalContentHeight = GetTotalContentHeight();
             
-            // calculate scroll limits
-            float topLimit = Bounds.Top; // first element's top can go to viewport top
-            float bottomLimit = GetBottomLimit(totalContentHeight);
-            
-            // check bounds and apply scroll
-            float newScrollOffset = _scrolledOffset + delta;
-            
-            if (scrollingDown && newScrollOffset < bottomLimit)
+            // only apply scroll limits if content overflows viewport
+            if (totalContentHeight > ViewportHeight)
             {
-                _scrolledOffset = bottomLimit; // clamp to bottom limit
+                var scrollingUp = delta > 0;
+                var scrollingDown = delta < 0;
+                
+                // calculate scroll limits
+                float topLimit = Bounds.Top; // first element's top can go to viewport top
+                float bottomLimit = GetBottomLimit(totalContentHeight);
+                
+                // check bounds and apply scroll
+                float newScrollOffset = _scrolledOffset + delta;
+                
+                if (scrollingDown && newScrollOffset < bottomLimit)
+                {
+                    _scrolledOffset = bottomLimit; // clamp to bottom limit
+                }
+                else if (scrollingUp && newScrollOffset > topLimit)
+                {
+                    _scrolledOffset = topLimit; // clamp to top limit
+                }
+                else
+                {
+                    _scrolledOffset = newScrollOffset; // normal scroll
+                }
             }
-            else if (scrollingUp && newScrollOffset > topLimit)
-            {
-                _scrolledOffset = topLimit; // clamp to top limit
-            }
-            else
-            {
-                _scrolledOffset = newScrollOffset; // normal scroll
-            }
-        }
-    
+        }   
         
         // update every child
         foreach (var child in _children)

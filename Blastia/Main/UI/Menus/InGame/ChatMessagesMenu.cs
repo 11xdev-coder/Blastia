@@ -13,6 +13,10 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
     private bool _isFading;
     private float _startFadingTimer;
     private const float SecondsToStartFadingOut = 4; // 4 seconds
+    /// <summary>
+    /// Won't hide messages if true
+    /// </summary>
+    private bool _keepForever;
     
     protected override void AddElements()
     {
@@ -35,6 +39,12 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
 
         // scroll to bottom
         _chat.ScrollToBottom();
+        RevealMessages();
+    }
+    
+    public void RevealMessages() 
+    {
+        if (_chat == null) return;
         
         // setup timer
         _startFadingTimer = SecondsToStartFadingOut;
@@ -50,8 +60,15 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
     public override void Update()
     {
         base.Update();
+        
+        if (_chat == null || _chat.Children.Count <= 0) return;
+        
+        // if messages are hidden -> block scrolling
+        if (_chat.Children[0].Alpha == 0f) _chat.ScrollLocked = true;
+        else _chat.ScrollLocked = false;
 
-        if (_chat == null) return;
+        // dont hide when chat input is active (typing a message)
+        if (BlastiaGame.ChatInputMenu?.Active == true) return;
         
         var delta = (float)BlastiaGame.GameTimeElapsedSeconds;
         _startFadingTimer -= delta;

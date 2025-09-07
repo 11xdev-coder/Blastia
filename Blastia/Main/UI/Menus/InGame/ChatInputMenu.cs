@@ -62,6 +62,8 @@ public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, 
 
         if (ChatInput == null) return;
         ChatInput.IsFocused = true;
+
+        BlastiaGame.ChatMessagesMenu?.RevealMessages();
     }
     
     private void TurnChatOff() 
