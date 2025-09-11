@@ -71,13 +71,31 @@ public class ScrollableArea : UIElement
     }
 
     public void ClearChildren()
-    {
+    {        
+        foreach (var child in _children)
+        {
+            if (child is ColoredText coloredText)
+            {
+                coloredText.OnAnyGifLoaded -= OnChildGifLoaded;
+            }
+        }
         _children.Clear();
     }
 
     public void AddChild(UIElement child)
     {
         _children.Add(child);
+
+        if (child is ColoredText coloredText)
+            coloredText.OnAnyGifLoaded += OnChildGifLoaded;
+    }
+    
+    /// <summary>
+    /// Called when ColoredText's Gif is just loaded
+    /// </summary>
+    private void OnChildGifLoaded() 
+    {
+        ScrollToBottom();
     }
 
     public override void Update()

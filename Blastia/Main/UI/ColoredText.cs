@@ -56,6 +56,8 @@ public class ColoredText : UIElement
         _wrapThreshold = wrapThreshold == default ? VideoManager.Instance.TargetResolution.X : wrapThreshold;
         ParseColoredText(text);
     }
+
+    public Action? OnAnyGifLoaded;
     
     /// <summary>
     /// 
@@ -104,6 +106,12 @@ public class ColoredText : UIElement
 
                         var gifUrl = gifTag.Substring(5, gifTag.Length - 6); // remove [gif: and ]
                         var animatedGif = new AnimatedGif(Vector2.Zero, gifUrl);
+                        animatedGif.OnGifLoaded += () => 
+                        {
+                            UpdateBounds();
+                            OnAnyGifLoaded?.Invoke();
+                            Console.WriteLine("Gif loaded");
+                        };
 
                         _gifSegments.Add(new GifSegment()
                         {
@@ -160,7 +168,6 @@ public class ColoredText : UIElement
     public override void Update()
     {
         base.Update();
-        
         foreach (var gif in _gifSegments) 
         {
             gif.Gif.Update();
@@ -177,7 +184,7 @@ public class ColoredText : UIElement
         float currentHeight = Font.LineSpacing * Scale.Y; // at least one line
         var gifIndex = 0;
         
-        // TODO: immediatly push the message up, multi-line support
+        // TODO: multi-line support
         foreach (var segment in _segments) 
         {
             if (segment.Text == "\n") 

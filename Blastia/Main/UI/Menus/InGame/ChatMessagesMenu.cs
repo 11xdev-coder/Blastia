@@ -13,11 +13,6 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
     private bool _isFading;
     private float _startFadingTimer;
     private const float SecondsToStartFadingOut = 4; // 4 seconds
-    /// <summary>
-    /// Won't hide messages if true
-    /// </summary>
-    private bool _keepForever;
-    
     protected override void AddElements()
     {
         Viewport chatViewport = new Viewport(2000, 200);

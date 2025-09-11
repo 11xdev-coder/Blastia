@@ -13,6 +13,9 @@ public class AnimatedGif : UIElement
     private int _currentFrame;
     private float _frameTimer;
     private bool _hasLoadedGif;
+
+    public Action? OnGifLoaded;
+    
     public AnimatedGif(Vector2 position, string url, bool loop = true) : base(position, BlastiaGame.InvisibleTexture)
     {
         _url = url;
@@ -35,6 +38,8 @@ public class AnimatedGif : UIElement
             {
                 Texture = _frames[0];
                 UpdateBounds();
+
+                OnGifLoaded?.Invoke();
             }
             else 
             {
@@ -53,7 +58,7 @@ public class AnimatedGif : UIElement
     {
         base.Update();
 
-        if (_frames.Length <= 1 || !_hasLoadedGif) return;
+        if (_frames.Length <= 1 || !_hasLoadedGif) return;    
 
         var delta = (float)BlastiaGame.GameTimeElapsedSeconds;
         _frameTimer += delta;
@@ -78,6 +83,6 @@ public class AnimatedGif : UIElement
         {
             Texture = newTexture;
             UpdateBounds();
-        }
+        }       
     }
 }
