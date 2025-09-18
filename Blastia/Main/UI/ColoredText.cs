@@ -81,6 +81,7 @@ public class ColoredText : UIElement
     {
         if (Font == null) return;
         _segments.Clear();
+        _gifSegments.Clear();
 
         if (string.IsNullOrEmpty(text))
             return;
@@ -117,9 +118,20 @@ public class ColoredText : UIElement
                         {
                             Gif = animatedGif
                         });
+                        
+                        // gif width for wrapping
+                        var gifWidth = animatedGif.Texture != null ? animatedGif.Texture.Width * animatedGif.Scale.X : 50f;
+                        if (currentWidth + gifWidth >= _wrapThreshold - 10) 
+                        {
+                            // add new line before GIF symbol
+                            AddTextSegment("\n", currentColor);
+                            currentWidth = 0f;
+                        }                        
 
                         // add placeholder text
-                        AddTextSegment(" ", currentColor);
+                        AddTextSegment("\x01", currentColor);
+
+                        currentWidth += gifWidth;
 
                         // skip to the end
                         i = closingBracketIndex;
@@ -144,8 +156,8 @@ public class ColoredText : UIElement
                     continue;
                 }
             }
-            
-            // check this symbol size            
+
+            // check this symbol size
             var symbolSize = Font.MeasureString(text[i].ToString());
             // at least one more same char should fit
             if (currentWidth + symbolSize.X >= _wrapThreshold - symbolSize.X - 10) 
@@ -157,7 +169,7 @@ public class ColoredText : UIElement
                 currentWidth = 0f;
             }
             
-            currentText += text[i];
+            currentText += text[i];            
             currentWidth += symbolSize.X;
         }
 
@@ -175,85 +187,107 @@ public class ColoredText : UIElement
         }
     }
 
-    public override void UpdateBounds()
+    private delegate void OnTextCallback(TextSegment segment, Vector2 position);
+    private delegate void OnGifCallback(GifSegment gifSegment, Vector2 position);
+    private delegate void OnNewLineCallback(ref Vector2 position, ref float maxLineHeight);
+    
+    /// <summary>
+    /// Iteration logic
+    /// </summary>
+    private void IterateSegments(OnTextCallback? onText = null, OnGifCallback? onGif = null, OnNewLineCallback? onNewLine = null) 
     {
-        if (Font == null || _segments.Count == 0) return;
-
-        float maxWidth = 0f;
-        float currentWidth = 0f;
-        float currentHeight = Font.LineSpacing * Scale.Y; // at least one line
+        if (Font == null) return;
+        
+        var currentPosition = new Vector2(Bounds.X, Bounds.Y);
+        var lineStartPos = currentPosition;
+        var lineSpacing = Font.LineSpacing * Scale.Y;
+        var currentLineMaxHeight = lineSpacing;
         var gifIndex = 0;
         
-        // TODO: multi-line support
         foreach (var segment in _segments) 
         {
             if (segment.Text == "\n") 
             {
-                maxWidth = Math.Max(currentWidth, maxWidth);
-                currentWidth = 0f;
-                currentHeight += Font.LineSpacing * Scale.Y;
-            }
-            else 
-            {
-                // add segment width
-                currentWidth += Font.MeasureString(segment.Text).X * Scale.X;
+                onNewLine?.Invoke(ref currentPosition, ref currentLineMaxHeight);
+                currentPosition.Y += currentLineMaxHeight;
+                currentPosition.X = lineStartPos.X;
+                
+                currentLineMaxHeight = lineSpacing; // reset max height for this line
+                continue;
             }
             
-            // if this is a gif
-            if (segment.Text == " "  && gifIndex < _gifSegments.Count)  
+            // special gif char
+            if (segment.Text == "\x01" && gifIndex < 0) 
             {
-                // add its height
-                var gif = _gifSegments[gifIndex].Gif;
-                if (gif.Texture != null) currentHeight += gif.Texture.Height;
+                var gifSegment = _gifSegments[gifIndex];
+                onGif?.Invoke(gifSegment, currentPosition);
+                gifIndex++;
+                
+                if (gifSegment.Gif.Texture != null) 
+                {
+                    currentPosition.X += gifSegment.Gif.Texture.Width * gifSegment.Gif.Texture.Width;
+                    // track max height
+                    currentLineMaxHeight = Math.Max(currentLineMaxHeight, gifSegment.Gif.Texture.Height * gifSegment.Gif.Texture.Height);
+                }
+                continue;
             }
-        }
 
-        // last line
-        maxWidth = Math.Max(currentWidth, maxWidth);
-        UpdateBoundsBase(maxWidth, currentHeight);
+            // else -> default text
+            onText?.Invoke(segment, currentPosition);
+
+            currentPosition.X += Font.MeasureString(segment.Text).X * Scale.X;
+        }
+    }
+
+    public override void UpdateBounds()
+    {
+        if (Font == null || _segments.Count == 0) return;
+
+        var currentWidth = 0f;
+        var maxWidth = 0f; // final width
+        var totalHeight = 0f;
+        
+        IterateSegments(onText: (segment, position) =>
+        {
+            // dont track gifs
+            if (segment.Text != "\x01") 
+            {
+                // position.X - bounds.X -> how much pixels from the start + add new symbol size
+                currentWidth = position.X - Bounds.X + Font.MeasureString(segment.Text).X * Scale.X;
+                maxWidth = Math.Max(currentWidth, maxWidth);
+            }
+        },
+        onGif: (gifSegment, position) =>
+        {
+            if (gifSegment.Gif.Texture != null) 
+            {
+                currentWidth = position.X - Bounds.X + gifSegment.Gif.Texture.Width * Scale.X;
+                maxWidth = Math.Max(currentWidth, maxWidth);
+            }
+        },
+        onNewLine: (ref Vector2 position, ref float maxLineHeight) =>
+        {
+            totalHeight += maxLineHeight;
+            currentWidth = 0f;
+        });
+
+        UpdateBoundsBase(maxWidth, totalHeight);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        if (Font == null || _segments.Count == 0) return;
-
-        var currentPosition = new Vector2(Bounds.X, Bounds.Y);
-        var lineStartPos = currentPosition;
-        var lineSpacing = Font.LineSpacing * Scale.Y;
-        var gifIndex = 0;
-
-        foreach (var segment in _segments)
-        {            
-            // handle new line segments
-            if (segment.Text == "\n") 
+        IterateSegments(onText: (segment, position) =>
+        {
+            // dont draw gifs
+            if (segment.Text != "\x01") 
             {
-                currentPosition.Y += lineSpacing;
-                currentPosition.X = lineStartPos.X;
-                continue;
+                base.Draw(spriteBatch, position, segment.Text, default, segment.Color);
             }
-            
-            // check if this is a gif placeholder
-            if (segment.Text == " "  && gifIndex < _gifSegments.Count) 
-            {
-                var gifSegment = _gifSegments[gifIndex];
-                gifSegment.Gif.Position = currentPosition;
-                gifSegment.Gif.Draw(spriteBatch);
-
-                // move text
-                if (gifSegment.Gif.Texture != null) 
-                {
-                    currentPosition.X += gifSegment.Gif.Texture.Width * gifSegment.Gif.Scale.X;
-                }
-
-                gifIndex += 1;
-                continue;
-            }
-
-            base.Draw(spriteBatch, currentPosition, segment.Text, default, segment.Color);
-
-            // move positon for next segment
-            var segmentSize = Font.MeasureString(segment.Text);
-            currentPosition.X += segmentSize.X * Scale.X;
-        }
+        },
+        onGif: (gifSegment, position) =>
+        {
+            gifSegment.Gif.Position = position;
+            gifSegment.Gif.Draw(spriteBatch);
+        });
     }
 }
