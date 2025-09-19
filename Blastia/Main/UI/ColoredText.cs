@@ -217,7 +217,7 @@ public class ColoredText : UIElement
             }
             
             // special gif char
-            if (segment.Text == "\x01" && gifIndex < 0) 
+            if (segment.Text == "\x01" && gifIndex < _gifSegments.Count) 
             {
                 var gifSegment = _gifSegments[gifIndex];
                 onGif?.Invoke(gifSegment, currentPosition);
@@ -225,9 +225,9 @@ public class ColoredText : UIElement
                 
                 if (gifSegment.Gif.Texture != null) 
                 {
-                    currentPosition.X += gifSegment.Gif.Texture.Width * gifSegment.Gif.Texture.Width;
+                    currentPosition.X += gifSegment.Gif.Texture.Width * gifSegment.Gif.Scale.X;
                     // track max height
-                    currentLineMaxHeight = Math.Max(currentLineMaxHeight, gifSegment.Gif.Texture.Height * gifSegment.Gif.Texture.Height);
+                    currentLineMaxHeight = Math.Max(currentLineMaxHeight, gifSegment.Gif.Texture.Height * gifSegment.Gif.Scale.Y);
                 }
                 continue;
             }
@@ -237,6 +237,9 @@ public class ColoredText : UIElement
 
             currentPosition.X += Font.MeasureString(segment.Text).X * Scale.X;
         }
+        
+        // ensure last line's height is accounted for
+        onNewLine?.Invoke(ref currentPosition, ref currentLineMaxHeight);
     }
 
     public override void UpdateBounds()
@@ -245,7 +248,7 @@ public class ColoredText : UIElement
 
         var currentWidth = 0f;
         var maxWidth = 0f; // final width
-        var totalHeight = 0f;
+        var totalHeight = Font.LineSpacing * Scale.Y; // start with 1 line
         
         IterateSegments(onText: (segment, position) =>
         {
@@ -261,13 +264,21 @@ public class ColoredText : UIElement
         {
             if (gifSegment.Gif.Texture != null) 
             {
-                currentWidth = position.X - Bounds.X + gifSegment.Gif.Texture.Width * Scale.X;
+                currentWidth = position.X - Bounds.X + gifSegment.Gif.Texture.Width * gifSegment.Gif.Scale.X;
                 maxWidth = Math.Max(currentWidth, maxWidth);
             }
         },
         onNewLine: (ref Vector2 position, ref float maxLineHeight) =>
         {
-            totalHeight += maxLineHeight;
+            if (position.X != Bounds.X) // we are not in the start
+            {
+                // add last line height
+                totalHeight = position.Y - Bounds.Y + maxLineHeight;
+            }
+            else // keep (IterateSegments already set position to 0 on new line)
+            {
+                totalHeight = position.Y - Bounds.Y;
+            }
             currentWidth = 0f;
         });
 
