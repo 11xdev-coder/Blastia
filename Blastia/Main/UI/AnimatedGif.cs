@@ -37,6 +37,7 @@ public class AnimatedGif : UIElement
             if (_frames.Length > 0) 
             {
                 Texture = _frames[0];
+                ResizeGif();
                 UpdateBounds();
 
                 OnGifLoaded?.Invoke();
@@ -46,6 +47,20 @@ public class AnimatedGif : UIElement
                 Console.WriteLine("No frames found for AnimatedGif");
             }
         }
+    }
+    
+    /// <summary>
+    /// Resized gif to reasonable scale (200f width)
+    /// </summary>
+    private void ResizeGif() 
+    {
+        if (Texture == null) return;
+        
+        var targetWidth = 200f;
+        var scaleX = targetWidth / Texture.Width;
+        var scaleY = scaleX;
+
+        Scale = new Vector2(scaleX, scaleY);
     }
 
     public override void UpdateBounds()
