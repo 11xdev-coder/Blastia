@@ -106,7 +106,7 @@ public class ColoredText : UIElement
                         AddTextSegment(currentText, currentColor, () => currentText = "");
 
                         var gifUrl = gifTag.Substring(5, gifTag.Length - 6); // remove [gif: and ]
-                        var animatedGif = new AnimatedGif(Vector2.Zero, gifUrl);
+                        var animatedGif = new AnimatedGif(Vector2.Zero, gifUrl, true, true);
                         animatedGif.OnGifLoaded += () => 
                         {
                             UpdateBounds();

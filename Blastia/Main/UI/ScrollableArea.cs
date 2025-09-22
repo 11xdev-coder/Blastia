@@ -35,6 +35,8 @@ public class ScrollableArea : UIElement
     public float ScrollSpeed { get; set; } = 0.05f;
     
     public float Spacing { get; set; }
+
+    private RasterizerState _scissorState;
     
     public ScrollableArea(Vector2 position, Viewport viewport, AlignmentType alignmentType = AlignmentType.Center, 
         float spacing = 0f, float scrolledOffset = 0f) : 
@@ -50,6 +52,13 @@ public class ScrollableArea : UIElement
         // offset
         _startingScrolledOffset = scrolledOffset;
         _scrolledOffset = CalculateStartingOffset() + _startingScrolledOffset;
+
+        _scissorState = new RasterizerState
+        {
+            ScissorTestEnable = true,
+            CullMode = CullMode.None,
+            FillMode = FillMode.Solid
+        };
     }
 
     private float CalculateStartingOffset()
@@ -178,15 +187,32 @@ public class ScrollableArea : UIElement
     public override void Draw(SpriteBatch spriteBatch)
     {
         base.Draw(spriteBatch);
+        var matrix = VideoManager.Instance.CalculateResolutionScaleMatrix();
+
+        // transform bounds to screen coordinates
+        var topLeft = Vector2.Transform(new Vector2(Bounds.X, Bounds.Y), matrix);
+        var bottomRight = Vector2.Transform(new Vector2(Bounds.X + ViewportWidth, Bounds.Y + ViewportHeight), matrix);
         
-        // draw if in the viewport
-        foreach (var child in _children)
+        // set scissor rect
+        var originalScissorRect = spriteBatch.GraphicsDevice.ScissorRectangle;
+        var scissorRect = new Rectangle((int) topLeft.X, (int) topLeft.Y, (int) (bottomRight.X - topLeft.X), (int) (bottomRight.Y - topLeft.Y));
+
+        // end current batch
+        spriteBatch.End();
+        BlastiaGame.BeginScissorSpriteBatch(spriteBatch, _scissorState, matrix);
+        spriteBatch.GraphicsDevice.ScissorRectangle = scissorRect;
+        
+        // draw children
+        foreach (var child in _children) 
         {
-            if (Bounds.Intersects(child.Bounds))
-            {
+            if (child.Bounds.Bottom >= Bounds.Top && child.Bounds.Top <= Bounds.Bottom)
                 child.Draw(spriteBatch);
-            }
         }
+
+        // restore
+        spriteBatch.End();
+        BlastiaGame.BeginSpriteBatch(spriteBatch, matrix);
+        spriteBatch.GraphicsDevice.ScissorRectangle = originalScissorRect;
     }
 }
 

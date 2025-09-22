@@ -36,6 +36,10 @@ public class BlastiaGame : Game
 	private readonly GraphicsDeviceManager _graphics;
 	public static SpriteBatch SpriteBatch { get; private set; } = null!;
 	private readonly SamplerState _pixelatedSamplerState;
+	/// <summary>
+	/// Static reference to <c>_pixelatedSamplerState</c>
+	/// </summary>
+	private static SamplerState _staticPixelaredSamplerState;
 	private const string CrashLogFileName = "crash_log.txt";
 	private readonly string? _crashLogPath;
 	
@@ -215,6 +219,7 @@ public class BlastiaGame : Game
 			AddressU = TextureAddressMode.Clamp,
 			AddressV = TextureAddressMode.Clamp
 		};
+		_staticPixelaredSamplerState = _pixelatedSamplerState;
 
 		NetworkManager.Instance = new NetworkManager();
 		if (NetworkManager.Instance.InitializeSteam())
@@ -745,16 +750,35 @@ public class BlastiaGame : Game
 		IsAnyBlockEscapeMenuActive = _menus.Where(m => m.Active && m.BlockEscape).ToList().Count > 0;
 	}
 
+	/// <summary>
+	/// Begins a sprite batch with default settings
+	/// </summary>
+	public static void BeginSpriteBatch(SpriteBatch spriteBatch, Matrix? customMatrix = null) 
+	{
+	    var matrix = customMatrix ?? VideoManager.Instance.CalculateResolutionScaleMatrix();
+		
+		spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
+			_staticPixelaredSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
+			null, matrix);
+	}
+	
+	/// <summary>
+	/// Begins a sprite batch with scissor state (to not draw an area)
+	/// </summary>
+	public static void BeginScissorSpriteBatch(SpriteBatch spriteBatch, RasterizerState scissorState, Matrix? customMatrix = null) 
+	{
+	    var matrix = customMatrix ?? VideoManager.Instance.CalculateResolutionScaleMatrix();
+		
+		spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
+			_staticPixelaredSamplerState, DepthStencilState.None, scissorState, 
+			null, matrix);
+	}
+	
 	// DRAW
 	protected override void Draw(GameTime gameTime)
 	{
 		GraphicsDevice.Clear(Color.CornflowerBlue);
-		
-		var matrix = VideoManager.Instance.CalculateResolutionScaleMatrix();
-		
-		SpriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
-			_pixelatedSamplerState, DepthStencilState.None, RasterizerState.CullCounterClockwise, 
-			null, matrix);
+		BeginSpriteBatch(SpriteBatch);
 
 		if (IsWorldInitialized && PlayerNWorldManager.Instance.SelectedWorld != null)
 		{

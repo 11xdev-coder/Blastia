@@ -16,16 +16,16 @@ public class AnimatedGif : UIElement
 
     public Action? OnGifLoaded;
     
-    public AnimatedGif(Vector2 position, string url, bool loop = true) : base(position, BlastiaGame.InvisibleTexture)
+    public AnimatedGif(Vector2 position, string url, bool loop = true, bool resize = false) : base(position, BlastiaGame.InvisibleTexture)
     {
         _url = url;
         _loop = loop;
         _currentFrame = 0;
         _frameTimer = 0f;
-        Init();
+        Init(resize);
     }
     
-    private async void Init() 
+    private async void Init(bool resize) 
     {
         var gifData = await Util.DownloadAndProcessGif(_url);
         if (gifData.HasValue) 
@@ -37,7 +37,10 @@ public class AnimatedGif : UIElement
             if (_frames.Length > 0) 
             {
                 Texture = _frames[0];
-                ResizeGif();
+                
+                // resize if needed
+                if (resize)
+                    ResizeGif();
                 UpdateBounds();
 
                 OnGifLoaded?.Invoke();
@@ -50,7 +53,7 @@ public class AnimatedGif : UIElement
     }
     
     /// <summary>
-    /// Resized gif to reasonable scale (200f width)
+    /// Resizes gif to reasonable scale (200f width)
     /// </summary>
     private void ResizeGif() 
     {
