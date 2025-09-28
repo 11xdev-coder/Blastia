@@ -15,7 +15,7 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
     private const float SecondsToStartFadingOut = 4; // 4 seconds
     protected override void AddElements()
     {
-        Viewport chatViewport = new Viewport(2000, 200);
+        Viewport chatViewport = new Viewport(2000, 300);
         _chat = new ScrollableArea(new Vector2(15, 0), chatViewport, AlignmentType.Left)
         {
             HAlign = 0.01f,
