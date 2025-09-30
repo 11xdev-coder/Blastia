@@ -537,25 +537,34 @@ public class NetworkManager
         }
     }
 
-    public void SendChatMessageToAll(string chatMessage)
+    /// <summary>
+    /// Syncs a new chat message for all clients
+    /// </summary>
+    public void SyncChatMessage(string content, string senderName, HSteamNetConnection senderConnection) 
     {
-        if (!IsConnected || string.IsNullOrEmpty(chatMessage)) return;
-        
-        Console.WriteLine($"[NetworkManager] Sending chat: {chatMessage}");
-        var fullMessage = $"{SteamFriends.GetPersonaName()}: {chatMessage}";
-
-        foreach (var connection in Connections.Values)
+        var chatMessage = new NetworkChatMessage
         {
-            NetworkMessageQueue.QueueMessage(connection, MessageType.ChatMessage, fullMessage);
-        }
-        
-        // show locally
-        ProcessChatMessageLocally(fullMessage);
+            Text = content,
+            SenderName = senderName
+        };
+        NetworkSync.Sync(chatMessage, MessageType.ChatMessage, SyncMode.Auto, senderConnection);
     }
 
-    private void ProcessChatMessageLocally(string message)
+    /// <summary>
+    /// Handles <c>ChatMessage</c> network message
+    /// </summary>
+    public void HandleChatMessage(string chatMessageBase64, HSteamNetConnection senderConnection) 
     {
-        Console.WriteLine($"[CHAT] {message}");
+        NetworkSync.HandleNetworkMessage<NetworkChatMessage>(chatMessageBase64, MessageType.ChatMessage,
+        ApplyChatMessageLocally, (chatMessage, sender) => ApplyChatMessageLocally(chatMessage), senderConnection);
+    }
+    
+    /// <summary>
+    /// Applies a chat message from network
+    /// </summary>
+    private void ApplyChatMessageLocally(NetworkChatMessage chatMessage) 
+    {
+        BlastiaGame.ChatMessagesMenu?.AddMessage(chatMessage.SenderName, chatMessage.Text);
     }
 
     private void ReceiveNetworkMessages()
@@ -612,7 +621,7 @@ public class NetworkManager
                         Console.WriteLine($"[NetworkManager] Client received HostWelcome: {content}");
                         break;
                     case MessageType.ChatMessage:
-                        ProcessChatMessageLocally(content);
+                        HandleChatMessage(content, senderConnection);
                         break;
                     case MessageType.PlayerLeftGame:
                         // just a notification
