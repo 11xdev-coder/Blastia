@@ -71,6 +71,9 @@ public class NetworkSync
             NetworkMessageQueue.QueueMessage(hostConnection, message, content);
     }
     
+    /// <summary>
+    /// All network message serialize methods must be added here
+    /// </summary>
     private static string SerializeData<T>(T data) 
     {
         var bytes = data switch
@@ -82,6 +85,7 @@ public class NetworkSync
             NetworkSignEditedMessage signEdited => signEdited.Serialize(),
             Guid networkId => networkId.ToByteArray(),
             NetworkItemPullMessage itemPull => itemPull.Serialize(),
+            NetworkChatMessage chatMessage => chatMessage.Serialize(),
             _ => System.Text.Encoding.UTF8.GetBytes(data?.ToString() ?? "")
         };
 
@@ -118,6 +122,10 @@ public class NetworkSync
         }
     }
     
+    /// <summary>
+    /// All network message deserialize method must be added here
+    /// </summary>
+    /// <exception cref="NotSupportedException">forgot to add the network message!</exception>
     private static T DeserializeData<T>(string base64) 
     {
         var bytes = Convert.FromBase64String(base64);
@@ -129,6 +137,7 @@ public class NetworkSync
         if (typeof(T) == typeof(NetworkSignEditedMessage)) return (T)(object)NetworkSignEditedMessage.Deserialize(bytes);
         if (typeof(T) == typeof(Guid)) return (T)(object)new Guid(bytes);
         if (typeof(T) == typeof(NetworkItemPullMessage)) return (T)(object)NetworkItemPullMessage.Deserialize(bytes);
+        if (typeof(T) == typeof(NetworkChatMessage)) return (T)(object)NetworkChatMessage.Deserialize(bytes);
         
         throw new NotSupportedException($"Deserialization not supported for type {typeof(T)}");
     }

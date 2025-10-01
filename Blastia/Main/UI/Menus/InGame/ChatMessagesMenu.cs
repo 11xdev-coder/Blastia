@@ -1,3 +1,4 @@
+using Blastia.Main.Networking;
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -35,6 +36,8 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
         // scroll to bottom
         _chat.ScrollToBottom();
         RevealMessages();
+
+        NetworkManager.Instance?.SyncChatMessage(text ?? "", senderName);
     }
     
     public void RevealMessages() 

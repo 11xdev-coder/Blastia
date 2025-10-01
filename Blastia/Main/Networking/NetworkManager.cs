@@ -78,9 +78,9 @@ public class NetworkManager
     
     // entity syncing
     private float _lastPlayerSync;
-    private const float PlayerSyncRate = 1f / 20f; // 20 times in 1 second
+    private const float PlayerSyncRate = 1f / 10f; // 10 times in 1 second
     private float _lastEntitySync;
-    private const float EntitySyncRate = 1f / 10f; // 10 times in 1 second
+    private const float EntitySyncRate = 1f / 5f; // 5 times in 1 second
 
     public NetworkManager()
     {
@@ -540,14 +540,14 @@ public class NetworkManager
     /// <summary>
     /// Syncs a new chat message for all clients
     /// </summary>
-    public void SyncChatMessage(string content, string senderName, HSteamNetConnection senderConnection) 
+    public void SyncChatMessage(string content, string senderName) 
     {
         var chatMessage = new NetworkChatMessage
         {
             Text = content,
             SenderName = senderName
         };
-        NetworkSync.Sync(chatMessage, MessageType.ChatMessage, SyncMode.Auto, senderConnection);
+        NetworkSync.Sync(chatMessage, MessageType.ChatMessage, SyncMode.Auto);
     }
 
     /// <summary>
