@@ -25,7 +25,7 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
         Elements.Add(_chat);
     }
     
-    public void AddMessage(string senderName, string? text) 
+    public void AddMessage(string senderName, string? text, bool shouldSyncToNetwork = true) 
     {
         if (_chat == null) return;
 
@@ -37,7 +37,7 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
         _chat.ScrollToBottom();
         RevealMessages();
 
-        NetworkManager.Instance?.SyncChatMessage(text ?? "", senderName);
+        if (shouldSyncToNetwork) NetworkManager.Instance?.SyncChatMessage(text ?? "", senderName);
     }
     
     public void RevealMessages() 

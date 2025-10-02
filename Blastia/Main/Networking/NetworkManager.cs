@@ -564,7 +564,7 @@ public class NetworkManager
     /// </summary>
     private void ApplyChatMessageLocally(NetworkChatMessage chatMessage) 
     {
-        BlastiaGame.ChatMessagesMenu?.AddMessage(chatMessage.SenderName, chatMessage.Text);
+        BlastiaGame.ChatMessagesMenu?.AddMessage(chatMessage.SenderName, chatMessage.Text, false);
     }
 
     private void ReceiveNetworkMessages()
