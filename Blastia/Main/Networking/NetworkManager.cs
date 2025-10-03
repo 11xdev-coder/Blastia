@@ -33,7 +33,7 @@ public enum MessageType : byte
     // world transfer
     WorldTransferStart, // host -> client, start of world transfer
     WorldChunk, // host -> client, contains a chunk of world data
-    WorldTransferComplete // host -> client, all chunks sent
+    WorldTransferComplete // client -> host, received final chunk (create a player)
 }
 
 /// <summary>
@@ -448,18 +448,6 @@ public class NetworkManager
                 NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.ClientHello, $"Hello from {SteamFriends.GetPersonaName()}");
                 NetworkMessageQueue.QueueMessage(callback.m_hConn, MessageType.RequestUpdateWorldForClient, "host send me the world!!!");
             }
-            
-            // spawn player if hosting
-            if (IsHost)
-            {
-                var remoteSteamId = callback.m_info.m_identityRemote.GetSteamID();
-
-                // only spawn if loaded in the world
-                if (PlayerNWorldManager.Instance.SelectedWorld != null)
-                {
-                    NetworkEntitySync.OnClientJoined(remoteSteamId, callback.m_hConn);
-                }
-            }
         }
         else if (callback.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer ||
                  callback.m_info.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally)
@@ -668,7 +656,7 @@ public class NetworkManager
                         NetworkWorldTransfer.HandleWorldChunk(content, IsHost);
                         break;
                     case MessageType.WorldTransferComplete:
-                        Console.WriteLine($"[NetworkManager] {content}");
+                        NetworkWorldTransfer.HandleWorldTransferComplete(message.m_identityPeer.GetSteamID(), senderConnection);
                         break;
                     default:
                         Console.WriteLine($"[NetworkManager] Unknown message type: {type}");

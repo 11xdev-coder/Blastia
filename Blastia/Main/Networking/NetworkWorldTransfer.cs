@@ -39,7 +39,6 @@ public class WorldTransferData
 
 public static class NetworkWorldTransfer
 {
-    // TODO: player pos sync
     private const int MaxTilesAtOnce = 150;
     private const int MaxChunkSizeBytes = 300 * 1024; // 300 KB max chunk size
     private const int EstimatedTileSize = 50;
@@ -204,7 +203,7 @@ public static class NetworkWorldTransfer
             return;
         }
         
-        Console.WriteLine("[NetworkWorldTransfer] Starting world transfer");
+        Console.WriteLine("[NetworkWorldTransfer] [HOST] Starting world transfer");
 
         // create basic data first
         var data = new WorldTransferData
@@ -256,7 +255,7 @@ public static class NetworkWorldTransfer
                 var chunkBase64 = Convert.ToBase64String(chunkBytes);
                 NetworkMessageQueue.QueueMessage(connection, MessageType.WorldChunk, chunkBase64);
                 successfulChunks += 1;
-                Console.WriteLine($"[NetworkWorldTransfer] Sent chunk {chunk.ChunkIndex + 1}/{allChunks.Count} for layer {chunk.Layer}");
+                Console.WriteLine($"[NetworkWorldTransfer] [HOST] Sent chunk {chunk.ChunkIndex + 1}/{allChunks.Count} for layer {chunk.Layer}");
             }
             else
             {
@@ -264,11 +263,26 @@ public static class NetworkWorldTransfer
             }
         }
         
-        // send completion message
-        NetworkMessageQueue.QueueMessage(connection, MessageType.WorldTransferComplete, $"Sent {successfulChunks}/{allChunks.Count} chunks");
-        SteamNetworkingSockets.FlushMessagesOnConnection(connection);
+        SteamNetworkingSockets.FlushMessagesOnConnection(connection);        
+        Console.WriteLine($"[NetworkWorldTransfer] [HOST] World transfer completed for client, sent {successfulChunks}/{allChunks.Count} chunks");
+    }
+    
+    /// <summary>
+    /// Called when host receives client <c>WorldTransferComplete</c> message to create a client with its steam ID
+    /// </summary>
+    public static void HandleWorldTransferComplete(CSteamID clientId, HSteamNetConnection clientConnection) 
+    {
+        if (NetworkManager.Instance == null) return;
         
-        Console.WriteLine($"[NetworkWorldTransfer] World transfer completed for client, sent {successfulChunks}/{allChunks.Count} chunks");
+        // spawn player if hosting
+        if (NetworkManager.Instance.IsHost)
+        {
+            // only spawn if loaded in the world
+            if (PlayerNWorldManager.Instance.SelectedWorld != null)
+            {
+                NetworkEntitySync.OnClientJoined(clientId, clientConnection);
+            }
+        }
     }
 
     /// <summary>
@@ -383,7 +397,7 @@ public static class NetworkWorldTransfer
     public static void HandleWorldChunk(string chunkBase64, bool isHost)
     {
         // client-side
-        if (isHost || _clientWorldStateBuffer == null) return;
+        if (isHost || _clientWorldStateBuffer == null || NetworkManager.Instance == null) return;
         
         var chunkBytes = Convert.FromBase64String(chunkBase64);
         var chunk = DeserializeChunk(chunkBytes);
@@ -392,13 +406,18 @@ public static class NetworkWorldTransfer
         ReceivedWorldChunks[chunk.ChunkIndex] = chunk;
         _receivedChunks += 1;
 
-        Console.WriteLine($"[NetworkWorldTransfer] Received chunk {chunk.ChunkIndex + 1}/{_expectedChunks} for layer {chunk.Layer}");
+        Console.WriteLine($"[NetworkWorldTransfer] [CLIENT] Received chunk {chunk.ChunkIndex + 1}/{_expectedChunks} for layer {chunk.Layer}");
         BlastiaGame.JoinGameMenu?.UpdateStatusText($"Receiving chunks: {chunk.ChunkIndex + 1}/{_expectedChunks}"); // update visual feedback
         
         // all chunks received
         if (_receivedChunks >= _expectedChunks)
         {
             ReconstructWorld();
+
+            // send message to host to create the player
+            var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
+            if (hostConnection != HSteamNetConnection.Invalid)
+                NetworkMessageQueue.QueueMessage(hostConnection, MessageType.WorldTransferComplete, $"Completed world transfer for client. Received {chunk.ChunkIndex}/{_expectedChunks}");
         }
     }
 
@@ -406,7 +425,7 @@ public static class NetworkWorldTransfer
     {
         if (_clientWorldStateBuffer == null) return;
         
-        Console.WriteLine("[NetworkWorldTransfer] All chunks received, reconstructing world");
+        Console.WriteLine("[NetworkWorldTransfer] [CLIENT] All chunks received, reconstructing world");
 
         for (var i = 0; i < _expectedChunks; i++)
         {
