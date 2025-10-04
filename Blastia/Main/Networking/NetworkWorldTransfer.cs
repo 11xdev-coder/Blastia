@@ -412,12 +412,19 @@ public static class NetworkWorldTransfer
         // all chunks received
         if (_receivedChunks >= _expectedChunks)
         {
-            ReconstructWorld();
-
             // send message to host to create the player
             var hostConnection = NetworkManager.Instance.Connections.Values.FirstOrDefault();
-            if (hostConnection != HSteamNetConnection.Invalid)
-                NetworkMessageQueue.QueueMessage(hostConnection, MessageType.WorldTransferComplete, $"Completed world transfer for client. Received {chunk.ChunkIndex}/{_expectedChunks}");
+            if (hostConnection != HSteamNetConnection.Invalid) 
+            {
+                NetworkMessageQueue.QueueMessage(hostConnection, MessageType.WorldTransferComplete, $"Completed world transfer for client. Received {chunk.ChunkIndex+1}/{_expectedChunks}");
+
+                // send joined chat message (this client -> host)
+                var playerName = PlayerNWorldManager.Instance.GetSelectedPlayerName();
+                NetworkManager.Instance?.SyncChatMessage($"&{playerName} joined", null);
+            }
+                
+                
+            ReconstructWorld();
         }
     }
 

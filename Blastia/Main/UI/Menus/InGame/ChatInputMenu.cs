@@ -43,7 +43,7 @@ public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, 
         if (KeyboardHelper.IsKeyJustPressed(Keys.Enter)) 
         {
             // send message
-            var selectedPlayerName = PlayerNWorldManager.Instance.SelectedPlayer?.Name ?? ""; 
+            var selectedPlayerName = PlayerNWorldManager.Instance.GetSelectedPlayerName();
             BlastiaGame.ChatMessagesMenu?.AddMessage(selectedPlayerName, ChatInput?.StringBuilder.ToString());
             
             // turn chat off

@@ -155,6 +155,12 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 		if (switchToJoinMenu)
 			switchToMenu(BlastiaGame.JoinGameMenu);
 	}
+
+    /// <summary>
+    /// Returns name of a selected player
+    /// </summary>
+    /// <returns>If a player is selected, returns its <c>Name</c>. Otherwise returns empty string</returns>
+    public string GetSelectedPlayerName() => SelectedPlayer?.Name ?? "";
 	
 	public void UnselectPlayer() => SelectedPlayer = null;
 	

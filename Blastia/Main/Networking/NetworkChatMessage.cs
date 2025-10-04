@@ -7,7 +7,7 @@ namespace Blastia.Main.Networking;
 public class NetworkChatMessage 
 {
     public string Text = "";
-    public string SenderName = "";
+    public string? SenderName = "";
     
     public byte[] Serialize() 
     {
@@ -15,7 +15,9 @@ public class NetworkChatMessage
         using var writer = new BinaryWriter(stream);
 
         writer.Write(Text);
-        writer.Write(SenderName);
+        // have a sender name
+        writer.Write(SenderName != null);
+        if (SenderName != null) writer.Write(SenderName);
         return stream.ToArray();
     }
     
@@ -24,10 +26,16 @@ public class NetworkChatMessage
         using var stream = new MemoryStream(data);
         using var reader = new BinaryReader(stream);
 
+        // read values
+        var text = reader.ReadString();
+        var hasSenderName = reader.ReadBoolean();
+        var senderName = "";
+        if (hasSenderName) senderName = reader.ReadString();
+        
         return new NetworkChatMessage
         {
-            Text = reader.ReadString(),
-            SenderName = reader.ReadString()
+            Text = text,
+            SenderName = senderName
         };
     }
 }
