@@ -25,13 +25,13 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
         Elements.Add(_chat);
     }
     
-    public void AddMessage(string? senderName, string? text, bool shouldSyncToNetwork = true) 
+    public void AddMessage(string senderName, string? text, bool shouldSyncToNetwork = true) 
     {
         if (_chat == null) return;
 
         // have a sender -> use <> brackets
         ColoredText newText;
-        if (senderName != null)
+        if (!string.IsNullOrEmpty(senderName))
             newText = new ColoredText(Vector2.Zero, $"<{senderName}>: {text}", Font);
         else
             newText = new ColoredText(Vector2.Zero, $"{text}", Font);

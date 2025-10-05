@@ -420,7 +420,7 @@ public static class NetworkWorldTransfer
 
                 // send joined chat message (this client -> host)
                 var playerName = PlayerNWorldManager.Instance.GetSelectedPlayerName();
-                NetworkManager.Instance?.SyncChatMessage($"&{playerName} joined", null);
+                NetworkManager.Instance?.SyncChatMessage($"&e{playerName} joined", "");
             }
                 
                 

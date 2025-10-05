@@ -528,7 +528,7 @@ public class NetworkManager
     /// <summary>
     /// Syncs a new chat message for all clients
     /// </summary>
-    public void SyncChatMessage(string content, string? senderName) 
+    public void SyncChatMessage(string content, string senderName) 
     {
         var chatMessage = new NetworkChatMessage
         {
