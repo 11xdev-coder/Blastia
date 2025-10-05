@@ -468,6 +468,15 @@ public class NetworkManager
                 Console.WriteLine("[NetworkManager] Lost connection to host, leaving lobby");
                 _isConnectedToHost = false;
                 DisconnectFromLobby();
+
+                // display "lost connection" status text
+                BlastiaGame.RequestWorldUnload();
+                if (BlastiaGame.JoinGameMenu != null) 
+                {
+                    BlastiaGame.JoinGameMenu.Active = true;
+                    BlastiaGame.JoinGameMenu.ToggleStatusText(true);
+                    BlastiaGame.JoinGameMenu.UpdateStatusText("Lost connection");
+                }
             }
         }
     }

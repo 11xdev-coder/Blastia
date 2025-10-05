@@ -39,7 +39,7 @@ public class BlastiaGame : Game
 	/// <summary>
 	/// Static reference to <c>_pixelatedSamplerState</c>
 	/// </summary>
-	private static SamplerState _staticPixelaredSamplerState;
+	private static SamplerState? _staticPixelaredSamplerState;
 	private const string CrashLogFileName = "crash_log.txt";
 	private readonly string? _crashLogPath;
 	

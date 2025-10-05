@@ -423,7 +423,6 @@ public static class NetworkWorldTransfer
                 NetworkManager.Instance?.SyncChatMessage($"&e{playerName} joined", "");
             }
                 
-                
             ReconstructWorld();
         }
     }
