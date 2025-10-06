@@ -20,7 +20,8 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
         _chat = new ScrollableArea(new Vector2(15, 0), chatViewport, AlignmentType.Left)
         {
             HAlign = 0.01f,
-            VAlign = 0.9f
+            VAlign = 0.9f,
+            UnblockClicks = true
         };
         Elements.Add(_chat);
     }

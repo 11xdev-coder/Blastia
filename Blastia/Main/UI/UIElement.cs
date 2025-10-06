@@ -100,6 +100,11 @@ public abstract class UIElement
     /// </summary>
     public bool IsFocused { get; set; }
 
+    /// <summary>
+    /// Still can break blocks, etc. when hovered over this <c>UIElement</c>
+    /// </summary>
+    public bool UnblockClicks { get; set; }
+
     #region Dragging
 
     public virtual bool Draggable { get; set; }
@@ -243,7 +248,7 @@ public abstract class UIElement
         if (IsHovered)  // if hovering
         {
             OnHover?.Invoke();
-            BlastiaGame.IsHoveredOnAnyUi = true;
+            if (!UnblockClicks) BlastiaGame.IsHoveredOnAnyUi = true;
         }
         
         switch (IsHovered)
