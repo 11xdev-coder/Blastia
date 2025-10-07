@@ -18,7 +18,6 @@ public static class Util
     private static Func<GraphicsDevice>? _graphicsDeviceFactory;
     private static readonly HttpClient _httpClient = new();
     private static readonly Dictionary<string, GifData> _loadedGifs = [];
-    private static readonly string _gifSavePath = Path.Combine(Paths.GetSaveGameDirectory(), "Gifs");
     
     /// <summary>
     /// Loads .png texture from stream
@@ -46,9 +45,13 @@ public static class Util
     public static void Init(Func<GraphicsDevice> graphicsDeviceFactory) 
     {
         _graphicsDeviceFactory = graphicsDeviceFactory;
-        if (!Directory.Exists(_gifSavePath)) Directory.CreateDirectory(_gifSavePath);
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="url">Website url</param>
+    /// <returns><c>GifData</c> containing frames and their durations</returns>
     public static async Task<GifData?> DownloadAndProcessGif(string url) 
     {
         if (_graphicsDeviceFactory == null) return null;
@@ -60,8 +63,16 @@ public static class Util
 
             Console.WriteLine($"Retrieving GIF from URL: {url}");
 
+            // for this to work with all websites, we need to extract the GIF URL from the website
+            var gifUrl = await GetGifUrl(url);
+            if (string.IsNullOrEmpty(gifUrl))
+            {
+                Console.WriteLine("Could not extract GIF URL");
+                return null;
+            }
+
             // download
-            byte[] gifData = await _httpClient.GetByteArrayAsync(url);            
+            byte[] gifData = await _httpClient.GetByteArrayAsync(gifUrl);            
             // extract frames
             var result = ProcessGif(_graphicsDeviceFactory(), gifData);
             
@@ -77,6 +88,79 @@ public static class Util
             Console.WriteLine($"Error retrieving GIF: {ex.Message}");
             return null;
         }
+    }
+    
+    /// <summary>
+    /// Extracts actual GIF url from the website url
+    /// </summary>
+    private static async Task<string> GetGifUrl(string url) 
+    {
+        if (url.Contains("tenor.com"))
+            return await GetGifUrlFromTenor(url);
+
+        return url;
+    }
+    
+    /// <summary>
+    /// Extracts actual GIF url from <c>tenor.com</c>
+    /// </summary>
+    private static async Task<string> GetGifUrlFromTenor(string tenorUrl) 
+    {
+        try 
+        {
+            var html = await _httpClient.GetStringAsync(tenorUrl);
+
+            // look for tenor media URLs in the HTML
+            // pattern 1: looks for Open Graph meta tags
+            // <meta property="og:image" content=" - matches this exact HTML text
+            // ( - starts capture group
+            // [^" - means any character except "
+            // + - means one or more times
+            // \.gif - mathes .gif
+            
+            // pattern 2: similar to pattern 1, but looks for og:url instead
+            
+            // pattern 3: looks for GIF urls in JSON data
+            // "url" - matches the text "url"
+            // \s* - matches 0 or more whitespace chars
+            // : - matches colon
+            // \s* matches more whitespace chars
+            // https?:// - matches http:// or https:// (? makes S optional)
+            // [^""]+ - means any character except "
+            // \.gif - ".gif"
+            
+            // pattern 4: looks for standard HTML image tags
+            // src=" - matches src attribute
+            // (https?://[^""]+\.gif) - full GIF url ending in .gif
+            var patterns = new[]
+            {
+                @"<meta property=""og:image"" content=""([^""]+\.gif)""",
+                @"<meta property=""og:url"" content=""([^""]+\.gif)""",
+                @"""url""\s*:\s*""(https?://[^""]+\.gif)""",
+                @"src=""(https?://[^""]+\.gif)"""
+            };
+            
+            foreach (var pattern in patterns) 
+            {
+                // search and extract these patterns
+                var match = System.Text.RegularExpressions.Regex.Match(html, pattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                // match.Groups[0] - same as match.Value
+                // match.Groups[1] - the URL we need
+                
+                if (match.Success && match.Groups.Count > 1)
+                {
+                    var url = match.Groups[1].Value;
+                    if (!url.Contains("thumb"))
+                        return url;
+                }
+            }
+        }
+        catch (Exception ex) 
+        {
+            Console.WriteLine($"Error extracting GIF URL from tenor.com: {ex.Message}");
+        }
+
+        return "";
     }
     
     private static GifData? ProcessGif(GraphicsDevice graphicsDevice, byte[] bytes) 
