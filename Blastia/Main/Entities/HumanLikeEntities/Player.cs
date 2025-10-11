@@ -45,10 +45,8 @@ public class Player : HumanLikeEntity
 	private float _flickerTimer;
 	private bool _isDrawing;
 
-	private const float MinJumpVelocity = 200f;
-	private const float MaxJumpVelocity = 320f;
-	private const float MaxChargeTime = 0.35f;
-	private float _jumpCharge;
+	private const int JumpPower = 100;
+	private bool _startedJumping;
 	
 	// pulling
 	private const float PickupRadius = 30f;
@@ -270,21 +268,15 @@ public class Player : HumanLikeEntity
 			}
 		}
 
+		// start the jump if grounded
 		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump)
-		{
-			_jumpCharge += (float) BlastiaGame.GameTimeElapsedSeconds;
-		}
-		else if (BlastiaGame.KeyboardState.IsKeyUp(Keys.Space) &&
-		         BlastiaGame.PreviousKeyboardState.IsKeyDown(Keys.Space) && CanJump)
-		{
-			_jumpCharge = Math.Min(_jumpCharge, MaxChargeTime);
-			float chargeRatio = _jumpCharge / MaxChargeTime;
-			var boostedJump = MathHelper.Lerp(MinJumpVelocity, MaxJumpVelocity, chargeRatio);
-			
-			var jumpHeight = boostedJump;
-			MovementVector.Y = -jumpHeight;
-			_jumpCharge = 0;
-		}
+			_startedJumping = true;
+		else if (BlastiaGame.KeyboardState.IsKeyUp(Keys.Space)) // released space -> stop the jump
+			_startedJumping = false;
+
+		// add jump if jumping
+		if (_startedJumping)
+			MovementVector.Y = -JumpPower;
 	}
 
 	private Vector2 GetCoordsForBlockPlacement()

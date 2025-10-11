@@ -477,46 +477,6 @@ public abstract class Entity : Object
         MovementVector += acceleration * deltaTime;
     }
 
-    /// <summary>
-    /// Calculates and applies impulse to this entity
-    /// </summary>
-    /// <param name="force">Force applied</param>
-    /// <param name="seconds">Amount of time in seconds of how long is the force applied</param>
-    protected void AddImpulse(Vector2 force, float seconds)
-    {
-        var impulse = force * seconds;
-        _totalImpulse += impulse;
-    }
-
-    /// <summary>
-    /// Slowly updates impulse from 0 to total and updates the velocity
-    /// </summary>
-    private void UpdateImpulse()
-    {
-        if (_totalImpulse == Vector2.Zero) return;
-    
-        var deltaTime = (float)BlastiaGame.GameTimeElapsedSeconds;
-        var remainingImpulse = _totalImpulse - _currentImpulse;
-    
-        // impulse per frame
-        var impulseThisFrame = _totalImpulse / deltaTime;
-    
-        // finish impulse if very close to 0
-        if (remainingImpulse.LengthSquared() < float.Epsilon 
-            || impulseThisFrame.LengthSquared() > remainingImpulse.LengthSquared())
-        {
-            MovementVector += remainingImpulse;
-            _totalImpulse = Vector2.Zero;
-            _currentImpulse = Vector2.Zero;
-        }
-        else
-        {
-            MovementVector += impulseThisFrame;
-            _currentImpulse += impulseThisFrame;
-            Console.WriteLine($"Remaining impulse: {remainingImpulse.Length()}");
-        }
-    }
-
     private void ApplyGroundDrag(float dragCoefficient)
     {
         if (dragCoefficient > 0 && MovementVector.LengthSquared() > 0.001f)
