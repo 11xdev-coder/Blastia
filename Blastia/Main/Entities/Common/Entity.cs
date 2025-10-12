@@ -400,12 +400,8 @@ public abstract class Entity : Object
                 {
                     MovementVector.X = 0f;
     
-                    // avoid hitting the wall when moving up
-                    if (MovementVector.Y < 0)
-                    {
-                        // move slightly away from the wall
-                        Position += new Vector2(firstHitNormal.X * 0.1f, 0);
-                    }
+                    const float separationDistance = 0.01f;
+                    Position += new Vector2(firstHitNormal.X * separationDistance, 0);
                 }
                 else // vertical
                 {
