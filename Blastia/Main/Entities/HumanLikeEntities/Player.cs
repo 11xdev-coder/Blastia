@@ -46,7 +46,11 @@ public class Player : HumanLikeEntity
 	private bool _isDrawing;
 
 	private const int JumpPower = 100;
-	private bool _startedJumping;
+	private const float JumpDuration = 0.35f;
+	private bool _isCurrentlyJumping;
+	private float _currentJumpDuration;
+	private bool _needsSpaceRelease; // no auto-jump, true when jumped and haven't released space
+	private bool _couldJumpLastFrame;
 	
 	// pulling
 	private const float PickupRadius = 30f;
@@ -268,15 +272,49 @@ public class Player : HumanLikeEntity
 			}
 		}
 
-		// start the jump if grounded
-		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump)
-			_startedJumping = true;
-		else if (BlastiaGame.KeyboardState.IsKeyUp(Keys.Space)) // released space -> stop the jump
-			_startedJumping = false;
+		Jump(deltaTime);
+	}
 
-		// add jump if jumping
-		if (_startedJumping)
+	private void Jump(float deltaTime) 
+	{
+		// force release after landing
+		if (CanJump && !_couldJumpLastFrame)
+			_needsSpaceRelease = true;
+		
+		// space released
+		if (BlastiaGame.KeyboardState.IsKeyUp(Keys.Space)) // released space -> stop the jump
+		{
+			_isCurrentlyJumping = false;
+			_needsSpaceRelease = false;
+			_currentJumpDuration = 0;	
+		}
+		
+	    // can jump if:
+	    // 1. pressed space
+	    // 2. grounded (CanJump)
+	    // 3. not waiting for space release (no auto-jump)
+		if (BlastiaGame.KeyboardState.IsKeyDown(Keys.Space) && CanJump && !_needsSpaceRelease)
+        {
+            _isCurrentlyJumping = true;
+			_needsSpaceRelease = true;
+        }
+
+		if (_isCurrentlyJumping) 
+		{
+			// start the timer
+			_currentJumpDuration += deltaTime;
+			if (_currentJumpDuration >= JumpDuration)
+            {
+				// stop jumping if exceed
+                _isCurrentlyJumping = false;
+				_currentJumpDuration = 0;
+            }
+		    
+			// add jump if jumping
 			MovementVector.Y = -JumpPower;
+		}
+
+		_couldJumpLastFrame = CanJump;
 	}
 
 	private Vector2 GetCoordsForBlockPlacement()

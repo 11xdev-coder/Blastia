@@ -83,10 +83,6 @@ public abstract class Entity : Object
     /// </summary>
     public bool CanJump { get; set; }
     
-    // IMPULSE
-    private Vector2 _totalImpulse;
-    private Vector2 _currentImpulse;
-    
     // HITBOX
     /// <summary>
     /// Entity height in blocks
