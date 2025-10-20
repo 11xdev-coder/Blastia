@@ -717,16 +717,26 @@ public class BlastiaGame : Game
 	{
 		_currentMouseState = Mouse.GetState();
 		
-		HasClickedLeft = _currentMouseState.LeftButton == ButtonState.Released 
+		if (IsActive) 
+		{
+		    HasClickedLeft = _currentMouseState.LeftButton == ButtonState.Released 
 						 && _previousMouseState.LeftButton == ButtonState.Pressed;
 		
-		HasClickedRight = _currentMouseState.RightButton == ButtonState.Released 
-		                 && _previousMouseState.RightButton == ButtonState.Pressed;
+			HasClickedRight = _currentMouseState.RightButton == ButtonState.Released 
+							&& _previousMouseState.RightButton == ButtonState.Pressed;
 
-		IsHoldingLeft = _currentMouseState.LeftButton == ButtonState.Pressed;
-		
-		// subtract previous from current
-		ScrollWheelDelta = _currentMouseState.ScrollWheelValue - _previousMouseState.ScrollWheelValue;
+			IsHoldingLeft = _currentMouseState.LeftButton == ButtonState.Pressed;
+			
+			// subtract previous from current
+			ScrollWheelDelta = _currentMouseState.ScrollWheelValue - _previousMouseState.ScrollWheelValue;
+		}
+		else 
+		{
+			HasClickedLeft = false;
+			HasClickedRight = false;
+			IsHoldingLeft = false;
+			ScrollWheelDelta = 0f;
+		}	
 		
 		// mouse position that is aligned with OS cursor
 		CursorPosition = Vector2.Transform(new Vector2(_currentMouseState.X, _currentMouseState.Y),
