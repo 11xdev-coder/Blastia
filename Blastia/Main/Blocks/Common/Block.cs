@@ -210,8 +210,7 @@ public class BlockInstance
 
 		if (SoundEngine.CanPlaySoundForBlock(position))
 		{
-			//SoundEngine.PlaySoundWithoutOverlappingForBlock(ChooseRandomBreakingSound(), position, 0.2f);
-			SoundEngine.PlayProceduralBlockBreakSound(position, BlockMaterial.Dirt, 0.1f, 0.2f);
+			SoundEngine.PlaySoundWithoutOverlappingForBlock(ChooseRandomBreakingSound(), position, 0.2f);
 		}
 		
 		if (!_breakingAnimation.IsAnimating)

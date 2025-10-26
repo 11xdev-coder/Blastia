@@ -31,100 +31,10 @@ public enum SoundID
     PlayerDeath
 }
 
-public enum BlockMaterial 
-{
-    Stone,
-    Dirt,
-    Wood,
-    Metal,
-    Glass,
-    Sand,
-    Gravel
-}
-
-public class ProceduralSoundGenerator 
-{
-    private const int SampleRate = 44100;
-    private const int BitsPerSample = 16;
-    private const int Channels = 1;
-    private Random _random = new();
-    
-    public SoundEffect GenerateBlockBreakSound(BlockMaterial material, float hardness) 
-    {
-        var duration = (int)(0.3 * SampleRate);
-        byte[] audioData = new byte[duration * 2];
-        
-        for (int i = 0; i < duration; i++) 
-        {
-            var time = i / (float)SampleRate;
-            var sample = 0f;
-
-            // base impact
-            var impact = (float)(_random.NextDouble() * 2 - 1);
-            impact *= MathF.Exp(-time * 20);
-
-            // material specific frequency
-            var frequency = material switch
-            {
-                BlockMaterial.Stone => 200 + hardness * 300,
-                BlockMaterial.Metal => 800 + hardness * 500,
-                BlockMaterial.Wood => 400 + hardness * 200,
-                BlockMaterial.Glass => 1200 + hardness * 800,
-                BlockMaterial.Dirt => 150 + hardness * 100,
-                BlockMaterial.Sand => 100 + hardness * 80,
-                BlockMaterial.Gravel => 250 + hardness * 150,
-                _ => 300
-            };
-            
-            // tonal component
-            if (material == BlockMaterial.Metal || material == BlockMaterial.Glass) 
-            {
-                var tone = MathF.Sin(2 * MathF.PI * frequency * time);
-                tone *= MathF.Exp(-time * 10);
-                sample += tone * 0.3f;
-            }
-
-            // cracking sounds (multiple micro-impacts)
-            var crackCount = material == BlockMaterial.Stone ? 5 : 3;
-            for (int c = 0; c < crackCount; c++) 
-            {
-                var crackTime = c * 0.05f;
-                if (time > crackTime && time < crackTime + 0.01f) 
-                {
-                    var crack = (float)(_random.NextDouble() * 2 - 1);
-                    crack *= 0.5f;
-                    sample += crack;
-                }
-            }
-
-            sample += impact;
-
-            // low-pass filter
-            var cutoff = frequency / (SampleRate / 2);
-            sample *= MathF.Min(1, cutoff * 2);
-
-            // clamp and convert to 16-bit
-            sample = Math.Clamp(sample, -1f, 1f);
-            var value = (short)(sample * short.MaxValue);
-            audioData[i * 2] = (byte)(value & 0xFF);
-            audioData[i * 2 + 1] = (byte)(value >> 8);
-        }
-
-        return new SoundEffect(audioData, SampleRate, (AudioChannels)Channels);
-    }
-}
-
 public static class SoundEngine
 {
     private static Dictionary<SoundID, SoundEffect> _sounds = new();
     private static ContentManager? _contentManager;
-    
-    #region Procedural Sounds
-    private static ProceduralSoundGenerator _soundGenerator = new();
-    private static Dictionary<string, SoundEffect> _proceduralSoundCache = new();
-    private const int MaxCacheSize = 50;    
-    
-    #endregion
 
     private static readonly Dictionary<Vector2, SoundEffectInstance> ActiveBlockSounds = [];
     private static readonly Dictionary<Vector2, DelayInfo> BlockSoundDelays = [];
@@ -278,37 +188,6 @@ public static class SoundEngine
     }
     
     #endregion
-    
-    #region Procedural Sounds
-    public static void PlayProceduralBlockBreakSound(Vector2 position, BlockMaterial material, float hardness, float delayAfterSound = 0.5f) 
-    {
-        var cacheKey = $"break_{material}_{hardness:F1}";
-        SoundEffect? sound;
-        
-        if (!_proceduralSoundCache.TryGetValue(cacheKey, out sound)) 
-        {
-            sound = _soundGenerator.GenerateBlockBreakSound(material, hardness);
-            CacheProceduralSound(cacheKey, sound);
-        }
-
-        PlaySoundWithoutOverlappingForBlock(sound, position, delayAfterSound);
-    }
-    
-    private static void CacheProceduralSound(string cacheKey, SoundEffect sound) 
-    {
-        // limit cache size
-        if (_proceduralSoundCache.Count >= MaxCacheSize) 
-        {
-            // remove oldest entry
-            var firstKey = _proceduralSoundCache.Keys.First();
-            _proceduralSoundCache[firstKey].Dispose();
-            _proceduralSoundCache.Remove(firstKey);
-        }
-
-        _proceduralSoundCache[cacheKey] = sound;
-    }
-    
-    #endregion
 
     /// <summary>
     /// Cleans up finished sounds
@@ -356,11 +235,5 @@ public static class SoundEngine
             sound.Dispose();
         }
         _sounds.Clear();
-        
-        foreach (var proceduralSound in _proceduralSoundCache.Values) 
-        {
-            proceduralSound.Dispose();
-        }
-        _proceduralSoundCache.Clear();
     }
 }
