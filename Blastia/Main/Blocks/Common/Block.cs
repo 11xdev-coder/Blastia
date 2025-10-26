@@ -1,4 +1,5 @@
 using Blastia.Main.Entities;
+using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
@@ -14,7 +15,7 @@ namespace Blastia.Main.Blocks.Common;
 [Serializable]
 public abstract class Block 
 {
-	public static readonly int Size = 8;
+	public static readonly int Size = 4;
 	public static readonly float AirDragCoefficient = 50f;
 	
 	public ushort Id { get; }
@@ -80,7 +81,7 @@ public abstract class Block
 		var item = StuffRegistry.GetItem(ItemIdDrop);
 		
 		// item launch constructor
-		var droppedItem = new DroppedItem(correctPosition, 0.25f, world, 
+		var droppedItem = new DroppedItem(correctPosition, Entity.DroppedItemScale, world, 
 			item, ItemDropAmount, randomDirection, 10f, 15f, 0f);		
 		BlastiaGame.RequestAddEntity(droppedItem);
 	}

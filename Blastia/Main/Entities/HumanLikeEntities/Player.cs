@@ -76,8 +76,8 @@ public class Player : HumanLikeEntity
 		// always create a camera
 		Camera = new Camera(position)
 		{
-			DrawWidth = 240 * Block.Size,
-			DrawHeight = 135 * Block.Size
+			DrawWidth = 480 * Block.Size,
+			DrawHeight = 270 * Block.Size
 		};
 		
 		if (myPlayer)

@@ -15,8 +15,9 @@ namespace Blastia.Main.Entities.Common;
 
 public abstract class Entity : Object
 {
-    public const float PlayerScale = 0.15f;
-    public const float DroppedItemScale = 0.25f;
+    public static readonly float EntityScalar = (float) Block.Size / BlockRectangles.SpriteSize;
+    public static readonly float PlayerScale = 0.15f * EntityScalar;
+    public static readonly float DroppedItemScale = 0.25f * EntityScalar;
     // map for movement keys and their vectors
     protected readonly Dictionary<Keys, Vector2> MovementMap = new()
     {

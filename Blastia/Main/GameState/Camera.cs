@@ -18,11 +18,11 @@ public class Camera : Object
 	};
 	
 	/// <summary>
-	/// in blocks *8 (tile_size = 8)
+	/// in blocks *4
 	/// </summary>
 	public int DrawWidth;
 	/// <summary>
-	/// in blocks *8 (tile_size = 8)
+	/// in blocks *4
 	/// </summary>
 	public int DrawHeight;
 
@@ -169,10 +169,10 @@ public class Camera : Object
 				MathUtilities.SmoothRound(worldPositionY * CameraScale), 
 				scaledBlockSize, scaledBlockSize);
 
-			var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - 8, layer);
-			var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + 8, layer);
-			var rightTile = worldState.GetBlockInstance(worldXCoord + 8, worldYCoord, layer);
-			var leftTile = worldState.GetBlockInstance(worldXCoord - 8, worldYCoord, layer);
+			var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - Block.Size, layer);
+			var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + Block.Size, layer);
+			var rightTile = worldState.GetBlockInstance(worldXCoord + Block.Size, worldYCoord, layer);
+			var leftTile = worldState.GetBlockInstance(worldXCoord - Block.Size, worldYCoord, layer);
 			Rectangle sourceRect = blockInstance.Block.GetRuleTileSourceRectangle(topTile == null || topTile.Block.IsTransparent, 
 				bottomTile == null || bottomTile.Block.IsTransparent, 
 				rightTile == null || rightTile.Block.IsTransparent, 
