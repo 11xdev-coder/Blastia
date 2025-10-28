@@ -73,7 +73,7 @@ public abstract class Entity : Object
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
-    protected const float Gravity = 68.521488f; // G constant
+    protected const float Gravity = 8565.186f; // G constant
     protected virtual float Mass { get; set; } = 1f; // kg
     /// <summary>
     /// <c>True</c> if player touches the ground (1 pixel above ground)
@@ -490,27 +490,26 @@ public abstract class Entity : Object
     /// </summary>
     private void ApplyGravityForce()
     {
-         if (!ApplyGravity || IsGrounded) return;
+        if (!ApplyGravity || IsGrounded) return;
          
-         var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
-         if (currentWorld == null) return;
+        var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
+        if (currentWorld == null) return;
         
-         var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
-         // m1 * m2
-         var totalMass = worldMass * Mass;
-        
-         // find distance between Entity position and center of Hell
-         // some variables
-         var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
-         var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
-         // distance squared
-         var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
-         var minDistance = 50f * 50f;
-         r = Math.Max(r, minDistance);
-        
-         // find gravity force
-         var gravityForce = Gravity * (totalMass / r);
-        
-         ApplyForce(new Vector2(0, (float) gravityForce));
+        var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
+        // m1 * m2
+        var totalMass = worldMass * Mass;
+    
+        // find distance between Entity position and center of Hell
+        var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
+        var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
+        // distance squared
+        var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
+        var minDistance = 50f * 50f;
+        r = Math.Max(r, minDistance);
+    
+        // find gravity force
+        var gravityForce = Gravity * (totalMass / r);
+    
+        ApplyForce(new Vector2(0, (float) gravityForce));
     }
 }
