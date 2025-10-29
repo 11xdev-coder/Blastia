@@ -167,7 +167,7 @@ public class Camera : Object
 			float worldPositionY = worldYCoord - Position.Y;
 			Rectangle destRect = new Rectangle(MathUtilities.SmoothRound(worldPositionX * CameraScale), 
 				MathUtilities.SmoothRound(worldPositionY * CameraScale), 
-				scaledBlockSize, scaledBlockSize);
+				scaledBlockSize + 1, scaledBlockSize + 1);
 
 			var topTile = worldState.GetBlockInstance(worldXCoord, worldYCoord - Block.Size, layer);
 			var bottomTile = worldState.GetBlockInstance(worldXCoord, worldYCoord + Block.Size, layer);
