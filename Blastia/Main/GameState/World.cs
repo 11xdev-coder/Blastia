@@ -13,7 +13,7 @@ namespace Blastia.Main.GameState;
 /// </summary>
 public class World
 {
-	public const int BaseSmallWorldSize = 426585600;
+	public const int BaseWorldMass = 3411200;
 	
 	private WorldState _state;
 	public Player? MyPlayer;
@@ -71,10 +71,9 @@ public class World
 		BlastiaGame.RulerMenu.Active = _rulerMode;
 	}
 	
-	public static double GetMass(int width, int height)
+	public static double GetMass()
 	{
-		// maybe improve this later
-		return width * height;
+		return BaseWorldMass;
 	}
 
 	/// <summary>

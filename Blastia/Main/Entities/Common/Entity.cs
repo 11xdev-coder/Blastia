@@ -495,7 +495,7 @@ public abstract class Entity : Object
         var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
         if (currentWorld == null) return;
         
-        var worldMass = World.GetMass(currentWorld.WorldWidth, currentWorld.WorldHeight);
+        var worldMass = World.GetMass();
         // m1 * m2
         var totalMass = worldMass * Mass;
     
@@ -503,9 +503,7 @@ public abstract class Entity : Object
         var halfWorldWidth = currentWorld.WorldWidth * 0.5f;
         var hellWorldPosition = new Vector2(halfWorldWidth, currentWorld.WorldHeight) * Block.Size;
         // distance squared
-        var r = MathUtilities.DistanceBetweenTwoPointsSquared(Position, hellWorldPosition);
-        var minDistance = 50f * 50f;
-        r = Math.Max(r, minDistance);
+        var r = MathUtilities.DistanceBetweenTwoPoints(Position, hellWorldPosition);
     
         // find gravity force
         var gravityForce = Gravity * (totalMass / r);

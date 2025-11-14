@@ -6,20 +6,21 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
-public class WorldCreationMenu(SpriteFont font, bool isActive = false) : CreationMenu(font, isActive)
+public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
 	private HandlerArrowButton<WorldDifficulty>? _difficultyButton;
 	private readonly WorldDifficultyHandler _difficultyHandler = new();
 	private HandlerArrowButton<WorldSize>? _sizeButton;
 	private readonly WorldSizeHandler _sizeHandler = new();
-
-	protected override string GetNameLabel() => "World name";
-	protected override string GetExistsText() => "World already exists!";
-	protected override float CreateButtonVAlign => 0.65f;
-
+	
 	protected override void AddElements()
 	{
-		base.AddElements();
+		PlainBackground bg = new PlainBackground(Vector2.Zero, 1400, 600, Colors.DarkBackground, 2, Colors.DarkBorder)
+		{
+			HAlign = 0.5f,
+			VAlign = 0.6f
+		};
+		Elements.Add(bg);
 		
 		_difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
 		"Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
@@ -43,33 +44,26 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Creatio
 		
 	}
 
-	protected override void UpdateSpecific()
-	{
+	// protected override void Create()
+	// {
+	// 	int width = _sizeHandler.GetWidth();
+	// 	int height = _sizeHandler.GetHeight();
+	// 	Console.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
 		
-	}
+	// 	if (NameInput?.Text == null) return;
+	// 	string playerName = NameInput.StringBuilder.ToString();
 
-	protected override void Create()
-	{
-		int width = _sizeHandler.GetWidth();
-		int height = _sizeHandler.GetHeight();
-		Console.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
-		
-		if (NameInput?.Text == null) return;
-		string playerName = NameInput.StringBuilder.ToString();
-
-		if (!PlayerNWorldManager.Instance.WorldExists(playerName))
-		{	
-			// create world with custom difficulty if doesnt exist
-			PlayerNWorldManager.Instance.NewWorld(NameInput.StringBuilder.ToString(), 
-				_difficultyHandler.CurrentItem, width, height);			
+	// 	if (!PlayerNWorldManager.Instance.WorldExists(playerName))
+	// 	{	
+	// 		// create world with custom difficulty if doesnt exist
+	// 		PlayerNWorldManager.Instance.NewWorld(NameInput.StringBuilder.ToString(), 
+	// 			_difficultyHandler.CurrentItem, width, height);			
 			
-			Back(); // go back
-		}
-		else
-		{
-			ShowExistsError();
-		}
-	}
-
-	protected override void Back() => SwitchToMenu(BlastiaGame.WorldsMenu);
+	// 		Back(); // go back
+	// 	}
+	// 	else
+	// 	{
+	// 		ShowExistsError();
+	// 	}
+	// }
 }

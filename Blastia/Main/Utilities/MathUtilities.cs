@@ -59,6 +59,14 @@ public static class MathUtilities
     }
 
     /// <summary>
+    /// Finds distance between point A and point B
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static double DistanceBetweenTwoPoints(Vector2 a, Vector2 b) => Math.Sqrt(DistanceBetweenTwoPointsSquared(a, b));
+
+    /// <summary>
     /// 
     /// </summary>
     /// <param name="value"></param>

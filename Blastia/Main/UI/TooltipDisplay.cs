@@ -1,5 +1,6 @@
 ﻿using Blastia.Main.GameState;
 using Blastia.Main.Items;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
@@ -25,8 +26,8 @@ public class TooltipData
 {
     public List<TooltipLine> Lines { get; set; } = [];
     public int Padding { get; set; } = 8;
-    public Color BackgroundColor { get; set; } = new(37, 76, 167);
-    public Color BorderColor { get; set; } = new(17, 47, 118);
+    public Color BackgroundColor { get; set; } = Colors.TooltipBackground;
+    public Color BorderColor { get; set; } = Colors.TooltipBorder;
     public int BorderThickness { get; set; } = 2;
 
     public void AddLine(string text, Color color, float scale = 0.8f)
