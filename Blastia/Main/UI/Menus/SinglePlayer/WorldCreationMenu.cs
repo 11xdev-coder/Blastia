@@ -12,6 +12,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private readonly WorldDifficultyHandler _difficultyHandler = new();
 	private HandlerArrowButton<WorldSize>? _sizeButton;
 	private readonly WorldSizeHandler _sizeHandler = new();
+	private Image? _worldPreview;
 	
 	protected override void AddElements()
 	{
@@ -22,27 +23,42 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		};
 		Elements.Add(bg);
 		
-		_difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
-		"Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
+		_worldPreview = new Image(Vector2.Zero, BlastiaGame.WorldCreationPreviewTexture, 32, 32, 3, new Vector2(3.5f, 3.5f)) 
 		{
-			HAlign = 0.5f,
-			VAlign = 0.55f
+		    HAlign = 0.4f,
+		    VAlign = 0.5f
 		};
-		_difficultyButton.AddToElements(Elements);
+		Elements.Add(_worldPreview);
 		
-		_sizeButton = new HandlerArrowButton<WorldSize>(Vector2.Zero,
-		"World size", Font, OnClickDifficulty, 10, _sizeHandler)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.6f
-		};
-		_sizeButton.AddToElements(Elements);
+		// _difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
+		// "Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
+		// {
+		// 	HAlign = 0.5f,
+		// 	VAlign = 0.55f
+		// };
+		// _difficultyButton.AddToElements(Elements);
+		
+		// _sizeButton = new HandlerArrowButton<WorldSize>(Vector2.Zero,
+		// "World size", Font, OnClickDifficulty, 10, _sizeHandler)
+		// {
+		// 	HAlign = 0.5f,
+		// 	VAlign = 0.6f
+		// };
+		// _sizeButton.AddToElements(Elements);
 	}
 	
 	private void OnClickDifficulty() 
 	{
 		
 	}
+
+    public override void Update()
+    {
+        base.Update();
+        if (_worldPreview == null) return;
+        
+        _worldPreview.Frame += 1;
+    }
 
 	// protected override void Create()
 	// {

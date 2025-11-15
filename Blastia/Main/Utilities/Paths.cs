@@ -28,6 +28,7 @@ public static class Paths
 	public static string ExitPath { get; private set; } = "";
 	public static string SlotBackgroundTexturePath { get; private set; } = "";
 	public static string SlotHighlightedTexturePath { get; private set; } = "";
+	public static string WorldCreationPreview { get; private set; } = "";
 	public static string BlockDestroyTexturePath { get; private set; } = "";
 	public static string SignEditBackgroundTexturePath { get; private set; } = "";
 	public static string SignWrittenOverlay1TexturePath { get; private set; } = "";
@@ -62,6 +63,7 @@ public static class Paths
 		ExitPath = Path.Combine(ContentRoot, "Textures/UI/Exit.png");
 		SlotBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotBackground.png");
 		SlotHighlightedTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotHighlighted.png");
+		WorldCreationPreview = Path.Combine(ContentRoot, "Textures/UI/WorldCreationPreview.png");
 		BlockDestroyTexturePath = Path.Combine(ContentRoot, "Textures/Blocks/BlockDestroy.png");
 		SignEditBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SignEditBackground.png");
 		SignWrittenOverlay1TexturePath = Path.Combine(ContentRoot, "Textures/Blocks/SignWrittenOverlay1.png");

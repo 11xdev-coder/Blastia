@@ -80,6 +80,7 @@ public class BlastiaGame : Game
 	public static Texture2D ExitTexture { get; private set; } = null!;
 	public static Texture2D SlotBackgroundTexture { get; private set; } = null!;
 	public static Texture2D SlotHighlightedTexture { get; private set; } = null!;
+	public static Texture2D WorldCreationPreviewTexture { get; private set; } = null!;
 	public static Texture2D BlockDestroyTexture { get; private set; } = null!;
 	public static Texture2D SignEditBackgroundTexture { get; private set; } = null!;
 	public static Texture2D SignWrittenOverlay1Texture { get; private set; } = null!;
@@ -313,6 +314,7 @@ public class BlastiaGame : Game
 		ExitTexture = Util.LoadTexture(GraphicsDevice, Paths.ExitPath);
 		SlotBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotBackgroundTexturePath);
 		SlotHighlightedTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotHighlightedTexturePath);
+		WorldCreationPreviewTexture = Util.LoadTexture(GraphicsDevice, Paths.WorldCreationPreview);
 		BlockDestroyTexture = Util.LoadTexture(GraphicsDevice, Paths.BlockDestroyTexturePath);
 		SignEditBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SignEditBackgroundTexturePath);
 		SignWrittenOverlay1Texture = Util.LoadTexture(GraphicsDevice, Paths.SignWrittenOverlay1TexturePath);
