@@ -217,7 +217,7 @@ public class Camera : Object
 	    
 	    // use fixed line thickness, dont scale too much
 	    int lineThickness = Math.Max(3, Math.Min(6, (int)(1 * CameraScale / 5)));
-	    Texture2D pixelTexture = BlastiaGame.WhitePixel;
+	    Texture2D pixelTexture = BlastiaGame.TextureManager.WhitePixel();
 	    
 	    // vertical lines
 	    for (int x = firstCellX; x <= lastCellX; x++)

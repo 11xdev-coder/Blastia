@@ -27,7 +27,7 @@ public class InventorySlot : UIElement
         BackgroundTexture = backgroundTexture;
         HighlightTexture = highlightTexture ?? backgroundTexture;
 
-        _itemIcon = new Image(Vector2.Zero, BlastiaGame.InvisibleTexture);
+        _itemIcon = new Image(Vector2.Zero, BlastiaGame.TextureManager.Invisible());
 
         _itemAmountText = new Text(Vector2.Zero, "", font)
         {
@@ -76,7 +76,7 @@ public class InventorySlot : UIElement
         {
             if (_itemIcon != null)
             {
-                _itemIcon.Texture = BlastiaGame.InvisibleTexture;
+                _itemIcon.Texture = BlastiaGame.TextureManager.Invisible();
             }
 
             if (_itemAmountText != null)

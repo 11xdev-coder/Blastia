@@ -11,7 +11,7 @@ public class LogoMenu(SpriteFont font, bool isActive = true) : Menu(font, isActi
     protected override void AddElements()
     {
         LogoImageElement logoText = new LogoImageElement(new Vector2(0, 100),
-            BlastiaGame.LogoTexture)
+            BlastiaGame.TextureManager.Get("Logo5X", "Menu"))
         {
             HAlign = 0.5f
         };

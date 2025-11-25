@@ -67,25 +67,7 @@ public class BlastiaGame : Game
 	public static KeyboardState PreviousKeyboardState { get; private set; }
 	
 	// GLOBAL TEXTURES
-	public static Texture2D LogoTexture { get; private set; } = null!;
-	public static Texture2D CursorTexture { get; private set; } = null!;
-	public static Texture2D SliderTexture { get; private set; } = null!;	
-	public static Texture2D RulerBlockHighlight { get; private set; } = null!;	
-	public static Texture2D ProgressBarBackground { get; private set; } = null!;
-	public static Texture2D WhitePixel { get; private set; } = null!;
-	public static Texture2D InvisibleTexture { get; private set; } = null!;
-	public static Texture2D MonitorTexture { get; private set; } = null!;
-	public static Texture2D AudioTexture { get; private set; } = null!;
-	public static Texture2D RedCrossTexture { get; private set; } = null!;
-	public static Texture2D ExitTexture { get; private set; } = null!;
-	public static Texture2D SlotBackgroundTexture { get; private set; } = null!;
-	public static Texture2D SlotHighlightedTexture { get; private set; } = null!;
-	public static Texture2D WorldCreationPreviewTexture { get; private set; } = null!;
-	public static Texture2D BlockDestroyTexture { get; private set; } = null!;
-	public static Texture2D SignEditBackgroundTexture { get; private set; } = null!;
-	public static Texture2D SignWrittenOverlay1Texture { get; private set; } = null!;
-	public static Texture2D SignWrittenOverlay2Texture { get; private set; } = null!;
-
+	public static TextureManager TextureManager { get; set; } = null!;
 	private MouseState _previousMouseState;
 	private MouseState _currentMouseState;
 	
@@ -283,42 +265,6 @@ public class BlastiaGame : Game
 	private void LoadTextures()
 	{
 		Util.Init(() => GraphicsDevice);
-		CursorTexture = Util.LoadTexture(GraphicsDevice, 
-			Paths.CursorTexturePath);
-		
-		LogoTexture = Util.LoadTexture(GraphicsDevice,
-			Paths.Logo5XTexturePath);
-		
-		SliderTexture = Util.LoadTexture(GraphicsDevice,
-			Paths.SliderBackgroundPath);
-		
-		RulerBlockHighlight = Util.LoadTexture(GraphicsDevice,
-			Paths.RulerBlockHighlightPath);
-			
-		ProgressBarBackground = Util.LoadTexture(GraphicsDevice,
-			Paths.ProgressbarBackgroundPath);
-		
-		WhitePixel = Util.LoadTexture(GraphicsDevice,
-			Paths.WhitePixelPath);
-		
-		InvisibleTexture = Util.LoadTexture(GraphicsDevice,
-			Paths.InvisibleTexturePath);
-		
-		MonitorTexture = Util.LoadTexture(GraphicsDevice,
-			Paths.MonitorTexturePath);
-		
-		AudioTexture = Util.LoadTexture(GraphicsDevice,
-			Paths.AudioTexturePath);
-
-		RedCrossTexture = Util.LoadTexture(GraphicsDevice, Paths.RedCrossPath);
-		ExitTexture = Util.LoadTexture(GraphicsDevice, Paths.ExitPath);
-		SlotBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotBackgroundTexturePath);
-		SlotHighlightedTexture = Util.LoadTexture(GraphicsDevice, Paths.SlotHighlightedTexturePath);
-		WorldCreationPreviewTexture = Util.LoadTexture(GraphicsDevice, Paths.WorldCreationPreview);
-		BlockDestroyTexture = Util.LoadTexture(GraphicsDevice, Paths.BlockDestroyTexturePath);
-		SignEditBackgroundTexture = Util.LoadTexture(GraphicsDevice, Paths.SignEditBackgroundTexturePath);
-		SignWrittenOverlay1Texture = Util.LoadTexture(GraphicsDevice, Paths.SignWrittenOverlay1TexturePath);
-		SignWrittenOverlay2Texture = Util.LoadTexture(GraphicsDevice, Paths.SignWrittenOverlay2TexturePath);
 	}
 	
 	protected override void LoadContent()
@@ -329,6 +275,7 @@ public class BlastiaGame : Game
 			SpriteBatch = new SpriteBatch(GraphicsDevice);
 
 			LoadTextures();
+			TextureManager = new TextureManager(Path.Combine(Content.RootDirectory, "Textures"), GraphicsDevice);
 
 			SoundEngine.LoadSounds();
 			MusicEngine.LoadMusic();
@@ -838,7 +785,7 @@ public class BlastiaGame : Game
 		}
 		
 		// draw cursor texture last on top of everything
-		SpriteBatch.Draw(CursorTexture, CursorPosition, Color.White);
+		SpriteBatch.Draw(TextureManager.Get("Cursor", "UI"), CursorPosition, Color.White);
 		TooltipDisplay?.Draw(SpriteBatch);
 		SpriteBatch.End();
 	}
@@ -922,7 +869,7 @@ public class BlastiaGame : Game
 		var slotSpacing = new Vector2(5f, 5f);
 
 		PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, World, gridStartPosition, Player.InventoryRows, 
-			Player.InventoryColumns, slotSize, slotSpacing, SlotBackgroundTexture, SlotHighlightedTexture, false, true);
+			Player.InventoryColumns, slotSize, slotSpacing, TextureManager.Get("SlotBackground", "UI"), TextureManager.Get("SlotHighlighted", "UI"), false, true);
 		AddMenu(PlayerInventoryUiMenu);
 
 		_myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.CandyBlock), 100);

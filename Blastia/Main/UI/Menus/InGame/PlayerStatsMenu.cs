@@ -11,7 +11,7 @@ public class PlayerStatsMenu(SpriteFont font, bool isActive = false) : Menu(font
     
     protected override void AddElements()
     {
-        _playerHealth = new Progressbar(Vector2.Zero, BlastiaGame.ProgressBarBackground)
+        _playerHealth = new Progressbar(Vector2.Zero, BlastiaGame.TextureManager.Get("ProgressBarBG", "UI"))
         {
             HAlign = 0.9f,
             VAlign = 0.05f

@@ -6,7 +6,6 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\peace
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\Menu\Tick.wav
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\Dirt.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Blocks\Stone.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Cursor.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\Body.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\Head.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\MutantScavenger\LeftArm.png
@@ -18,13 +17,11 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Huma
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\LeftArm.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\Leg.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Entities\Humans\Player\RightArm.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Invisible.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Menu\Logo.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Menu\Logo5X.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\Toilet.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\ProgressBarBG.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\SliderBG.png
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\WhitePixel.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Blastia.exe
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Blastia.deps.json
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Blastia.runtimeconfig.json
@@ -353,4 +350,6 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\runtimes\win-x64\native\freetype.dl
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\SixLabors.ImageSharp.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\TextCopy.dll
-D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\WorldCreationPreview.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\WorldCreation\Preview.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\WorldCreation\PreviewBorder.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\Cursor.png

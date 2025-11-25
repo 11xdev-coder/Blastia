@@ -77,7 +77,7 @@ public class InventoryUi : Menu
         _playerInventory.OnCursorItemChanged += OnCursorItemChanged;
         IsFullInventoryOpen = isFullyOpened;
 
-        _cursorItemImage = new Image(Vector2.Zero, BlastiaGame.InvisibleTexture);
+        _cursorItemImage = new Image(Vector2.Zero, BlastiaGame.TextureManager.Invisible());
         _cursorItemAmountText = new Text(Vector2.Zero, "", font);
         
         InitializeSlots();
@@ -104,7 +104,7 @@ public class InventoryUi : Menu
         }
         else
         {
-            _cursorItemImage.Texture = BlastiaGame.InvisibleTexture;
+            _cursorItemImage.Texture = BlastiaGame.TextureManager.Invisible();
             _cursorItemAmountText.Text = "";
         }
     }

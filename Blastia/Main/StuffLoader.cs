@@ -96,7 +96,7 @@ public static class StuffLoader
 				if (!File.Exists(fullTexturePath))
 				{
 					Console.WriteLine($"[StuffLoader] [SimpleBlocks] Texture not found at {fullTexturePath}");
-					texture = BlastiaGame.WhitePixel;
+					texture = BlastiaGame.TextureManager.WhitePixel();
 				}
 				else
 				{
@@ -221,7 +221,7 @@ public static class StuffLoader
 			if (!File.Exists(fullIconPath))
 			{
 				Console.WriteLine($"[StuffLoader] Icon not found at path: {fullIconPath} for item ID: {definition.Id}");
-				icon = BlastiaGame.WhitePixel;
+				icon = BlastiaGame.TextureManager.WhitePixel();
 			}
 			else
 			{
@@ -231,7 +231,7 @@ public static class StuffLoader
 		catch (Exception e)
 		{
 			Console.WriteLine($"[StuffLoader] Failed to load item icon: {e.Message}");
-			icon = BlastiaGame.WhitePixel;
+			icon = BlastiaGame.TextureManager.WhitePixel();
 		}
 		
 		// parse item type

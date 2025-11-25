@@ -16,14 +16,14 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	
 	protected override void AddElements()
 	{
-		PlainBackground bg = new PlainBackground(Vector2.Zero, 1400, 600, Colors.DarkBackground, 2, Colors.DarkBorder)
+		ColoredBackground bg = new ColoredBackground(Vector2.Zero, 1400, 600, Colors.DarkBackground, 2, Colors.DarkBorder)
 		{
 			HAlign = 0.5f,
 			VAlign = 0.6f
 		};
 		Elements.Add(bg);
 		
-		_worldPreview = new Image(Vector2.Zero, BlastiaGame.WorldCreationPreviewTexture, 32, 32, 3, new Vector2(3.5f, 3.5f)) 
+		_worldPreview = new Image(Vector2.Zero, BlastiaGame.TextureManager.Get("Preview", "UI", "WorldCreation"), 32, 32, 3, new Vector2(3.5f, 3.5f)) 
 		{
 		    HAlign = 0.4f,
 		    VAlign = 0.5f

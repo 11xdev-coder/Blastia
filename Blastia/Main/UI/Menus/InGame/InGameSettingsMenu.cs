@@ -12,10 +12,10 @@ public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(f
     {
         var scale = new Vector2(1.2f);
         _tabGroup = new TabGroup(Vector2.Zero, 40,
-            new Tab("Video", BlastiaGame.MonitorTexture, () => BlastiaGame.InGameVideoSettingsMenu, scale),
-            new Tab("Audio", BlastiaGame.AudioTexture, () => BlastiaGame.InGameAudioSettingsMenu, scale),
-            new Tab("Close", BlastiaGame.RedCrossTexture, () => null, scale, Back),
-            new Tab("Exit", BlastiaGame.ExitTexture, () => null, scale, ExitToMenu))
+            new Tab("Video", BlastiaGame.TextureManager.Get("Monitor", "UI"), () => BlastiaGame.InGameVideoSettingsMenu, scale),
+            new Tab("Audio", BlastiaGame.TextureManager.Get("Audio", "UI"), () => BlastiaGame.InGameAudioSettingsMenu, scale),
+            new Tab("Close", BlastiaGame.TextureManager.Get("RedCross", "UI"), () => null, scale, Back),
+            new Tab("Exit", BlastiaGame.TextureManager.Get("Exit", "UI"), () => null, scale, ExitToMenu))
         {
             HAlign = 0.3f,
             VAlign = 0.3f

@@ -311,7 +311,7 @@ public class Input : UIElement
                     var size = Font.MeasureString(substr) * Scale;
                     var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIdx * lineHeight);
                     var rect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, CursorWidth, CursorHeight);
-                    spriteBatch.Draw(BlastiaGame.WhitePixel, rect, CursorColor * Alpha);
+                    spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), rect, CursorColor * Alpha);
                     break;
                 }
                 acc += ln.Length;
@@ -412,7 +412,7 @@ public class Input : UIElement
                 var textSize = Font.MeasureString(safeText[..safeCursorIndex]);
                 var cursorPosition = new Vector2(Bounds.Left + textSize.X, Bounds.Center.Y - CursorHeight * 0.5f - yOffset);
                 var cursorRectangle = new Rectangle((int)cursorPosition.X, (int)cursorPosition.Y, CursorWidth, CursorHeight);
-                spriteBatch.Draw(BlastiaGame.WhitePixel, cursorRectangle, CursorColor * Alpha);
+                spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), cursorRectangle, CursorColor * Alpha);
             }
         }
     }

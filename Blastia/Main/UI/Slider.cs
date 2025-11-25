@@ -31,7 +31,7 @@ public class Slider : Image, IValueStorageUi<float>
     public Slider(Vector2 position, SpriteFont font, 
         Func<float> getValue, Action<float> setValue, Action<Action>? subscribeToEvent = null,
         bool showPercent = false, float percentTextOffset = 35) : 
-        base(position, BlastiaGame.SliderTexture)
+        base(position, BlastiaGame.TextureManager.Get("SliderBG", "UI"))
     {
         SetValue = setValue;
         GetValue = getValue;

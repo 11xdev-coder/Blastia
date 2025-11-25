@@ -253,6 +253,8 @@ public class TooltipDisplay
     
     public void Draw(SpriteBatch spriteBatch)
     {
+        var whitePixel = BlastiaGame.TextureManager.WhitePixel();
+        
         if (_playerCamera != null)
         {
             foreach (var bouncingText in _activeBouncingTexts)
@@ -277,9 +279,9 @@ public class TooltipDisplay
 
         if (_currentTooltipData.BorderThickness > 0)
         {
-            spriteBatch.Draw(BlastiaGame.WhitePixel, _tooltipBorderRect, _currentTooltipData.BorderColor);
+            spriteBatch.Draw(whitePixel, _tooltipBorderRect, _currentTooltipData.BorderColor);
         }
-        spriteBatch.Draw(BlastiaGame.WhitePixel, _tooltipBackgroundRect, _currentTooltipData.BackgroundColor);
+        spriteBatch.Draw(whitePixel, _tooltipBackgroundRect, _currentTooltipData.BackgroundColor);
 
         var currentLinePosition = _tooltipPosition + new Vector2(_currentTooltipData.Padding);
         var lineSpacing = 4f;

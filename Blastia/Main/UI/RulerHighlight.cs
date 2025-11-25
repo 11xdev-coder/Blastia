@@ -8,7 +8,7 @@ using Object = Blastia.Main.GameState.Object;
 namespace Blastia.Main.UI;
 
 public class RulerHighlight(Vector2 scale = default)
-    : Image(Vector2.Zero, BlastiaGame.RulerBlockHighlight, scale), IWorldPositionUi
+    : Image(Vector2.Zero, BlastiaGame.TextureManager.Get("RulerBlockHighlight", "UI"), scale), IWorldPositionUi
 {
     public override bool Scalable => false;
     public override bool ScalesWithCamera => true;

@@ -40,7 +40,7 @@ public class ScrollableArea : UIElement
     
     public ScrollableArea(Vector2 position, Viewport viewport, AlignmentType alignmentType = AlignmentType.Center, 
         float spacing = 0f, float scrolledOffset = 0f) : 
-        base(position, BlastiaGame.InvisibleTexture)
+        base(position, BlastiaGame.TextureManager.Invisible())
     {
         ViewportWidth = viewport.Width;
         ViewportHeight = viewport.Height;

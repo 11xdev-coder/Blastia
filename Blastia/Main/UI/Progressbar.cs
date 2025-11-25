@@ -31,6 +31,6 @@ public class Progressbar : Image
 						(int)((Bounds.Width - 2 * _horizontalOffset) * Progress), 
 						Bounds.Height - 2 * _verticalOffset);
 						
-		spriteBatch.Draw(BlastiaGame.WhitePixel, fillRectangle, _fillColor);
+		spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), fillRectangle, _fillColor);
 	}
 }

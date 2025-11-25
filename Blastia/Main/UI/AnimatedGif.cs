@@ -16,7 +16,7 @@ public class AnimatedGif : UIElement
 
     public Action? OnGifLoaded;
     
-    public AnimatedGif(Vector2 position, string url, bool loop = true, bool resize = false) : base(position, BlastiaGame.InvisibleTexture)
+    public AnimatedGif(Vector2 position, string url, bool loop = true, bool resize = false) : base(position, BlastiaGame.TextureManager.Invisible())
     {
         _url = url;
         _loop = loop;

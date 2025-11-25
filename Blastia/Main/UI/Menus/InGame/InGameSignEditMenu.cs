@@ -14,7 +14,7 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
     
     protected override void AddElements()
     {
-        var background = new Image(Vector2.Zero, BlastiaGame.SignEditBackgroundTexture)
+        var background = new Image(Vector2.Zero, BlastiaGame.TextureManager.Get("SignEditBackground", "UI"))
         {
             HAlign = 0.5f,
             VAlign = 0.3f

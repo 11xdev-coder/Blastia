@@ -63,10 +63,10 @@ public class SignBlock : Block
         switch (text.Length)
         {
             case > 72:
-                spriteBatch.Draw(BlastiaGame.SignWrittenOverlay2Texture, overlayRect, Color.White);
+                spriteBatch.Draw(BlastiaGame.TextureManager.Get("SignWrittenOverlay1", "Blocks"), overlayRect, Color.White);
                 break;
             case > 0:
-                spriteBatch.Draw(BlastiaGame.SignWrittenOverlay1Texture, overlayRect, Color.White);
+                spriteBatch.Draw(BlastiaGame.TextureManager.Get("SignWrittenOverlay2", "Blocks"), overlayRect, Color.White);
                 break;
         }
     }

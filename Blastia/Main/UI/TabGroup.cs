@@ -35,7 +35,7 @@ public class TabGroup : UIElement
     private Menu? _cachedActiveMenu;
     private int _selectedTabIndex = -1;
     
-    public TabGroup(Vector2 position, float tabSpacing, params Tab[] tabs) : base(position, BlastiaGame.InvisibleTexture)
+    public TabGroup(Vector2 position, float tabSpacing, params Tab[] tabs) : base(position, BlastiaGame.TextureManager.Invisible())
     {
         _tabSpacing = tabSpacing;
         _tabsData.AddRange(tabs);

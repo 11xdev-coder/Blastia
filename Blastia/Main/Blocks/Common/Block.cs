@@ -309,6 +309,6 @@ public class BlockInstance
 		}
 
 		var blockDestroySourceRectangle = GetBlockDestroySourceRectangle();
-		spriteBatch.Draw(BlastiaGame.BlockDestroyTexture, destRectangle, blockDestroySourceRectangle, Color.White);
+		spriteBatch.Draw(BlastiaGame.TextureManager.Get("BlockDestroy", "Blocks"), destRectangle, blockDestroySourceRectangle, Color.White);
 	}
 }
