@@ -54,7 +54,7 @@ public class Image : UIElement
             return;
         }
         
-        Vector2 origin = new Vector2(Texture.Width * 0.5f, Texture.Height * 0.5f);
+        Vector2 origin = new Vector2(_frameWidth * 0.5f, _frameHeight * 0.5f);
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
         

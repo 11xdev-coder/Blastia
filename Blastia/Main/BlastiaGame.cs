@@ -261,11 +261,6 @@ public class BlastiaGame : Game
 			LogError(ex, "Error in Initialize");
 		}
 	}
-
-	private void LoadTextures()
-	{
-		Util.Init(() => GraphicsDevice);
-	}
 	
 	protected override void LoadContent()
 	{
@@ -274,7 +269,7 @@ public class BlastiaGame : Game
 			Exiting += (_, _) => NetworkManager.Instance?.Shutdown();
 			SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-			LoadTextures();
+			Util.Init(() => GraphicsDevice);
 			TextureManager = new TextureManager(Path.Combine(Content.RootDirectory, "Textures"), GraphicsDevice);
 
 			SoundEngine.LoadSounds();

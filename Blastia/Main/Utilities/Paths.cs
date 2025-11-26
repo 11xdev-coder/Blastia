@@ -14,26 +14,6 @@ public static class Paths
 		set => Properties.OnValueChangedProperty(ref _contentRoot, value, UpdatePaths);
 	}
 	
-	// relative paths
-	public static string CursorTexturePath { get; private set; } = "";
-	public static string Logo5XTexturePath { get; private set; } = "";
-	public static string SliderBackgroundPath { get; private set; } = "";
-	public static string RulerBlockHighlightPath { get; private set; } = "";
-	public static string ProgressbarBackgroundPath { get; private set; } = "";
-	public static string WhitePixelPath { get; private set; } = "";
-	public static string InvisibleTexturePath { get; private set; } = "";
-	public static string MonitorTexturePath { get; private set; } = "";
-	public static string AudioTexturePath { get; private set; } = "";
-	public static string RedCrossPath { get; private set; } = "";
-	public static string ExitPath { get; private set; } = "";
-	public static string SlotBackgroundTexturePath { get; private set; } = "";
-	public static string SlotHighlightedTexturePath { get; private set; } = "";
-	public static string WorldCreationPreview { get; private set; } = "";
-	public static string BlockDestroyTexturePath { get; private set; } = "";
-	public static string SignEditBackgroundTexturePath { get; private set; } = "";
-	public static string SignWrittenOverlay1TexturePath { get; private set; } = "";
-	public static string SignWrittenOverlay2TexturePath { get; private set; } = "";
-	
 	// music
 	public static readonly string RatsOnSaturn = "Sounds/MenuSongs/rats_on_saturn.ogg";
 	public static readonly string PeacefulJourney00 = "Sounds/MenuSongs/peaceful journey_00.ogg";
@@ -49,26 +29,7 @@ public static class Paths
 	
 	// update all paths when ContentRoot changes
 	private static void UpdatePaths()
-	{
-		CursorTexturePath = Path.Combine(ContentRoot, "Textures/Cursor.png");
-		Logo5XTexturePath = Path.Combine(ContentRoot, "Textures/Menu/Logo5X.png");
-		SliderBackgroundPath = Path.Combine(ContentRoot, "Textures/UI/SliderBG.png");
-		RulerBlockHighlightPath = Path.Combine(ContentRoot, "Textures/UI/RulerBlockHighlight.png");
-		ProgressbarBackgroundPath = Path.Combine(ContentRoot, "Textures/UI/ProgressBarBG.png");
-		WhitePixelPath = Path.Combine(ContentRoot, "Textures/WhitePixel.png");
-		InvisibleTexturePath = Path.Combine(ContentRoot, "Textures/Invisible.png");
-		MonitorTexturePath = Path.Combine(ContentRoot, "Textures/UI/Monitor.png");
-		AudioTexturePath = Path.Combine(ContentRoot, "Textures/UI/Audio.png");
-		RedCrossPath = Path.Combine(ContentRoot, "Textures/UI/RedCross.png");
-		ExitPath = Path.Combine(ContentRoot, "Textures/UI/Exit.png");
-		SlotBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotBackground.png");
-		SlotHighlightedTexturePath = Path.Combine(ContentRoot, "Textures/UI/SlotHighlighted.png");
-		WorldCreationPreview = Path.Combine(ContentRoot, "Textures/UI/WorldCreationPreview.png");
-		BlockDestroyTexturePath = Path.Combine(ContentRoot, "Textures/Blocks/BlockDestroy.png");
-		SignEditBackgroundTexturePath = Path.Combine(ContentRoot, "Textures/UI/SignEditBackground.png");
-		SignWrittenOverlay1TexturePath = Path.Combine(ContentRoot, "Textures/Blocks/SignWrittenOverlay1.png");
-		SignWrittenOverlay2TexturePath = Path.Combine(ContentRoot, "Textures/Blocks/SignWrittenOverlay2.png");
-		
+	{		
 		// loading
 		BlockTextures = ContentRoot + "/Textures/Blocks";
 		HumanTextures = ContentRoot + "/Textures/Entities/Humans";

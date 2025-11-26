@@ -13,6 +13,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private HandlerArrowButton<WorldSize>? _sizeButton;
 	private readonly WorldSizeHandler _sizeHandler = new();
 	private Image? _worldPreview;
+	private Image? _worldPreviewBorder;
 	
 	protected override void AddElements()
 	{
@@ -25,10 +26,24 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		_worldPreview = new Image(Vector2.Zero, BlastiaGame.TextureManager.Get("Preview", "UI", "WorldCreation"), 32, 32, 3, new Vector2(3.5f, 3.5f)) 
 		{
-		    HAlign = 0.4f,
-		    VAlign = 0.5f
+		    HAlign = 0.155f,
+		    VAlign = 0.32f
 		};
 		Elements.Add(_worldPreview);
+		
+		_worldPreviewBorder = new Image(Vector2.Zero, BlastiaGame.TextureManager.Get("PreviewBorder", "UI", "WorldCreation"), 36, 36, 4, new Vector2(3.5f, 3.5f)) 
+		{
+		    HAlign = 0.1527f,
+		    VAlign = 0.317f
+		};
+		Elements.Add(_worldPreviewBorder);
+		
+		var t = new Button(Vector2.Zero, "Nigga", Font, () => {}, Color.Black, 1, Color.White) 
+		{
+		    HAlign = 0.5f,
+		    VAlign = 0.5f
+		};
+		Elements.Add(t);
 		
 		// _difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
 		// "Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
@@ -56,8 +71,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
     {
         base.Update();
         if (_worldPreview == null) return;
-        
-        _worldPreview.Frame += 1;
     }
 
 	// protected override void Create()
