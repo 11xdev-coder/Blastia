@@ -38,28 +38,45 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		};
 		Elements.Add(_worldPreviewBorder);
 		
-		var t = new Button(Vector2.Zero, "Nigga", Font, () => {}, Color.Black, 1, Color.White) 
+		var sizeText = new Text(Vector2.Zero, "Size", Font) 
 		{
-		    HAlign = 0.5f,
-		    VAlign = 0.5f
+		    HAlign = 0.15f,
+		    VAlign = 0.44f
 		};
-		Elements.Add(t);
+		Elements.Add(sizeText);
 		
-		// _difficultyButton = new HandlerArrowButton<WorldDifficulty>(Vector2.Zero,
-		// "Difficulty", Font, OnClickDifficulty, 10, _difficultyHandler)
-		// {
-		// 	HAlign = 0.5f,
-		// 	VAlign = 0.55f
-		// };
-		// _difficultyButton.AddToElements(Elements);
+		var small = new Button(Vector2.Zero, "Small", Font, () => {}, Color.Black, 0, Color.White, 5) 
+		{
+		    HAlign = 0.2f,
+		    VAlign = 0.44f
+		};
+		Elements.Add(small);
 		
-		// _sizeButton = new HandlerArrowButton<WorldSize>(Vector2.Zero,
-		// "World size", Font, OnClickDifficulty, 10, _sizeHandler)
-		// {
-		// 	HAlign = 0.5f,
-		// 	VAlign = 0.6f
-		// };
-		// _sizeButton.AddToElements(Elements);
+		var medium = new Button(Vector2.Zero, "Medium", Font, () => {}, Color.Black, 0, Color.White, 5) 
+		{
+		    HAlign = 0.26f,
+		    VAlign = 0.44f
+		};
+		Elements.Add(medium);
+		
+		var large = new Button(Vector2.Zero, "Large", Font, () => {}, Color.Black, 0, Color.White, 5) 
+		{
+		    HAlign = 0.33f,
+		    VAlign = 0.44f
+		};
+		Elements.Add(large);
+		
+		var difficultyText = new Text(new Vector2(275, 550), "Difficulty", Font);
+		Elements.Add(difficultyText);
+		
+		var easy = new Button(new Vector2(430, 550), "I am too young to die", Font, () => {}, Color.Black, 0, Color.White, 5);
+		Elements.Add(easy);
+		
+		var normal = new Button(new Vector2(430, 600), "Hurt me plenty", Font, () => {}, Color.Black, 0, Color.White, 5);
+		Elements.Add(normal);
+		
+		var hard = new Button(new Vector2(670, 600), "Nightmare", Font, () => {}, Color.Black, 0, Color.White, 5);
+		Elements.Add(hard);
 	}
 	
 	private void OnClickDifficulty() 

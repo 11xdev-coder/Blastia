@@ -13,6 +13,7 @@ public class Button : UIElement
     private Color _backgroundColor;
     private float _borderThickness;
     private Color _borderColor;
+    private float _padding;
 
     public Button(Vector2 position, string text, SpriteFont font, Action? onClick) : 
         base(position, text, font)
@@ -28,13 +29,14 @@ public class Button : UIElement
     /// <summary>
     /// Creates a button with custom background
     /// </summary>
-    public Button(Vector2 position, string text, SpriteFont font, Action? onClick, Color backgroundColor, float borderThickness, Color borderColor) : 
+    public Button(Vector2 position, string text, SpriteFont font, Action? onClick, Color backgroundColor, float borderThickness, Color borderColor, float padding) : 
         this(position, text, font, onClick)
     {
         _hasBackground = true;
         _backgroundColor = backgroundColor;
         _borderThickness = borderThickness;
         _borderColor = borderColor;
+        _padding = padding;
     }
 
     public override void OnAlignmentChanged()
@@ -42,7 +44,7 @@ public class Button : UIElement
         base.OnAlignmentChanged();
         
         if (_background == null) return;
-        _background.Position = new Vector2(Bounds.Left - 10, Bounds.Top - 10);
+        _background.Position = new Vector2(Bounds.Left - _padding, Bounds.Top - _padding);
     }
 
     public override void UpdateBounds()
@@ -51,7 +53,7 @@ public class Button : UIElement
         
         if (_hasBackground && _background == null) 
         {
-            _background = new ColoredBackground(new Vector2(Bounds.Left - 10, Bounds.Top - 10), Bounds.Width + 20, Bounds.Height + 20, _backgroundColor, _borderThickness, _borderColor);
+            _background = new ColoredBackground(new Vector2(Bounds.Left - _padding, Bounds.Top - _padding), Bounds.Width + _padding * 2, Bounds.Height + _padding * 2, _backgroundColor, _borderThickness, _borderColor);
         }
     }
 
