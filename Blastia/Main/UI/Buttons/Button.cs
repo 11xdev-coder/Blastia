@@ -4,8 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Buttons;
 
-public class Button : UIElement
+public class Button : UIElement, IValueStorageUi<bool>
 {
+    public Func<bool>? GetValue { get; set; }
+    public Action<bool>? SetValue { get; set; }
+    
     public Color NormalColor = Color.White;
     public Color SelectedColor = Color.Yellow;
     private ColoredBackground? _background;
@@ -38,6 +41,44 @@ public class Button : UIElement
         _borderColor = borderColor;
         _padding = padding;
     }
+    
+    /// <summary>
+    /// Turns this button into a boolean switch
+    /// </summary>
+    /// <param name="getValue">Original value getter</param>
+    /// <param name="setValue">Method for setting the original value to new value</param>
+    /// <param name="onOriginalValueChanged">Method that subscribes handler to when original value changes. Used when original value changes from other source to update this value</param>
+    public void CreateBooleanSwitch(Func<bool> getValue, Action<bool> setValue, Action<Action>? onOriginalValueChanged) 
+    {
+        GetValue = getValue;
+        SetValue = setValue;
+        
+        OnClick += OnClickChangeValue;
+        UpdateText();
+        
+        if (onOriginalValueChanged != null)
+            onOriginalValueChanged(UpdateText);
+    }
+    
+    private void OnClickChangeValue() 
+    {
+        if (GetValue == null || SetValue == null) return;
+        
+        // get opposite value and set it
+        var opposite = !GetValue();
+        SetValue(opposite);
+        
+        UpdateText();
+    }
+    
+    /// <summary>
+    /// Keeps text in sync with the value
+    /// </summary>
+    private void UpdateText() 
+    {
+        if (GetValue == null) return;
+        Text = $"{InitialText}: {GetValue()}";
+    }
 
     public override void OnAlignmentChanged()
     {
@@ -59,11 +100,15 @@ public class Button : UIElement
 
     private void Select()
     {
-        DrawColor = SelectedColor;
+        if (_hasBackground)
+            _background?.SetBorderColor(SelectedColor);
+        else
+            DrawColor = SelectedColor;
     }
 
     private void Deselect()
     {
+        _background?.SetBorderColor(_borderColor);
         DrawColor = NormalColor;
     }
 
@@ -77,5 +122,15 @@ public class Button : UIElement
     {
         _background?.Draw(spriteBatch);
         base.Draw(spriteBatch);
+    }
+
+    public void UpdateLabel()
+    {
+        throw new NotImplementedException();
+    }
+
+    void IValueStorageUi<bool>.UpdateLabel()
+    {
+        UpdateLabel();
     }
 }

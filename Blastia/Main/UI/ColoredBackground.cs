@@ -25,6 +25,8 @@ public class ColoredBackground : UIElement
         _borderThickness = borderThickness;
         _borderColor = borderColor;
     }
+    
+    public void SetBorderColor(Color newColor) => _borderColor = newColor;
 
     public override void UpdateBounds()
     {

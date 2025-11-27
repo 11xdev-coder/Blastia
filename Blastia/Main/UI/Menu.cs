@@ -222,15 +222,15 @@ public class Menu
 
     protected void AddFullscreenSwitch(float hAlign, float vAlign, Action onClick)
     {
-        BoolSwitchButton isFullScreenButton = new BoolSwitchButton(Vector2.Zero, "Full Screen", Font, 
-            onClick, 
-            () => VideoManager.Instance.IsFullScreen,
-            _ => VideoManager.Instance.ToggleFullscreen(),
-            handler => VideoManager.Instance.FullScreenChanged += handler)
+        var isFullScreenButton = new Button(Vector2.Zero, "Full Screen", Font, onClick)
         {
             HAlign = hAlign,
             VAlign = vAlign
         };
+        isFullScreenButton.CreateBooleanSwitch( 
+            () => VideoManager.Instance.IsFullScreen,
+            _ => VideoManager.Instance.ToggleFullscreen(),
+            handler => VideoManager.Instance.FullScreenChanged += handler);
         Elements.Add(isFullScreenButton);
     }
 
