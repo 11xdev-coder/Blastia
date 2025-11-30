@@ -50,6 +50,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    HAlign = 0.2f,
 		    VAlign = 0.44f
 		};
+		WorldCreationBoolButtonPreset(small);
 		Elements.Add(small);
 		
 		var medium = new Button(Vector2.Zero, "Medium", Font, () => {}, Color.Black, 1, Color.Transparent, 5) 
@@ -57,6 +58,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    HAlign = 0.26f,
 		    VAlign = 0.44f
 		};
+		WorldCreationBoolButtonPreset(medium);
 		Elements.Add(medium);
 		
 		var large = new Button(Vector2.Zero, "Large", Font, () => {}, Color.Black, 1, Color.Transparent, 5) 
@@ -64,18 +66,22 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    HAlign = 0.33f,
 		    VAlign = 0.44f
 		};
+		WorldCreationBoolButtonPreset(large);
 		Elements.Add(large);
 		
 		var difficultyText = new Text(new Vector2(275, 550), "Difficulty", Font);
 		Elements.Add(difficultyText);
 		
 		var easy = new Button(new Vector2(430, 550), "I am too young to die", Font, () => {}, Color.Black, 1, Color.Transparent, 5);
+		WorldCreationBoolButtonPreset(easy);
 		Elements.Add(easy);
 		
 		var normal = new Button(new Vector2(430, 600), "Hurt me plenty", Font, () => {}, Color.Black, 1, Color.Transparent, 5);
+		WorldCreationBoolButtonPreset(normal);
 		Elements.Add(normal);
 		
 		var hard = new Button(new Vector2(670, 600), "Nightmare", Font, () => {}, Color.Black, 1, Color.Transparent, 5);
+		WorldCreationBoolButtonPreset(hard);
 		Elements.Add(hard);
 	}
 	

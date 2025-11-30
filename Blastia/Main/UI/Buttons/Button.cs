@@ -17,6 +17,15 @@ public class Button : UIElement, IValueStorageUi<bool>
     private float _borderThickness;
     private Color _borderColor;
     private float _padding;
+    
+    /// <summary>
+    /// Called whenever boolean value changed
+    /// </summary>
+    private Action? _onValueChangedUpdate;
+    /// <summary>
+    /// Used when creating boolean buttons <c>GetValue</c> or <c>SetValue</c> are null
+    /// </summary>
+    private bool _state;
 
     public Button(Vector2 position, string text, SpriteFont font, Action? onClick) : 
         base(position, text, font)
@@ -47,17 +56,31 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// </summary>
     /// <param name="getValue">Original value getter</param>
     /// <param name="setValue">Method for setting the original value to new value</param>
-    /// <param name="onOriginalValueChanged">Method that subscribes handler to when original value changes. Used when original value changes from other source to update this value</param>
-    public void CreateBooleanSwitch(Func<bool> getValue, Action<bool> setValue, Action<Action>? onOriginalValueChanged) 
+    /// <param name="whenOriginalValueChanged">Method that subscribes handler to when original value changes. Used when original value changes from other source to update this value</param>
+    /// <param name="showValue">Will show the value of the boolean (e.g. "Test: True")</param>
+    /// <param name="getValue">Executed whenever the button is pressed (or original value changed). Boolean argument is the new value</param>
+    public void CreateBooleanSwitch(Func<bool>? getValue, Action<bool>? setValue, Action<Action>? whenOriginalValueChanged, bool showValue = true, Action<bool, Button>? onValueChanged = null) 
     {
-        GetValue = getValue;
-        SetValue = setValue;
+        GetValue = getValue == null ? () => _state : getValue;
+        SetValue = setValue == null ? (val) => _state = val : setValue;
+        
+        Action updateAction = () => 
+        {
+            if (GetValue == null) return;
+            
+            if (showValue)
+                Text = $"{InitialText}: {GetValue()}";
+            
+            // call update with the new variable
+            onValueChanged?.Invoke(GetValue(), this);
+        };
+        _onValueChangedUpdate = updateAction;
         
         OnClick += OnClickChangeValue;
-        UpdateText();
+        updateAction();
         
-        if (onOriginalValueChanged != null)
-            onOriginalValueChanged(UpdateText);
+        if (whenOriginalValueChanged != null)
+            whenOriginalValueChanged(updateAction);
     }
     
     private void OnClickChangeValue() 
@@ -68,16 +91,7 @@ public class Button : UIElement, IValueStorageUi<bool>
         var opposite = !GetValue();
         SetValue(opposite);
         
-        UpdateText();
-    }
-    
-    /// <summary>
-    /// Keeps text in sync with the value
-    /// </summary>
-    private void UpdateText() 
-    {
-        if (GetValue == null) return;
-        Text = $"{InitialText}: {GetValue()}";
+        _onValueChangedUpdate?.Invoke();
     }
 
     public override void OnAlignmentChanged()
@@ -97,6 +111,9 @@ public class Button : UIElement, IValueStorageUi<bool>
             _background = new ColoredBackground(new Vector2(Bounds.Left - _padding, Bounds.Top - _padding), Bounds.Width + _padding * 2, Bounds.Height + _padding * 2, _backgroundColor, _borderThickness, _borderColor);
         }
     }
+    
+    public void SetBackgroundColor(Color newColor) => _background?.SetBackgroundColor(newColor);
+    public void RevertOriginalBackgroundColor() => _background?.SetBackgroundColor(_backgroundColor);
 
     private void Select()
     {

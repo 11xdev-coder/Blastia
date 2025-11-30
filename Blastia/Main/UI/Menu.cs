@@ -2,6 +2,7 @@
 using Blastia.Main.GameState;
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.Utilities;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -245,5 +246,16 @@ public class Menu
         };
         resolutionSwitcher.AddToElements(Elements);
 
+    }
+    
+    protected void WorldCreationBoolButtonPreset(Button button) 
+    {
+        button.CreateBooleanSwitch(null, null, null, false, (newVal, button) => 
+        {
+            if (newVal)
+                button.SetBackgroundColor(Color.Yellow);
+            else
+                button.RevertOriginalBackgroundColor();
+        });
     }
 }
