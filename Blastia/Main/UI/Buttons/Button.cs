@@ -26,6 +26,10 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// Used when creating boolean buttons <c>GetValue</c> or <c>SetValue</c> are null
     /// </summary>
     private bool _state;
+    /// <summary>
+    /// List of button getters that will deactivate once this button is activated (when this is a boolean switch)
+    /// </summary>
+    private List<Func<Button>> _buttonGroup = [];
 
     public Button(Vector2 position, string text, SpriteFont font, Action? onClick) : 
         base(position, text, font)
@@ -59,7 +63,8 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// <param name="whenOriginalValueChanged">Method that subscribes handler to when original value changes. Used when original value changes from other source to update this value</param>
     /// <param name="showValue">Will show the value of the boolean (e.g. "Test: True")</param>
     /// <param name="getValue">Executed whenever the button is pressed (or original value changed). Boolean argument is the new value</param>
-    public void CreateBooleanSwitch(Func<bool>? getValue, Action<bool>? setValue, Action<Action>? whenOriginalValueChanged, bool showValue = true, Action<bool, Button>? onValueChanged = null) 
+    public void CreateBooleanSwitch(Func<bool>? getValue, Action<bool>? setValue, Action<Action>? whenOriginalValueChanged, bool showValue = true, Action<bool, Button>? onValueChanged = null,
+        List<Func<Button>>? buttonGroupGetters = null) 
     {
         GetValue = getValue == null ? () => _state : getValue;
         SetValue = setValue == null ? (val) => _state = val : setValue;
@@ -79,11 +84,18 @@ public class Button : UIElement, IValueStorageUi<bool>
         OnClick += OnClickChangeValue;
         updateAction();
         
-        if (whenOriginalValueChanged != null)
+        if (whenOriginalValueChanged != null) 
             whenOriginalValueChanged(updateAction);
+        
+        if (buttonGroupGetters == null) return;
+        foreach (var buttonGetter in buttonGroupGetters)
+            _buttonGroup.Add(buttonGetter);
     }
     
-    private void OnClickChangeValue() 
+    /// <summary>
+    /// Just sets the opposite value for this button
+    /// </summary>
+    public void SetOppositeValue() 
     {
         if (GetValue == null || SetValue == null) return;
         
@@ -92,6 +104,25 @@ public class Button : UIElement, IValueStorageUi<bool>
         SetValue(opposite);
         
         _onValueChangedUpdate?.Invoke();
+    }
+    
+    /// <summary>
+    /// Called when clicked directly on this button => updates value and deselects other buttons
+    /// </summary>
+    private void OnClickChangeValue() 
+    {
+        SetOppositeValue();
+        
+        // deactivate other buttons
+        foreach (var buttonGetter in _buttonGroup) 
+        {
+            var button = buttonGetter();
+            if (button == this) continue;
+            
+            // opposite values for other buttons
+            if (button.GetValue?.Invoke() == true) 
+                button.SetOppositeValue();
+        }
     }
 
     public override void OnAlignmentChanged()
@@ -143,11 +174,6 @@ public class Button : UIElement, IValueStorageUi<bool>
 
     public void UpdateLabel()
     {
-        throw new NotImplementedException();
-    }
-
-    void IValueStorageUi<bool>.UpdateLabel()
-    {
-        UpdateLabel();
+        _onValueChangedUpdate?.Invoke();
     }
 }

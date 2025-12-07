@@ -248,7 +248,7 @@ public class Menu
 
     }
     
-    protected void WorldCreationBoolButtonPreset(Button button) 
+    protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null) 
     {
         button.CreateBooleanSwitch(null, null, null, false, (newVal, button) => 
         {
@@ -256,6 +256,6 @@ public class Menu
                 button.SetBackgroundColor(Color.Yellow);
             else
                 button.RevertOriginalBackgroundColor();
-        });
+        }, buttonGroupGetters);
     }
 }
