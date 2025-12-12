@@ -34,13 +34,21 @@ public class Input : UIElement
     /// Allows multi-line input and doesn't try to center this element (keeps in one place)
     /// </summary>
     public bool IsSignEditing { get; set; }
+    /// <summary>
+    /// Only works if <c>IsSignEditing</c> is true
+    /// </summary>
+    private bool _hasBackground { get; set; }
+    private Color _backgroundColor { get; set; }
+    private Color _borderColor { get; set; }
+    private float _borderThickness { get; set; }
+    private float _padding { get; set; }
     public int CharacterLimit { get; set; } = 280;
     /// <summary>
     /// Horizontal line size which when exceeded will start a new line
     /// </summary>
     public float WrapTextSize { get; set; } = 650;
     /// <summary>
-    /// If true, when <c>WrapLength</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
+    /// If true, when <c>WrapTextSize</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
     /// </summary>
     public bool MoveInsteadOfWrapping { get; set; }
     /// <summary>
@@ -68,6 +76,62 @@ public class Input : UIElement
         DefaultText = defaultText;
         
         IsFocused = focusedByDefault;
+    }
+    
+    // TODO: Merge background creation to UIElement?
+    /// <summary>
+    /// Creates background for this element
+    /// </summary>
+    public void CreateBackground(Color backgroundColor, Color borderColor, float borderThickness, float padding) 
+    {
+        _hasBackground = true;
+        _backgroundColor = backgroundColor;
+        _borderColor = borderColor;
+        _borderThickness = borderThickness;
+        _padding = padding;
+    }
+    
+    /// <summary>
+    /// Calculates maximum possible bounds depending on max text size
+    /// </summary>
+    /// <returns></returns>
+    private Rectangle GetMaxPossibleBounds() 
+    {
+        if (Font == null || !IsSignEditing) return Rectangle.Empty;
+        
+        // horizontal only
+        if (MoveInsteadOfWrapping) 
+        {
+            var height = Font.LineSpacing;
+            return new Rectangle((int) Position.X, (int) Position.Y,
+                (int) WrapTextSize, height);
+        }
+        else 
+        {
+            // calculate multiple lines
+            var lines = GetMaxPossibleLines();
+            var height = Font.LineSpacing * lines;
+            
+            return new Rectangle((int) Position.X, (int) Position.Y, (int) WrapTextSize, height);
+        }
+    }
+    
+    /// <summary>
+    /// Estimates average amount of lines (using 'M' character)
+    /// </summary>
+    /// <returns></returns>
+    private int GetMaxPossibleLines() 
+    {
+        if (Font == null) return 1;
+        
+        var avgCharWidth = Font.MeasureString("M").X;
+        var charsPerLine = (int) (WrapTextSize / avgCharWidth);
+        
+        if (charsPerLine <= 0) return 1;
+        
+        var lines = (int) Math.Ceiling((double) CharacterLimit / charsPerLine);
+        if (lines <= 0) return 1;
+        return lines;
     }
 
     public override void Update()
