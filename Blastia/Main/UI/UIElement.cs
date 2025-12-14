@@ -153,7 +153,7 @@ public abstract class UIElement
     /// </summary>
     public Color BorderColor { get; set; } = Color.Black;
     /// <summary>
-    /// Thickness of the Border. Only used when rendering text (<c>UseTexture = false</c>). Defaults to <c>1.4f</c>
+    /// Thickness of the Border. Only used when rendering text (<c>UseTexture = false</c>). Defaults to <c>2f</c>
     /// </summary>
     public float BorderOffsetFactor { get; set; } = 2f;
     protected readonly Vector2[] _borderOffsets =
@@ -170,6 +170,15 @@ public abstract class UIElement
 
     public virtual float Alpha { get; set; } = 1f;
     public bool LerpAlphaToZero { get; set; }
+    
+    // background
+    public ColoredBackground? Background;
+    private bool _hasBackground;
+    private Color _backgroundColor;
+    private float _borderThickness;
+    protected Color _borderColor;
+    private float _padding;
+    private Func<Rectangle>? _backgroundBounds;
     
     /// <summary>
     /// Image constructor
@@ -343,6 +352,10 @@ public abstract class UIElement
         
         Vector2 textSize = Font.MeasureString(Text);
         UpdateBoundsBase(textSize.X, textSize.Y);
+        
+        // if we have a background -> create it
+        if (_hasBackground)
+            CreateBackground();
     }
 
     /// <summary>
@@ -384,6 +397,9 @@ public abstract class UIElement
     {
         // update bounds by default
         UpdateBounds();
+        
+        if (_hasBackground)
+            UpdateBackgroundPosition();
     }
 
     /// <summary>
@@ -536,4 +552,45 @@ public abstract class UIElement
     {
         SoundEngine.PlaySound(SoundID.Tick);
     }
+    
+    
+    #region Background
+    /// <summary>
+    /// Setups background properties, but doesn't create yet
+    /// </summary>
+    public void SetBackgroundProperties(Func<Rectangle> backgroundBounds, Color backgroundColor, float borderThickness, Color borderColor, float padding) 
+    {
+        _backgroundBounds = backgroundBounds;
+        _hasBackground = true;
+        _backgroundColor = backgroundColor;
+        _borderThickness = borderThickness;
+        _borderColor = borderColor;
+        _padding = padding;
+    }
+    
+    /// <summary>
+    /// Creates background (only if <c>SetBackgroundProperties</c> was called)
+    /// </summary>
+    protected void CreateBackground() 
+    {
+        if (!_hasBackground || _backgroundBounds == null || Background != null) return;
+        
+        var bounds = _backgroundBounds();
+        Background =  new ColoredBackground(new Vector2(bounds.Left - _padding, bounds.Top - _padding), bounds.Width + _padding * 2, bounds.Height + _padding * 2, _backgroundColor, _borderThickness, _borderColor);
+    }
+    
+    /// <summary>
+    /// Updates the background position with new bounds (only if <c>SetBackgroundProperties</c> was called)
+    /// </summary>
+    protected void UpdateBackgroundPosition() 
+    {
+        if (!_hasBackground || Background == null || _backgroundBounds == null) return;
+        
+        var bounds = _backgroundBounds();
+        Background.Position = new Vector2(bounds.Left - _padding, bounds.Top - _padding);
+    }
+    
+    public void SetBackgroundColor(Color newColor) => Background?.SetBackgroundColor(newColor);
+    public void RevertOriginalBackgroundColor() => Background?.SetBackgroundColor(_backgroundColor);
+    #endregion
 }

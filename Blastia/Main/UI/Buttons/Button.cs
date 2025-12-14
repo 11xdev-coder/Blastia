@@ -11,12 +11,7 @@ public class Button : UIElement, IValueStorageUi<bool>
     
     public Color NormalColor = Color.White;
     public Color SelectedColor = Color.Yellow;
-    private ColoredBackground? _background;
-    private bool _hasBackground;
-    private Color _backgroundColor;
-    private float _borderThickness;
-    private Color _borderColor;
-    private float _padding;
+    
     
     /// <summary>
     /// Called whenever boolean value changed
@@ -40,19 +35,6 @@ public class Button : UIElement, IValueStorageUi<bool>
         
         OnStartHovering = () => { PlayTickSound(); Select(); };
         OnEndHovering = Deselect;
-    }
-    
-    /// <summary>
-    /// Creates a button with custom background
-    /// </summary>
-    public Button(Vector2 position, string text, SpriteFont font, Action? onClick, Color backgroundColor, float borderThickness, Color borderColor, float padding) : 
-        this(position, text, font, onClick)
-    {
-        _hasBackground = true;
-        _backgroundColor = backgroundColor;
-        _borderThickness = borderThickness;
-        _borderColor = borderColor;
-        _padding = padding;
     }
     
     /// <summary>
@@ -124,51 +106,30 @@ public class Button : UIElement, IValueStorageUi<bool>
                 button.SetOppositeValue();
         }
     }
-
-    public override void OnAlignmentChanged()
-    {
-        base.OnAlignmentChanged();
-        
-        if (_background == null) return;
-        _background.Position = new Vector2(Bounds.Left - _padding, Bounds.Top - _padding);
-    }
-
-    public override void UpdateBounds()
-    {
-        base.UpdateBounds();
-        
-        if (_hasBackground && _background == null) 
-        {
-            _background = new ColoredBackground(new Vector2(Bounds.Left - _padding, Bounds.Top - _padding), Bounds.Width + _padding * 2, Bounds.Height + _padding * 2, _backgroundColor, _borderThickness, _borderColor);
-        }
-    }
     
-    public void SetBackgroundColor(Color newColor) => _background?.SetBackgroundColor(newColor);
-    public void RevertOriginalBackgroundColor() => _background?.SetBackgroundColor(_backgroundColor);
-
     private void Select()
     {
-        if (_hasBackground)
-            _background?.SetBorderColor(SelectedColor);
+        if (Background != null)
+            Background?.SetBorderColor(SelectedColor);
         else
             DrawColor = SelectedColor;
     }
 
     private void Deselect()
     {
-        _background?.SetBorderColor(_borderColor);
+        Background?.SetBorderColor(_borderColor);
         DrawColor = NormalColor;
     }
 
     public override void Update()
     {
-        _background?.Update();
+        Background?.Update();
         base.Update();
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        _background?.Draw(spriteBatch);
+        Background?.Draw(spriteBatch);
         base.Draw(spriteBatch);
     }
 

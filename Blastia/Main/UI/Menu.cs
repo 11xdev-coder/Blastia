@@ -250,6 +250,7 @@ public class Menu
     
     protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null) 
     {
+        button.SetBackgroundProperties(() => button.Bounds, Color.Black, 1, Color.Transparent, 5);
         button.CreateBooleanSwitch(null, null, null, false, (newVal, button) => 
         {
             if (newVal)

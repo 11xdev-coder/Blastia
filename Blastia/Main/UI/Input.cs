@@ -34,14 +34,6 @@ public class Input : UIElement
     /// Allows multi-line input and doesn't try to center this element (keeps in one place)
     /// </summary>
     public bool IsSignEditing { get; set; }
-    /// <summary>
-    /// Only works if <c>IsSignEditing</c> is true
-    /// </summary>
-    private bool _hasBackground { get; set; }
-    private Color _backgroundColor { get; set; }
-    private Color _borderColor { get; set; }
-    private float _borderThickness { get; set; }
-    private float _padding { get; set; }
     public int CharacterLimit { get; set; } = 280;
     /// <summary>
     /// Horizontal line size which when exceeded will start a new line
@@ -76,19 +68,6 @@ public class Input : UIElement
         DefaultText = defaultText;
         
         IsFocused = focusedByDefault;
-    }
-    
-    // TODO: Merge background creation to UIElement?
-    /// <summary>
-    /// Creates background for this element
-    /// </summary>
-    public void CreateBackground(Color backgroundColor, Color borderColor, float borderThickness, float padding) 
-    {
-        _hasBackground = true;
-        _backgroundColor = backgroundColor;
-        _borderColor = borderColor;
-        _borderThickness = borderThickness;
-        _padding = padding;
     }
     
     /// <summary>
