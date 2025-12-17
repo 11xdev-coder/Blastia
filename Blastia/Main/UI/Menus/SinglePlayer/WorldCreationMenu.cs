@@ -85,6 +85,9 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		WorldCreationBoolButtonPreset(easy, [() => normal, () => hard]);
 		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard]);
 		WorldCreationBoolButtonPreset(hard, [() => easy, () => normal]);
+		
+		var test = new Input(new Vector2(900, 900), Font, labelText: "Nigga:");
+		Elements.Add(test);
 	}
 
     public override void Update()

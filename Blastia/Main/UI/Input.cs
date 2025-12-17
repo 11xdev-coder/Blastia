@@ -53,10 +53,13 @@ public class Input : UIElement
     private bool _shouldRecalcOptimalStart;
 
     private bool _ctrlVPressedLastFrame;
+    
+    private string _labelText = "";
+    private Text? _labelTextUi;
 
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
         double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
-        int cursorWidth = 2, int cursorHeight = 30, string defaultText = "Text here...") : base(position, "", font)
+        int cursorWidth = 2, int cursorHeight = 30, string defaultText = "Text here...", string labelText = "") : base(position, "", font)
     {
         _cursorVisible = cursorVisible;
         _shouldDrawCursor = cursorVisible;
@@ -68,6 +71,12 @@ public class Input : UIElement
         DefaultText = defaultText;
         
         IsFocused = focusedByDefault;
+        
+        if (!string.IsNullOrEmpty(labelText)) 
+        {
+            _labelText = labelText;
+            _labelTextUi = new Text(GetLabelTextPosition(), _labelText, font);
+        }
     }
     
     /// <summary>
@@ -235,6 +244,8 @@ public class Input : UIElement
         {
             UpdateBounds();
         }
+        
+        _labelTextUi?.Update();
     }
     
     private void PasteText() 
@@ -458,6 +469,8 @@ public class Input : UIElement
                 spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), cursorRectangle, CursorColor * Alpha);
             }
         }
+        
+        _labelTextUi?.Draw(spriteBatch);
     }
 
     /// <summary>
@@ -525,6 +538,9 @@ public class Input : UIElement
         {
             base.UpdateBounds();
         }
+        
+        if (_labelTextUi != null)
+            _labelTextUi.Position = GetLabelTextPosition();
     }
 
     /// <summary>
@@ -536,5 +552,19 @@ public class Input : UIElement
         StringBuilder.Append(newText);
         _cursorIndex = StringBuilder.Length;
         Text = newText;
+    }
+    
+    /// <summary>
+    /// Returns the position slightly left to the input and accounting for label text size
+    /// </summary>
+    /// <returns></returns>
+    private Vector2 GetLabelTextPosition() 
+    {
+        if (Font == null) return Vector2.Zero;
+        
+        var labelSize = Font.MeasureString(_labelText);
+        var left = Bounds.Left - labelSize.X - 10;
+        
+        return new Vector2(left, Position.Y);
     }
 }
