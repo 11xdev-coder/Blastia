@@ -80,10 +80,10 @@ public class Input : UIElement
     }
     
     /// <summary>
-    /// Calculates maximum possible bounds depending on max text size
+    /// Calculates proper bounds for the background creation
     /// </summary>
     /// <returns></returns>
-    private Rectangle GetMaxPossibleBounds() 
+    public Rectangle GetBackgroundBounds() 
     {
         if (Font == null || !IsSignEditing) return Rectangle.Empty;
         
@@ -91,7 +91,11 @@ public class Input : UIElement
         if (MoveInsteadOfWrapping) 
         {
             var height = Font.LineSpacing;
-            return new Rectangle((int) Position.X, (int) Position.Y,
+            var leftOffset = 0f;
+            if (!string.IsNullOrEmpty(_labelText))
+                leftOffset = Font.MeasureString(_labelText).X + 10;
+                
+            return new Rectangle((int) (Position.X - leftOffset), (int) Position.Y,
                 (int) WrapTextSize, height);
         }
         else 
@@ -376,6 +380,8 @@ public class Input : UIElement
 
     public override void Draw(SpriteBatch spriteBatch)
     {
+        Background?.Draw(spriteBatch);
+        
         if (IsSignEditing)
         {
             if (Font == null || Text == null) return;
@@ -441,9 +447,9 @@ public class Input : UIElement
                 var pos = new Vector2(Bounds.Left, Bounds.Top);
                 base.Draw(spriteBatch, pos, displayText); // draw text
                 DrawCursor(spriteBatch, cursorIndex, displayLines, lineHeight); // draw cursor before exiting
+                _labelTextUi?.Draw(spriteBatch);
                 return;
-            }
-            
+            }            
             
             // draw each line left-aligned
             for (int i = 0; i < lines.Length; i++)
@@ -468,7 +474,7 @@ public class Input : UIElement
                 var cursorRectangle = new Rectangle((int)cursorPosition.X, (int)cursorPosition.Y, CursorWidth, CursorHeight);
                 spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), cursorRectangle, CursorColor * Alpha);
             }
-        }
+        }        
         
         _labelTextUi?.Draw(spriteBatch);
     }
@@ -565,6 +571,6 @@ public class Input : UIElement
         var labelSize = Font.MeasureString(_labelText);
         var left = Bounds.Left - labelSize.X - 10;
         
-        return new Vector2(left, Position.Y);
+        return new Vector2(left, Bounds.Top);
     }
 }

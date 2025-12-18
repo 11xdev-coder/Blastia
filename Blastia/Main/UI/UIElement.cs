@@ -172,6 +172,9 @@ public abstract class UIElement
     public bool LerpAlphaToZero { get; set; }
     
     // background
+    /// <summary>
+    /// Must be drawn manually in <c>Draw</c> methods
+    /// </summary>
     public ColoredBackground? Background;
     private bool _hasBackground;
     private Color _backgroundColor;
@@ -247,12 +250,17 @@ public abstract class UIElement
     
     public virtual void Update()
     {
+        Background?.Update();
+        
         int cursorX = (int)BlastiaGame.CursorPosition.X;
         int cursorY = (int)BlastiaGame.CursorPosition.Y;
         bool hasClickedLeft = BlastiaGame.HasClickedLeft;
         bool hasClickedRight = BlastiaGame.HasClickedRight;
         bool isHoldingLeft = BlastiaGame.IsHoldingLeft;
         IsHovered = Bounds.Contains(cursorX, cursorY);
+        
+        var isBackgroundHovered = Background?.IsHovered ?? false;
+        var isHoveredIncludingBackground = IsHovered || isBackgroundHovered;
 
         if (IsHovered)  // if hovering
         {
@@ -269,13 +277,13 @@ public abstract class UIElement
                 OnEndHovering?.Invoke(); // end hovering
                 break;
         }
-
+        
         if (IsHovered && hasClickedLeft) // focus + click
         {
             OnFocus();
             OnClick?.Invoke();
         }
-        if (hasClickedLeft && !IsHovered && IsFocused) OnUnfocus(); // if clicked, not hovered and was focused -> unfocus
+        if (hasClickedLeft && !isHoveredIncludingBackground && IsFocused) OnUnfocus(); // if clicked, not hovered and was focused -> unfocus
 
         if (IsHovered && hasClickedRight) // focus + right click
         {
@@ -351,11 +359,7 @@ public abstract class UIElement
         if (Font == null) return;
         
         Vector2 textSize = Font.MeasureString(Text);
-        UpdateBoundsBase(textSize.X, textSize.Y);
-        
-        // if we have a background -> create it
-        if (_hasBackground)
-            CreateBackground();
+        UpdateBoundsBase(textSize.X, textSize.Y);        
     }
 
     /// <summary>
@@ -388,6 +392,10 @@ public abstract class UIElement
         }
 
         Bounds = new Rectangle(positionX, positionY, (int)scaledWidth, (int)scaledHeight);
+        
+        // if we have a background -> create it
+        if (_hasBackground)
+            CreateBackground();    
     }
     
     /// <summary>
@@ -529,7 +537,7 @@ public abstract class UIElement
         Vector2 origin = textSize / 2f;
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
-
+        
         Draw(spriteBatch, position, Text, origin, DrawColor);
     }
 
@@ -577,6 +585,7 @@ public abstract class UIElement
         
         var bounds = _backgroundBounds();
         Background =  new ColoredBackground(new Vector2(bounds.Left - _padding, bounds.Top - _padding), bounds.Width + _padding * 2, bounds.Height + _padding * 2, _backgroundColor, _borderThickness, _borderColor);
+        Background.OnClick += OnFocus;
     }
     
     /// <summary>

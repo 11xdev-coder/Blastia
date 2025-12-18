@@ -86,7 +86,12 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard]);
 		WorldCreationBoolButtonPreset(hard, [() => easy, () => normal]);
 		
-		var test = new Input(new Vector2(900, 900), Font, labelText: "Nigga:");
+		var test = new Input(new Vector2(900, 900), Font, true, labelText: "Nigga")
+        {
+            IsSignEditing = true,
+            MoveInsteadOfWrapping = true
+        };
+        test.SetBackgroundProperties(test.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
 		Elements.Add(test);
 	}
 

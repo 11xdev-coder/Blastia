@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -8,22 +9,13 @@ namespace Blastia.Main.UI.Menus.InGame;
 
 public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-    private Text? _chatSayText;
     public Input? ChatInput;
 
     public override bool BlockEscape => true;
     
     protected override void AddElements()
-    {
-        
-        _chatSayText = new Text(Vector2.Zero, "Say:", Font)
-        {
-            HAlign = 0.01f,
-            VAlign = 0.98f
-        };
-        Elements.Add(_chatSayText);
-        
-        ChatInput = new Input(new Vector2(100, 0), Font, true, defaultText: "...")
+    {        
+        ChatInput = new Input(new Vector2(100, 0), Font, true, defaultText: "...", labelText: "Say: ")
         {
             HAlign = 0f,
             VAlign = 0.98f,
