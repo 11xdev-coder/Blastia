@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Assimp;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -44,11 +45,11 @@ public class Input : UIElement
     /// </summary>
     public bool MoveInsteadOfWrapping { get; set; }
     /// <summary>
-    /// Used when <c>MoveInsteadOfWrapping</c> is true for better horizontal cursor scrolling
+    /// If <c>MoveInsteadOfWrapping</c> is true -> indicates character index from where we start showing text
     /// </summary>
     private int _cachedDisplayStart;
     /// <summary>
-    /// Used when <c>MoveInsteadOfWrapping</c> is true. If this is true, will recalculate the start of display text (visible part not whole text)
+    /// If <c>MoveInsteadOfWrapping</c> is true -> if true, recalculates <c>_cachedDisplayStart</c>
     /// </summary>
     private bool _shouldRecalcOptimalStart;
 
@@ -96,7 +97,7 @@ public class Input : UIElement
                 leftOffset = Font.MeasureString(_labelText).X + 10;
                 
             return new Rectangle((int) (Position.X - leftOffset), (int) Position.Y,
-                (int) WrapTextSize, height);
+                (int) (WrapTextSize + leftOffset), height);
         }
         else 
         {
@@ -213,6 +214,8 @@ public class Input : UIElement
             if (MoveInsteadOfWrapping && Font.MeasureString(safeText).X >= WrapTextSize) 
             {
                 var charsAdded = StringBuilder.Length - previousLength;
+                
+                // added text at the end -> simply recalculate
                 if (charsAdded > 0 && previousLength == previousCursorIndex) // added text at the end
                 {
                     // just recalculate start
@@ -222,15 +225,37 @@ public class Input : UIElement
                 {
                     // if cursor exceeds display text length
                     var displayText = GetDisplayText(safeText, _cachedDisplayStart);
+                    // convert cursor position from full text position relative to visible part
+                    // e.g. _cachedDisplayStart = 10, and we typed text at _cursorIndex = 30, then relative pos would be 30 - 10 = 20
                     var cursorRelativeToStart = _cursorIndex - _cachedDisplayStart;
                     
                     if (cursorRelativeToStart > displayText.Length)
                     {
-                        // how many characters dont fit
+                        // calculate how many characters dont fit on the visible text (overflowed)
                         var charactersOverflow = cursorRelativeToStart - displayText.Length;
+                        // shift visible text
                         _cachedDisplayStart += charactersOverflow;
                     }
                 }
+                else if (charsAdded < 0) // removing characters
+                {
+                    // moved before visible start -> move to the left
+                    if (_cursorIndex < _cachedDisplayStart) 
+                    {
+                        _cachedDisplayStart = _cursorIndex;                        
+                    }
+                    // recalculate if we might have space to show from earlier
+                    else if (_cachedDisplayStart > 0)
+                    {
+                        _shouldRecalcOptimalStart = true;
+                    }
+                }
+            }
+            // text no longer exceeds wrap size
+            else if (MoveInsteadOfWrapping) 
+            {
+                _cachedDisplayStart = 0;
+                _shouldRecalcOptimalStart = false;
             }
         }
         else
@@ -397,7 +422,7 @@ public class Input : UIElement
                 
                 // exceeded wrap size
                 if (StringBuilder.Length > 0 && Font.MeasureString(safeText).X >= WrapTextSize) 
-                {
+                { 
                     // only if we need to recalc
                     if (_shouldRecalcOptimalStart) 
                     {
@@ -440,7 +465,7 @@ public class Input : UIElement
                 }
 
                 // get cursor index relative to this substring
-                var displayText = GetDisplayText(safeText, start);;
+                var displayText = GetDisplayText(safeText, start);
                 var displayLines = displayText.Split('\n');
                 var cursorIndex = Math.Clamp(_cursorIndex - start, 0, displayText.Length);
                 
@@ -485,6 +510,13 @@ public class Input : UIElement
     private string GetDisplayText(string originalText, int start)
     {
         if (Font == null) return "";
+        
+        // safety check
+        if (start >= originalText.Length) 
+        {
+            Console.WriteLine($"[Input - GetDisplayText] Starting position {start} exceeds original text length {originalText.Length}");
+            return "";
+        }
         
         for (int i = start + 1; i <= originalText.Length; i++) 
         {
