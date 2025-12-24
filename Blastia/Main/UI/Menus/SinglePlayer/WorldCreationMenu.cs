@@ -8,9 +8,6 @@ namespace Blastia.Main.UI.Menus.SinglePlayer;
 
 public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-	private HandlerArrowButton<WorldDifficulty>? _difficultyButton;
-	private readonly WorldDifficultyHandler _difficultyHandler = new();
-	private HandlerArrowButton<WorldSize>? _sizeButton;
 	private readonly WorldSizeHandler _sizeHandler = new();
 	private Image? _worldPreview;
 	private Image? _worldPreviewBorder;

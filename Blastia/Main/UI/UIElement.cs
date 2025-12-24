@@ -171,17 +171,19 @@ public abstract class UIElement
     public virtual float Alpha { get; set; } = 1f;
     public bool LerpAlphaToZero { get; set; }
     
-    // background
+    #region Background
     /// <summary>
     /// Must be drawn manually in <c>Draw</c> methods
     /// </summary>
     public ColoredBackground? Background;
     private bool _hasBackground;
-    private Color _backgroundColor;
+    protected Color OriginalBackgroundColor;
     private float _borderThickness;
-    protected Color _borderColor;
+    protected Color OriginalBorderColor;
     private float _padding;
     private Func<Rectangle>? _backgroundBounds;
+    
+    #endregion
     
     /// <summary>
     /// Image constructor
@@ -570,9 +572,9 @@ public abstract class UIElement
     {
         _backgroundBounds = backgroundBounds;
         _hasBackground = true;
-        _backgroundColor = backgroundColor;
+        OriginalBackgroundColor = backgroundColor;
         _borderThickness = borderThickness;
-        _borderColor = borderColor;
+        OriginalBorderColor = borderColor;
         _padding = padding;
     }
     
@@ -584,7 +586,7 @@ public abstract class UIElement
         if (!_hasBackground || _backgroundBounds == null || Background != null) return;
         
         var bounds = _backgroundBounds();
-        Background =  new ColoredBackground(new Vector2(bounds.Left - _padding, bounds.Top - _padding), bounds.Width + _padding * 2, bounds.Height + _padding * 2, _backgroundColor, _borderThickness, _borderColor);
+        Background =  new ColoredBackground(new Vector2(bounds.Left - _padding, bounds.Top - _padding), bounds.Width + _padding * 2, bounds.Height + _padding * 2, OriginalBackgroundColor, _borderThickness, OriginalBorderColor);
         Background.OnClick += OnFocus;
     }
     
@@ -600,6 +602,6 @@ public abstract class UIElement
     }
     
     public void SetBackgroundColor(Color newColor) => Background?.SetBackgroundColor(newColor);
-    public void RevertOriginalBackgroundColor() => Background?.SetBackgroundColor(_backgroundColor);
+    public void RevertOriginalBackgroundColor() => Background?.SetBackgroundColor(OriginalBackgroundColor);
     #endregion
 }

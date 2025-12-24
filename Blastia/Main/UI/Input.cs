@@ -57,6 +57,7 @@ public class Input : UIElement
     
     private string _labelText = "";
     private Text? _labelTextUi;
+    private bool _subscribedBackgroundMethods;
 
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
         double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
@@ -79,6 +80,9 @@ public class Input : UIElement
             _labelTextUi = new Text(GetLabelTextPosition(), _labelText, font);
         }
     }
+    
+    private void Select() => Background?.SetBorderColor(Color.Yellow);
+    private void Deselect() => Background?.SetBorderColor(OriginalBorderColor);
     
     /// <summary>
     /// Calculates proper bounds for the background creation
@@ -537,6 +541,9 @@ public class Input : UIElement
     
     public override void UpdateBounds()
     {
+        if (!_subscribedBackgroundMethods)
+            SubscribeBackgroundMethods();
+        
         if (IsSignEditing && Font != null && Text != null)
         {
             if (MoveInsteadOfWrapping) 
@@ -579,6 +586,19 @@ public class Input : UIElement
         
         if (_labelTextUi != null)
             _labelTextUi.Position = GetLabelTextPosition();
+    }
+    
+    /// <summary>
+    /// Subscribes some of the events to background's methods (only once, when <c>_subscribedBackgroundMethods</c> is false)
+    /// </summary>
+    private void SubscribeBackgroundMethods() 
+    {
+        if (Background == null || _subscribedBackgroundMethods) return;
+        
+        Background.OnStartHovering += Select;
+        Background.OnEndHovering += Deselect;
+        
+        _subscribedBackgroundMethods = true;
     }
 
     /// <summary>

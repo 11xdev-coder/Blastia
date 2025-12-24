@@ -117,7 +117,7 @@ public class Button : UIElement, IValueStorageUi<bool>
 
     private void Deselect()
     {
-        Background?.SetBorderColor(_borderColor);
+        Background?.SetBorderColor(OriginalBorderColor);
         DrawColor = NormalColor;
     }
 
