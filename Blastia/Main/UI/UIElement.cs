@@ -237,7 +237,7 @@ public abstract class UIElement
     /// <summary>
     /// Called when clicked on this UIElement
     /// </summary>
-    public virtual void OnFocus()
+    public virtual void Focus()
     {
         IsFocused = true;
     }
@@ -245,7 +245,7 @@ public abstract class UIElement
     /// <summary>
     /// Called when clicked NOT on this UIElement (ClickedLeft + !IsHovered)
     /// </summary>
-    public virtual void OnUnfocus()
+    public virtual void Unfocus()
     {
         IsFocused = false;
     }
@@ -264,34 +264,39 @@ public abstract class UIElement
         var isBackgroundHovered = Background?.IsHovered ?? false;
         var isHoveredIncludingBackground = IsHovered || isBackgroundHovered;
 
-        if (IsHovered)  // if hovering
+        // dont fire events when have background (background copies over events)
+        if (!_hasBackground || this is ColoredBackground) 
         {
-            OnHover?.Invoke();
-            if (!UnblockClicks) BlastiaGame.IsHoveredOnAnyUi = true;
+            if (IsHovered)  // if hovering
+            {
+                OnHover?.Invoke();
+                if (!UnblockClicks) BlastiaGame.IsHoveredOnAnyUi = true;
+            }
+            
+            switch (IsHovered)
+            {
+                case true when !_prevIsHovered:
+                    OnStartHovering?.Invoke(); // if started hovering
+                    break;
+                case false when _prevIsHovered:
+                    OnEndHovering?.Invoke(); // end hovering
+                    break;
+            }
+            
+            if (IsHovered && hasClickedLeft) // focus + click
+            {
+                Focus();
+                OnClick?.Invoke();
+            }
+            if (IsHovered && hasClickedRight) // focus + right click
+            {
+                Focus();
+                OnRightClick?.Invoke();
+            }
         }
         
-        switch (IsHovered)
-        {
-            case true when !_prevIsHovered:
-                OnStartHovering?.Invoke(); // if started hovering
-                break;
-            case false when _prevIsHovered:
-                OnEndHovering?.Invoke(); // end hovering
-                break;
-        }
-        
-        if (IsHovered && hasClickedLeft) // focus + click
-        {
-            OnFocus();
-            OnClick?.Invoke();
-        }
-        if (hasClickedLeft && !isHoveredIncludingBackground && IsFocused) OnUnfocus(); // if clicked, not hovered and was focused -> unfocus
-
-        if (IsHovered && hasClickedRight) // focus + right click
-        {
-            OnFocus();
-            OnRightClick?.Invoke();
-        }
+        if (hasClickedLeft && !isHoveredIncludingBackground && IsFocused) 
+            Unfocus(); // if clicked, not hovered and was focused -> unfocus  
         
         Drag(isHoldingLeft);
         ProcessAlpha();
@@ -587,7 +592,13 @@ public abstract class UIElement
         
         var bounds = _backgroundBounds();
         Background =  new ColoredBackground(new Vector2(bounds.Left - _padding, bounds.Top - _padding), bounds.Width + _padding * 2, bounds.Height + _padding * 2, OriginalBackgroundColor, _borderThickness, OriginalBorderColor);
-        Background.OnClick += OnFocus;
+        
+        // copy over events
+        Background.OnClick += () => { Focus(); OnClick?.Invoke(); };
+        Background.OnRightClick += () => { Focus(); OnRightClick?.Invoke(); };
+        Background.OnStartHovering += OnStartHovering;
+        Background.OnEndHovering += OnEndHovering;
+        Background.OnHover += OnHover;
     }
     
     /// <summary>

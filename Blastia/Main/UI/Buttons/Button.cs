@@ -121,12 +121,6 @@ public class Button : UIElement, IValueStorageUi<bool>
         DrawColor = NormalColor;
     }
 
-    public override void Update()
-    {
-        Background?.Update();
-        base.Update();
-    }
-
     public override void Draw(SpriteBatch spriteBatch)
     {
         Background?.Draw(spriteBatch);

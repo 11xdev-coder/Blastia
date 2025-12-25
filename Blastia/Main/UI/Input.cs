@@ -79,6 +79,9 @@ public class Input : UIElement
             _labelText = labelText;
             _labelTextUi = new Text(GetLabelTextPosition(), _labelText, font);
         }
+        
+        OnStartHovering += Select;
+        OnEndHovering += Deselect;
     }
     
     private void Select() => Background?.SetBorderColor(Color.Yellow);
@@ -540,10 +543,7 @@ public class Input : UIElement
     }
     
     public override void UpdateBounds()
-    {
-        if (!_subscribedBackgroundMethods)
-            SubscribeBackgroundMethods();
-        
+    {        
         if (IsSignEditing && Font != null && Text != null)
         {
             if (MoveInsteadOfWrapping) 
@@ -586,19 +586,6 @@ public class Input : UIElement
         
         if (_labelTextUi != null)
             _labelTextUi.Position = GetLabelTextPosition();
-    }
-    
-    /// <summary>
-    /// Subscribes some of the events to background's methods (only once, when <c>_subscribedBackgroundMethods</c> is false)
-    /// </summary>
-    private void SubscribeBackgroundMethods() 
-    {
-        if (Background == null || _subscribedBackgroundMethods) return;
-        
-        Background.OnStartHovering += Select;
-        Background.OnEndHovering += Deselect;
-        
-        _subscribedBackgroundMethods = true;
     }
 
     /// <summary>
