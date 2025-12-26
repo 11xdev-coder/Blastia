@@ -57,7 +57,6 @@ public class Input : UIElement
     
     private string _labelText = "";
     private Text? _labelTextUi;
-    private bool _subscribedBackgroundMethods;
 
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
         double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
@@ -93,27 +92,34 @@ public class Input : UIElement
     /// <returns></returns>
     public Rectangle GetBackgroundBounds() 
     {
-        if (Font == null || !IsSignEditing) return Rectangle.Empty;
+        if (Font == null) return Rectangle.Empty;
         
-        // horizontal only
-        if (MoveInsteadOfWrapping) 
-        {
-            var height = Font.LineSpacing;
-            var leftOffset = 0f;
-            if (!string.IsNullOrEmpty(_labelText))
-                leftOffset = Font.MeasureString(_labelText).X + 10;
-                
-            return new Rectangle((int) (Position.X - leftOffset), (int) Position.Y,
-                (int) (WrapTextSize + leftOffset), height);
-        }
-        else 
+        // multiple line input
+        if (IsSignEditing && !MoveInsteadOfWrapping) 
         {
             // calculate multiple lines
             var lines = GetMaxPossibleLines();
-            var height = Font.LineSpacing * lines;
+            var totalHeight = Font.LineSpacing * lines;
             
-            return new Rectangle((int) Position.X, (int) Position.Y, (int) WrapTextSize, height);
+            return new Rectangle((int) Position.X, (int) Position.Y, (int) WrapTextSize, totalHeight);
         }
+        
+        // else horizontal only
+        var height = Font.LineSpacing;
+        var leftOffset = 0f;
+        if (!string.IsNullOrEmpty(_labelText))
+            leftOffset = Font.MeasureString(_labelText).X + 10;
+        
+        // use character limit if we cant wrap
+        var width = WrapTextSize;
+        if (!MoveInsteadOfWrapping) 
+        {
+            var avgCharWidth = Font.MeasureString("M").X;
+            width = CharacterLimit * avgCharWidth;
+        }
+            
+        return new Rectangle((int) (Position.X - leftOffset), (int) Position.Y,
+            (int) (width + leftOffset), height);
     }
     
     /// <summary>
@@ -179,21 +185,21 @@ public class Input : UIElement
             }
         }
         
+        // over character limit
+        if (StringBuilder.Length > CharacterLimit)
+        {
+            StringBuilder.Length = CharacterLimit;
+            _cursorIndex = Math.Min(_cursorIndex, StringBuilder.Length);
+        }
+        
+        // placeholder text when not focused and not empty
+        var setDefaultText = !IsFocused && StringBuilder.Length <= 0;
+        Text = setDefaultText ? DefaultText : StringBuilder.ToString();
+        DrawColor = setDefaultText ? _defaultTextColor : _normalTextColor;
+            
         if (IsSignEditing)
         {
-            // clamp length and cursor
-            if (StringBuilder.Length > CharacterLimit)
-            {
-                StringBuilder.Length = CharacterLimit;
-                _cursorIndex = Math.Min(_cursorIndex, StringBuilder.Length);
-            }
-            // placeholder when not editing or empty
-            if (!IsFocused && StringBuilder.Length <= 0)
-            {
-                Text = DefaultText;
-                DrawColor = _defaultTextColor;
-            }
-            else
+            if (IsFocused || StringBuilder.Length > 0)
             {
                 // wrap text
                 var plain = StringBuilder.ToString();
@@ -264,12 +270,6 @@ public class Input : UIElement
                 _cachedDisplayStart = 0;
                 _shouldRecalcOptimalStart = false;
             }
-        }
-        else
-        {
-            var setDefaultText = !IsFocused && StringBuilder.Length <= 0;
-            Text = setDefaultText ? DefaultText : StringBuilder.ToString();
-            DrawColor = setDefaultText ? _defaultTextColor : _normalTextColor;
         }
 
         // blink if cursor is visible + focused

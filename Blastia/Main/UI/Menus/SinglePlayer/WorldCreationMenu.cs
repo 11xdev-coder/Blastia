@@ -11,6 +11,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private readonly WorldSizeHandler _sizeHandler = new();
 	private Image? _worldPreview;
 	private Image? _worldPreviewBorder;
+	private Input? _name;
 	
 	protected override void AddElements()
 	{
@@ -34,6 +35,13 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    VAlign = 0.317f
 		};
 		Elements.Add(_worldPreviewBorder);
+		
+		_name = new Input(new Vector2(540, 345), Font, true, labelText: "Name") 
+		{
+		    CharacterLimit = 20	    
+		};
+		_name.SetBackgroundProperties(_name.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
+		Elements.Add(_name);
 		
 		var sizeText = new Text(Vector2.Zero, "Size", Font) 
 		{
@@ -82,14 +90,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		WorldCreationBoolButtonPreset(easy, [() => normal, () => hard]);
 		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard]);
 		WorldCreationBoolButtonPreset(hard, [() => easy, () => normal]);
-		
-		var test = new Input(new Vector2(900, 900), Font, true, labelText: "Nigga")
-        {
-            IsSignEditing = true,
-            MoveInsteadOfWrapping = true
-        };
-        test.SetBackgroundProperties(test.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
-		Elements.Add(test);
 	}
 
     public override void Update()
