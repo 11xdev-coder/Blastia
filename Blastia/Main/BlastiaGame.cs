@@ -785,14 +785,7 @@ public class BlastiaGame : Game
 		SpriteBatch.End();
 	}
 
-	public static MusicID ChooseRandomMenuMusic()
-	{
-		float randomIndex = Rand.Next(0, 4);
-		
-		MusicID musicId = (MusicID)randomIndex;
-
-		return musicId;
-	}
+	public static MusicID ChooseRandomMenuMusic() => (MusicID) Rand.Next(0, 2);
 
 	// UPDATE RESOLUTION
 	/// <summary>

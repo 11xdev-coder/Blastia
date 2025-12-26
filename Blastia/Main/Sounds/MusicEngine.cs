@@ -5,7 +5,9 @@ using Microsoft.Xna.Framework.Media;
 namespace Blastia.Main.Sounds;
 
 public enum MusicID
-{
+{   
+    EchoesOfTheVoid,
+    IAmLost,
     RatsOnSaturn,
     PeacefulJourney00,
     PeacefulJourney01,
@@ -29,7 +31,9 @@ public static class MusicEngine
 
     public static void LoadMusic()
     {
-	LoadMusicTrack(MusicID.RatsOnSaturn, Paths.RatsOnSaturn);
+        LoadMusicTrack(MusicID.EchoesOfTheVoid, "Sounds/MenuSongs/EchoesOfTheVoid.ogg");
+        LoadMusicTrack(MusicID.IAmLost, "Sounds/MenuSongs/IAmLost.ogg");
+	    LoadMusicTrack(MusicID.RatsOnSaturn, Paths.RatsOnSaturn);
         LoadMusicTrack(MusicID.PeacefulJourney00, Paths.PeacefulJourney00);
         LoadMusicTrack(MusicID.PeacefulJourney01, Paths.PeacefulJourney01);
         LoadMusicTrack(MusicID.PeacefulJourney02, Paths.PeacefulJourney02);

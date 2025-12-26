@@ -353,3 +353,5 @@ D:\Projects\Blastia\Blastia\bin\Debug\net8.0\TextCopy.dll
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\WorldCreation\Preview.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\WorldCreation\PreviewBorder.png
 D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Textures\UI\Cursor.png
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\EchoesOfTheVoid.ogg
+D:\Projects\Blastia\Blastia\bin\Debug\net8.0\Main\Content\Sounds\MenuSongs\IAmLost.ogg

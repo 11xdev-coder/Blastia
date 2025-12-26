@@ -7,6 +7,14 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Blastia.Main.UI;
 
+public enum InputMode 
+{
+    SingleLine,
+    MultipleLines,
+    MultipleLinesAutomaticWrapping,
+    ScrollHorizontally
+}
+
 public class Input : UIElement
 {
     public StringBuilder StringBuilder = new();
@@ -44,6 +52,7 @@ public class Input : UIElement
     /// If true, when <c>WrapTextSize</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
     /// </summary>
     public bool MoveInsteadOfWrapping { get; set; }
+    public InputMode Mode { get; set; }
     /// <summary>
     /// If <c>MoveInsteadOfWrapping</c> is true -> indicates character index from where we start showing text
     /// </summary>
