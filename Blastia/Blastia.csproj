@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <CaseSensitiveFilenames>true</CaseSensitiveFilenames>
         <Nullable>enable</Nullable>
@@ -34,6 +34,7 @@
       <PackageReference Include="MathNet.Numerics" Version="6.0.0-beta2" />
       <PackageReference Include="MonoGame.Framework.Content.Pipeline" Version="3.8.4" />
       <PackageReference Include="NAudio" Version="2.2.1" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
       <PackageReference Include="Steamworks.NET" Version="2024.8.0" />
       <PackageReference Include="System.Drawing.Common" Version="9.0.1" />

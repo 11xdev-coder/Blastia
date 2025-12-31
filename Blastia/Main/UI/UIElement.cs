@@ -514,7 +514,7 @@ public abstract class UIElement
     /// </summary>
     /// <param name="origin">Vector2.Zero by default</param>
     /// <param name="color">White color by default (color not account alpha)</param>
-    public virtual void Draw(SpriteBatch spriteBatch, Vector2 pos, string str, Vector2 origin = default, Color color = default) 
+    public virtual void DrawStringAt(SpriteBatch spriteBatch, Vector2 pos, string str, Vector2 origin = default, Color color = default) 
     {
         if (Font == null) return;
 
@@ -545,7 +545,7 @@ public abstract class UIElement
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
         
-        Draw(spriteBatch, position, Text, origin, DrawColor);
+        DrawStringAt(spriteBatch, position, Text, origin, DrawColor);
     }
 
     private void DrawTexture(SpriteBatch spriteBatch)

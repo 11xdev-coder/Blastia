@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Reflection.Emit;
+using System.Text;
 using Assimp;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -11,7 +12,6 @@ public enum InputMode
 {
     SingleLine,
     MultipleLines,
-    MultipleLinesAutomaticWrapping,
     ScrollHorizontally
 }
 
@@ -39,33 +39,30 @@ public class Input : UIElement
     private Color _defaultTextColor = Color.Wheat;
     private Color _normalTextColor = Color.White;
     
-    /// <summary>
-    /// Allows multi-line input and doesn't try to center this element (keeps in one place)
-    /// </summary>
-    public bool IsSignEditing { get; set; }
     public int CharacterLimit { get; set; } = 280;
     /// <summary>
     /// Horizontal line size which when exceeded will start a new line
     /// </summary>
     public float WrapTextSize { get; set; } = 650;
     /// <summary>
-    /// If true, when <c>WrapTextSize</c> is exceeded instead of wrapping to the new line will start moving this element to the left. Only works when <c>IsSignEditing</c> is true
+    /// <para><c>SingleLine</c> -> only 1 line</para>
+    /// <para><c>MultipleLines</c> ->multiple lines, but text wraps to new line automatically after <c>WrapTextSize</c> is reached</para>
+    /// <para><c>ScrollHorizontally</c> -> 1 line, but after reaching <c>WrapTextSize</c> the text begins to scroll to the left</para>
     /// </summary>
-    public bool MoveInsteadOfWrapping { get; set; }
     public InputMode Mode { get; set; }
     /// <summary>
     /// If <c>MoveInsteadOfWrapping</c> is true -> indicates character index from where we start showing text
     /// </summary>
     private int _cachedDisplayStart;
-    /// <summary>
-    /// If <c>MoveInsteadOfWrapping</c> is true -> if true, recalculates <c>_cachedDisplayStart</c>
-    /// </summary>
-    private bool _shouldRecalcOptimalStart;
 
     private bool _ctrlVPressedLastFrame;
     
     private string _labelText = "";
     private Text? _labelTextUi;
+    /// <summary>
+    /// Distance between the label text and input
+    /// </summary>
+    private const float LabelPadding = 10f;
 
     public Input(Vector2 position, SpriteFont font, bool cursorVisible = false,
         double blinkInterval = 0.15f, Color? cursorColor = default, bool focusedByDefault = false,
@@ -96,39 +93,78 @@ public class Input : UIElement
     private void Deselect() => Background?.SetBorderColor(OriginalBorderColor);
     
     /// <summary>
-    /// Calculates proper bounds for the background creation
+    /// Calculates proper bounds for the background creation. Covers both label and the input
     /// </summary>
     /// <returns></returns>
     public Rectangle GetBackgroundBounds() 
     {
         if (Font == null) return Rectangle.Empty;
         
+        var oneLineHeight = Font.LineSpacing;
+        var offset = GetLabelOffset();
+        
         // multiple line input
-        if (IsSignEditing && !MoveInsteadOfWrapping) 
+        switch (Mode) 
         {
-            // calculate multiple lines
-            var lines = GetMaxPossibleLines();
-            var totalHeight = Font.LineSpacing * lines;
-            
-            return new Rectangle((int) Position.X, (int) Position.Y, (int) WrapTextSize, totalHeight);
+            case InputMode.MultipleLines:
+            {
+                var lines = GetMaxPossibleLines();
+                var inputHeight = oneLineHeight * lines;
+                return new Rectangle(
+                    (int)Position.X, 
+                    (int)(Position.Y - offset.Y),
+                    (int)WrapTextSize, 
+                    (int)(inputHeight + offset.Y)
+                );
+            }
+            case InputMode.ScrollHorizontally:
+            {
+                // text scrolls horizontally after WrapTextSize
+                return new Rectangle(
+                    (int)(Position.X - offset.X), 
+                    (int)Position.Y,
+                    (int)(WrapTextSize + offset.X), 
+                    oneLineHeight
+                );
+            }
+            case InputMode.SingleLine:
+            default:
+            {
+                // text doesnt scroll, only limited by CharacterLimit 
+                var avgCharWidth = Font.MeasureString("M").X;
+                var width = CharacterLimit * avgCharWidth;
+                
+                return new Rectangle(
+                    (int)(Position.X - offset.X), 
+                    (int)Position.Y,
+                    (int)(width + offset.X), 
+                    oneLineHeight
+                );
+            }
         }
+    }
+    
+    /// <summary>
+    /// Returns the offset for the label text
+    /// </summary>
+    /// <returns></returns>
+    private Vector2 GetLabelOffset() 
+    {
+        if (string.IsNullOrEmpty(_labelText) || Font == null) return Vector2.Zero;
         
-        // else horizontal only
-        var height = Font.LineSpacing;
-        var leftOffset = 0f;
-        if (!string.IsNullOrEmpty(_labelText))
-            leftOffset = Font.MeasureString(_labelText).X + 10;
-        
-        // use character limit if we cant wrap
-        var width = WrapTextSize;
-        if (!MoveInsteadOfWrapping) 
+        switch (Mode) 
         {
-            var avgCharWidth = Font.MeasureString("M").X;
-            width = CharacterLimit * avgCharWidth;
+            case InputMode.MultipleLines:
+            {
+                return new Vector2(0f, Font.MeasureString(_labelText).Y + LabelPadding);
+            }
+            case InputMode.ScrollHorizontally:
+            case InputMode.SingleLine:
+            default:
+            {
+                return new Vector2(Font.MeasureString(_labelText).X + LabelPadding, 0f);
+            }
         }
-            
-        return new Rectangle((int) (Position.X - leftOffset), (int) Position.Y,
-            (int) (width + leftOffset), height);
     }
     
     /// <summary>
@@ -148,147 +184,264 @@ public class Input : UIElement
         if (lines <= 0) return 1;
         return lines;
     }
-
-    public override void Update()
+    
+    /// <summary>
+    /// Pastes the text if Ctrl and V were pressed
+    /// </summary>
+    private void HandleCtrlVPaste() 
     {
-        base.Update();
-
-        if (Font == null) return;
-
-        if (IsSignEditing)
-        {
-            // clamp cursor index to valid range
-            _cursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
-        }
-
-        var previousLength = StringBuilder.Length;
-        var previousCursorIndex = _cursorIndex;
-        
-        // Ctrl V first
 		var ctrlPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.LeftControl) || BlastiaGame.KeyboardState.IsKeyDown(Keys.RightControl);
 		var vPressed = BlastiaGame.KeyboardState.IsKeyDown(Keys.V);
-		if (ctrlPressed && vPressed) 
+		var ctrlVPressed = ctrlPressed && vPressed;
+		
+		if (ctrlVPressed && !_ctrlVPressedLastFrame) 
 		{
-			if (!_ctrlVPressedLastFrame) 
-			{
-			    _ctrlVPressedLastFrame = true;
-                PasteText();
-			}
+            PasteText();
 		}
-		else 
-		{
-			_ctrlVPressedLastFrame = false;
-		}
-
-        // handle input if focused
-        if (IsFocused)
-        {
-            HandleArrows();
-            try
-            {
-                KeyboardHelper.ProcessInput(ref _cursorIndex, StringBuilder);
-            }
-            catch (IndexOutOfRangeException)
-            {
-                _cursorIndex = StringBuilder.Length;
-            }
-        }
+		_ctrlVPressedLastFrame = ctrlVPressed;
+    }
+    
+    /// <summary>
+    /// Processes keyboard input, only if focused
+    /// </summary>
+    private void HandleInput() 
+    {
+        if (!IsFocused) return;
         
+        HandleArrows();
+        try
+        {
+            KeyboardHelper.ProcessInput(ref _cursorIndex, StringBuilder);
+        }
+        catch (IndexOutOfRangeException)
+        {
+            _cursorIndex = StringBuilder.Length;
+        }
+    }
+    
+    /// <summary>
+    /// Doesn't let the cursor and string builder go beyond character limit
+    /// </summary>
+    private void EnforceCharacterLimit() 
+    {
         // over character limit
         if (StringBuilder.Length > CharacterLimit)
         {
             StringBuilder.Length = CharacterLimit;
             _cursorIndex = Math.Min(_cursorIndex, StringBuilder.Length);
         }
-        
-        // placeholder text when not focused and not empty
+    }
+    
+    /// <summary>
+    /// Sets the default text when there are no text and not focused
+    /// </summary>
+    private void SetDefaultTextIfEmpty() 
+    {
         var setDefaultText = !IsFocused && StringBuilder.Length <= 0;
         Text = setDefaultText ? DefaultText : StringBuilder.ToString();
         DrawColor = setDefaultText ? _defaultTextColor : _normalTextColor;
+    }
+    
+    /// <summary>
+    /// Wraps the <c>input</c> so that each line will fit in <c>maxWidthPerLine</c>
+    /// </summary>
+    /// <param name="input">Original text</param>
+    /// <param name="maxWidthPerLine">Maximum possible width of each line</param>
+    /// <returns></returns>
+    private string WrapText(string input, float maxWidthPerLine) 
+    {
+        if (Font == null) return input;
+        
+        var wrapped = new StringBuilder();
+        var currentWidth = 0f;
+        foreach (var c in input) 
+        {
+            var charWidth = Font.MeasureString(c.ToString()).X;
             
-        if (IsSignEditing)
+            if (currentWidth + charWidth >= maxWidthPerLine) 
+            {
+                wrapped.Append('\n');
+                currentWidth = 0f;
+            }
+            
+            wrapped.Append(c);
+            currentWidth += charWidth;
+        }
+        
+        return wrapped.ToString();
+    }
+    
+    /// <summary>
+    /// Update designed for multiple line mode, only if text is focused or is not empty
+    /// </summary>
+    private void UpdateMultipleLineMode() 
+    {
+        if (!IsFocused && StringBuilder.Length <= 0) return;
+        
+        Text = WrapText(StringBuilder.ToString(), WrapTextSize);
+        DrawColor = _normalTextColor;
+    }
+
+    /// <summary>
+    /// Update designed for ScrollHorizontally mode
+    /// </summary>
+    /// <param name="previousLength"></param>
+    /// <param name="previousCursorIndex"></param>
+    private void UpdateScrollHorizontallyMode(int previousLength, int previousCursorIndex) 
+    {
+        if (Font == null) return;
+        
+        var safeText = GetSafeText();
+        if (Font.MeasureString(safeText).X >= WrapTextSize) // text exceeds wrap size
         {
-            if (IsFocused || StringBuilder.Length > 0)
-            {
-                // wrap text
-                var plain = StringBuilder.ToString();
-                var wrapped = new StringBuilder();
-                var currentWidth = 0f;
-                for (int i = 0; i < plain.Length; i++)
-                {
-                    var symbolSize = Font.MeasureString(plain[i].ToString());
-                    
-                    if (currentWidth + symbolSize.X >= WrapTextSize - symbolSize.X - 10 && !MoveInsteadOfWrapping) 
-                    {
-                        wrapped.Append('\n');
-                        currentWidth = 0f;
-                    }
-
-                    wrapped.Append(plain[i]);
-                    currentWidth += symbolSize.X;
-                }
-                Text = wrapped.ToString();
-                DrawColor = _normalTextColor;
+            UpdateHorizontalWrapPosition(safeText, previousLength, previousCursorIndex);
+        }
+        else // text no longer exceeds wrap size
+        {
+            // reset
+            _cachedDisplayStart = 0;
+        }
+    }
+    
+    /// <summary>
+    /// Recalculates <c>_cachedDisplayStart</c> to capture the biggest possible string that will fit in WrapTextSize
+    /// </summary>
+    private void RecalculateOptimalDisplayStart() 
+    {
+        if (Font == null) return;
+        
+        var safeText = GetSafeText();
+        
+        if (StringBuilder.Length <= 0 || Font.MeasureString(safeText).X < WrapTextSize) 
+        {
+            // entire text fits
+            _cachedDisplayStart = 0;
+            return;
+        }
+        
+        // else -> exceeds wrap text size
+        // binary serach to earliest start
+        var low = 0;
+        var high = StringBuilder.Length;
+        
+        while (low <= high) 
+        {
+            var mid = (low + high) / 2;
+            var substring = safeText.Substring(mid); // from mid to end
+            var textWidth = Font.MeasureString(substring);
+            
+            // this start works, try finding earlier one
+            if (textWidth.X <= WrapTextSize) 
+            {  
+                _cachedDisplayStart = mid; // update cached
+                high = mid - 1;                            
             }
-
-            // optimal start recalc
-            var safeText = GetSafeText();
-            if (MoveInsteadOfWrapping && Font.MeasureString(safeText).X >= WrapTextSize) 
+            else // doesnt work, try later position 
             {
-                var charsAdded = StringBuilder.Length - previousLength;
-                
-                // added text at the end -> simply recalculate
-                if (charsAdded > 0 && previousLength == previousCursorIndex) // added text at the end
-                {
-                    // just recalculate start
-                    _shouldRecalcOptimalStart = true;
-                }
-                else if (charsAdded > 0) // in the middle + exceed wrap size
-                {
-                    // if cursor exceeds display text length
-                    var displayText = GetDisplayText(safeText, _cachedDisplayStart);
-                    // convert cursor position from full text position relative to visible part
-                    // e.g. _cachedDisplayStart = 10, and we typed text at _cursorIndex = 30, then relative pos would be 30 - 10 = 20
-                    var cursorRelativeToStart = _cursorIndex - _cachedDisplayStart;
-                    
-                    if (cursorRelativeToStart > displayText.Length)
-                    {
-                        // calculate how many characters dont fit on the visible text (overflowed)
-                        var charactersOverflow = cursorRelativeToStart - displayText.Length;
-                        // shift visible text
-                        _cachedDisplayStart += charactersOverflow;
-                    }
-                }
-                else if (charsAdded < 0) // removing characters
-                {
-                    // moved before visible start -> move to the left
-                    if (_cursorIndex < _cachedDisplayStart) 
-                    {
-                        _cachedDisplayStart = _cursorIndex;                        
-                    }
-                    // recalculate if we might have space to show from earlier
-                    else if (_cachedDisplayStart > 0)
-                    {
-                        _shouldRecalcOptimalStart = true;
-                    }
-                }
+                low = mid + 1;
             }
-            // text no longer exceeds wrap size
-            else if (MoveInsteadOfWrapping) 
+        }
+    }
+    
+    /// <summary>
+    /// Depending on amount of chars added, does wrapping logic
+    /// </summary>
+    /// <param name="safeText"></param>
+    /// <param name="previousLength"></param>
+    /// <param name="previousCursorIndex"></param>
+    private void UpdateHorizontalWrapPosition(string safeText, int previousLength, int previousCursorIndex) 
+    {
+        var charsAdded = StringBuilder.Length - previousLength;
+    
+        if (charsAdded > 0) 
+        {
+            HorizontalWrapWhenAddedText(safeText, previousLength, previousCursorIndex);
+        }
+        else if (charsAdded < 0)
+        {
+            HorizontalWrapWhenRemovedText();
+        }
+    }
+    
+    /// <summary>
+    /// Wrapping logic when text was added
+    /// </summary>
+    /// <param name="safeText"></param>
+    /// <param name="previousLength"></param>
+    /// <param name="previousCursorIndex"></param>
+    private void HorizontalWrapWhenAddedText(string safeText, int previousLength, int previousCursorIndex) 
+    {
+        // added text at the end
+        if (previousLength == previousCursorIndex) 
+        {
+            // just recalculate start
+            RecalculateOptimalDisplayStart();
+            return;
+        }
+        
+        // added in the middle
+        // if cursor exceeds display text length
+        var displayText = GetDisplayText(safeText, _cachedDisplayStart);
+        // convert cursor position from full text position relative to visible part
+        // e.g. _cachedDisplayStart = 10, and we typed text at _cursorIndex = 30, then relative pos would be 30 - 10 = 20
+        var cursorRelativeToStart = _cursorIndex - _cachedDisplayStart;
+        
+        if (cursorRelativeToStart > displayText.Length)
+        {
+            // calculate how many characters dont fit on the visible text (overflowed)
+            var charactersOverflow = cursorRelativeToStart - displayText.Length;
+            // shift visible text
+            _cachedDisplayStart += charactersOverflow;
+        }
+    }
+    
+    /// <summary>
+    /// Wrapping logic when text was removed
+    /// </summary>
+    private void HorizontalWrapWhenRemovedText() 
+    {
+        // moved before visible start -> move to the left
+        if (_cursorIndex < _cachedDisplayStart) 
+        {
+            _cachedDisplayStart = _cursorIndex;                        
+        }
+        // recalculate if we might have space to show from earlier
+        else if (_cachedDisplayStart > 0)
+        {
+            RecalculateOptimalDisplayStart();
+        }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (Font == null) return;
+        
+        _cursorIndex = Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
+        var previousLength = StringBuilder.Length;
+        var previousCursorIndex = _cursorIndex;
+        
+        HandleCtrlVPaste();
+        HandleInput();
+        EnforceCharacterLimit();
+        SetDefaultTextIfEmpty();
+        
+        switch (Mode) 
+        {
+            case InputMode.MultipleLines:
             {
-                _cachedDisplayStart = 0;
-                _shouldRecalcOptimalStart = false;
+                UpdateMultipleLineMode();
+                break;
+            }
+            case InputMode.ScrollHorizontally:
+            {
+                UpdateScrollHorizontallyMode(previousLength, previousCursorIndex);
+                break;
             }
         }
 
-        // blink if cursor is visible + focused
         if (_cursorVisible && IsFocused) Blink();
-
-        // ensure hitbox matches sign-edit area
-        if (IsSignEditing)
-        {
-            UpdateBounds();
-        }
         
         _labelTextUi?.Update();
     }
@@ -297,18 +450,16 @@ public class Input : UIElement
     {
         var clipboardText = TextCopy.ClipboardService.GetText();
         if (string.IsNullOrEmpty(clipboardText)) return;
-        var filtered = FilterText(clipboardText);
         
-        if (StringBuilder.Length + filtered.Length > CharacterLimit) 
-        {
-            // cut to fit the limit
-            int maxLength = CharacterLimit - StringBuilder.Length; // space to fit in
-            if (maxLength > 0)
-                filtered = filtered.Substring(0, Math.Min(filtered.Length, maxLength)); // cut the text
-            else
-                return; // no space left
-        }
-
+        var filtered = FilterText(clipboardText);
+        if (string.IsNullOrEmpty(filtered)) return;
+        
+        var availableSpace = CharacterLimit - StringBuilder.Length;
+        if (availableSpace <= 0) return;
+        
+        if (filtered.Length > availableSpace)
+            filtered = filtered.Substring(0, availableSpace);
+        
         // paste
         StringBuilder.Insert(_cursorIndex, filtered);
         _cursorIndex += filtered.Length;
@@ -317,16 +468,26 @@ public class Input : UIElement
     private string FilterText(string input) 
     {
         var filtered = new StringBuilder();
+        var allowMultipleLines = Mode == InputMode.MultipleLines;
+        
         foreach (var c in input) 
         {
-            // character that performs an action (like \n or \r)
-            if (char.IsControl(c))
+            if (c == '\n' || c == '\r')
             {
-                if (c == '\n' || c == '\r')
-                    filtered.Append(IsSignEditing ? '\n' : ' ');
+                filtered.Append(allowMultipleLines ? '\n' : ' ');
             }
-            else
+            else if (c == '\t') 
+            {
+                filtered.Append("    "); // 4 spaces for tabs
+            }
+            else if (char.IsControl(c)) // character that performs an action (like \n or \r)
+            {
+                continue;
+            }
+            else 
+            {
                 filtered.Append(c);
+            }                
         }
 
         return filtered.ToString();
@@ -381,141 +542,147 @@ public class Input : UIElement
     /// </summary>
     /// <returns></returns>
     private string GetSafeText() => StringBuilder.Length > 0 ? StringBuilder.ToString() : " ";
+
     /// <summary>
-    /// Clamps cursor index to not be out of bounds
+    /// Find the line index and position in that line where <c>_cursorIndex</c> is located
     /// </summary>
     /// <returns></returns>
-    private int GetSafeCursorIndex() => Math.Clamp(_cursorIndex, 0, StringBuilder.Length);
-
+    private (int lineIndex, int positionInLine) FindCursorPosition(string[] lines, int cursorIndex)
+    {
+        var charsCounted = 0;
+        
+        for (int i = 0; i < lines.Length; i++)
+        {
+            var line = lines[i];
+            var lastLine = i == lines.Length - 1;
+            // TODO: maybe dont add +1?
+            var lineLength = line.Length + (lastLine ? 0 : 1); // account for \n chars at the end (if not the last line)
+            
+            if (charsCounted + lineLength >= cursorIndex) // _cursorIndex between currentChars and next line
+            {
+                var positionInLine = cursorIndex - charsCounted;
+                return (i, positionInLine);
+            }
+            charsCounted += lineLength;
+        }
+        
+        return (lines.Length - 1, lines[^1].Length); // at the end
+    }
+    
+    /// <summary>
+    /// Returns a cursor rectangle
+    /// </summary>
+    /// <param name="lines"></param>
+    /// <param name="lineIndex"></param>
+    /// <param name="positionInLine"></param>
+    /// <param name="lineHeight"></param>
+    /// <returns></returns>
+    private Rectangle GetCursorRectangle(string[] lines, int lineIndex, int positionInLine, float lineHeight) 
+    {
+        if (Font == null || lineIndex < 0 || lineIndex >= lines.Length) return Rectangle.Empty;
+        
+        var line = lines[lineIndex];
+        
+        var safePosition = Math.Min(positionInLine, line.Length);        
+        var substr = line.Substring(0, safePosition);
+        var size = Font.MeasureString(substr) * Scale;
+        
+        var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIndex * lineHeight);
+        var rect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, CursorWidth, CursorHeight);
+        return rect;
+    }
+    
     /// <summary>
     /// Calculates cursor position depending on <c>_cursorIndex</c> and draws it
     /// </summary>
-    /// <param name="lines">Splitted text lines</param>
-    /// <param name="lineHeight"></param>
     private void DrawCursor(SpriteBatch spriteBatch, int cursorIndex, string[] lines, float lineHeight) 
     {
-        if (Font == null) return;
+        if (!_shouldDrawCursor || !IsFocused) return;
         
-        // draw cursor at end of text
-        if (_shouldDrawCursor && IsFocused)
+        var cursorData = FindCursorPosition(lines, cursorIndex);
+                
+        var rect = GetCursorRectangle(lines, cursorData.lineIndex, cursorData.positionInLine, lineHeight);                   
+        spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), rect, CursorColor * Alpha);
+    }
+    
+    /// <summary>
+    /// Draw logic for <c>MultipleLines</c> input mode
+    /// </summary>
+    /// <param name="spriteBatch"></param>
+    /// <param name="lineHeight"></param>
+    private void DrawMultipleLinesMode(SpriteBatch spriteBatch, float lineHeight) 
+    {
+        if (Text == null) return;
+        
+        var lines = Text.Split('\n');
+        // draw each line left-aligned
+        for (int i = 0; i < lines.Length; i++)
         {
-            int acc = 0;
-            int lineIdx = 0;
-            foreach (var ln in lines)
-            {
-                if (cursorIndex <= acc + ln.Length)
-                {
-                    int posInLine = cursorIndex - acc;
-                    var substr = ln[..Math.Min(posInLine, ln.Length)];
-                    var size = Font.MeasureString(substr) * Scale;
-                    var cursorPos = new Vector2(Bounds.Left + size.X, Bounds.Top + lineIdx * lineHeight);
-                    var rect = new Rectangle((int)cursorPos.X, (int)cursorPos.Y, CursorWidth, CursorHeight);
-                    spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), rect, CursorColor * Alpha);
-                    break;
-                }
-                acc += ln.Length;
-                lineIdx++;
-            }
+            var pos = new Vector2(Bounds.Left, Bounds.Top + i * lineHeight);
+            DrawStringAt(spriteBatch, pos, lines[i]);
         }
+        DrawCursor(spriteBatch, _cursorIndex, lines, lineHeight);
+    }
+    
+    /// <summary>
+    /// Draw logic for <c>ScrolLHorizontally</c> input mode
+    /// </summary>
+    /// <param name="spriteBatch"></param>
+    /// <param name="relativeCursorIndex">New cursor index relative to the visible part</param>
+    /// <param name="displayText">The part of the text thats visible (fits in WrapTextSize)</param>
+    /// <param name="lineHeight"></param>
+    private void DrawScrollHorizontallyMode(SpriteBatch spriteBatch, float lineHeight) 
+    {
+        // get cursor index relative to this substring
+        var safeText = GetSafeText();
+        var displayText = GetDisplayText(safeText, _cachedDisplayStart);
+        var relativeCursorIndex = Math.Clamp(_cursorIndex - _cachedDisplayStart, 0, displayText.Length);
+        
+        var lines = displayText.Split('\n');
+        var pos = new Vector2(Bounds.Left, Bounds.Top);
+        DrawStringAt(spriteBatch, pos, displayText); // draw text
+        DrawCursor(spriteBatch, relativeCursorIndex, lines, lineHeight); // draw cursor before exiting
+    }
+    
+    /// <summary>
+    /// Draw logic for <c>SingleLine</c> input mode
+    /// </summary>
+    /// <param name="spriteBatch"></param>
+    /// <param name="lineHeight"></param>
+    private void DrawSingleLineMode(SpriteBatch spriteBatch, float lineHeight) 
+    {
+        if (Text == null) return;
+        
+        var pos = new Vector2(Bounds.Left, Bounds.Top);
+        DrawStringAt(spriteBatch, pos, Text);
+        DrawCursor(spriteBatch, _cursorIndex, [Text], lineHeight);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         Background?.Draw(spriteBatch);
         
-        if (IsSignEditing)
+        if (Font == null || Text == null) return;
+        var lineHeight = Font.LineSpacing * Scale.Y;
+        
+        switch (Mode)
         {
-            if (Font == null || Text == null) return;
-            
-            var lines = Text.Split('\n');
-            float lineHeight = Font.LineSpacing * Scale.Y;
-            
-            // imitate moving text to the left instead of starting new line
-            if (MoveInsteadOfWrapping) 
+            case InputMode.MultipleLines:
             {
-                var safeText = GetSafeText();
-                var start = 0;
-                
-                // exceeded wrap size
-                if (StringBuilder.Length > 0 && Font.MeasureString(safeText).X >= WrapTextSize) 
-                { 
-                    // only if we need to recalc
-                    if (_shouldRecalcOptimalStart) 
-                    {
-                        // binary serach to earliest start
-                        var low = 0;
-                        var high = StringBuilder.Length;
-                        
-                        while (low <= high) 
-                        {
-                            var mid = (low + high) / 2;
-                            var substring = safeText.Substring(mid); // from mid to end
-                            var textWidth = Font.MeasureString(substring);
-                            
-                            // this start works, try finding earlier one
-                            if (textWidth.X <= WrapTextSize) 
-                            {  
-                                start = mid;
-                                high = mid - 1;                            
-                            }
-                            else // doesnt work, try later position 
-                            {
-                                low = mid + 1;
-                            }
-                        }
-
-                        _cachedDisplayStart = start; // update cached (but only when recalculating)
-                        _shouldRecalcOptimalStart = false;
-                    }
-                    else 
-                    {
-                        // dont need recalc
-                        start = _cachedDisplayStart; // else use cached value (when text is typed in the middle)
-                    }
-                }
-                else 
-                {
-                    // entire text fits
-                    start = 0;
-                    _cachedDisplayStart = 0;
-                }
-
-                // get cursor index relative to this substring
-                var displayText = GetDisplayText(safeText, start);
-                var displayLines = displayText.Split('\n');
-                var cursorIndex = Math.Clamp(_cursorIndex - start, 0, displayText.Length);
-                
-                var pos = new Vector2(Bounds.Left, Bounds.Top);
-                base.Draw(spriteBatch, pos, displayText); // draw text
-                DrawCursor(spriteBatch, cursorIndex, displayLines, lineHeight); // draw cursor before exiting
-                _labelTextUi?.Draw(spriteBatch);
-                return;
-            }            
-            
-            // draw each line left-aligned
-            for (int i = 0; i < lines.Length; i++)
-            {
-                var pos = new Vector2(Bounds.Left, Bounds.Top + i * lineHeight);
-                base.Draw(spriteBatch, pos, lines[i]);
+                DrawMultipleLinesMode(spriteBatch, lineHeight);
+                break;
             }
-            DrawCursor(spriteBatch, GetSafeCursorIndex(), lines, lineHeight);
-        }
-        else
-        {
-            base.Draw(spriteBatch);
-            if (Font == null || Text == null) return;
-            if (_shouldDrawCursor && IsFocused)
+            case InputMode.ScrollHorizontally:
             {
-                int safeCursorIndex = GetSafeCursorIndex();
-                var safeText = GetSafeText();
-                
-                float yOffset = string.IsNullOrEmpty(Text) ? 10 : 0;
-                var textSize = Font.MeasureString(safeText[..safeCursorIndex]);
-                var cursorPosition = new Vector2(Bounds.Left + textSize.X, Bounds.Center.Y - CursorHeight * 0.5f - yOffset);
-                var cursorRectangle = new Rectangle((int)cursorPosition.X, (int)cursorPosition.Y, CursorWidth, CursorHeight);
-                spriteBatch.Draw(BlastiaGame.TextureManager.WhitePixel(), cursorRectangle, CursorColor * Alpha);
+                DrawScrollHorizontallyMode(spriteBatch, lineHeight);
+                break;
             }
-        }        
+            case InputMode.SingleLine:
+            {
+                DrawSingleLineMode(spriteBatch, lineHeight);                
+                break;
+            }
+        }      
         
         _labelTextUi?.Draw(spriteBatch);
     }
@@ -534,63 +701,81 @@ public class Input : UIElement
             return "";
         }
         
-        for (int i = start + 1; i <= originalText.Length; i++) 
+        // whole text fits
+        var remainingText = originalText.Substring(start);
+        if (Font.MeasureString(remainingText).X <= WrapTextSize)
+            return remainingText;
+        
+        // TODO: Optimize for binary search
+        for (int length = 1; length <= originalText.Length - start; length++) 
         {
-            var substring = originalText.Substring(start, i - start);
-            var size = Font.MeasureString(substring);
+            var substring = originalText.Substring(start, length);
+            var width = Font.MeasureString(substring).X;
             
-            if (size.X > WrapTextSize) 
+            if (width > WrapTextSize) 
             {
-                // dont go before start + 1
-                i = Math.Max(start + 1, i - 1);
-                return originalText.Substring(start, i - start);
+                // return previous length (that wasnt exceeding)
+                // ensure at least 1 character
+                var fitLength = Math.Max(length - 1, 1);
+                return originalText.Substring(start, fitLength);
             }
         }
+        
+        return remainingText;
+    }
+    
+    private (float width, float height) CalculateMultipleLinesBounds() 
+    {
+        if (Text == null || Font == null) return (0, 0);
+        
+        // get max possible width out of all lines
+        var lines = Text.Split('\n');
+        var maxWidth = 0f;
+        
+        foreach (var line in lines) 
+        {
+            var lineWidth = Font.MeasureString(line);
+            maxWidth = Math.Max(maxWidth, lineWidth.X);
+        }
 
-        // whole text fits
-        return originalText.Substring(start);
+        float height = Font.LineSpacing * lines.Length;
+        
+        return (maxWidth, height);
     }
     
     public override void UpdateBounds()
-    {        
-        if (IsSignEditing && Font != null && Text != null)
+    {
+        if (Font == null) return;
+        
+        // empty string -> 1f size
+        if (string.IsNullOrEmpty(Text)) 
         {
-            if (MoveInsteadOfWrapping) 
+            UpdateBoundsBase(1f, 1f);
+            return;
+        }
+        
+        switch (Mode)
+        {
+            case InputMode.MultipleLines:
+            {
+                var (width, height) = CalculateMultipleLinesBounds();
+                UpdateBoundsBase(width, height);
+                break;
+            }
+            case InputMode.ScrollHorizontally:
             {
                 // single line mode -> width is wrap length and height is 1 line
                 // entered text width or wrap size
                 var width = Math.Min(WrapTextSize, Font.MeasureString(GetSafeText()).X);
                 var height = Font.LineSpacing;
                 UpdateBoundsBase(width, height);
+                break;
             }
-            else 
+            case InputMode.SingleLine:
             {
-                // empty string -> 1f size
-                if (string.IsNullOrEmpty(Text)) 
-                {
-                    UpdateBoundsBase(1f, 1f);
-                    return;
-                }
-                
-                // get max possible width out of all lines
-                var lines = Text.Split('\n');
-                var maxWidth = 0f;
-                
-                foreach (var line in lines) 
-                {
-                    var lineWidth = Font.MeasureString(line);
-                    maxWidth = Math.Max(maxWidth, lineWidth.X);
-                }
-
-                float height = Font.LineSpacing * lines.Length;
-
-                // apply alignment
-                UpdateBoundsBase(maxWidth, height);
-            }           
-        }
-        else
-        {
-            base.UpdateBounds();
+                base.UpdateBounds();
+                break;
+            }
         }
         
         if (_labelTextUi != null)

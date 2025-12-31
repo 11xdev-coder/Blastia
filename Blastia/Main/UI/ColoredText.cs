@@ -292,7 +292,7 @@ public class ColoredText : UIElement
             // dont draw gifs
             if (segment.Text != "\x01") 
             {
-                base.Draw(spriteBatch, position, segment.Text, default, segment.Color);
+                DrawStringAt(spriteBatch, position, segment.Text, default, segment.Color);
             }
         },
         onGif: (gifSegment, position) =>
