@@ -179,3 +179,4 @@
 /home/matvei/Projects/Blastia/Blastia/obj/Debug/net10.0/Blastia.pdb
 /home/matvei/Projects/Blastia/Blastia/obj/Debug/net10.0/Blastia.genruntimeconfig.cache
 /home/matvei/Projects/Blastia/Blastia/obj/Debug/net10.0/ref/Blastia.dll
+/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldCreation/RollingDice.png

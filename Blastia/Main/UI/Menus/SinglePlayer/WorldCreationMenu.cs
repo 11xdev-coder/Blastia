@@ -12,6 +12,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private Image? _worldPreview;
 	private Image? _worldPreviewBorder;
 	private Input? _name;
+	private Input? _seed;
 	
 	protected override void AddElements()
 	{
@@ -36,12 +37,19 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		};
 		Elements.Add(_worldPreviewBorder);
 		
-		_name = new Input(new Vector2(540, 345), Font, true, labelText: "Name") 
+		_name = new Input(new Vector2(515, 315), Font, true, labelText: "Name", defaultText: "") 
 		{
 		    CharacterLimit = 20	    
 		};
 		_name.SetBackgroundProperties(_name.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
 		Elements.Add(_name);
+		
+		_seed = new Input(new Vector2(502, 375), Font, true, labelText: "Seed", defaultText: "") 
+		{
+		    CharacterLimit = 20	    
+		};
+		_seed.SetBackgroundProperties(_seed.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
+		Elements.Add(_seed);
 		
 		var sizeText = new Text(Vector2.Zero, "Size", Font) 
 		{

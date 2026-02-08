@@ -8,9 +8,16 @@ public static class MainEntry
         if (args.Contains("-synth"))
         {
             Synthesizer.Synthesizer.Launch([]);
+            return;
         }
-        
-        BlastiaGame game = new BlastiaGame();
+
+        bool fullscreen = false;
+        if (args.Contains("-fullscreen"))
+        {
+            fullscreen = true;
+        }
+
+        BlastiaGame game = new BlastiaGame(fullscreen);
         game.Run();
     }
 }

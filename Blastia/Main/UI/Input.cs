@@ -49,7 +49,7 @@ public class Input : UIElement
     /// <para><c>MultipleLines</c> ->multiple lines, but text wraps to new line automatically after <c>WrapTextSize</c> is reached</para>
     /// <para><c>ScrollHorizontally</c> -> 1 line, but after reaching <c>WrapTextSize</c> the text begins to scroll to the left</para>
     /// </summary>
-    public InputMode Mode { get; set; }
+    public InputMode Mode { get; set; } = InputMode.SingleLine;
     /// <summary>
     /// If <c>MoveInsteadOfWrapping</c> is true -> indicates character index from where we start showing text
     /// </summary>

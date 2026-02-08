@@ -8,7 +8,7 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.UI;
 
-public enum ActivationMethod 
+public enum ActivationMethod
 {
     Default,
     OnlyInGame,
@@ -24,19 +24,16 @@ public class Menu
         get => _hAlignOffset;
         set => Properties.OnValueChangedProperty(ref _hAlignOffset, value, OnAlignmentOffsetChanged);
     }
-    
     private float _vAlignOffset;
     public float VAlignOffset
     {
         get => _vAlignOffset;
         set => Properties.OnValueChangedProperty(ref _vAlignOffset, value, OnAlignmentOffsetChanged);
     }
-    
     public readonly List<UIElement> Elements = [];
     protected readonly SpriteFont Font;
 
     public bool Active;
-    
     /// <summary>
     /// If <c>true</c> and player camera is initialized will use <see cref="Update(Camera)"/> to update.
     /// Otherwise, will use <see cref="Update()"/>
@@ -47,7 +44,6 @@ public class Menu
     /// If true, will set <c>IsAnyBlockEscapeMenuActive</c> flag when this menu is active. Used for not opening/closing inventory when escape is pressed on this menu
     /// </summary>
     public virtual bool BlockEscape { get; set; }
-    
     /// <summary>
     /// <para>Default -> default activation by hand</para>
     /// <para>OnlyInGame -> activation when loaded into the world, deactivation when in main menu</para>
@@ -68,10 +64,8 @@ public class Menu
     {
         Font = font;
         Active = isActive;
-        
         Initialize(initializeElementsImmediately);
     }
-    
     private void Initialize(bool initializeElementsImmediately)
     {
         if (initializeElementsImmediately)
@@ -79,10 +73,8 @@ public class Menu
             AddElements();
         }
     }
-    
     protected virtual void AddElements()
     {
-        
     }
 
     /// <summary>
@@ -95,7 +87,6 @@ public class Menu
             element.AlignOffset = new Vector2(HAlignOffset, VAlignOffset);
         }
     }
-    
     /// <summary>
     /// Update each element
     /// </summary>
@@ -118,7 +109,6 @@ public class Menu
             elem.Update();
         }
     }
-    
     /// <summary>
     /// Draw each element
     /// </summary>
@@ -130,7 +120,6 @@ public class Menu
             elem.Draw(spriteBatch);
         }
     }
-    
     /// <summary>
     /// Sets current menu to inactive and new menu to active
     /// </summary>
@@ -140,23 +129,19 @@ public class Menu
         if (menu != null && menu != this && !menu.Active)
         {
             OnMenuInactive();
-            
             Active = false;
             menu.Active = true;
             menu.OnMenuActive();
-            
             _menuSwitched = true;
         }
     }
-    
     /// <summary>
     /// Called when SwitchToMenu is called on the new menu
     /// </summary>
     protected virtual void OnMenuActive()
     {
-        
+
     }
-    
     /// <summary>
     /// Invokes the OnMenuInactive method on all UI elements to handle their state when the menu becomes inactive.
     /// Outputs a debug message to indicate the method has been called.
@@ -169,7 +154,6 @@ public class Menu
         }
         Console.WriteLine("Called OnMenuInactive on all UIElements.");
     }
-    
     /// <summary>
     /// Runs in Game Update method to prevent other menus from updating when transitioning
     /// to new menu
@@ -181,9 +165,9 @@ public class Menu
         _menuSwitched = false;
         return wasSwitched;
     }
-    
+
     // COMMON METHODS
-    private void AddSlider(Vector2 textPosition, Vector2 sliderPosition, 
+    private void AddSlider(Vector2 textPosition, Vector2 sliderPosition,
         float hAlign, float vAlign, string text, Func<float> sliderGetValue,
         Action<float> sliderSetValue, Action<Action> subscribeToEvent)
     {
@@ -193,7 +177,6 @@ public class Menu
             VAlign = vAlign
         };
         Elements.Add(textUi);
-        
         var slider = new Slider(sliderPosition, Font,
             sliderGetValue, sliderSetValue, subscribeToEvent, true)
         {
@@ -202,22 +185,20 @@ public class Menu
         };
         Elements.Add(slider);
     }
-    
     protected void AddMasterVolumeSlider(float hAlign, float vAlign) =>
         AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Master Volume",
-            () => AudioManager.Instance.MasterVolume, 
+            () => AudioManager.Instance.MasterVolume,
             f => AudioManager.Instance.MasterVolume = f,
             handler => AudioManager.Instance.MasterVolumeChanged += handler);
-    
     protected void AddMusicVolumeSlider(float hAlign, float vAlign) =>
         AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Music Volume",
-            () => AudioManager.Instance.MusicVolume, 
+            () => AudioManager.Instance.MusicVolume,
             f => AudioManager.Instance.MusicVolume = f,
             handler => AudioManager.Instance.MusicVolumeChanged += handler);
 
     protected void AddSoundVolumeSlider(float hAlign, float vAlign) =>
         AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Sound Volume",
-            () => AudioManager.Instance.SoundsVolume, 
+            () => AudioManager.Instance.SoundsVolume,
             f => AudioManager.Instance.SoundsVolume = f,
             handler => AudioManager.Instance.SoundsVolumeChanged += handler);
 
@@ -228,7 +209,7 @@ public class Menu
             HAlign = hAlign,
             VAlign = vAlign
         };
-        isFullScreenButton.CreateBooleanSwitch( 
+        isFullScreenButton.CreateBooleanSwitch(
             () => VideoManager.Instance.IsFullScreen,
             _ => VideoManager.Instance.ToggleFullscreen(),
             handler => VideoManager.Instance.FullScreenChanged += handler);
@@ -247,11 +228,10 @@ public class Menu
         resolutionSwitcher.AddToElements(Elements);
 
     }
-    
-    protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null) 
+    protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null)
     {
         button.SetBackgroundProperties(() => button.Bounds, Color.Black, 1, Color.Transparent, 5);
-        button.CreateBooleanSwitch(null, null, null, false, (newVal, button) => 
+        button.CreateBooleanSwitch(null, null, null, false, (newVal, button) =>
         {
             if (newVal)
                 button.SetBackgroundColor(Color.Yellow);
