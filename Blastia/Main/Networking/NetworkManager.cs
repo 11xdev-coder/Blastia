@@ -1,9 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using Blastia.Main.Blocks.Common;
-using Blastia.Main.Utilities.ListHandlers;
-using Microsoft.Xna.Framework;
-using Newtonsoft.Json;
 using Steamworks;
 
 namespace Blastia.Main.Networking;
@@ -99,9 +95,9 @@ public class NetworkManager
         {
             Environment.SetEnvironmentVariable("SteamAppId", AppId.ToString());
 
-            if (SteamAPI.InitEx(out var msg) != ESteamAPIInitResult.k_ESteamAPIInitResult_OK)
+            if (!SteamAPI.Init())
             {
-                Console.WriteLine($"[NetworkManager] SteamAPI.InitEx() failed! {msg}");
+                Console.WriteLine($"[NetworkManager] SteamAPI.InitEx() failed!");
                 return false;
             }
             

@@ -72,7 +72,8 @@
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/SlotHighlighted.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldCreation/Preview.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldCreation/PreviewBorder.png
-/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/steam_api64.dll
+/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldCreation/RollingDice.png
+/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/runtimes/linux-x64/native/libsteam_api.so
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/steam_appid.txt
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Blastia
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Blastia.deps.json
@@ -179,4 +180,3 @@
 /home/matvei/Projects/Blastia/Blastia/obj/Debug/net10.0/Blastia.pdb
 /home/matvei/Projects/Blastia/Blastia/obj/Debug/net10.0/Blastia.genruntimeconfig.cache
 /home/matvei/Projects/Blastia/Blastia/obj/Debug/net10.0/ref/Blastia.dll
-/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldCreation/RollingDice.png
