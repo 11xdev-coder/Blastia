@@ -689,9 +689,22 @@ public class BlastiaGame : Game
             ScrollWheelDelta = 0f;
         }
 
-        // mouse position that is aligned with OS cursor
-        CursorPosition = Vector2.Transform(new Vector2(_currentMouseState.X, _currentMouseState.Y),
-            Matrix.Invert(VideoManager.Instance.CalculateResolutionScaleMatrix()));
+        // 1. get raw SDL mouse coordinates in back buffer space
+        float mouseX = _currentMouseState.X;
+        float mouseY = _currentMouseState.Y;
+    
+        // when setting _graphics.PreferredBackBufferWidth we are making a request. that means when we get it we can get a different value than we requested.
+        // GraphicsDevice.PresentationParameters.BackBufferWidth gives the actual value that is currently applied, not the value that we requested and could be different
+        // 2. get actual back buffer size
+        float actualBackBufferWidth = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        float actualBackBufferHeight = GraphicsDevice.PresentationParameters.BackBufferHeight;
+    
+        // mouse coordinates should be in back buffer space, so ccale to target resolution
+        // 3. scale
+        float scaleX = VideoManager.Instance.TargetResolution.X / actualBackBufferWidth;
+        float scaleY = VideoManager.Instance.TargetResolution.Y / actualBackBufferHeight;
+    
+        CursorPosition = new Vector2(mouseX * scaleX, mouseY * scaleY);
 
         // reset this flag, will be set in any UIElement that is hovered on
         IsHoveredOnAnyUi = false;
