@@ -7,29 +7,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Blastia/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia.sln.DotSettings.user" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/Main/BlastiaGame.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net10.0/Blastia" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net10.0/Blastia" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net10.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net10.0/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/bin/Debug/net10.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/bin/Debug/net10.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Blastia.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Blastia.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.AssemblyInfo.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.AssemblyInfo.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.AssemblyInfoInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.AssemblyInfoInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.sourcelink.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/Blastia.sourcelink.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/apphost" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/apphost" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/ref/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/ref/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/refint/Blastia.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/Debug/net10.0/refint/Blastia.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.model.nuget.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Blastia/obj/rider.project.restore.info" afterDir="false" />
-    </list>
+    <list default="true" id="458d0b05-1e25-4b1a-bb49-930bb5dbec94" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -302,15 +280,7 @@
       <workItem from="1751454144235" duration="2395000" />
       <workItem from="1751465573512" duration="4895000" />
       <workItem from="1771160341596" duration="4670000" />
-      <workItem from="1771777617640" duration="2728000" />
-    </task>
-    <task id="LOCAL-00137" summary="complete liquid refactor">
-      <option name="closed" value="true" />
-      <created>1750144200143</created>
-      <option name="number" value="00137" />
-      <option name="presentableId" value="LOCAL-00137" />
-      <option name="project" value="LOCAL" />
-      <updated>1750144200144</updated>
+      <workItem from="1771777617640" duration="3403000" />
     </task>
     <task id="LOCAL-00138" summary="collision and tile source rect fixes">
       <option name="closed" value="true" />
@@ -696,7 +666,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751314536338</updated>
     </task>
-    <option name="localTasksCounter" value="186" />
+    <task id="LOCAL-00186" summary="cursor position mismatch fix">
+      <option name="closed" value="true" />
+      <created>1771783887717</created>
+      <option name="number" value="00186" />
+      <option name="presentableId" value="LOCAL-00186" />
+      <option name="project" value="LOCAL" />
+      <updated>1771783887717</updated>
+    </task>
+    <option name="localTasksCounter" value="187" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -706,7 +684,6 @@
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
-    <MESSAGE value="fps dependency fixes" />
     <MESSAGE value="draw collision grid command" />
     <MESSAGE value="liquid fix" />
     <MESSAGE value="massive rework: different tile layers" />
@@ -731,6 +708,7 @@
     <MESSAGE value="player join bug fixes" />
     <MESSAGE value="basic player movement sync" />
     <MESSAGE value="fixed player spawn point on host bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed player spawn point on host bug" />
+    <MESSAGE value="cursor position mismatch fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="cursor position mismatch fix" />
   </component>
 </project>

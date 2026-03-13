@@ -224,4 +224,23 @@ public static class Util
         texture.SetData(pixelData);
         return texture;
     }
+    
+    public static Microsoft.Xna.Framework.Color HsvToColor(float h, float s, float v) 
+    {
+        int hi = (int)(h * 6f) % 6;
+        float f = (h * 6f) - (int)(h * 6f);
+        float p = v * (1f - s);
+        float q = v * (1f - f * s);
+        float t = v * (1f - (1f - f) * s);
+        
+        switch (hi) 
+        {
+            case 0: return new Microsoft.Xna.Framework.Color(v, t, p);
+            case 1: return new Microsoft.Xna.Framework.Color(q, v, p);
+            case 2: return new Microsoft.Xna.Framework.Color(p, v, t);
+            case 3: return new Microsoft.Xna.Framework.Color(p, q, v);
+            case 4: return new Microsoft.Xna.Framework.Color(t, p, v);
+            default: return new Microsoft.Xna.Framework.Color(v, p, v);
+        }
+    }
 }

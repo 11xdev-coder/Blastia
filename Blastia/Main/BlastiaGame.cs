@@ -130,6 +130,10 @@ public class BlastiaGame : Game
     // COLORS
     private double _colorTimer;
     public static Color ErrorColor { get; private set; }
+    /// <summary>
+    /// Controls color of the cursor glow
+    /// </summary>
+    private float _cursorHueOffset;
 
     // CONSOLE
     public ConsoleWindow? ConsoleWindow;
@@ -656,6 +660,10 @@ public class BlastiaGame : Game
 
         ErrorColor = MathUtilities.PingPongLerpColor(Color.Red, Color.DarkRed,
             (float)_colorTimer, 0.4f);
+        
+        // loop it over and over
+        _cursorHueOffset += (float) GameTimeElapsedSeconds * 0.4f;
+        if (_cursorHueOffset > 1) _cursorHueOffset -= 1f;
     }
 
     private void UpdateGameTime(GameTime newGameTime)
@@ -800,9 +808,40 @@ public class BlastiaGame : Game
         }
 
         // draw cursor texture last on top of everything
-        SpriteBatch.Draw(TextureManager.Get("Cursor", "UI"), CursorPosition, Color.White);
+        DrawCursor(SpriteBatch, CursorPosition);
         TooltipDisplay?.Draw(SpriteBatch);
         SpriteBatch.End();
+    }
+    
+    private void DrawCursor(SpriteBatch spriteBatch, Vector2 position) 
+    {
+        // bigger circle factor -> more sprites drawn around creating a smoother "circle" around
+        var circleFactor = 12f;
+        var rings = 3; // how many rings
+        var baseRadius = 3f; // starting radius
+        
+        for (var ring = rings; ring >= 1; ring--) 
+        {
+            float radius = baseRadius * ring;
+            float alpha = 0.35f / ring; // rings fade out more
+            
+            for (var i = 0; i < circleFactor; i++) 
+            {
+                var angle = MathHelper.TwoPi / circleFactor * i;
+                
+                // gets position depending on the angle and pushes it out by radius
+                var offset = new Vector2(
+                    (float) (Math.Cos(angle) * radius), 
+                    (float) (Math.Sin(angle) * radius)
+                );
+                
+                var hue = (_cursorHueOffset + (float) i / circleFactor) % 1f;
+                Color color = Util.HsvToColor(hue, 1f, 1f);
+                spriteBatch.Draw(TextureManager.Get("Cursor", "UI"), position + offset, color);
+            }
+        }
+        
+        SpriteBatch.Draw(TextureManager.Get("Cursor", "UI"), position, Color.White);
     }
 
     public static MusicID ChooseRandomMenuMusic() => (MusicID)Rand.Next(0, 2);
