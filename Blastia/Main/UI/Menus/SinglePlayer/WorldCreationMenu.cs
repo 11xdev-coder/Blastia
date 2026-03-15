@@ -89,21 +89,44 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		var easy = new Button(new Vector2(430, 550), "I am too young to die", Font, () => {});
 		Elements.Add(easy);
 		
-		var normal = new Button(new Vector2(430, 600), "Hurt me plenty", Font, () => {});
+		var normal = new Button(new Vector2(430, 605), "Hurt me plenty", Font, () => {});
 		Elements.Add(normal);
 		
-		var hard = new Button(new Vector2(670, 600), "Nightmare", Font, () => {});
+		var hard = new Button(new Vector2(670, 605), "Nightmare", Font, () => {});
 		Elements.Add(hard);
 		
 		WorldCreationBoolButtonPreset(easy, [() => normal, () => hard]);
 		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard]);
 		WorldCreationBoolButtonPreset(hard, [() => easy, () => normal]);
+		
+		var createButton = new Button(new Vector2(950, 900), "Create", Font, () => {})
+		{
+			Scale = new Vector2(1.2f, 1.2f)
+		};
+		Elements.Add(createButton);
+		
+		var back = new Button(new Vector2(850, 900), "Back", Font, Back)
+		{
+			Scale = new Vector2(1.2f, 1.2f)
+		};
+		Elements.Add(back);
+		
+		WorldCreationButtonPreset(createButton);
+		WorldCreationButtonPreset(back);
+
+		var btn = new ImageButton(new Vector2(1000, 1000), BlastiaGame.TextureManager.Get("Cursor", "UI"), Font, () => {});
+		Elements.Add(btn);
 	}
 
     public override void Update()
     {
         base.Update();
         if (_worldPreview == null) return;
+    }
+    
+    private void Back() 
+    {
+        SwitchToMenu(BlastiaGame.WorldsMenu);
     }
 
 	// protected override void Create()

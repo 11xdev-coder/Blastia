@@ -239,4 +239,9 @@ public class Menu
                 button.RevertOriginalBackgroundColor();
         }, buttonGroupGetters);
     }
+    
+    protected void WorldCreationButtonPreset(Button button)
+    {
+        button.SetBackgroundProperties(() => button.Bounds, Color.Black, 1, Color.Transparent, 5);
+    }
 }

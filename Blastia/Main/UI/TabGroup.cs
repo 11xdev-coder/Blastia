@@ -54,6 +54,8 @@ public class TabGroup : UIElement
     
     private void CreateTabs()
     {
+        if (Font == null) return;
+        
         // remove previously initialized tabs
         if (_initializedTabs.Count > 0)
         {
@@ -66,7 +68,7 @@ public class TabGroup : UIElement
         {
             var tabData = _tabsData[i];
             
-            var tabButton = new ImageButton(startingPosition, tabData.TabTexture, tabData.OnClick)
+            var tabButton = new ImageButton(startingPosition, tabData.TabTexture, Font, tabData.OnClick)
             {
                 Scale = tabData.Scale
             };
