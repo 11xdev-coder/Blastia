@@ -817,7 +817,7 @@ public class BlastiaGame : Game
     {
         // bigger circle factor -> more sprites drawn around creating a smoother "circle" around
         var circleFactor = 12f;
-        var rings = 3; // how many rings
+        var rings = 2; // how many rings
         var baseRadius = 3f; // starting radius
         
         for (var ring = rings; ring >= 1; ring--) 
@@ -836,7 +836,7 @@ public class BlastiaGame : Game
                 );
                 
                 var hue = (_cursorHueOffset + (float) i / circleFactor) % 1f;
-                Color color = Util.HsvToColor(hue, 1f, 1f);
+                Color color = Util.HsvToColor(hue, 1f, 1f) * alpha;
                 spriteBatch.Draw(TextureManager.Get("Cursor", "UI"), position + offset, color);
             }
         }
