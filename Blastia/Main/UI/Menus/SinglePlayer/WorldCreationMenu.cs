@@ -37,14 +37,23 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		};
 		Elements.Add(_worldPreviewBorder);
 		
-		_name = new Input(new Vector2(515, 315), Font, true, labelText: "Name", defaultText: "") 
+		var nameRandButton = new ImageButton(new Vector2(415, 317), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("SignBlock", "Items"), new Vector2(2f, 2f)), Font, () => {});
+		Elements.Add(nameRandButton);
+		
+		var seedRandButton = new ImageButton(new Vector2(415, 377), BlastiaGame.TextureManager.Get("Cursor", "UI"), Font, () => {});
+		Elements.Add(seedRandButton);
+				
+		WorldCreationButtonPreset(nameRandButton);
+		WorldCreationButtonPreset(seedRandButton);
+		
+		_name = new Input(new Vector2(565, 315), Font, true, labelText: "Name", defaultText: "") 
 		{
 		    CharacterLimit = 20	    
 		};
 		_name.SetBackgroundProperties(_name.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
 		Elements.Add(_name);
 		
-		_seed = new Input(new Vector2(502, 375), Font, true, labelText: "Seed", defaultText: "") 
+		_seed = new Input(new Vector2(552, 375), Font, true, labelText: "Seed", defaultText: "") 
 		{
 		    CharacterLimit = 20	    
 		};
@@ -113,9 +122,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(back);
-
-		var btn = new ImageButton(new Vector2(1000, 1000), BlastiaGame.TextureManager.Get("Cursor", "UI"), Font, () => {});
-		Elements.Add(btn);
 	}
 
     public override void Update()

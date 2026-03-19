@@ -1,3 +1,4 @@
+using Assimp;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,7 +7,7 @@ namespace Blastia.Main.Utilities;
 public class TextureManager 
 {
     private GraphicsDevice _graphicsDevice;
-    private List<string> _workingFolders = ["Blocks", "UI", "Menu", "UI/WorldCreation"];
+    private List<string> _workingFolders = ["Blocks", "UI", "Menu", "UI/WorldCreation", "Items"];
     private Dictionary<string, Texture2D> _textures = [];
     private Texture2D? _invisibleTexture;
     private Texture2D? _whitePixelTexture;
@@ -64,5 +65,47 @@ public class TextureManager
             _whitePixelTexture.SetData([Color.White]);
         }
         return _whitePixelTexture;
+    }
+    
+    public Texture2D Rescale(Texture2D tex, Vector2 size) 
+    {
+        // SetData and GetData use 1d arrays for texture pixels
+        // [0] - index
+        // (0,0) [0] | (1,0) [1] | (2,0) [3]
+        // (0,1) [4] | (1,1) [5] | (2,1) [6]
+        // (0,2) [7] | (1,2) [8] | (2,2) [9]
+        // by accessing arr[i], CPU loads nearby memory and loads arr[i+1], so its faster to follow the intended layout
+        // 1. iterate: inner loop - columns
+        // 2. map rescaled pixels to nearby source coordinates
+        // 3. set new texture
+        
+        Color[] originalData = new Color[tex.Width * tex.Height];
+        tex.GetData(originalData);
+        
+        int newWidth = (int)(tex.Width * size.X);
+        int newHeight = (int)(tex.Height * size.Y);
+        Color[] newData = new Color[newWidth * newHeight];
+        
+        for (int row = 0; row < newWidth; row++) 
+        {
+            for (int col = 0; col < newWidth; col++) 
+            {
+                int srcCol = (int)(col * tex.Width / newWidth);
+                int srcRow = (int)(row * tex.Height / newHeight);
+                
+                srcCol = Math.Min(srcCol, tex.Width - 1);
+                srcRow = Math.Min(srcRow, tex.Height - 1);
+                
+                // skip Y rows, then add X
+                // index = Y * width + X
+                newData[row * newWidth + col] = originalData[srcRow * tex.Width + srcCol];
+            }
+        }
+        
+        // create new texture
+        Texture2D newTexture = new Texture2D(_graphicsDevice, newWidth, newHeight);
+        newTexture.SetData(newData);
+        
+        return newTexture;
     }
 }
