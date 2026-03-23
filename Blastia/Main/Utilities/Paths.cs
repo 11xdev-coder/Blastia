@@ -26,6 +26,7 @@ public static class Paths
 	public static string HumanTextures { get; private set; } = "";
 	public static string BlocksData { get; private set; } = "";
 	public static string ItemsData { get; private set; } = "";
+	public static string WorldNamesData { get; private set; } = "";
 	
 	// update all paths when ContentRoot changes
 	private static void UpdatePaths()
@@ -35,6 +36,7 @@ public static class Paths
 		HumanTextures = ContentRoot + "/Textures/Entities/Humans";
 		BlocksData = ContentRoot + "/Data/blocks.json";
 		ItemsData = ContentRoot + "/Data/items.json";
+		WorldNamesData = ContentRoot + "/Data/worldnames.json";
 	}
 	
 	// Windows -> Documents/My Games/Blastia

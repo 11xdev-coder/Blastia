@@ -71,9 +71,9 @@ public class TextureManager
     {
         // SetData and GetData use 1d arrays for texture pixels
         // [0] - index
-        // (0,0) [0] | (1,0) [1] | (2,0) [3]
-        // (0,1) [4] | (1,1) [5] | (2,1) [6]
-        // (0,2) [7] | (1,2) [8] | (2,2) [9]
+        // (0,0) [0] | (1,0) [1] | (2,0) [2]
+        // (0,1) [3] | (1,1) [4] | (2,1) [5]
+        // (0,2) [6] | (1,2) [7] | (2,2) [8]
         // by accessing arr[i], CPU loads nearby memory and loads arr[i+1], so its faster to follow the intended layout
         // 1. iterate: inner loop - columns
         // 2. map rescaled pixels to nearby source coordinates
