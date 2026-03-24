@@ -40,7 +40,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		var nameRandButton = new ImageButton(new Vector2(415, 317), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("SignBlock", "Items"), new Vector2(2f, 2f)), Font, RandomizeWorldName);
 		Elements.Add(nameRandButton);
 		
-		var seedRandButton = new ImageButton(new Vector2(415, 377), BlastiaGame.TextureManager.Get("Cursor", "UI"), Font, () => {});
+		var seedRandButton = new ImageButton(new Vector2(415, 377), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Seed", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, RandomizeSeed);
 		Elements.Add(seedRandButton);
 				
 		WorldCreationButtonPreset(nameRandButton);
@@ -55,7 +55,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		_seed = new Input(new Vector2(552, 375), Font, true, labelText: "Seed", defaultText: "") 
 		{
-		    CharacterLimit = 20	    
+		    CharacterLimit = 20
 		};
 		_seed.SetBackgroundProperties(_seed.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
 		Elements.Add(_seed);
@@ -128,6 +128,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
     {
         base.OnMenuActive();
         RandomizeWorldName();
+        RandomizeSeed();
     }
 
     public override void Update()
@@ -146,6 +147,20 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		if (_name == null) return;
 		
         _name.SetText(WorldNameGenerator.Generate(20));
+    }
+    
+    private void RandomizeSeed() 
+    {
+		if (_seed == null) return;
+		
+		int length = BlastiaGame.Rand.Next(15, 21);
+		char[] digits = new char[length];
+		for (int i = 0; i < length; i++) 
+		{
+		    digits[i] = (char) ('0' + BlastiaGame.Rand.Next(10));
+		}
+		
+		_seed.SetText(new string(digits));
     }
 
 	// protected override void Create()
