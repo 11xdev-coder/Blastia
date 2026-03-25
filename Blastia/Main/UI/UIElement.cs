@@ -175,7 +175,7 @@ public abstract class UIElement
     /// <summary>
     /// Must be drawn manually in <c>Draw</c> methods
     /// </summary>
-    public ColoredBackground? Background;
+    public AdvancedBackground? Background;
     private bool _hasBackground;
     protected Color OriginalBackgroundColor;
     private float _borderThickness;
@@ -265,7 +265,7 @@ public abstract class UIElement
         var isHoveredIncludingBackground = IsHovered || isBackgroundHovered;
 
         // dont fire events when have background (background copies over events)
-        if (!_hasBackground || this is ColoredBackground) 
+        if (!_hasBackground || this is AdvancedBackground) 
         {
             if (IsHovered)  // if hovering
             {
@@ -591,7 +591,7 @@ public abstract class UIElement
         if (!_hasBackground || _backgroundBounds == null || Background != null) return;
         
         var bounds = _backgroundBounds();
-        Background =  new ColoredBackground(new Vector2(bounds.Left - _padding, bounds.Top - _padding), bounds.Width + _padding * 2, bounds.Height + _padding * 2, OriginalBackgroundColor, _borderThickness, OriginalBorderColor);
+        Background =  new AdvancedBackground(new Vector2(bounds.Left - _padding, bounds.Top - _padding), bounds.Width + _padding * 2, bounds.Height + _padding * 2, OriginalBackgroundColor, _borderThickness, OriginalBorderColor);
         
         // copy over events
         Background.OnClick += () => { Focus(); OnClick?.Invoke(); };

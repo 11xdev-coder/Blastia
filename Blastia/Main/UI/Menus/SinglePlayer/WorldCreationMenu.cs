@@ -1,4 +1,5 @@
 using Blastia.Main.UI.Buttons;
+using Blastia.Main.UI.Warnings;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
@@ -16,7 +17,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	
 	protected override void AddElements()
 	{
-		ColoredBackground bg = new ColoredBackground(Vector2.Zero, 1400, 600, Colors.DarkBackground, 2, Colors.DarkBorder)
+		AdvancedBackground bg = new AdvancedBackground(Vector2.Zero, 1400, 600, Colors.DarkBackground, 2, Colors.DarkBorder)
 		{
 			HAlign = 0.5f,
 			VAlign = 0.6f
@@ -122,6 +123,9 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(back);
+		
+		var test = new WarningUi(new Vector2(1200, 900), "test warning lololol", Font);
+		Elements.Add(test);
 	}
 
     protected override void OnMenuActive()

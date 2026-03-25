@@ -7,7 +7,7 @@ namespace Blastia.Main.Utilities;
 public class TextureManager 
 {
     private GraphicsDevice _graphicsDevice;
-    private List<string> _workingFolders = ["Blocks", "UI", "Menu", "UI/WorldCreation", "Items"];
+    private List<string> _workingFolders = ["Blocks", "UI", "Menu", "UI/WorldCreation", "UI/Icons"];
     private Dictionary<string, Texture2D> _textures = [];
     private Texture2D? _invisibleTexture;
     private Texture2D? _whitePixelTexture;
