@@ -110,14 +110,14 @@ public class Button : UIElement, IValueStorageUi<bool>
     private void Select()
     {
         if (Background != null)
-            Background?.SetBorderColor(SelectedColor);
+            Background?.SetOutlineColor(SelectedColor);
         else
             DrawColor = SelectedColor;
     }
 
     private void Deselect()
     {
-        Background?.SetBorderColor(OriginalBorderColor);
+        Background?.SetOutlineColor(OriginalBorderColor);
         DrawColor = NormalColor;
     }
 

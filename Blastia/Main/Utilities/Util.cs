@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace Blastia.Main.Utilities;
 
@@ -206,7 +207,7 @@ public static class Util
     private static Texture2D FrameToTexture2D(GraphicsDevice graphicsDevice, ImageFrame<Rgba32> frame) 
     {
         var texture = new Texture2D(graphicsDevice, frame.Width, frame.Height);
-        var pixelData = new Microsoft.Xna.Framework.Color[frame.Width * frame.Height];
+        var pixelData = new Color[frame.Width * frame.Height];
 
         frame.ProcessPixelRows(accessor =>
         {
@@ -216,7 +217,7 @@ public static class Util
                 for (int x = 0; x < row.Length; x++) 
                 {
                     var pixel = row[x];
-                    pixelData[y * frame.Width + x] = new Microsoft.Xna.Framework.Color(pixel.R, pixel.G, pixel.B, pixel.A);
+                    pixelData[y * frame.Width + x] = new Color(pixel.R, pixel.G, pixel.B, pixel.A);
                 }
             }
         });
@@ -225,7 +226,7 @@ public static class Util
         return texture;
     }
     
-    public static Microsoft.Xna.Framework.Color HsvToColor(float h, float s, float v) 
+    public static Color HsvToColor(float h, float s, float v) 
     {
         int hi = (int)(h * 6f) % 6;
         float f = (h * 6f) - (int)(h * 6f);
@@ -235,12 +236,29 @@ public static class Util
         
         switch (hi) 
         {
-            case 0: return new Microsoft.Xna.Framework.Color(v, t, p);
-            case 1: return new Microsoft.Xna.Framework.Color(q, v, p);
-            case 2: return new Microsoft.Xna.Framework.Color(p, v, t);
-            case 3: return new Microsoft.Xna.Framework.Color(p, q, v);
-            case 4: return new Microsoft.Xna.Framework.Color(t, p, v);
-            default: return new Microsoft.Xna.Framework.Color(v, p, v);
+            case 0: return new Color(v, t, p);
+            case 1: return new Color(q, v, p);
+            case 2: return new Color(p, v, t);
+            case 3: return new Color(p, q, v);
+            case 4: return new Color(t, p, v);
+            default: return new Color(v, p, v);
         }
+    }
+    
+    /// <summary>
+    /// Interpolates between 2 colors
+    /// </summary>
+    /// <param name="t">Interpolation ration (0f to 1f)</param>
+    public static Color Lerp(Color color1, Color color2, float t)
+    {
+        // clamp the interpolation value between 0 and 1
+        t = Math.Clamp(t, 0f, 1f);
+
+        int r = (int)(color1.R + (color2.R - color1.R) * t);
+        int g = (int)(color1.G + (color2.G - color1.G) * t);
+        int b = (int)(color1.B + (color2.B - color1.B) * t);
+        int a = (int)(color1.A + (color2.A - color1.A) * t);
+
+        return new Color(r, g, b, a);
     }
 }

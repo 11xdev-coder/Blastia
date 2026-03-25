@@ -12,19 +12,20 @@ public class AdvancedBackground : UIElement
     private float _width;
     private float _height;
     private Color _color;
-    private Rectangle _borderRect;
-    private float _borderThickness;
-    private Color _borderColor;
+    private Rectangle _outlineRect;
+    private float _outlineThickness;
+    private Color _outlineColor;
     private Texture2D? _rightBorderImg;
+    private Color _borderImgsColor = Color.White;
     
-    public AdvancedBackground(Vector2 position, float width, float height, Color color, float borderThickness = 0f, Color borderColor = default) 
+    public AdvancedBackground(Vector2 position, float width, float height, Color color, float outlineThickness = 0f, Color outlineColor = default) 
         : base(position, BlastiaGame.TextureManager.Invisible(), Vector2.One)
     {
         _width = width;
         _height = height;
         _color = color;
-        _borderThickness = borderThickness;
-        _borderColor = borderColor;
+        _outlineThickness = outlineThickness;
+        _outlineColor = outlineColor;
     }
     
     /// <summary>
@@ -32,39 +33,41 @@ public class AdvancedBackground : UIElement
     /// </summary>
     public void SetRightBorderImage(Texture2D img) => _rightBorderImg = img;
     
+    public void SetBorderImagesColor(Color newColor) => _borderImgsColor = newColor;
+    
     public new void SetBackgroundColor(Color newColor) => _color = newColor;
-    public void SetBorderColor(Color newColor) => _borderColor = newColor;
+    public void SetOutlineColor(Color newColor) => _outlineColor = newColor;
 
     public override void UpdateBounds()
     {
         UpdateBoundsBase(_width, _height);
         
-        _borderRect = new Rectangle(
-            (int) (Bounds.X - _borderThickness), (int) (Bounds.Y - _borderThickness), 
-            (int) (Bounds.Width + _borderThickness * 2), (int) (Bounds.Height + _borderThickness * 2));
+        _outlineRect = new Rectangle(
+            (int) (Bounds.X - _outlineThickness), (int) (Bounds.Y - _outlineThickness), 
+            (int) (Bounds.Width + _outlineThickness * 2), (int) (Bounds.Height + _outlineThickness * 2));
     }
 
     public override void Draw(SpriteBatch spriteBatch)
     {
         var whitePixel = BlastiaGame.TextureManager.WhitePixel();
-        if (_borderThickness > 0)
+        if (_outlineThickness > 0)
         {
             // draw 4 separate edges
             // top
-            spriteBatch.Draw(whitePixel, new Rectangle(_borderRect.X, _borderRect.Y, _borderRect.Width, (int)_borderThickness), _borderColor);
+            spriteBatch.Draw(whitePixel, new Rectangle(_outlineRect.X, _outlineRect.Y, _outlineRect.Width, (int)_outlineThickness), _outlineColor);
             // bottom
-            spriteBatch.Draw(whitePixel, new Rectangle(_borderRect.X, (int) (_borderRect.Bottom - _borderThickness), _borderRect.Width, (int)_borderThickness), _borderColor);
+            spriteBatch.Draw(whitePixel, new Rectangle(_outlineRect.X, (int) (_outlineRect.Bottom - _outlineThickness), _outlineRect.Width, (int)_outlineThickness), _outlineColor);
             // left
-            spriteBatch.Draw(whitePixel, new Rectangle(_borderRect.X, _borderRect.Y, (int) _borderThickness, _borderRect.Height), _borderColor);
+            spriteBatch.Draw(whitePixel, new Rectangle(_outlineRect.X, _outlineRect.Y, (int) _outlineThickness, _outlineRect.Height), _outlineColor);
             // right
-            spriteBatch.Draw(whitePixel, new Rectangle((int) (_borderRect.Right - _borderThickness), _borderRect.Y, (int) _borderThickness, _borderRect.Height), _borderColor);
+            spriteBatch.Draw(whitePixel, new Rectangle((int) (_outlineRect.Right - _outlineThickness), _outlineRect.Y, (int) _outlineThickness, _outlineRect.Height), _outlineColor);
         }
         spriteBatch.Draw(whitePixel, Bounds, _color);
         
         
         if (_rightBorderImg != null) 
         {
-            spriteBatch.Draw(_rightBorderImg, new Vector2(Bounds.Right, Bounds.Top), Color.White);
+            spriteBatch.Draw(_rightBorderImg, new Vector2(Bounds.Right, Bounds.Top), _borderImgsColor);
         }
     }
 }

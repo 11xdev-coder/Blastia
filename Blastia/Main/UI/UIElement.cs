@@ -514,25 +514,26 @@ public abstract class UIElement
     /// </summary>
     /// <param name="origin">Vector2.Zero by default</param>
     /// <param name="color">White color by default (color not account alpha)</param>
-    public virtual void DrawStringAt(SpriteBatch spriteBatch, Vector2 pos, string str, Vector2 origin = default, Color color = default) 
+    public virtual void DrawStringAt(SpriteBatch spriteBatch, Vector2 pos, string str, Vector2 origin = default, Color color = default, Vector2 scale = default) 
     {
         if (Font == null) return;
 
         // if origin is not specified, fallback to Vector2.Zero
         var textOrigin = origin == default ? Vector2.Zero : origin;
         var textColor = color == default ? Color.White : color;
+        var sc = scale == default ? Scale : scale;
         
         if (BorderColor.A > 0)
         {
             foreach (var offset in _borderOffsets)
             {
                 spriteBatch.DrawString(Font, str, pos + offset * BorderOffsetFactor, BorderColor * Alpha, 
-                    Rotation, textOrigin, Scale, SpriteEffects.None, 0f);
+                    Rotation, textOrigin, sc, SpriteEffects.None, 0f);
             }
         }
         
         spriteBatch.DrawString(Font, str, pos, textColor * Alpha, 
-            Rotation, textOrigin, Scale, SpriteEffects.None, 0f);
+            Rotation, textOrigin, sc, SpriteEffects.None, 0f);
     }
 
     private void DrawText(SpriteBatch spriteBatch)

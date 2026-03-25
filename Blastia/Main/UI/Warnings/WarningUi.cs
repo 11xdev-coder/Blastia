@@ -1,3 +1,4 @@
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,8 +12,11 @@ public class WarningUi : UIElement
     /// Spacing between image and text
     /// </summary>
     private const float TextSpacing = 12f;
-    private const float BgPadding = 3f;
+    private const float BgPadding = -10f;
     private const int GlowSmoothness = 12;
+    
+    private float _colorLerpFactor;
+    private Color _color2 = new(219, 0, 0);
     
     public WarningUi(Vector2 position, string text, SpriteFont font) : base(position, text, font)
     {
@@ -24,9 +28,9 @@ public class WarningUi : UIElement
         
         var bgHeight = Math.Max(textScale.Y, _warningImg.Bounds.Height);
         var bgBounds = new Rectangle(
-            (int) Position.X, 
+            (int) Position.X + 5, 
             (int) Position.Y,
-            (int) (_warningImg.Bounds.Width + TextSpacing + textScale.X),
+            (int) (_warningImg.Bounds.Width + TextSpacing + textScale.X) - 5,
             (int) bgHeight
         );
         
@@ -43,6 +47,15 @@ public class WarningUi : UIElement
     {
         base.Update();
         _warningImg.Update();
+        
+        float delta = (float) BlastiaGame.GameTimeElapsedSeconds;
+        _colorLerpFactor += 4 * delta;
+        if (_colorLerpFactor >= 1)
+            _colorLerpFactor = 0;
+        
+        Color lerpedColor = Util.Lerp(Color.DarkRed, _color2, _colorLerpFactor);
+        Background?.SetBackgroundColor(lerpedColor);
+        Background?.SetBorderImagesColor(lerpedColor);
     }
 
     public override void Draw(SpriteBatch spriteBatch)
@@ -50,7 +63,7 @@ public class WarningUi : UIElement
         if (Text == null) return;
         
         Background?.Draw(spriteBatch);
-        base.DrawStringAt(spriteBatch, _textDrawPos, Text);
+        base.DrawStringAt(spriteBatch, _textDrawPos, Text, scale: new Vector2(0.7f, 0.7f));
         
         for (int i = 0; i < GlowSmoothness; i++) 
         {

@@ -89,8 +89,8 @@ public class Input : UIElement
         OnEndHovering += Deselect;
     }
     
-    private void Select() => Background?.SetBorderColor(Color.Yellow);
-    private void Deselect() => Background?.SetBorderColor(OriginalBorderColor);
+    private void Select() => Background?.SetOutlineColor(Color.Yellow);
+    private void Deselect() => Background?.SetOutlineColor(OriginalBorderColor);
     
     /// <summary>
     /// Calculates proper bounds for the background creation. Covers both label and the input
