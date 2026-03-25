@@ -64,7 +64,7 @@ public class AdvancedBackground : UIElement
         
         if (_rightBorderImg != null) 
         {
-            spriteBatch.Draw(_rightBorderImg, new Vector2(Bounds.Left, Bounds.Top), Color.White);
+            spriteBatch.Draw(_rightBorderImg, new Vector2(Bounds.Right, Bounds.Top), Color.White);
         }
     }
 }
