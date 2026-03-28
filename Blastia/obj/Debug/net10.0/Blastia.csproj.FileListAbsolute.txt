@@ -185,3 +185,4 @@
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldCreation/Name.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/Icons/Warning.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/Background/RightBorderWing.png
+/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/Icons/Anomaly.png

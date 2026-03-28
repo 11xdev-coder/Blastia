@@ -9,5 +9,6 @@ public static class Colors
     public static readonly Color DarkBackground = new(0, 0, 0, 190);
     public static readonly Color DarkBorder = new(255, 255, 255);
     public static readonly Color GlowingRedWarning = new(219, 0, 0);
-    
+    public static readonly Color DepletedYellowAnomaly = new(165, 142, 70);
+    public static readonly Color GlowingYellowAnomaly = new(255, 194, 0);
 }

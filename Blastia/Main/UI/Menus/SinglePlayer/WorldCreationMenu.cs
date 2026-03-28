@@ -124,7 +124,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(back);
 		
-		var test = new WarningUi(new Vector2(1200, 900), "test warning lololol", Font);
+		var test = new AnomalyUi(new Vector2(1200, 900), "test aaa lololol", Font);
 		Elements.Add(test);
 	}
 

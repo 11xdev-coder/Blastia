@@ -17,8 +17,9 @@ public abstract class WarningUiBase : UIElement
     private float _colorLerpFactor;
     private Color _startColor;
     private Color _endColor;
+    private float _blinkSpeed;
     
-    public WarningUiBase(Vector2 position, string text, Texture2D image, SpriteFont font, Color blinkAnimationStartColor, Color blinkAnimationEndColor) : base(position, text, font)
+    public WarningUiBase(Vector2 position, string text, Texture2D image, SpriteFont font, Color blinkAnimationStartColor, Color blinkAnimationEndColor, float blinkSpeed = 4f) : base(position, text, font)
     {
         _warningImg = new Image(position, image);
         
@@ -40,6 +41,7 @@ public abstract class WarningUiBase : UIElement
         
         _startColor = blinkAnimationStartColor;
         _endColor = blinkAnimationEndColor;
+        _blinkSpeed = blinkSpeed;
     }
 
     public override void Update()
@@ -48,7 +50,7 @@ public abstract class WarningUiBase : UIElement
         _warningImg.Update();
         
         float delta = (float) BlastiaGame.GameTimeElapsedSeconds;
-        _colorLerpFactor += 4 * delta;
+        _colorLerpFactor += _blinkSpeed * delta;
         if (_colorLerpFactor >= 1)
             _colorLerpFactor = 0;
         
