@@ -12,15 +12,15 @@ public abstract class WarningUiBase : UIElement
     /// Spacing between image and text
     /// </summary>
     private const float TextSpacing = 12f;
-    private const float BgPadding = -10f;
     private const int GlowSmoothness = 12;
     
     private float _colorLerpFactor;
-    private Color _color2 = new(219, 0, 0);
+    private Color _startColor;
+    private Color _endColor;
     
-    public WarningUiBase(Vector2 position, string text, Texture2D image, SpriteFont font) : base(position, text, font)
+    public WarningUiBase(Vector2 position, string text, Texture2D image, SpriteFont font, Color blinkAnimationStartColor, Color blinkAnimationEndColor) : base(position, text, font)
     {
-        _warningImg = new Image(position, image, new Vector2(3f, 3f));
+        _warningImg = new Image(position, image);
         
         Vector2 textScale = font.MeasureString(text) * Scale;
         float y = _warningImg.Bounds.Top + textScale.Y * 0.25f;
@@ -33,14 +33,13 @@ public abstract class WarningUiBase : UIElement
             (int) (_warningImg.Bounds.Width + TextSpacing + textScale.X) - 5,
             (int) bgHeight
         );
-        
-        // scale right border to fit the bg bounds height
-        var rightBorderTex = BlastiaGame.TextureManager.Get("RightBorderWing", "UI", "Background");
-        float factor = (bgHeight + 2 * BgPadding) / rightBorderTex.Height;
-                    
-        SetBackgroundProperties(() => bgBounds, Color.Black, 0, Color.Black, BgPadding);
+            
+        SetBackgroundProperties(() => bgBounds, blinkAnimationStartColor, 0, blinkAnimationStartColor, -10f);
         CreateBackground();
-        Background?.SetRightBorderImage(BlastiaGame.TextureManager.Rescale(rightBorderTex, new Vector2(factor, factor)));
+        Background?.SetRightBorderImage(BlastiaGame.TextureManager.Get("RightBorderWing", "UI", "Background"));
+        
+        _startColor = blinkAnimationStartColor;
+        _endColor = blinkAnimationEndColor;
     }
 
     public override void Update()
@@ -53,7 +52,7 @@ public abstract class WarningUiBase : UIElement
         if (_colorLerpFactor >= 1)
             _colorLerpFactor = 0;
         
-        Color lerpedColor = Util.Lerp(Color.DarkRed, _color2, _colorLerpFactor);
+        Color lerpedColor = Util.Lerp(_startColor, _endColor, _colorLerpFactor);
         Background?.SetBackgroundColor(lerpedColor);
         Background?.SetBorderImagesColor(lerpedColor);
     }

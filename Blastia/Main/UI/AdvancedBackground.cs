@@ -29,9 +29,13 @@ public class AdvancedBackground : UIElement
     }
     
     /// <summary>
-    /// Sets custom image that will be drawn exactly at right border
+    /// Sets custom image that will be drawn exactly at right border. Automatically rescales texture to fit background height
     /// </summary>
-    public void SetRightBorderImage(Texture2D img) => _rightBorderImg = img;
+    public void SetRightBorderImage(Texture2D img) 
+    {
+        float factor = _height / img.Height;
+        _rightBorderImg = BlastiaGame.TextureManager.Rescale(img, new Vector2(factor, factor));
+    }
     
     public void SetBorderImagesColor(Color newColor) => _borderImgsColor = newColor;
     
