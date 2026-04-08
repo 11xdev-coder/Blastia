@@ -5,15 +5,28 @@ using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+
 namespace Blastia.Main.UI.Menus.SinglePlayer;
+
+public enum WorldModificator 
+{
+    LowGravity,
+    HighGravity,
+    EternalWinter
+}
+
 
 public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
-	private readonly WorldSizeHandler _sizeHandler = new();
 	private Image? _worldPreview;
 	private Image? _worldPreviewBorder;
 	private Input? _name;
 	private Input? _seed;
+	private ScrollableArea? _warnings;
+	
+	private bool _lowGraivty;
+	private bool _highGravity;
+	private bool _eternalWinter;
 	
 	protected override void AddElements()
 	{
@@ -38,6 +51,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		};
 		Elements.Add(_worldPreviewBorder);
 		
+		// --------------- NAME & SEED -----------------------
 		var nameRandButton = new ImageButton(new Vector2(415, 317), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Name", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, RandomizeWorldName);
 		Elements.Add(nameRandButton);
 		
@@ -61,6 +75,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		_seed.SetBackgroundProperties(_seed.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
 		Elements.Add(_seed);
 		
+		// --------------- SIZE -----------------------
 		var sizeText = new Text(Vector2.Zero, "Size", Font) 
 		{
 		    HAlign = 0.15f,
@@ -86,13 +101,22 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		{
 		    HAlign = 0.33f,
 		    VAlign = 0.44f
-		};		
+		};
 		Elements.Add(large);
+				
+		var xl = new Button(Vector2.Zero, "XL", Font, () => {}) 
+		{
+		    HAlign = 0.375f,
+		    VAlign = 0.44f
+		};		
+		Elements.Add(xl);
 		
-		WorldCreationBoolButtonPreset(small, [() => medium, () => large]);
-		WorldCreationBoolButtonPreset(medium, [() => small, () => large]);
-		WorldCreationBoolButtonPreset(large, [() => small, () => medium]);
+		WorldCreationBoolButtonPreset(small, [() => medium, () => large, () => xl]);
+		WorldCreationBoolButtonPreset(medium, [() => small, () => large, () => xl]);
+		WorldCreationBoolButtonPreset(large, [() => small, () => medium, () => xl]);
+		WorldCreationBoolButtonPreset(xl, [() => small, () => medium, () => large]);
 		
+		// --------------- DIFFICULTY -----------------------
 		var difficultyText = new Text(new Vector2(275, 550), "Difficulty", Font);
 		Elements.Add(difficultyText);
 		
@@ -109,6 +133,24 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard]);
 		WorldCreationBoolButtonPreset(hard, [() => easy, () => normal]);
 		
+		// --------------- WARNINGS -----------------------
+		var viewport = new Viewport(400, 500);
+		_warnings = new ScrollableArea(new Vector2(1180, 330), viewport);
+		Elements.Add(_warnings);
+		
+		// --------------- MODIFICATORS -----------------------
+		var lowGravity = new Button(new Vector2(430, 680), "Low gravity", Font, () => OnModificatorClick(WorldModificator.LowGravity));
+		Elements.Add(lowGravity);
+		var highGravity = new Button(new Vector2(620, 680), "High gravity", Font, () => OnModificatorClick(WorldModificator.HighGravity));
+		Elements.Add(highGravity);
+		WorldCreationBoolButtonPreset(lowGravity, [() => highGravity]);
+		WorldCreationBoolButtonPreset(highGravity, [() => lowGravity]);
+		
+		var eternalWinter = new Button(new Vector2(430, 730), "Eternal winter", Font, () => OnModificatorClick(WorldModificator.EternalWinter));
+		Elements.Add(eternalWinter);
+		WorldCreationBoolButtonPreset(eternalWinter); 
+		
+		
 		var createButton = new Button(new Vector2(950, 900), "Create", Font, () => {})
 		{
 			Scale = new Vector2(1.2f, 1.2f)
@@ -123,9 +165,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(back);
-		
-		var test = new AnomalyUi(new Vector2(1200, 900), "test aaa lololol", Font);
-		Elements.Add(test);
 	}
 
     protected override void OnMenuActive()
@@ -133,6 +172,54 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
         base.OnMenuActive();
         RandomizeWorldName();
         RandomizeSeed();
+    }
+    
+    private void OnModificatorClick(WorldModificator mod) 
+    {
+		if (_warnings == null) return;
+		
+        switch (mod)
+        {
+            case WorldModificator.LowGravity:
+				_lowGraivty = !_lowGraivty;
+				break;
+			case WorldModificator.HighGravity:
+				_highGravity = !_highGravity;
+				break;
+			case WorldModificator.EternalWinter:
+				_eternalWinter = !_eternalWinter;
+				break;
+        }
+        
+        if (_lowGraivty) 
+        {
+            var anomaly = new AnomalyUi(Vector2.Zero, "Low gravity", Font);
+            _warnings.AddChild(anomaly);
+        }
+        else 
+        {
+            _warnings.RemoveByIndex(0);
+        }
+        
+        if (_highGravity) 
+        {
+            var w = new WarningUi(Vector2.Zero, "High gravity", Font);
+            _warnings.AddChild(w);
+        }
+        else 
+        {
+            _warnings.RemoveByIndex(1);
+        }
+        
+        if (_eternalWinter) 
+        {
+            var w = new WarningUi(Vector2.Zero, "Eternal Winter", Font);
+            _warnings.AddChild(w);
+        }
+        else 
+        {
+            _warnings.RemoveByIndex(2);
+        }
     }
 
     public override void Update()

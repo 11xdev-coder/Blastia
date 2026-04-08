@@ -35,6 +35,8 @@ public class ScrollableArea : UIElement
     public float ScrollSpeed { get; set; } = 0.05f;
     
     public float Spacing { get; set; }
+    
+    public bool DrawDebugOutline { get; set; }
 
     private RasterizerState _scissorState;
     
@@ -97,6 +99,13 @@ public class ScrollableArea : UIElement
 
         if (child is ColoredText coloredText)
             coloredText.OnAnyGifLoaded += OnChildGifLoaded;
+    }
+    
+    public void RemoveByIndex(int idx) 
+    {
+        if (idx >= _children.Count) return;
+        
+        _children.RemoveAt(idx);
     }
     
     /// <summary>
@@ -213,6 +222,22 @@ public class ScrollableArea : UIElement
         spriteBatch.End();
         BlastiaGame.BeginSpriteBatch(spriteBatch, matrix);
         spriteBatch.GraphicsDevice.ScissorRectangle = originalScissorRect;
+        
+        if (DrawDebugOutline) 
+        {
+            int thickness = 2;
+            Color color = Color.Red;
+            var wp = BlastiaGame.TextureManager.WhitePixel();
+            
+            // top
+            spriteBatch.Draw(wp, new Rectangle(Bounds.X, Bounds.Y, ViewportWidth, thickness), color);
+            // bottom
+            spriteBatch.Draw(wp, new Rectangle(Bounds.X, Bounds.Y + ViewportHeight - thickness, ViewportWidth, thickness), color);
+            // left
+            spriteBatch.Draw(wp, new Rectangle(Bounds.X, Bounds.Y, thickness, ViewportHeight), color);
+            // right
+            spriteBatch.Draw(wp, new Rectangle(Bounds.X + ViewportWidth - thickness, Bounds.Y, thickness, ViewportHeight), color);
+        }
     }
 }
 
