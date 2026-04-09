@@ -28,14 +28,14 @@ public abstract class WarningUiBase : UIElement
         _textDrawPos = new Vector2(_warningImg.Bounds.Right + TextSpacing, y);
         
         var bgHeight = Math.Max(textScale.Y, _warningImg.Bounds.Height);
-        var bgBounds = new Rectangle(
+            
+        SetBackgroundProperties(() => new Rectangle(
             (int) Position.X + 5, 
             (int) Position.Y,
             (int) (_warningImg.Bounds.Width + TextSpacing + textScale.X) - 5,
             (int) bgHeight
-        );
-            
-        SetBackgroundProperties(() => bgBounds, blinkAnimationStartColor, 0, blinkAnimationStartColor, -10f);
+        ), blinkAnimationStartColor, 0, blinkAnimationStartColor, -10f);
+        
         CreateBackground();
         Background?.SetRightBorderImage(BlastiaGame.TextureManager.Get("RightBorderWing", "UI", "Background"));
         
@@ -46,8 +46,9 @@ public abstract class WarningUiBase : UIElement
 
     public override void Update()
     {
+        if (Font == null) return;
+        
         base.Update();
-        _warningImg.Update();
         
         float delta = (float) BlastiaGame.GameTimeElapsedSeconds;
         _colorLerpFactor += _blinkSpeed * delta;
@@ -57,6 +58,22 @@ public abstract class WarningUiBase : UIElement
         Color lerpedColor = Util.Lerp(_startColor, _endColor, _colorLerpFactor);
         Background?.SetBackgroundColor(lerpedColor);
         Background?.SetBorderImagesColor(lerpedColor);
+    }
+
+    public override void UpdateBounds()
+    {
+        base.UpdateBounds();
+        
+        if (_warningImg == null || Font == null) return;
+    
+        _warningImg.Position = Position;
+        _warningImg.UpdateBounds();
+        
+        Vector2 textScale = Font.MeasureString(Text) * Scale;
+        float y = _warningImg.Bounds.Top + textScale.Y * 0.25f;
+        _textDrawPos = new Vector2(_warningImg.Bounds.Right + TextSpacing, y);
+        
+        UpdateBackgroundPosition();
     }
 
     public override void Draw(SpriteBatch spriteBatch)

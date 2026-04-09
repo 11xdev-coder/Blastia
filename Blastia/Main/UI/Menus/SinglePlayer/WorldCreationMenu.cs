@@ -24,7 +24,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private Input? _seed;
 	private ScrollableArea? _warnings;
 	
-	private bool _lowGraivty;
+	private bool _lowGravity;
 	private bool _highGravity;
 	private bool _eternalWinter;
 	
@@ -135,7 +135,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		// --------------- WARNINGS -----------------------
 		var viewport = new Viewport(400, 500);
-		_warnings = new ScrollableArea(new Vector2(1180, 330), viewport);
+		_warnings = new ScrollableArea(new Vector2(1180, 330), viewport, AlignmentType.Left, 20);
 		Elements.Add(_warnings);
 		
 		// --------------- MODIFICATORS -----------------------
@@ -175,52 +175,37 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
     }
     
     private void OnModificatorClick(WorldModificator mod) 
-    {
+	{
 		if (_warnings == null) return;
 		
-        switch (mod)
-        {
-            case WorldModificator.LowGravity:
-				_lowGraivty = !_lowGraivty;
+		switch (mod)
+		{
+			case WorldModificator.LowGravity:
+				_lowGravity = !_lowGravity;
+				if (_lowGravity)
+					_highGravity = false;
 				break;
 			case WorldModificator.HighGravity:
 				_highGravity = !_highGravity;
+				if (_highGravity)
+					_lowGravity = false;
 				break;
 			case WorldModificator.EternalWinter:
 				_eternalWinter = !_eternalWinter;
 				break;
-        }
-        
-        if (_lowGraivty) 
-        {
-            var anomaly = new AnomalyUi(Vector2.Zero, "Low gravity", Font);
-            _warnings.AddChild(anomaly);
-        }
-        else 
-        {
-            _warnings.RemoveByIndex(0);
-        }
-        
-        if (_highGravity) 
-        {
-            var w = new WarningUi(Vector2.Zero, "High gravity", Font);
-            _warnings.AddChild(w);
-        }
-        else 
-        {
-            _warnings.RemoveByIndex(1);
-        }
-        
-        if (_eternalWinter) 
-        {
-            var w = new WarningUi(Vector2.Zero, "Eternal Winter", Font);
-            _warnings.AddChild(w);
-        }
-        else 
-        {
-            _warnings.RemoveByIndex(2);
-        }
-    }
+		}
+
+		_warnings.ClearChildren();
+
+		if (_lowGravity)
+			_warnings.AddChild(new AnomalyUi(Vector2.Zero, "low gravity", Font));
+
+		if (_highGravity)
+			_warnings.AddChild(new WarningUi(Vector2.Zero, "high gravity", Font));
+
+		if (_eternalWinter)
+			_warnings.AddChild(new WarningUi(Vector2.Zero, "eternal winter", Font));
+	}
 
     public override void Update()
     {

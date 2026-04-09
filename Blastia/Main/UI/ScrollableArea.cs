@@ -37,6 +37,7 @@ public class ScrollableArea : UIElement
     public float Spacing { get; set; }
     
     public bool DrawDebugOutline { get; set; }
+    public bool DebugLog { get; set; }
 
     private RasterizerState _scissorState;
     
@@ -120,6 +121,9 @@ public class ScrollableArea : UIElement
     {
         base.Update();
         
+        if (DebugLog)
+            Console.WriteLine($"ScrollableArea Bounds: {Bounds}, Position: {Position}");
+              
         if (!ScrollLocked) 
         {
             _currentSpacing = 0; // reset spacing
@@ -173,6 +177,9 @@ public class ScrollableArea : UIElement
             child.Position.Y = _scrolledOffset + _currentSpacing;
             _currentSpacing += Spacing + child.Bounds.Height;
             
+            if (DebugLog)
+                Console.WriteLine($"Child pos: {child.Position}, bounds: {child.Bounds}, scrollOffset: {_scrolledOffset}");  // add
+            
             child.Update();
         }
     }
@@ -214,8 +221,12 @@ public class ScrollableArea : UIElement
         // draw children
         foreach (var child in _children) 
         {
-            if (child.Bounds.Bottom >= Bounds.Top && child.Bounds.Top <= Bounds.Bottom)
+            bool shouldDraw = child.Bounds.Bottom >= Bounds.Top && child.Bounds.Top <= Bounds.Bottom;
+            if (shouldDraw)
                 child.Draw(spriteBatch);
+                
+            if (DebugLog)
+                Console.WriteLine($"{(shouldDraw ? "NOT " : "")}Drawing child: {child.GetType().Name}, shouldDraw: {shouldDraw}, Bounds: {child.Bounds}");
         }
 
         // restore
