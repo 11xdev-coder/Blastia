@@ -23,13 +23,23 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private Input? _name;
 	private Input? _seed;
 	private ScrollableArea? _warnings;
+	private Text? _tooltipText;
 	
 	private bool _lowGravity;
 	private bool _highGravity;
 	private bool _eternalWinter;
 	
+	private void SetTooltipText(UIElement elem, string text) 
+	{	
+		if (_tooltipText == null) return;
+		
+	    elem.OnStartHovering += () => { _tooltipText.Text = text; };
+	    elem.OnEndHovering += () => { _tooltipText.Text = ""; };
+	}
+	
 	protected override void AddElements()
 	{
+		// --------------- BACKGROUND -----------------------
 		AdvancedBackground bg = new AdvancedBackground(Vector2.Zero, 1400, 600, Colors.DarkBackground, 2, Colors.DarkBorder)
 		{
 			HAlign = 0.5f,
@@ -37,6 +47,21 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		};
 		Elements.Add(bg);
 		
+		AdvancedBackground tooltipBg = new AdvancedBackground(Vector2.Zero, 1300, 90, Colors.DarkBackground, 0) 
+		{
+		    HAlign = 0.5f,
+		    VAlign = 0.8f
+		};
+		Elements.Add(tooltipBg);
+		
+		_tooltipText = new Text(Vector2.Zero, "", Font)
+		{
+			HAlign = 0.5f,
+			VAlign = 0.78f
+		};
+		Elements.Add(_tooltipText);
+		
+		// --------------- WORLD ICON -----------------------
 		_worldPreview = new Image(Vector2.Zero, BlastiaGame.TextureManager.Get("Preview", "UI", "WorldCreation"), 32, 32, 3, new Vector2(3.5f, 3.5f)) 
 		{
 		    HAlign = 0.155f,
@@ -54,9 +79,11 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		// --------------- NAME & SEED -----------------------
 		var nameRandButton = new ImageButton(new Vector2(415, 317), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Name", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, RandomizeWorldName);
 		Elements.Add(nameRandButton);
+		SetTooltipText(nameRandButton, "Randomize name");
 		
 		var seedRandButton = new ImageButton(new Vector2(415, 377), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Seed", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, RandomizeSeed);
 		Elements.Add(seedRandButton);
+		SetTooltipText(seedRandButton, "Randomize seed");
 				
 		WorldCreationButtonPreset(nameRandButton);
 		WorldCreationButtonPreset(seedRandButton);
@@ -89,6 +116,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    VAlign = 0.44f
 		};		
 		Elements.Add(small);
+		SetTooltipText(small, "4200x1200");
 		
 		var medium = new Button(Vector2.Zero, "Medium", Font, () => {}) 
 		{
@@ -96,6 +124,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    VAlign = 0.44f
 		};		
 		Elements.Add(medium);
+		SetTooltipText(medium, "6400x1800");
 		
 		var large = new Button(Vector2.Zero, "Large", Font, () => {}) 
 		{
@@ -103,6 +132,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    VAlign = 0.44f
 		};
 		Elements.Add(large);
+		SetTooltipText(large, "8400x2400");
 				
 		var xl = new Button(Vector2.Zero, "XL", Font, () => {}) 
 		{
@@ -110,6 +140,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    VAlign = 0.44f
 		};		
 		Elements.Add(xl);
+		SetTooltipText(xl, "16800x4800");
 		
 		WorldCreationBoolButtonPreset(small, [() => medium, () => large, () => xl]);
 		WorldCreationBoolButtonPreset(medium, [() => small, () => large, () => xl]);
@@ -122,12 +153,15 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		var easy = new Button(new Vector2(430, 550), "I am too young to die", Font, () => {});
 		Elements.Add(easy);
+		SetTooltipText(easy, "The standard Blastia experience");
 		
 		var normal = new Button(new Vector2(430, 605), "Hurt me plenty", Font, () => {});
 		Elements.Add(normal);
+		SetTooltipText(normal, "Greater difficulty with better loot");
 		
 		var hard = new Button(new Vector2(670, 605), "Nightmare", Font, () => {});
-		Elements.Add(hard);
+		Elements.Add(hard);		
+		SetTooltipText(hard, "For those who'd like a challenge");
 		
 		WorldCreationBoolButtonPreset(easy, [() => normal, () => hard]);
 		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard]);
@@ -135,19 +169,22 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		// --------------- WARNINGS -----------------------
 		var viewport = new Viewport(400, 500);
-		_warnings = new ScrollableArea(new Vector2(1180, 330), viewport, AlignmentType.Left, 20);
+		_warnings = new ScrollableArea(new Vector2(1280, 330), viewport, AlignmentType.Left, 20);
 		Elements.Add(_warnings);
 		
 		// --------------- MODIFICATORS -----------------------
 		var lowGravity = new Button(new Vector2(430, 680), "Low gravity", Font, () => OnModificatorClick(WorldModificator.LowGravity));
 		Elements.Add(lowGravity);
+		SetTooltipText(lowGravity, "Lower gravity (0.7x)");
 		var highGravity = new Button(new Vector2(620, 680), "High gravity", Font, () => OnModificatorClick(WorldModificator.HighGravity));
 		Elements.Add(highGravity);
+		SetTooltipText(highGravity, "Higher gravity (1.5x)");
 		WorldCreationBoolButtonPreset(lowGravity, [() => highGravity]);
 		WorldCreationBoolButtonPreset(highGravity, [() => lowGravity]);
 		
 		var eternalWinter = new Button(new Vector2(430, 730), "Eternal winter", Font, () => OnModificatorClick(WorldModificator.EternalWinter));
 		Elements.Add(eternalWinter);
+		SetTooltipText(eternalWinter, "Brutal everlasting winter");
 		WorldCreationBoolButtonPreset(eternalWinter); 
 		
 		
