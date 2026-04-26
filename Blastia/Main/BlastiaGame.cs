@@ -846,7 +846,7 @@ public class BlastiaGame : Game
         SpriteBatch.Draw(TextureManager.Get("Cursor", "UI"), position, Color.White);
     }
 
-    public static MusicID ChooseRandomMenuMusic() => (MusicID)Rand.Next(0, 2);
+    public static MusicID ChooseRandomMenuMusic() => 0;
 
     // UPDATE RESOLUTION
     /// <summary>

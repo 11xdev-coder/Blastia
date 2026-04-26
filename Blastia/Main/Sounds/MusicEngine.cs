@@ -6,6 +6,7 @@ namespace Blastia.Main.Sounds;
 
 public enum MusicID
 {   
+    Blastia,
     EchoesOfTheVoid,
     IAmLost,
     RatsOnSaturn,
@@ -31,6 +32,7 @@ public static class MusicEngine
 
     public static void LoadMusic()
     {
+        LoadMusicTrack(MusicID.Blastia, "Sounds/MenuSongs/Blastia.ogg");
         LoadMusicTrack(MusicID.EchoesOfTheVoid, "Sounds/MenuSongs/EchoesOfTheVoid.ogg");
         LoadMusicTrack(MusicID.IAmLost, "Sounds/MenuSongs/IAmLost.ogg");
 	    LoadMusicTrack(MusicID.RatsOnSaturn, Paths.RatsOnSaturn);
