@@ -38,6 +38,12 @@ public class Button : UIElement, IValueStorageUi<bool>
     }
     
     /// <summary>
+    /// Returns button selected state. Works only if no get/set variable is specified
+    /// </summary>
+    /// <returns></returns>
+    public bool GetState() => _state;
+    
+    /// <summary>
     /// Turns this button into a boolean switch
     /// </summary>
     /// <param name="getValue">Original value getter</param>
@@ -91,7 +97,7 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// <summary>
     /// Called when clicked directly on this button => updates value and deselects other buttons
     /// </summary>
-    private void OnClickChangeValue() 
+    public void OnClickChangeValue() 
     {
         SetOppositeValue();
         

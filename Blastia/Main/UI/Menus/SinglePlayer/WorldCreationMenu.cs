@@ -22,6 +22,8 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private Image? _worldPreviewBorder;
 	private Input? _name;
 	private Input? _seed;
+	private Button? _normal;
+	private Button? _medium;
 	private ScrollableArea? _warnings;
 	private Text? _tooltipText;
 	
@@ -118,13 +120,13 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(small);
 		SetTooltipText(small, "4200x1200");
 		
-		var medium = new Button(Vector2.Zero, "Medium", Font, () => {}) 
+		_medium = new Button(Vector2.Zero, "Medium", Font, () => {}) 
 		{
 		    HAlign = 0.26f,
 		    VAlign = 0.44f
 		};		
-		Elements.Add(medium);
-		SetTooltipText(medium, "6400x1800");
+		Elements.Add(_medium);
+		SetTooltipText(_medium, "6400x1800");
 		
 		var large = new Button(Vector2.Zero, "Large", Font, () => {}) 
 		{
@@ -142,10 +144,10 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(xl);
 		SetTooltipText(xl, "16800x4800");
 		
-		WorldCreationBoolButtonPreset(small, [() => medium, () => large, () => xl]);
-		WorldCreationBoolButtonPreset(medium, [() => small, () => large, () => xl]);
-		WorldCreationBoolButtonPreset(large, [() => small, () => medium, () => xl]);
-		WorldCreationBoolButtonPreset(xl, [() => small, () => medium, () => large]);
+		WorldCreationBoolButtonPreset(small, [() => _medium, () => large, () => xl]);
+		WorldCreationBoolButtonPreset(_medium, [() => small, () => large, () => xl]);
+		WorldCreationBoolButtonPreset(large, [() => small, () => _medium, () => xl]);
+		WorldCreationBoolButtonPreset(xl, [() => small, () => _medium, () => large]);
 		
 		// --------------- DIFFICULTY -----------------------
 		var difficultyText = new Text(new Vector2(275, 550), "Difficulty", Font);
@@ -155,17 +157,17 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(easy);
 		SetTooltipText(easy, "The standard Blastia experience");
 		
-		var normal = new Button(new Vector2(430, 605), "Hurt me plenty", Font, () => {});
-		Elements.Add(normal);
-		SetTooltipText(normal, "Greater difficulty with better loot");
+		_normal = new Button(new Vector2(430, 605), "Hurt me plenty", Font, () => {});
+		Elements.Add(_normal);
+		SetTooltipText(_normal, "Greater difficulty with better loot");
 		
 		var hard = new Button(new Vector2(670, 605), "Nightmare", Font, () => {});
 		Elements.Add(hard);		
 		SetTooltipText(hard, "For those who'd like a challenge");
 		
-		WorldCreationBoolButtonPreset(easy, [() => normal, () => hard]);
-		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard]);
-		WorldCreationBoolButtonPreset(hard, [() => easy, () => normal]);
+		WorldCreationBoolButtonPreset(easy, [() => _normal, () => hard]);
+		WorldCreationBoolButtonPreset(_normal, [() => easy, () => hard]);
+		WorldCreationBoolButtonPreset(hard, [() => easy, () => _normal]);
 		
 		// --------------- WARNINGS -----------------------
 		var viewport = new Viewport(400, 500);
@@ -202,6 +204,9 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(back);
+		
+        // call an extra update for buttons to keep up
+        base.Update();
 	}
 
     protected override void OnMenuActive()
@@ -209,6 +214,8 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
         base.OnMenuActive();
         RandomizeWorldName();
         RandomizeSeed();
+        
+        ResetSettings();
     }
     
     private void OnModificatorClick(WorldModificator mod) 
@@ -274,6 +281,17 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		}
 		
 		_seed.SetText(new string(digits));
+    }
+    
+    private void ResetSettings() 
+    {
+		if (_normal == null || _medium == null) return;
+		
+		if (!_normal.GetState())
+        	_normal?.OnClickChangeValue();
+        	
+        if (!_medium.GetState())
+        	_medium?.OnClickChangeValue();
     }
 
 	// protected override void Create()
