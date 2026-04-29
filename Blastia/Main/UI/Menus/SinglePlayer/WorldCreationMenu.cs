@@ -27,6 +27,9 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private ScrollableArea? _warnings;
 	private Text? _tooltipText;
 	
+	
+	private List<Button> _modificatorButtons = [];
+	
 	private bool _lowGravity;
 	private bool _highGravity;
 	private bool _eternalWinter;
@@ -189,6 +192,8 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		SetTooltipText(eternalWinter, "Brutal everlasting winter");
 		WorldCreationBoolButtonPreset(eternalWinter); 
 		
+		_modificatorButtons.AddRange([lowGravity, highGravity, eternalWinter]);
+		
 		
 		var createButton = new Button(new Vector2(950, 900), "Create", Font, () => {})
 		{
@@ -218,10 +223,12 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
         ResetSettings();
     }
     
+    /// <summary>
+	/// Called when modificator button is clicked => changes its value
+	/// </summary>
+	/// <param name="mod"></param>
     private void OnModificatorClick(WorldModificator mod) 
-	{
-		if (_warnings == null) return;
-		
+	{		
 		switch (mod)
 		{
 			case WorldModificator.LowGravity:
@@ -238,7 +245,16 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 				_eternalWinter = !_eternalWinter;
 				break;
 		}
-
+		
+		UpdateModificators();
+	}
+	
+	/// <summary>
+	/// Updates list of warnings
+	/// </summary>
+	private void UpdateModificators() 
+	{
+		if (_warnings == null) return;
 		_warnings.ClearChildren();
 
 		if (_lowGravity)
@@ -250,24 +266,13 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		if (_eternalWinter)
 			_warnings.AddChild(new WarningUi(Vector2.Zero, "eternal winter", Font));
 	}
-
-    public override void Update()
-    {
-        base.Update();
-        if (_worldPreview == null) return;
-    }
     
     private void Back() 
     {
         SwitchToMenu(BlastiaGame.WorldsMenu);
     }
     
-    private void RandomizeWorldName() 
-    {
-		if (_name == null) return;
-		
-        _name.SetText(WorldNameGenerator.Generate(20));
-    }
+    private void RandomizeWorldName() => _name?.SetText(WorldNameGenerator.Generate(20));
     
     private void RandomizeSeed() 
     {
@@ -287,11 +292,24 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
     {
 		if (_normal == null || _medium == null) return;
 		
+		// reset all buttons
 		if (!_normal.GetState())
         	_normal?.OnClickChangeValue();
         	
         if (!_medium.GetState())
         	_medium?.OnClickChangeValue();
+        	
+        foreach (var button in _modificatorButtons) 
+        {
+            if (button.GetState())
+				button.OnClickChangeValue();
+        }
+        
+        // reset modificators
+        _lowGravity = false;
+        _highGravity = false;
+        _eternalWinter = false;
+        UpdateModificators();
     }
 
 	// protected override void Create()
