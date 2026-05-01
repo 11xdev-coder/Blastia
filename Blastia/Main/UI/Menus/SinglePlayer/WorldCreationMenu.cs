@@ -147,10 +147,10 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(xl);
 		SetTooltipText(xl, "16800x4800");
 		
-		WorldCreationBoolButtonPreset(small, [() => _medium, () => large, () => xl]);
-		WorldCreationBoolButtonPreset(_medium, [() => small, () => large, () => xl]);
-		WorldCreationBoolButtonPreset(large, [() => small, () => _medium, () => xl]);
-		WorldCreationBoolButtonPreset(xl, [() => small, () => _medium, () => large]);
+		WorldCreationBoolButtonPreset(small, [() => _medium, () => large, () => xl], false);
+		WorldCreationBoolButtonPreset(_medium, [() => small, () => large, () => xl], false);
+		WorldCreationBoolButtonPreset(large, [() => small, () => _medium, () => xl], false);
+		WorldCreationBoolButtonPreset(xl, [() => small, () => _medium, () => large], false);
 		
 		// --------------- DIFFICULTY -----------------------
 		var difficultyText = new Text(new Vector2(275, 550), "Difficulty", Font);
@@ -168,9 +168,9 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(hard);		
 		SetTooltipText(hard, "For those who'd like a challenge");
 		
-		WorldCreationBoolButtonPreset(easy, [() => _normal, () => hard]);
-		WorldCreationBoolButtonPreset(_normal, [() => easy, () => hard]);
-		WorldCreationBoolButtonPreset(hard, [() => easy, () => _normal]);
+		WorldCreationBoolButtonPreset(easy, [() => _normal, () => hard], false);
+		WorldCreationBoolButtonPreset(_normal, [() => easy, () => hard], false);
+		WorldCreationBoolButtonPreset(hard, [() => easy, () => _normal], false);
 		
 		// --------------- WARNINGS -----------------------
 		var viewport = new Viewport(400, 500);

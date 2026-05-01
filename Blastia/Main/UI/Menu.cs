@@ -228,7 +228,7 @@ public class Menu
         resolutionSwitcher.AddToElements(Elements);
 
     }
-    protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null)
+    protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null, bool canDeselectWholeButtonGroup = true)
     {
         button.SetBackgroundProperties(() => button.Bounds, Color.Black, 1, Color.Transparent, 5);
         button.CreateBooleanSwitch(null, null, null, false, (newVal, button) =>
@@ -237,7 +237,7 @@ public class Menu
                 button.SetBackgroundColor(Color.Yellow);
             else
                 button.RevertOriginalBackgroundColor();
-        }, buttonGroupGetters);
+        }, buttonGroupGetters, canDeselectWholeButtonGroup);
     }
     
     protected void WorldCreationButtonPreset(Button button)

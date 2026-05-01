@@ -25,6 +25,8 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// List of button getters that will deactivate once this button is activated (when this is a boolean switch)
     /// </summary>
     private List<Func<Button>> _buttonGroup = [];
+    
+    private bool _canDeselectWholeButtonGroup;
 
     public Button(Vector2 position, string text, SpriteFont font, Action? onClick) : 
         base(position, text, font)
@@ -52,7 +54,7 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// <param name="showValue">Will show the value of the boolean (e.g. "Test: True")</param>
     /// <param name="getValue">Executed whenever the button is pressed (or original value changed). Boolean argument is the new value</param>
     public void CreateBooleanSwitch(Func<bool>? getValue, Action<bool>? setValue, Action<Action>? whenOriginalValueChanged, bool showValue = true, Action<bool, Button>? onValueChanged = null,
-        List<Func<Button>>? buttonGroupGetters = null) 
+        List<Func<Button>>? buttonGroupGetters = null, bool canDeselectWholeButtonGroup = true) 
     {
         GetValue = getValue == null ? () => _state : getValue;
         SetValue = setValue == null ? (val) => _state = val : setValue;
@@ -74,6 +76,8 @@ public class Button : UIElement, IValueStorageUi<bool>
         
         if (whenOriginalValueChanged != null) 
             whenOriginalValueChanged(updateAction);
+        
+        _canDeselectWholeButtonGroup = canDeselectWholeButtonGroup;
         
         if (buttonGroupGetters == null) return;
         foreach (var buttonGetter in buttonGroupGetters)
@@ -99,6 +103,9 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// </summary>
     public void OnClickChangeValue() 
     {
+        // if the button is pressed, dont deselect it
+        if (GetValue?.Invoke() == true && !_canDeselectWholeButtonGroup) return;
+        
         SetOppositeValue();
         
         // deactivate other buttons
