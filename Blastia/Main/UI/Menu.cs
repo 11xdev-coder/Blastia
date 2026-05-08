@@ -230,14 +230,16 @@ public class Menu
     }
     protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null, bool canDeselectWholeButtonGroup = true)
     {
-        button.SetBackgroundProperties(() => button.Bounds, Color.Black, 1, Color.Transparent, 5);
-        button.CreateBooleanSwitch(null, null, null, false, (newVal, button) =>
+        button.OnStateChanged += () =>
         {
-            if (newVal)
+            if (button.GetState())
                 button.SetBackgroundColor(Color.Yellow);
             else
                 button.RevertOriginalBackgroundColor();
-        }, buttonGroupGetters, canDeselectWholeButtonGroup);
+        };
+        
+        button.SetBackgroundProperties(() => button.Bounds, Color.Black, 1, Color.Transparent, 5);
+        button.CreateBooleanSwitch(null, null, null, false, buttonGroupGetters, canDeselectWholeButtonGroup);
     }
     
     protected void WorldCreationButtonPreset(Button button)

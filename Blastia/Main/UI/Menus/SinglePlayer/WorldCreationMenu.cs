@@ -1,20 +1,11 @@
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.UI.Warnings;
 using Blastia.Main.Utilities;
-using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
-
-public enum WorldModificator 
-{
-    LowGravity,
-    HighGravity,
-    EternalWinter
-}
-
 
 public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
 {
@@ -22,17 +13,25 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private Image? _worldPreviewBorder;
 	private Input? _name;
 	private Input? _seed;
-	private Button? _normal;
-	private Button? _medium;
 	private ScrollableArea? _warnings;
 	private Text? _tooltipText;
 	
-	
+	private List<Button> _sizeButtons = [];
+	// sizes in order to match their buttons
+	private static readonly (int width, int height)[] SizeValues = [
+		(4200, 1200),
+		(6400, 1800),
+		(8400, 2400),
+		(16800, 4800)
+	];
+	private List<Button> _difficultyButtons = [];
+	// difficulties in order to match their buttons
+	private static readonly WorldDifficulty[] DifficultyValues = [
+		WorldDifficulty.Easy,
+		WorldDifficulty.Medium,
+		WorldDifficulty.Hard
+	];
 	private List<Button> _modificatorButtons = [];
-	
-	private bool _lowGravity;
-	private bool _highGravity;
-	private bool _eternalWinter;
 	
 	private void SetTooltipText(UIElement elem, string text) 
 	{	
@@ -40,6 +39,22 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 	    elem.OnStartHovering += () => { _tooltipText.Text = text; };
 	    elem.OnEndHovering += () => { _tooltipText.Text = ""; };
+	}
+	
+	/// <summary>
+	/// Get the first selected button's index from a group
+	/// </summary>
+	private int GetSelectedIndex(List<Button> group) => group.FindIndex(b => b.GetState());
+	private (int width, int height) GetSelectedSize() 
+	{
+	    int idx = GetSelectedIndex(_sizeButtons);
+	    return idx >= 0 ? SizeValues[idx] : SizeValues[1];
+	}
+	
+	private WorldDifficulty GetSelectedDifficulty() 
+	{
+	    int idx = GetSelectedIndex(_difficultyButtons);
+	    return idx >= 0 ? DifficultyValues[idx] : DifficultyValues[1];
 	}
 	
 	protected override void AddElements()
@@ -123,13 +138,13 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(small);
 		SetTooltipText(small, "4200x1200");
 		
-		_medium = new Button(Vector2.Zero, "Medium", Font, () => {}) 
+		var medium = new Button(Vector2.Zero, "Medium", Font, () => {}) 
 		{
 		    HAlign = 0.26f,
 		    VAlign = 0.44f
 		};		
-		Elements.Add(_medium);
-		SetTooltipText(_medium, "6400x1800");
+		Elements.Add(medium);
+		SetTooltipText(medium, "6400x1800");
 		
 		var large = new Button(Vector2.Zero, "Large", Font, () => {}) 
 		{
@@ -147,10 +162,11 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(xl);
 		SetTooltipText(xl, "16800x4800");
 		
-		WorldCreationBoolButtonPreset(small, [() => _medium, () => large, () => xl], false);
-		WorldCreationBoolButtonPreset(_medium, [() => small, () => large, () => xl], false);
-		WorldCreationBoolButtonPreset(large, [() => small, () => _medium, () => xl], false);
-		WorldCreationBoolButtonPreset(xl, [() => small, () => _medium, () => large], false);
+		WorldCreationBoolButtonPreset(small, [() => medium, () => large, () => xl], false);
+		WorldCreationBoolButtonPreset(medium, [() => small, () => large, () => xl], false);
+		WorldCreationBoolButtonPreset(large, [() => small, () => medium, () => xl], false);
+		WorldCreationBoolButtonPreset(xl, [() => small, () => medium, () => large], false);
+		_sizeButtons.AddRange([small, medium, large, xl]);
 		
 		// --------------- DIFFICULTY -----------------------
 		var difficultyText = new Text(new Vector2(275, 550), "Difficulty", Font);
@@ -160,17 +176,18 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(easy);
 		SetTooltipText(easy, "The standard Blastia experience");
 		
-		_normal = new Button(new Vector2(430, 605), "Hurt me plenty", Font, () => {});
-		Elements.Add(_normal);
-		SetTooltipText(_normal, "Greater difficulty with better loot");
+		var normal = new Button(new Vector2(430, 605), "Hurt me plenty", Font, () => {});
+		Elements.Add(normal);
+		SetTooltipText(normal, "Greater difficulty with better loot");
 		
 		var hard = new Button(new Vector2(670, 605), "Nightmare", Font, () => {});
 		Elements.Add(hard);		
 		SetTooltipText(hard, "For those who'd like a challenge");
 		
-		WorldCreationBoolButtonPreset(easy, [() => _normal, () => hard], false);
-		WorldCreationBoolButtonPreset(_normal, [() => easy, () => hard], false);
-		WorldCreationBoolButtonPreset(hard, [() => easy, () => _normal], false);
+		WorldCreationBoolButtonPreset(easy, [() => normal, () => hard], false);
+		WorldCreationBoolButtonPreset(normal, [() => easy, () => hard], false);
+		WorldCreationBoolButtonPreset(hard, [() => easy, () => normal], false);
+		_difficultyButtons.AddRange([easy, normal, hard]);
 		
 		// --------------- WARNINGS -----------------------
 		var viewport = new Viewport(400, 500);
@@ -178,16 +195,16 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		Elements.Add(_warnings);
 		
 		// --------------- MODIFICATORS -----------------------
-		var lowGravity = new Button(new Vector2(430, 680), "Low gravity", Font, () => OnModificatorClick(WorldModificator.LowGravity));
+		var lowGravity = new Button(new Vector2(430, 680), "Low gravity", Font, UpdateModificators);
 		Elements.Add(lowGravity);
 		SetTooltipText(lowGravity, "Lower gravity (0.7x)");
-		var highGravity = new Button(new Vector2(620, 680), "High gravity", Font, () => OnModificatorClick(WorldModificator.HighGravity));
+		var highGravity = new Button(new Vector2(620, 680), "High gravity", Font, UpdateModificators);
 		Elements.Add(highGravity);
 		SetTooltipText(highGravity, "Higher gravity (1.5x)");
 		WorldCreationBoolButtonPreset(lowGravity, [() => highGravity]);
 		WorldCreationBoolButtonPreset(highGravity, [() => lowGravity]);
 		
-		var eternalWinter = new Button(new Vector2(430, 730), "Eternal winter", Font, () => OnModificatorClick(WorldModificator.EternalWinter));
+		var eternalWinter = new Button(new Vector2(430, 730), "Eternal winter", Font, UpdateModificators);
 		Elements.Add(eternalWinter);
 		SetTooltipText(eternalWinter, "Brutal everlasting winter");
 		WorldCreationBoolButtonPreset(eternalWinter); 
@@ -222,32 +239,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
         
         ResetSettings();
     }
-    
-    /// <summary>
-	/// Called when modificator button is clicked => changes its value
-	/// </summary>
-	/// <param name="mod"></param>
-    private void OnModificatorClick(WorldModificator mod) 
-	{		
-		switch (mod)
-		{
-			case WorldModificator.LowGravity:
-				_lowGravity = !_lowGravity;
-				if (_lowGravity)
-					_highGravity = false;
-				break;
-			case WorldModificator.HighGravity:
-				_highGravity = !_highGravity;
-				if (_highGravity)
-					_lowGravity = false;
-				break;
-			case WorldModificator.EternalWinter:
-				_eternalWinter = !_eternalWinter;
-				break;
-		}
-		
-		UpdateModificators();
-	}
 	
 	/// <summary>
 	/// Updates list of warnings
@@ -257,13 +248,13 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		if (_warnings == null) return;
 		_warnings.ClearChildren();
 
-		if (_lowGravity)
+		if (_modificatorButtons[0].GetState())
 			_warnings.AddChild(new AnomalyUi(Vector2.Zero, "low gravity", Font));
 
-		if (_highGravity)
+		if (_modificatorButtons[1].GetState())
 			_warnings.AddChild(new WarningUi(Vector2.Zero, "high gravity", Font));
 
-		if (_eternalWinter)
+		if (_modificatorButtons[2].GetState())
 			_warnings.AddChild(new WarningUi(Vector2.Zero, "eternal winter", Font));
 	}
     
@@ -290,25 +281,18 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
     
     private void ResetSettings() 
     {
-		if (_normal == null || _medium == null) return;
-		
-		// reset all buttons
-		if (!_normal.GetState())
-        	_normal?.OnClickChangeValue();
+    	// reset all buttons
+		if (!_difficultyButtons[1].GetState())
+        	_difficultyButtons[1]?.OnClickChangeValue();
         	
-        if (!_medium.GetState())
-        	_medium?.OnClickChangeValue();
-        	
-        foreach (var button in _modificatorButtons) 
-        {
+        if (!_sizeButtons[1].GetState())
+        	_sizeButtons[1]?.OnClickChangeValue();
+        
+        // clear modificators
+        foreach (var button in _modificatorButtons)
             if (button.GetState())
 				button.OnClickChangeValue();
-        }
-        
-        // reset modificators
-        _lowGravity = false;
-        _highGravity = false;
-        _eternalWinter = false;
+		
         UpdateModificators();
     }
 

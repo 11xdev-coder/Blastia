@@ -6,6 +6,11 @@ namespace Blastia.Main.UI.Buttons;
 
 public class Button : UIElement, IValueStorageUi<bool>
 {
+    /// <summary>
+    /// Fires when the button's state changes (for boolean switches)
+    /// </summary>
+    public Action? OnStateChanged;
+    
     public Func<bool>? GetValue { get; set; }
     public Action<bool>? SetValue { get; set; }
     
@@ -53,7 +58,7 @@ public class Button : UIElement, IValueStorageUi<bool>
     /// <param name="whenOriginalValueChanged">Method that subscribes handler to when original value changes. Used when original value changes from other source to update this value</param>
     /// <param name="showValue">Will show the value of the boolean (e.g. "Test: True")</param>
     /// <param name="getValue">Executed whenever the button is pressed (or original value changed). Boolean argument is the new value</param>
-    public void CreateBooleanSwitch(Func<bool>? getValue, Action<bool>? setValue, Action<Action>? whenOriginalValueChanged, bool showValue = true, Action<bool, Button>? onValueChanged = null,
+    public void CreateBooleanSwitch(Func<bool>? getValue, Action<bool>? setValue, Action<Action>? whenOriginalValueChanged, bool showValue = true,
         List<Func<Button>>? buttonGroupGetters = null, bool canDeselectWholeButtonGroup = true) 
     {
         GetValue = getValue == null ? () => _state : getValue;
@@ -65,13 +70,15 @@ public class Button : UIElement, IValueStorageUi<bool>
             
             if (showValue)
                 Text = $"{InitialText}: {GetValue()}";
-            
-            // call update with the new variable
-            onValueChanged?.Invoke(GetValue(), this);
         };
         _onValueChangedUpdate = updateAction;
         
+        // save what was subscribed before, then subscribe value update FIRST => we need to update state before calling OnClick
+        var existingOnClick = OnClick;
+        OnClick = null;
         OnClick += OnClickChangeValue;
+        OnClick += existingOnClick; // resubscribe
+        
         updateAction();
         
         if (whenOriginalValueChanged != null) 
@@ -96,6 +103,7 @@ public class Button : UIElement, IValueStorageUi<bool>
         SetValue(opposite);
         
         _onValueChangedUpdate?.Invoke();
+        OnStateChanged?.Invoke();
     }
     
     /// <summary>

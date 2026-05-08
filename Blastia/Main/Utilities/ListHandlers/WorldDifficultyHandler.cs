@@ -1,12 +1,5 @@
 namespace Blastia.Main.Utilities.ListHandlers;
 
-public enum WorldDifficulty 
-{
-	Easy,
-	Medium,
-	Hard
-}
-
 public class WorldDifficultyHandler: EnumListHandler<WorldDifficulty> 
 {
 	public WorldDifficultyHandler() : base() 

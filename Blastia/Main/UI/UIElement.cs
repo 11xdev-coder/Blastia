@@ -87,7 +87,7 @@ public abstract class UIElement
     #endregion
 
     /// <summary>
-    /// Called once when LMB is released while hovered
+    /// Fires when this button was clicked directly
     /// </summary>
     public Action? OnClick { get; set; }
     /// <summary>
