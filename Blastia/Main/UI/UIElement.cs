@@ -143,9 +143,13 @@ public abstract class UIElement
     #endregion
 
     /// <summary>
-    /// Draw color applied to Texture and Text
+    /// Draw color applied to Texture and Text. This is used when <c>DrawColorGetter</c> is not set.
     /// </summary>
     public Color DrawColor { get; set; } = Color.White;
+    /// <summary>
+    /// Function for actively updating colors. If set will be used instead of <c>DrawColor</c>
+    /// </summary>
+    public Func<Color>? DrawColorGetter { get; set; }
 
     /// <summary>
     /// Color of the Border. Only used when rendering text (<c>UseTexture = false</c>). If border color is transparent (<c>A = 0</c>)
@@ -546,7 +550,8 @@ public abstract class UIElement
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
         
-        DrawStringAt(spriteBatch, position, Text, origin, DrawColor);
+        var color = DrawColorGetter?.Invoke() ?? DrawColor;
+        DrawStringAt(spriteBatch, position, Text, origin, color);
     }
 
     private void DrawTexture(SpriteBatch spriteBatch)
@@ -556,8 +561,9 @@ public abstract class UIElement
         Vector2 origin = new Vector2(Texture.Width * 0.5f, Texture.Height * 0.5f);
         Vector2 position = new Vector2(Bounds.Center.X, 
             Bounds.Center.Y);
-        
-        spriteBatch.Draw(Texture, position, null, DrawColor * Alpha, 
+
+        var color = DrawColorGetter?.Invoke() ?? DrawColor;
+        spriteBatch.Draw(Texture, position, null, color * Alpha, 
             Rotation, origin, Scale, SpriteEffects.None, 0f);
     }
     

@@ -15,6 +15,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private Input? _seed;
 	private ScrollableArea? _warnings;
 	private Text? _tooltipText;
+	private Text? _existsText;
 	
 	private List<Button> _sizeButtons = [];
 	// sizes in order to match their buttons
@@ -212,7 +213,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		_modificatorButtons.AddRange([lowGravity, highGravity, eternalWinter]);
 		
 		
-		var createButton = new Button(new Vector2(950, 900), "Create", Font, () => {})
+		var createButton = new Button(new Vector2(950, 900), "Create", Font, Create)
 		{
 			Scale = new Vector2(1.2f, 1.2f)
 		};
@@ -226,6 +227,14 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(back);
+		
+		_existsText = new Text(new Vector2(0, 960), "World with same name already exists", Font) 
+		{
+		    HAlign = 0.5f,
+		    DrawColorGetter = () => BlastiaGame.ErrorColor,
+		    Alpha = 0f
+		};
+		Elements.Add(_existsText);
 		
         // call an extra update for buttons to keep up
         base.Update();
@@ -296,26 +305,27 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
         UpdateModificators();
     }
 
-	// protected override void Create()
-	// {
-	// 	int width = _sizeHandler.GetWidth();
-	// 	int height = _sizeHandler.GetHeight();
-	// 	Console.WriteLine($"World difficulty: {_difficultyHandler.CurrentItem}, Width: {width}, Height: {height}");
+	protected void Create()
+	{
+		if (_name == null || string.IsNullOrEmpty(_name.Text) || _existsText == null) return;
 		
-	// 	if (NameInput?.Text == null) return;
-	// 	string playerName = NameInput.StringBuilder.ToString();
+		(int width, int height) = GetSelectedSize();
+		WorldDifficulty difficulty = GetSelectedDifficulty();
+		Console.WriteLine($"[WORLD] Name: {_name.Text}, Seed: {_seed?.Text}, World difficulty: {difficulty}, Width: {width}, Height: {height}");
+		
+		string name = _name.StringBuilder.ToString();
 
-	// 	if (!PlayerNWorldManager.Instance.WorldExists(playerName))
-	// 	{	
-	// 		// create world with custom difficulty if doesnt exist
-	// 		PlayerNWorldManager.Instance.NewWorld(NameInput.StringBuilder.ToString(), 
-	// 			_difficultyHandler.CurrentItem, width, height);			
+		if (!PlayerNWorldManager.Instance.WorldExists(name))
+		{			
+			// create world with custom difficulty if doesnt exist
+			//PlayerNWorldManager.Instance.NewWorld(name, difficulty, width, height);			
 			
-	// 		Back(); // go back
-	// 	}
-	// 	else
-	// 	{
-	// 		ShowExistsError();
-	// 	}
-	// }
+			Back(); // go back
+		}
+		else
+		{
+			_existsText.Alpha = 1f;
+			_existsText.LerpAlphaToZero = true;
+		}
+	}
 }
