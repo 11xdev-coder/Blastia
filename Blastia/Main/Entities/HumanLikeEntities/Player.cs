@@ -5,6 +5,8 @@ using Blastia.Main.GameState;
 using Blastia.Main.Items;
 using Blastia.Main.Networking;
 using Blastia.Main.Sounds;
+using Blastia.Main.UI;
+using Blastia.Main.UI.Menus.InGame;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -126,8 +128,7 @@ public class Player : HumanLikeEntity
 	{
 		base.OnLifeChanged();
 		
-		if (BlastiaGame.PlayerStatsMenu != null)
-			BlastiaGame.PlayerStatsMenu.UpdateHealth(Life, MaxLife);
+		BlastiaGame.GetMenu<PlayerStatsMenu>()?.UpdateHealth(Life, MaxLife);
 	}
 
 	protected override void OnHit()
@@ -159,9 +160,11 @@ public class Player : HumanLikeEntity
 	private bool ShouldBlockInput()
 	{
 		// typing in sign edit menu OR typing in chat
-		return (BlastiaGame.InGameSignEditMenu != null && BlastiaGame.InGameSignEditMenu.Active
-			&& BlastiaGame.InGameSignEditMenu.SignText != null && BlastiaGame.InGameSignEditMenu.SignText.IsFocused) ||
-			(BlastiaGame.ChatInputMenu?.ChatInput?.IsFocused == true);
+		var signMenu = BlastiaGame.GetMenu<InGameSignEditMenu>();
+		var chatMenu = BlastiaGame.GetMenu<ChatInputMenu>();
+		
+		return (signMenu?.Active == true && signMenu.SignText?.IsFocused == true) ||
+			(chatMenu?.ChatInput?.IsFocused == true);
 	}
 
 	public override void Update()
@@ -195,10 +198,9 @@ public class Player : HumanLikeEntity
 			
 			HandleItemPickup();
 			
-			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && BlastiaGame.PlayerInventoryUiMenu != null 
-				&& !BlastiaGame.IsAnyBlockEscapeMenuActive) // if chat was not active (players updated after menus)
+			if (KeyboardHelper.IsKeyJustPressed(Keys.Escape) && !BlastiaGame.IsAnyBlockEscapeMenuActive) // if chat was not active (players updated after menus)
 			{
-				BlastiaGame.PlayerInventoryUiMenu.ToggleFullInventoryDisplay();
+				BlastiaGame.GetMenu<InventoryUi>()?.ToggleFullInventoryDisplay();
 			}
 			UpdateHotbarSelection();
 
@@ -547,7 +549,10 @@ public class Player : HumanLikeEntity
 
 	private void UpdateHotbarSelection()
 	{
-		if (BlastiaGame.PlayerInventoryUiMenu == null || _isBlocked) return;
+		if (_isBlocked) return;
+		
+		var inventoryUi = BlastiaGame.GetMenu<InventoryUi>();
+		if (inventoryUi == null) return;
 		
 		Keys[] hotbarKeys =
 		[
@@ -570,7 +575,7 @@ public class Player : HumanLikeEntity
 
 		if (scrollDelta != 0)
 		{
-			var hotbarSlots = BlastiaGame.PlayerInventoryUiMenu.HotbarSlotsCount;
+			var hotbarSlots = inventoryUi.HotbarSlotsCount;
 
 			if (scrollDelta < 0)
 			{
@@ -590,7 +595,7 @@ public class Player : HumanLikeEntity
 			}
 		}
 		
-		BlastiaGame.PlayerInventoryUiMenu.SetSelectedHotbarSlotIndex(SelectedHotbarSlot);
+		inventoryUi.SetSelectedHotbarSlotIndex(SelectedHotbarSlot);
 	}
 	
 	private void UpdateSignHoverText()

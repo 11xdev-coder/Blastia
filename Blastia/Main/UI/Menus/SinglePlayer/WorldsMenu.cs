@@ -23,12 +23,12 @@ public class WorldsMenu : CollectionMenu
 	
 	protected override void Create()
 	{
-		SwitchToMenu(BlastiaGame.WorldCreationMenu);
+		SwitchToMenu(BlastiaGame.GetMenu<WorldCreationMenu>());
 	}
 
 	protected override void Back()
 	{
-		SwitchToMenu(BlastiaGame.PlayersMenu);
+		SwitchToMenu(BlastiaGame.GetMenu<PlayersMenu>());
 	}
 	
 	protected override IEnumerable<object> LoadItems() => PlayerNWorldManager.Instance.LoadAllWorlds();

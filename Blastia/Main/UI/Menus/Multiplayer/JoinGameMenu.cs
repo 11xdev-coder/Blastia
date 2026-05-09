@@ -104,7 +104,7 @@ public class JoinGameMenu(SpriteFont font, bool isActive = false) : Menu(font, i
 
     private void Back()
     {
-        SwitchToMenu(BlastiaGame.MultiplayerMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<MultiplayerMenu>());
     }
 
     public override void Draw(SpriteBatch spriteBatch)

@@ -29,18 +29,18 @@ public class SettingsMenu(SpriteFont font, bool isActive = false) : Menu(font, i
 
     private void OnClickBack()
     {
-        SwitchToMenu(BlastiaGame.MainMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<MainMenu>());
     }
 
     private void OnClickAudioSettings()
     {
         AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
-        SwitchToMenu(BlastiaGame.AudioSettingsMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<AudioSettingsMenu>());
     }
 
     private void OnClickVideoSettings()
     {
         VideoManager.Instance.LoadStateFromFile<VideoManagerState>();
-        SwitchToMenu(BlastiaGame.VideoSettingsMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<VideoSettingsMenu>());
     }
 }

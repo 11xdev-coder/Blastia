@@ -74,28 +74,7 @@ public class BlastiaGame : Game
     public static SpriteFont? MainFont { get; private set; }
 
     // MENUS
-    public static LogoMenu? LogoMenu { get; private set; }
-    public static MainMenu? MainMenu { get; private set; }
-    public static PlayersMenu? PlayersMenu { get; private set; }
-    public static WorldsMenu? WorldsMenu { get; private set; }
-    public static PlayerCreationMenu? PlayerCreationMenu { get; private set; }
-    public static WorldCreationMenu? WorldCreationMenu { get; private set; }
-    public static MultiplayerMenu? MultiplayerMenu { get; private set; }
-    public static JoinGameMenu? JoinGameMenu { get; private set; }
-    public static SettingsMenu? SettingsMenu { get; private set; }
-    public static AudioSettingsMenu? AudioSettingsMenu { get; private set; }
-    public static VideoSettingsMenu? VideoSettingsMenu { get; private set; }
-    public static RulerMenu? RulerMenu { get; private set; }
-    public static InGameSettingsButtonMenu? InGameSettingsButtonMenu { get; private set; }
-    public static FpsCounterMenu? FpsCounterMenu { get; private set; }
-    public static InGameSettingsMenu? InGameSettingsMenu { get; private set; }
-    public static InGameVideoSettingsMenu? InGameVideoSettingsMenu { get; private set; }
-    public static InGameAudioSettingsMenu? InGameAudioSettingsMenu { get; private set; }
-    public static InGameSignEditMenu? InGameSignEditMenu { get; private set; }
-    public static InventoryUi? PlayerInventoryUiMenu { get; private set; }
-    public static PlayerStatsMenu? PlayerStatsMenu { get; private set; }
-    public static ChatInputMenu? ChatInputMenu { get; private set; }
-    public static ChatMessagesMenu? ChatMessagesMenu { get; private set; }
+    private static readonly Dictionary<Type, Menu> _menuRegistry = [];
     private readonly List<Menu> _menus = [];
     private readonly List<Menu> _menusToAdd = [];
     public static bool IsAnyBlockEscapeMenuActive;
@@ -295,68 +274,27 @@ public class BlastiaGame : Game
             MainFont = Content.Load<SpriteFont>("Font/Raleway");
 
             // menus
-            LogoMenu = new LogoMenu(MainFont);
-            AddMenu(LogoMenu);
-
-            MainMenu = new MainMenu(MainFont);
-            AddMenu(MainMenu);
-
-            PlayersMenu = new PlayersMenu(MainFont);
-            AddMenu(PlayersMenu);
-
-            WorldsMenu = new WorldsMenu(MainFont);
-            AddMenu(WorldsMenu);
-
-            PlayerCreationMenu = new PlayerCreationMenu(MainFont);
-            AddMenu(PlayerCreationMenu);
-
-            WorldCreationMenu = new WorldCreationMenu(MainFont);
-            AddMenu(WorldCreationMenu);
-
-            MultiplayerMenu = new MultiplayerMenu(MainFont);
-            AddMenu(MultiplayerMenu);
-
-            JoinGameMenu = new JoinGameMenu(MainFont);
-            AddMenu(JoinGameMenu);
-
-            SettingsMenu = new SettingsMenu(MainFont);
-            AddMenu(SettingsMenu);
-
-            AudioSettingsMenu = new AudioSettingsMenu(MainFont);
-            AddMenu(AudioSettingsMenu);
-
-            VideoSettingsMenu = new VideoSettingsMenu(MainFont);
-            AddMenu(VideoSettingsMenu);
-
-            RulerMenu = new RulerMenu(MainFont);
-            AddMenu(RulerMenu);
-
-            InGameSettingsButtonMenu = new InGameSettingsButtonMenu(MainFont);
-            AddMenu(InGameSettingsButtonMenu);
-
-            FpsCounterMenu = new FpsCounterMenu(MainFont);
-            AddMenu(FpsCounterMenu);
-
-            InGameSettingsMenu = new InGameSettingsMenu(MainFont);
-            AddMenu(InGameSettingsMenu);
-
-            InGameVideoSettingsMenu = new InGameVideoSettingsMenu(MainFont);
-            AddMenu(InGameVideoSettingsMenu);
-
-            InGameAudioSettingsMenu = new InGameAudioSettingsMenu(MainFont);
-            AddMenu(InGameAudioSettingsMenu);
-
-            InGameSignEditMenu = new InGameSignEditMenu(MainFont);
-            AddMenu(InGameSignEditMenu);
-
-            PlayerStatsMenu = new PlayerStatsMenu(MainFont);
-            AddMenu(PlayerStatsMenu);
-
-            ChatInputMenu = new ChatInputMenu(MainFont);
-            AddMenu(ChatInputMenu);
-
-            ChatMessagesMenu = new ChatMessagesMenu(MainFont);
-            AddMenu(ChatMessagesMenu);
+            AddMenu(new LogoMenu(MainFont));
+            AddMenu(new MainMenu(MainFont));
+            AddMenu(new PlayersMenu(MainFont));
+            AddMenu(new WorldsMenu(MainFont));
+            AddMenu(new PlayerCreationMenu(MainFont));
+            AddMenu(new WorldCreationMenu(MainFont));
+            AddMenu(new MultiplayerMenu(MainFont));
+            AddMenu(new JoinGameMenu(MainFont));
+            AddMenu(new SettingsMenu(MainFont));
+            AddMenu(new AudioSettingsMenu(MainFont));
+            AddMenu(new VideoSettingsMenu(MainFont));
+            AddMenu(new RulerMenu(MainFont));
+            AddMenu(new InGameSettingsButtonMenu(MainFont));
+            AddMenu(new FpsCounterMenu(MainFont));
+            AddMenu(new InGameSettingsMenu(MainFont));
+            AddMenu(new InGameVideoSettingsMenu(MainFont));
+            AddMenu(new InGameAudioSettingsMenu(MainFont));
+            AddMenu(new InGameSignEditMenu(MainFont));
+            AddMenu(new PlayerStatsMenu(MainFont));
+            AddMenu(new ChatInputMenu(MainFont));
+            AddMenu(new ChatMessagesMenu(MainFont));
 
             TooltipDisplay = new TooltipDisplay(MainFont);
             NotificationDisplay = new NotificationDisplay(MainFont);
@@ -879,7 +817,7 @@ public class BlastiaGame : Game
                 menu.Active = true;
         }
 
-        if (RulerMenu != null) RulerMenu.Active = World.RulerMode;
+        GetMenu<RulerMenu>().SetActive(World.RulerMode);
 
         ConsoleWindow?.InitializeWorldCommands(World);
 
@@ -917,9 +855,8 @@ public class BlastiaGame : Game
         var slotSize = new Vector2(1.5f);
         var slotSpacing = new Vector2(5f, 5f);
 
-        PlayerInventoryUiMenu = new InventoryUi(MainFont, _myPlayer.PlayerInventory, World, gridStartPosition, Player.InventoryRows,
-            Player.InventoryColumns, slotSize, slotSpacing, TextureManager.Get("SlotBackground", "UI"), TextureManager.Get("SlotHighlighted", "UI"), false, true);
-        AddMenu(PlayerInventoryUiMenu);
+        AddMenu(new InventoryUi(MainFont, _myPlayer.PlayerInventory, World, gridStartPosition, Player.InventoryRows,
+            Player.InventoryColumns, slotSize, slotSpacing, TextureManager.Get("SlotBackground", "UI"), TextureManager.Get("SlotHighlighted", "UI"), false, true));
 
         _myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.CandyBlock), 100);
         _myPlayer.PlayerInventory.AddItem(StuffRegistry.GetItem(ItemId.AppleCandyBlock), 100);
@@ -960,11 +897,7 @@ public class BlastiaGame : Game
         World?.Unload();
         World = null;
 
-        if (PlayerInventoryUiMenu != null)
-        {
-            _menus.Remove(PlayerInventoryUiMenu);
-            PlayerInventoryUiMenu = null;
-        }
+        RemoveMenu<InventoryUi>();
         _myPlayer = null;
         _entities.Clear();
     }
@@ -1055,9 +988,30 @@ public class BlastiaGame : Game
         Exit();
     }
 
-    private void AddMenu(Menu? menu)
+    /// <summary>
+    /// If menu is present in the registry, returns its instance. Otherwise returns null
+    /// </summary>
+    public static T? GetMenu<T>() where T : Menu => _menuRegistry.TryGetValue(typeof(T), out var menu) ? menu as T: null;
+    
+    /// <summary>
+    /// Add new menu to the registry and starts updating it next frame.
+    /// </summary>
+    private void AddMenu<T>(T menu) where T : Menu
     {
-        if (menu != null) _menusToAdd.Add(menu);
+        _menuRegistry[typeof(T)] = menu;
+        _menusToAdd.Add(menu);
+    }
+    
+    /// <summary>
+    /// Removes a menu from registry and stops its updates
+    /// </summary>
+    private void RemoveMenu<T>() where T : Menu 
+    {
+        if (_menuRegistry.TryGetValue(typeof(T), out var menu)) 
+        {
+            _menus.Remove(menu);
+            _menuRegistry.Remove(typeof(T));
+        }
     }
 
     /// <summary>

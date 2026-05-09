@@ -12,8 +12,8 @@ public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(f
     {
         var scale = new Vector2(1.2f);
         _tabGroup = new TabGroup(Vector2.Zero, 40,
-            new Tab("Video", BlastiaGame.TextureManager.Get("Monitor", "UI"), () => BlastiaGame.InGameVideoSettingsMenu, scale),
-            new Tab("Audio", BlastiaGame.TextureManager.Get("Audio", "UI"), () => BlastiaGame.InGameAudioSettingsMenu, scale),
+            new Tab("Video", BlastiaGame.TextureManager.Get("Monitor", "UI"), () => BlastiaGame.GetMenu<InGameVideoSettingsMenu>(), scale),
+            new Tab("Audio", BlastiaGame.TextureManager.Get("Audio", "UI"), () => BlastiaGame.GetMenu<InGameAudioSettingsMenu>(), scale),
             new Tab("Close", BlastiaGame.TextureManager.Get("RedCross", "UI"), () => null, scale, Back),
             new Tab("Exit", BlastiaGame.TextureManager.Get("Exit", "UI"), () => null, scale, ExitToMenu))
         {
@@ -28,7 +28,7 @@ public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(f
         VideoManager.Instance.SaveStateToFile<VideoManagerState>();
         AudioManager.Instance.SaveStateToFile<AudioManagerState>();
         _tabGroup?.DeselectAll();
-        SwitchToMenu(BlastiaGame.InGameSettingsButtonMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<InGameSettingsButtonMenu>());
     }
 
     private void ExitToMenu()
@@ -37,7 +37,7 @@ public class InGameSettingsMenu(SpriteFont font, bool isActive = false) : Menu(f
         AudioManager.Instance.SaveStateToFile<AudioManagerState>();
         
         _tabGroup?.DeselectAll();
-        SwitchToMenu(BlastiaGame.MainMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<MainMenu>());
         BlastiaGame.RequestWorldUnload();
         if (NetworkManager.Instance != null && NetworkManager.Instance.IsInMultiplayerSession)
         {

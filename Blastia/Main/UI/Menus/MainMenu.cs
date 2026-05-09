@@ -1,4 +1,6 @@
 ﻿using Blastia.Main.UI.Buttons;
+using Blastia.Main.UI.Menus.Settings;
+using Blastia.Main.UI.Menus.SinglePlayer;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -39,20 +41,20 @@ public class MainMenu(SpriteFont font, bool isActive = true) : Menu(font, isActi
 
 	private void OnClickSinglePlayer()
 	{
-		SwitchToMenu(BlastiaGame.PlayersMenu);
-		BlastiaGame.WorldsMenu?.ToggleMultiplayer(false);
-		BlastiaGame.PlayersMenu?.ToggleSwitchToJoinMenu(false);
+		SwitchToMenu(BlastiaGame.GetMenu<PlayersMenu>());
+		BlastiaGame.GetMenu<WorldsMenu>()?.ToggleMultiplayer(false);
+		BlastiaGame.GetMenu<PlayersMenu>()?.ToggleSwitchToJoinMenu(false);
 	}
 
 	private void OnClickMultiplayer()
 	{
-		SwitchToMenu(BlastiaGame.MultiplayerMenu);
-		BlastiaGame.WorldsMenu?.ToggleMultiplayer(true);
+		SwitchToMenu(BlastiaGame.GetMenu<MultiplayerMenu>());
+		BlastiaGame.GetMenu<WorldsMenu>()?.ToggleMultiplayer(true);
 	}
 
 	private void OnClickSettings()
 	{
-		SwitchToMenu(BlastiaGame.SettingsMenu);
+		SwitchToMenu(BlastiaGame.GetMenu<SettingsMenu>());
 	}
 
 	private void OnClickExit()

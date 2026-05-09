@@ -35,7 +35,7 @@ public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, 
         {
             // send message
             var selectedPlayerName = PlayerNWorldManager.Instance.GetSelectedPlayerName();
-            BlastiaGame.ChatMessagesMenu?.AddMessage(selectedPlayerName, ChatInput?.StringBuilder.ToString());
+            BlastiaGame.GetMenu<ChatMessagesMenu>()?.AddMessage(selectedPlayerName, ChatInput?.StringBuilder.ToString());
             
             // turn chat off
             TurnChatOff();
@@ -54,7 +54,7 @@ public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, 
         if (ChatInput == null) return;
         ChatInput.IsFocused = true;
 
-        BlastiaGame.ChatMessagesMenu?.RevealMessages();
+        BlastiaGame.GetMenu<ChatMessagesMenu>()?.RevealMessages();
     }
     
     private void TurnChatOff() 
@@ -63,6 +63,6 @@ public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, 
         ChatInput.IsFocused = false; // unfocus        
         ChatInput?.SetText(""); // clear input
 
-        SwitchToMenu(BlastiaGame.InGameSettingsButtonMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<InGameSettingsButtonMenu>());
     }
 }

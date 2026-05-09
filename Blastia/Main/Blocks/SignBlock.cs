@@ -3,6 +3,7 @@ using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
 using Blastia.Main.Sounds;
+using Blastia.Main.UI.Menus.InGame;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -21,12 +22,14 @@ public class SignBlock : Block
     public override bool OnRightClick(World world, Vector2 position, Player player)
     {
         base.OnRightClick(world, position, player);
-        if (BlastiaGame.InGameSignEditMenu == null) return false;
+        
+        var signMenu = BlastiaGame.GetMenu<InGameSignEditMenu>();
+        if (signMenu == null) return false;
         
         Console.WriteLine($"Editing sign at {position}");
-        BlastiaGame.InGameSignEditMenu.SignPosition = position;
-        BlastiaGame.InGameSignEditMenu.UpdateText();
-        BlastiaGame.InGameSignEditMenu.Active = true;
+        signMenu.SignPosition = position;
+        signMenu.UpdateText();
+        signMenu.Active = true;
 
         return true;
     }

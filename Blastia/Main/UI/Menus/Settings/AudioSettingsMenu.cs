@@ -35,7 +35,7 @@ public class AudioSettingsMenu(SpriteFont font, bool isActive = false) : Menu(fo
     
     private void OnClickBack()
     {
-        SwitchToMenu(BlastiaGame.SettingsMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<SettingsMenu>());
         AudioManager.Instance.SaveStateToFile<AudioManagerState>();
     }
 }

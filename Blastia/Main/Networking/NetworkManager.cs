@@ -1,5 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
+using Blastia.Main.UI.Menus.InGame;
+using Blastia.Main.UI.Menus.Multiplayer;
+using Blastia.Main.Utilities;
 using Steamworks;
 
 namespace Blastia.Main.Networking;
@@ -240,7 +243,7 @@ public class NetworkManager
 
         if (string.IsNullOrEmpty(code) || code.Length != 6)
         {
-            BlastiaGame.JoinGameMenu?.UpdateStatusText("Invalid lobby code format");
+            BlastiaGame.GetMenu<JoinGameMenu>()?.UpdateStatusText("Invalid lobby code format");
             Console.WriteLine("[NetworkManager] Invalid lobby code format (must be 6 characters)");
             return;
         }
@@ -269,7 +272,7 @@ public class NetworkManager
         }
         else
         {
-            BlastiaGame.JoinGameMenu?.UpdateStatusText("No lobbies found");
+            BlastiaGame.GetMenu<JoinGameMenu>()?.UpdateStatusText("No lobbies found");
             Console.WriteLine("[NetworkManager] No lobbies was found (is the code correct?)");
         }
     }
@@ -279,7 +282,7 @@ public class NetworkManager
         if (!SteamAPI.IsSteamRunning())
         {
             Console.WriteLine("[NetworkManager] Cannot join: Steam is not running");
-            BlastiaGame.JoinGameMenu?.UpdateStatusText("Steam is not running");
+            BlastiaGame.GetMenu<JoinGameMenu>()?.UpdateStatusText("Steam is not running");
             return;
         }
 
@@ -467,12 +470,9 @@ public class NetworkManager
 
                 // display "lost connection" status text
                 BlastiaGame.RequestWorldUnload();
-                if (BlastiaGame.JoinGameMenu != null) 
-                {
-                    BlastiaGame.JoinGameMenu.Active = true;
-                    BlastiaGame.JoinGameMenu.ToggleStatusText(true);
-                    BlastiaGame.JoinGameMenu.UpdateStatusText("Lost connection");
-                }
+                BlastiaGame.GetMenu<JoinGameMenu>().SetActive(true);
+                BlastiaGame.GetMenu<JoinGameMenu>()?.ToggleStatusText(true);
+                BlastiaGame.GetMenu<JoinGameMenu>()?.UpdateStatusText("Lost connection");
             }
         }
     }
@@ -557,7 +557,7 @@ public class NetworkManager
     /// </summary>
     private void ApplyChatMessageLocally(NetworkChatMessage chatMessage) 
     {
-        BlastiaGame.ChatMessagesMenu?.AddMessage(chatMessage.SenderName, chatMessage.Text, false);
+        BlastiaGame.GetMenu<ChatMessagesMenu>()?.AddMessage(chatMessage.SenderName, chatMessage.Text, false);
     }
 
     private void ReceiveNetworkMessages()

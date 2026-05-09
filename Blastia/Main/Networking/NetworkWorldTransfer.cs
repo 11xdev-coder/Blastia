@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.UI.Menus.Multiplayer;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
@@ -407,7 +408,7 @@ public static class NetworkWorldTransfer
         _receivedChunks += 1;
 
         Console.WriteLine($"[NetworkWorldTransfer] [CLIENT] Received chunk {chunk.ChunkIndex + 1}/{_expectedChunks} for layer {chunk.Layer}");
-        BlastiaGame.JoinGameMenu?.UpdateStatusText($"Receiving chunks: {chunk.ChunkIndex + 1}/{_expectedChunks}"); // update visual feedback
+        BlastiaGame.GetMenu<JoinGameMenu>()?.UpdateStatusText($"Receiving chunks: {chunk.ChunkIndex + 1}/{_expectedChunks}"); // update visual feedback
         
         // all chunks received
         if (_receivedChunks >= _expectedChunks)

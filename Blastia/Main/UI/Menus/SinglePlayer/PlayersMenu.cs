@@ -24,12 +24,12 @@ public class PlayersMenu : CollectionMenu
 	
 	protected override void Create()
 	{
-		SwitchToMenu(BlastiaGame.PlayerCreationMenu);
+		SwitchToMenu(BlastiaGame.GetMenu<PlayerCreationMenu>());
 	}
 
 	protected override void Back()
 	{
-		SwitchToMenu(BlastiaGame.MainMenu);
+		SwitchToMenu(BlastiaGame.GetMenu<MainMenu>());
 	}
 	
 	protected override IEnumerable<object> LoadItems() => PlayerNWorldManager.Instance.LoadAllPlayers();
@@ -39,6 +39,6 @@ public class PlayersMenu : CollectionMenu
 		PlayerNWorldManager.Instance.SelectPlayer((PlayerState) playerState, SwitchToJoinMenu, SwitchToMenu);
 		
 		if (!SwitchToJoinMenu)
-			SwitchToMenu(BlastiaGame.WorldsMenu);
+			SwitchToMenu(BlastiaGame.GetMenu<WorldsMenu>());
 	}	
 }

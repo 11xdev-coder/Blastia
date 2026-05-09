@@ -46,5 +46,5 @@ public class PlayerCreationMenu(SpriteFont font, bool isActive = false) : Creati
 		}
 	}
 	
-	protected override void Back() => SwitchToMenu(BlastiaGame.PlayersMenu);
+	protected override void Back() => SwitchToMenu(BlastiaGame.GetMenu<PlayersMenu>());
 }

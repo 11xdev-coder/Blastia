@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using Blastia.Main.Networking;
 using Blastia.Main.UI.Buttons;
+using Blastia.Main.UI.Menus.SinglePlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
@@ -35,19 +36,19 @@ public class MultiplayerMenu(SpriteFont font, bool isActive = false) : Menu(font
     private void HostGame()
     {
         // select a player then world
-        SwitchToMenu(BlastiaGame.PlayersMenu);
-        BlastiaGame.PlayersMenu?.ToggleSwitchToJoinMenu(false);
+        SwitchToMenu(BlastiaGame.GetMenu<PlayersMenu>());
+        BlastiaGame.GetMenu<PlayersMenu>()?.ToggleSwitchToJoinMenu(false);
     }
 
     private void JoinGame()
     {
         // select player (SwitchToJoinMenu flag) then enter code
-        SwitchToMenu(BlastiaGame.PlayersMenu);
-        BlastiaGame.PlayersMenu?.ToggleSwitchToJoinMenu(true);
+        SwitchToMenu(BlastiaGame.GetMenu<PlayersMenu>());
+        BlastiaGame.GetMenu<PlayersMenu>()?.ToggleSwitchToJoinMenu(true);
     }
 
     private void Back()
     {
-        SwitchToMenu(BlastiaGame.MainMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<MainMenu>());
     }
 }

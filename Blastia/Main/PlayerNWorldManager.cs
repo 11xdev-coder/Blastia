@@ -4,6 +4,7 @@ using Blastia.Main.GameState;
 using Blastia.Main.Networking;
 using Blastia.Main.Physics;
 using Blastia.Main.UI;
+using Blastia.Main.UI.Menus.Multiplayer;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
@@ -153,7 +154,7 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 		SelectedPlayer = playerState;
 
 		if (switchToJoinMenu)
-			switchToMenu(BlastiaGame.JoinGameMenu);
+			switchToMenu(BlastiaGame.GetMenu<JoinGameMenu>());
 	}
 
     /// <summary>
@@ -194,11 +195,8 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 		BlastiaGame.RequestWorldInitialization();
 		
 		// hide join game menu whenever in a world
-		if (BlastiaGame.JoinGameMenu != null)
-		{
-			BlastiaGame.JoinGameMenu.Active = false;
-			BlastiaGame.JoinGameMenu.ToggleStatusText(false);
-		}
+		BlastiaGame.GetMenu<JoinGameMenu>().SetActive(true);
+		BlastiaGame.GetMenu<JoinGameMenu>()?.ToggleStatusText(false);
 
 		if (host)
 		{

@@ -73,7 +73,7 @@ public class ChatMessagesMenu(SpriteFont font, bool isActive = true) : Menu(font
         else _chat.ScrollLocked = false;
 
         // dont hide when chat input is active (typing a message)
-        if (BlastiaGame.ChatInputMenu?.Active == true) return;
+        if (BlastiaGame.GetMenu<ChatInputMenu>()?.Active == true) return;
         
         var delta = (float)BlastiaGame.GameTimeElapsedSeconds;
         _startFadingTimer -= delta;

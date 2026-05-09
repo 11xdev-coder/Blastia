@@ -21,7 +21,7 @@ public class VideoSettingsMenu(SpriteFont font, bool isActive = false) : Menu(fo
 
     private void OnClickBack()
     {
-        SwitchToMenu(BlastiaGame.SettingsMenu);
+        SwitchToMenu(BlastiaGame.GetMenu<SettingsMenu>());
         VideoManager.Instance.SaveStateToFile<VideoManagerState>();
     }
 
