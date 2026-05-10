@@ -1,9 +1,12 @@
-﻿using Blastia.Main.Blocks.Common;
+﻿using System.Numerics;
+using Blastia.Main.Blocks.Common;
 
 namespace Blastia.Main.GameState;
 
 public static class WorldGen
 {
+    public volatile static float Progress = 0f;
+    
     private static readonly NoisePass DirtNoisePass = new()
     {
         Frequency = 0.1f, 
@@ -16,7 +19,7 @@ public static class WorldGen
         Block = BlockId.Dirt
     };
     
-    public static void Generate(uint seed, WorldState worldState)
+    public static void Generate(BigInteger seed, WorldState worldState)
     {
         int width = worldState.WorldWidth;
         int height = worldState.WorldHeight;
@@ -32,6 +35,9 @@ public static class WorldGen
         
         for (int x = 0; x < width; x++) 
         {
+            // use float division instead of int division
+            Progress = (float)x / width;
+            
             foreach (var pass in noisePasses)
             {
                 float noiseValue = Noise.OctavePerlin(x, 0, 
@@ -52,7 +58,7 @@ public static class WorldGen
                 
                 if (x >= randomSpawnX)
                 {
-                    if (spawnPointSet) return;
+                    if (spawnPointSet) continue;
                     
                     // five blocks above current height
                     worldState.SetSpawnPoint(x, finalHeight - Block.Size * 3);

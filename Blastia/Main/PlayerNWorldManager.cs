@@ -1,4 +1,5 @@
-﻿using Blastia.Main.Blocks.Common;
+﻿using System.Numerics;
+using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
@@ -8,6 +9,7 @@ using Blastia.Main.UI.Menus.Multiplayer;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main;
 
@@ -166,8 +168,8 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 	public void UnselectPlayer() => SelectedPlayer = null;
 	
 	// WORLD
-	public void NewWorld(string worldName, WorldDifficulty difficulty = WorldDifficulty.Easy, 
-			int worldWidth = 0, int worldHeight = 0) 
+	public void NewWorld(string worldName, BigInteger seed, WorldDifficulty difficulty, 
+			int worldWidth, int worldHeight) 
 	{
 		WorldState worldData = new WorldState 
 		{ 
@@ -176,7 +178,8 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 			WorldWidth = worldWidth,
 			WorldHeight = worldHeight
 		};
-		WorldGen.Generate(52, worldData);
+		// run world gen on different thread
+		Task.Run(() => WorldGen.Generate(seed, worldData));
 		
 		New(SaveFolder.World, worldName, Extension.World, worldData);
 	}

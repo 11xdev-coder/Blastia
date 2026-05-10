@@ -1,9 +1,10 @@
+using System.Numerics;
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.UI.Warnings;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
@@ -307,20 +308,19 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 
 	protected void Create()
 	{
-		if (_name == null || string.IsNullOrEmpty(_name.Text) || _existsText == null) return;
+		if (_name == null || _seed == null || string.IsNullOrEmpty(_name.Text) || string.IsNullOrEmpty(_seed.Text) || _existsText == null) return;
 		
 		(int width, int height) = GetSelectedSize();
 		WorldDifficulty difficulty = GetSelectedDifficulty();
-		Console.WriteLine($"[WORLD] Name: {_name.Text}, Seed: {_seed?.Text}, World difficulty: {difficulty}, Width: {width}, Height: {height}");
+		Console.WriteLine($"[WORLD] Name: {_name.Text}, Seed: {_seed.Text}, World difficulty: {difficulty}, Width: {width}, Height: {height}");
 		
 		string name = _name.StringBuilder.ToString();
+		BigInteger seed = BigInteger.Parse(_seed.StringBuilder.ToString());
 
 		if (!PlayerNWorldManager.Instance.WorldExists(name))
-		{			
-			// create world with custom difficulty if doesnt exist
-			//PlayerNWorldManager.Instance.NewWorld(name, difficulty, width, height);			
-			
-			Back(); // go back
+		{
+			SwitchToMenu(BlastiaGame.GetMenu<WorldGenerationStatusMenu>());
+			PlayerNWorldManager.Instance.NewWorld(name, seed, difficulty, width, height);	
 		}
 		else
 		{
