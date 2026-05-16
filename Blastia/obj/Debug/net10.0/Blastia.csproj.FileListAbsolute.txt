@@ -18,11 +18,6 @@
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/Menu/Tick.wav
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/EchoesOfTheVoid.ogg
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/IAmLost.ogg
-/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/peaceful journey_00.ogg
-/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/peaceful journey_01.ogg
-/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/peaceful journey_02.ogg
-/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/peaceful journey_03.ogg
-/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/rats_on_saturn.ogg
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/Blocks/AppleCandy.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/Blocks/BlockDestroy.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/Blocks/BlueberryCandy.png
@@ -187,3 +182,4 @@
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/Background/RightBorderWing.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/Icons/Anomaly.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/Blastia.ogg
+/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Sounds/MenuSongs/FirstLight.ogg

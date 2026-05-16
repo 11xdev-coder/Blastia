@@ -7,13 +7,9 @@ namespace Blastia.Main.Sounds;
 public enum MusicID
 {   
     Blastia,
+    FirstLight,
     EchoesOfTheVoid,
-    IAmLost,
-    RatsOnSaturn,
-    PeacefulJourney00,
-    PeacefulJourney01,
-    PeacefulJourney02,
-    PeacefulJourney03
+    IAmLost
 }
 
 public static class MusicEngine
@@ -33,13 +29,9 @@ public static class MusicEngine
     public static void LoadMusic()
     {
         LoadMusicTrack(MusicID.Blastia, "Sounds/MenuSongs/Blastia.ogg");
+        LoadMusicTrack(MusicID.FirstLight, "Sounds/MenuSongs/FirstLight.ogg");
         LoadMusicTrack(MusicID.EchoesOfTheVoid, "Sounds/MenuSongs/EchoesOfTheVoid.ogg");
         LoadMusicTrack(MusicID.IAmLost, "Sounds/MenuSongs/IAmLost.ogg");
-	    LoadMusicTrack(MusicID.RatsOnSaturn, Paths.RatsOnSaturn);
-        LoadMusicTrack(MusicID.PeacefulJourney00, Paths.PeacefulJourney00);
-        LoadMusicTrack(MusicID.PeacefulJourney01, Paths.PeacefulJourney01);
-        LoadMusicTrack(MusicID.PeacefulJourney02, Paths.PeacefulJourney02);
-        LoadMusicTrack(MusicID.PeacefulJourney03, Paths.PeacefulJourney03);
     }
 
     private static void LoadMusicTrack(MusicID musicId, string path)
