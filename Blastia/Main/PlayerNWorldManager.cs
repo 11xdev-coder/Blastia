@@ -198,7 +198,7 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 		BlastiaGame.RequestWorldInitialization();
 		
 		// hide join game menu whenever in a world
-		BlastiaGame.GetMenu<JoinGameMenu>().SetActive(true);
+		BlastiaGame.GetMenu<JoinGameMenu>().SetActive(false);
 		BlastiaGame.GetMenu<JoinGameMenu>()?.ToggleStatusText(false);
 
 		if (host)

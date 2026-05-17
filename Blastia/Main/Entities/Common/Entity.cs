@@ -73,7 +73,7 @@ public abstract class Entity : Object
 
     // GRAVITY
     protected virtual bool ApplyGravity { get; set; }
-    protected const float Gravity = 8565.186f; // G constant
+    protected const float Gravity = 8565.186f; // G constant    protected const float Gravity = 0f;
     protected virtual float Mass { get; set; } = 1f; // kg
     /// <summary>
     /// <c>True</c> if player touches the ground (1 pixel above ground)

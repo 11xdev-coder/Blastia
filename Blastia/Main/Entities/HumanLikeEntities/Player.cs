@@ -66,6 +66,11 @@ public class Player : HumanLikeEntity
 	private const int InventoryCapacity = InventoryRows * InventoryColumns;
 	public int SelectedHotbarSlot = -1;
 
+	/// <summary>
+	/// Adds ability to fly (Debug)
+	/// </summary>
+	private readonly bool _flyMode = true;
+
 	public Player(Vector2 position, World? world, float initialScaleFactor = 1f, bool myPlayer = false) : 
 		base(position, initialScaleFactor, EntityID.Player, new Vector2(0, -24), Vector2.Zero, 
 			new Vector2(-13, -21), new Vector2(13, -21), new Vector2(-6, 21), 
@@ -275,6 +280,15 @@ public class Player : HumanLikeEntity
 		}
 
 		Jump(deltaTime);
+		
+		if (_flyMode)
+		{
+			MovementVector.Y = 0f; // cancel gravity each frame
+			if (BlastiaGame.KeyboardState.IsKeyDown(Keys.W))
+				MovementVector.Y = -MovementSpeed;
+			else if (BlastiaGame.KeyboardState.IsKeyDown(Keys.S))
+				MovementVector.Y = MovementSpeed;
+		}
 	}
 
 	private void Jump(float deltaTime) 

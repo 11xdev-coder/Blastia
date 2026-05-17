@@ -2,8 +2,6 @@
 
 public static class Noise
 {
-    // God forgive me for what I am about to do.
-    
     // lookup table -> randomly arranged array of 0-255 numbers
     private static readonly int[] Permutation =
     [
@@ -45,39 +43,30 @@ public static class Noise
 
     private static float Gradient(int hash, float x, float y)
     {
-        // Tour to hell and back
-        switch (hash & 0xF)
+        switch (hash & 0x7) // cases 0-7
         {
-            case 0x0: return x + y;
-            case 0x1: return -x + y;
-            case 0x2: return x - y;
-            case 0x3: return -x - y;
-            case 0x4: return y + x;
-            case 0x5: return y - x;
-            case 0x6: return -y + x;
-            case 0x7: return -y - x;
-            case 0x8: return x + y;
-            case 0x9: return -x + y;
-            case 0xA: return x - y;
-            case 0xB: return -x - y;
-            case 0xC: return y + x;
-            case 0xD: return y - x;
-            case 0xE: return -y + x;
-            case 0xF: return -y - x;
+            case 0: return x + y;
+            case 1: return -x + y;
+            case 2: return x - y;
+            case 3: return -x - y;
+            case 4: return x;
+            case 5: return -x;
+            case 6: return y;
+            case 7: return -y;
             default: return 0;
         }
     }
      
     public static float Perlin(float x, float y)
     {
-        // Ensure positive coordinates
-        x = x < 0 ? -x : x;
-        y = y < 0 ? -y : y;
+        // ensure positive coordinates
+        x = Math.Abs(x);
+        y = Math.Abs(y);
         
         // from 0 to 255
         // current point coords
-        int xi = (int) x % 255;
-        int yi = (int) y % 255;
+        int xi = (int) x & 255;
+        int yi = (int) y & 255;
 
         // truncate and get only fraction part for smooth fading
         float xFraction = x - (int) x;

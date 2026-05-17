@@ -319,8 +319,8 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 
 		if (!PlayerNWorldManager.Instance.WorldExists(name))
 		{
-			SwitchToMenu(BlastiaGame.GetMenu<WorldGenerationStatusMenu>());
 			PlayerNWorldManager.Instance.NewWorld(name, seed, difficulty, width, height);	
+			SwitchToMenu(BlastiaGame.GetMenu<WorldGenerationStatusMenu>());
 		}
 		else
 		{
