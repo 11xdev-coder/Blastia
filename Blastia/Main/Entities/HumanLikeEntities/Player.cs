@@ -102,7 +102,7 @@ public class Player : HumanLikeEntity
 		    LocallyControlled = false;
 		}
 		
-		MovementSpeed = 80f;
+		MovementSpeed = 300f;
 		TimeToMaxSpeed = 0.2f;
 	}
 

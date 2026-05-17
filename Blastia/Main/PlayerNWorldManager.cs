@@ -178,10 +178,13 @@ public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 			WorldWidth = worldWidth,
 			WorldHeight = worldHeight
 		};
-		// run world gen on different thread
-		Task.Run(() => WorldGen.Generate(seed, worldData));
 		
-		New(SaveFolder.World, worldName, Extension.World, worldData);
+		// run world gen on different thread
+		Task.Run(() => 
+		{
+		    WorldGen.Generate(seed, worldData);		
+			New(SaveFolder.World, worldName, Extension.World, worldData);
+		});
 	}
 	
 	public bool WorldExists(string worldName) => Exists(SaveFolder.World, worldName, Extension.World);

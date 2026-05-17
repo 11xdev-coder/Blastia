@@ -18,8 +18,11 @@ public class WorldGenContext
         WorldState = state;
         Seed = seed;
         
-        SurfaceHeights = [];
+        SurfaceHeights = new int[state.WorldWidth];
     }
+    
+    public void SetTile(int x, int y, ushort id, TileLayer layer) => WorldState.SetTile(x, y, id, layer);
+    public void SetSpawn(int x, int y) => WorldState.SetSpawnPoint(x, y);
 }
 
 public interface IWorldGenPass 
@@ -35,19 +38,23 @@ public interface ITerrainGenPass : IWorldGenPass
     /// </summary>
     public float Frequency { get; }
     /// <summary>
-    /// Noise value multiplier
+    /// Fraction of the world where terrain starts. 0.4f - world starts from 40% of height (from 40% to bottom)
     /// </summary>
-    public float Amplitude { get; }
+    public float MaxHeight { get; }
+    /// <summary>
+    /// How dramatic terrain variation is
+    /// </summary>
+    public float HeightScale { get; }
+    public ushort BaseBlock { get; }
 }
 
 public class DirtPass : ITerrainGenPass 
 {
     public string Name => "Placing dirt";
-    public float Frequency => 0.1f;
-    public int Octaves => 2;
-    public float Persistence => 0.15f;
-    public float Threshold => 0.3f;
-    public float Amplitude => 1f;
+    public float Frequency => 0.03f;
+    //public int Octaves => 2;
+    //public float Persistence => 0.15f;
+    //public float Threshold => 0.3f;
     public float HeightScale => 0.1f;
     public float MaxHeight => 0.4f;
     public ushort BaseBlock => BlockId.Dirt;
@@ -56,34 +63,37 @@ public class DirtPass : ITerrainGenPass
     {
         for (int x = 0; x < context.WorldWidth; x++) 
         {
-            float noiseValue = Noise.Perlin(x * Frequency, 0) * Amplitude;
+            float noiseValue = Noise.Perlin(x * Frequency, 0);
             
-            for (int y = (int) noiseValue; y < context.WorldHeight; y += Block.Size) 
+            int baseHeight = (int) (context.WorldHeight * MaxHeight);
+            int variation = (int) (context.WorldHeight * HeightScale * noiseValue);
+            int height = (baseHeight + variation) / Block.Size * Block.Size;
+            
+            for (int y = height; y < context.WorldHeight; y += Block.Size) 
             {
-                context.WorldState.SetTile(x * Block.Size, y, BaseBlock, TileLayer.Ground);
+                context.SetTile(x, y, BaseBlock, TileLayer.Ground);
             }
-            
-            // Calculate base height as percentage of world height
-            //int baseHeight = (int)(context.WorldHeight * MaxHeight);
-            
-            // Apply variation around base height
-            //int terrainVariation = (int)(context.WorldHeight * HeightScale * noiseValue);
-            //int finalHeight = baseHeight + terrainVariation;
-            
-            //int alignedHeight = finalHeight / Block.Size * Block.Size;
-            //for (int y = alignedHeight; y < context.WorldHeight; y += Block.Size)
-            //{
-            //    context.WorldState.SetTile(x * Block.Size, y, BaseBlock, TileLayer.Ground);
-            //}
-            
-            //if (x >= randomSpawnX)
-            //{
-            //    if (spawnPointSet) continue;
-                
-                // five blocks above current height
-            //    worldState.SetSpawnPoint(x, finalHeight - Block.Size * 3);
-            //    spawnPointSet = true;
-            //}
+            context.SurfaceHeights[x] = height;
+        }
+    }
+}
+
+public class SpawnPointPass : IWorldGenPass 
+{
+    public string Name => "Setting spawn point";
+    
+    public void Run(WorldGenContext context) 
+    {
+        int halfWorld = (int) (context.WorldWidth * 0.5f);
+        int randomSpawnX = BlastiaGame.Rand.Next(halfWorld - 20, halfWorld + 21);
+        
+        for (int x = 0; x < context.WorldWidth; x++) 
+        {
+            if (x >= randomSpawnX) 
+            {
+                context.SetSpawn(x, context.SurfaceHeights[x]);
+                return;
+            }
         }
     }
 }
@@ -93,19 +103,16 @@ public static class WorldGen
     public volatile static float Progress = 0f;
     
     private static readonly List<IWorldGenPass> Passes = [
-        new DirtPass()
+        new DirtPass(),
+        new SpawnPointPass()
     ];
     
     public static void Generate(BigInteger seed, WorldState worldState)
     {
-        //int halfWorld = (int) (width * 0.5f);
-        //int randomSpawnX = BlastiaGame.Rand.Next(halfWorld - 20, halfWorld + 21);
-        //bool spawnPointSet = false;
-        
         var context = new WorldGenContext(worldState, seed);
         for (int i = 0; i < Passes.Count; i++) 
         {
-            Progress = i / Passes.Count;
+            Progress = (float) i / Passes.Count;
             Passes[i].Run(context);
         }
         
