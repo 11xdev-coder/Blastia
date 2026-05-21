@@ -16,6 +16,9 @@ namespace Blastia.Main;
 public enum SaveFolder { Player, World }
 public enum Extension { Player, World }
 
+[AttributeUsage(AttributeTargets.Property)]
+public class EssentialPropertyAttribute : Attribute { }
+
 public class PlayerNWorldManager : Singleton<PlayerNWorldManager>
 {
 	private string _playersSaveFolder = "";
@@ -230,9 +233,12 @@ public enum TileLayer
 [Serializable]
 public class WorldState
 {
-	public string Name { get; set; } = "";
+	[EssentialProperty]	public string Name { get; set; } = "";
 	public override string ToString() => Name;
-	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
+	[EssentialProperty]	public WorldDifficulty Difficulty { get; set; } = WorldDifficulty.Easy;
+	
+	[EssentialProperty]	public int WorldWidth { get; set; }
+	[EssentialProperty]	public int WorldHeight { get; set; }
 
 	public Dictionary<Vector2, ushort> GroundTiles { get; set; } = [];
 	public Dictionary<Vector2, ushort> LiquidTiles { get; set; } = [];
@@ -254,9 +260,6 @@ public class WorldState
 		get => GroundInstances;
 		set => GroundInstances = value;
 	}
-	
-	public int WorldWidth { get; set; }
-	public int WorldHeight { get; set; }
 
 	// sign position -> sign text
 	public Dictionary<Vector2, string> SignTexts { get; set; } = [];

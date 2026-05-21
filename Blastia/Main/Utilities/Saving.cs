@@ -128,7 +128,9 @@ public static class Saving
         using FileStream fs = File.Open(filePath, FileMode.Create);
         using (BinaryWriter writer = new BinaryWriter(fs))
         {
-            PropertyInfo[] properties = state.GetType().GetProperties();
+            PropertyInfo[] properties = typeof(T).GetProperties()
+                .OrderBy(p => p.MetadataToken)
+                .ToArray();
 
             foreach (PropertyInfo property in properties)
             {
@@ -206,23 +208,28 @@ public static class Saving
     }
 
     /// <summary>
-    /// Loads state class data (must be empty constructor) from a file and returns state
-    /// with loaded parameters
+    /// Loads state class data (must be empty constructor) from a file and returns state with loaded parameters
     /// </summary>
     /// <param name="filePath"></param>
     /// <param name="debugLogs">If <c>true</c> prints debugging logs in the console</param>
+    /// <param name="readCondition">If Func returns true, then it continues to read properties. Otherwise <strong>breaks</strong> and stops reading</param>
     /// <typeparam name="T">Serializable state class with empty constructor</typeparam>
     /// <returns>State class with loaded parameters from the file. Returns empty if file doesn't exist</returns>
-    public static T Load<T>(string filePath, bool debugLogs = false) where T : new()
+    private static T LoadWithCondition<T>(string filePath, Func<PropertyInfo, bool> readCondition, bool debugLogs = false) where T : new()
     {
         T state = new T();
         
         using FileStream fs = File.Open(filePath, FileMode.Open);
         using (BinaryReader reader = new BinaryReader(fs))
         {
-            PropertyInfo[] properties = typeof(T).GetProperties();
+            PropertyInfo[] properties = typeof(T).GetProperties()
+                .OrderBy(p => p.MetadataToken)
+                .ToArray();
+                
             foreach (PropertyInfo property in properties)
             {
+                if (!readCondition(property)) break;
+                
                 try
                 {
                     Type propertyType = property.PropertyType;
@@ -239,6 +246,15 @@ public static class Saving
 
         return state;
     }
+    
+    /// <summary>
+    /// <inheritdoc cref="LoadWithCondition"/>
+    /// </summary>
+    public static T Load<T>(string filePath, bool debugLogs = false) where T : new() => LoadWithCondition<T>(filePath, (p) => true, debugLogs);
+    /// <summary>
+    /// Loads only essential properties (marked with <c>EssentialAttribute</c>). For proper load these properties must be listed first in a class declaration
+    /// </summary>
+    public static T LoadLightweight<T>(string filePath, bool debugLogs = false) where T : new() => LoadWithCondition<T>(filePath, (p) => p.GetCustomAttribute<EssentialPropertyAttribute>() != null, debugLogs);
     
     public static object ReadObject(BinaryReader reader, Type type) 
     {
