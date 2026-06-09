@@ -134,6 +134,9 @@ public static class Saving
 
             foreach (PropertyInfo property in properties)
             {
+                if (property.GetCustomAttribute<NoSaveAttribute>() != null)
+                    continue;
+                    
                 object? value = property.GetValue(state);
                 if (value == null) continue;
 

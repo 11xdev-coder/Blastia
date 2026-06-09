@@ -23,6 +23,7 @@ using Blastia.Main.Blocks;
 using Steamworks;
 using System.ComponentModel.Design;
 using Vortice.Direct3D11.Debug;
+using Blastia.Main.Persistence;
 
 namespace Blastia.Main;
 
@@ -712,7 +713,7 @@ public class BlastiaGame : Game
             }
 
             // first ground
-            _myPlayer?.Camera?.RenderGroundTiles(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
+            _myPlayer?.Camera?.RenderGroundTiles(SpriteBatch, WorldManager.Instance.SelectedWorldState);
             if (World is { DrawCollisionGrid: true }) _myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 
             // then entities
