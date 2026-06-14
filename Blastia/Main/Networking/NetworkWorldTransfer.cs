@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Blocks.Common;
+using Blastia.Main.Persistence;
 using Blastia.Main.UI.Menus.Multiplayer;
 using Blastia.Main.Utilities;
 using Blastia.Main.Utilities.ListHandlers;
@@ -18,7 +19,6 @@ public class WorldChunk
     public int ChunkIndex { get; set; }
     public int TotalChunks { get; set; }
     public TileLayer Layer { get; set; }
-    public Dictionary<Vector2, ushort> Tiles { get; set; } = [];
     public Dictionary<Vector2, NetworkBlockInstance> Instances { get; set; } = [];
 }
 
@@ -32,8 +32,7 @@ public class WorldTransferData
     public WorldDifficulty Difficulty { get; set; }
     public int WorldWidth { get; set; }
     public int WorldHeight { get; set; }
-    public float SpawnX { get; set; }
-    public float SpawnY { get; set; }
+    public Vector2 Spawn { get; set; }
     public Dictionary<Vector2, string> SignTexts { get; set; } = [];
     public int TotalChunksToSend { get; set; }
 }
@@ -59,8 +58,8 @@ public static class NetworkWorldTransfer
             writer.Write((byte) data.Difficulty);
             writer.Write(data.WorldWidth);
             writer.Write(data.WorldHeight);
-            writer.Write(data.SpawnX);
-            writer.Write(data.SpawnY);
+            writer.Write(data.Spawn.X);
+            writer.Write(data.Spawn.Y);
             
             // serialize sign texts
             writer.Write(data.SignTexts.Count);
@@ -88,8 +87,9 @@ public static class NetworkWorldTransfer
             data.Difficulty = (WorldDifficulty) reader.ReadByte();
             data.WorldWidth = reader.ReadInt32();
             data.WorldHeight = reader.ReadInt32();
-            data.SpawnX = reader.ReadSingle();
-            data.SpawnY = reader.ReadSingle();
+            var spawnX = reader.ReadSingle();
+            var spawnY = reader.ReadSingle();
+            data.Spawn = new Vector2(spawnX, spawnY);
             
             var signTextCount = reader.ReadInt32();
             var signTextDict = new Dictionary<Vector2, string>(signTextCount);
@@ -197,7 +197,7 @@ public static class NetworkWorldTransfer
     {
         if (!isHost) return;
         
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState == null)
         {
             Console.WriteLine("[NetworkWorldTransfer] No world selected, cannot send data");
@@ -213,14 +213,15 @@ public static class NetworkWorldTransfer
             Difficulty = worldState.Difficulty,
             WorldWidth = worldState.WorldWidth,
             WorldHeight = worldState.WorldHeight,
-            SpawnX = worldState.SpawnX,
-            SpawnY = worldState.SpawnY,
+            SpawnX = worldState.Spawn.X,
+            SpawnY = worldState.Spawn.Y,
             SignTexts = worldState.SignTexts
         };
         
         var allChunks = new List<WorldChunk>();
         
         // create all chunks for all layers
+        // TODO: Instances is <Vector2, BlockInstance> -> convert to <Vector2, ushort>
         var groundChunks = CreateChunksForLayer(worldState.GroundTiles, worldState.GroundInstances, TileLayer.Ground);
         allChunks.AddRange(groundChunks);
         var liquidChunks = CreateChunksForLayer(worldState.LiquidTiles, worldState.LiquidInstances, TileLayer.Liquid);
@@ -279,7 +280,7 @@ public static class NetworkWorldTransfer
         if (NetworkManager.Instance.IsHost)
         {
             // only spawn if loaded in the world
-            if (PlayerNWorldManager.Instance.SelectedWorld != null)
+            if (WorldManager.Instance.WorldState != null)
             {
                 NetworkEntitySync.OnClientJoined(clientId, clientConnection);
             }
@@ -289,16 +290,12 @@ public static class NetworkWorldTransfer
     /// <summary>
     /// Transfers all tiles of <c>layer</c> to list of world chunks (max length = 150 tiles per chunk)
     /// </summary>
-    /// <param name="tiles"></param>
-    /// <param name="instances"></param>
-    /// <param name="layer"></param>
     /// <returns></returns>
-    private static List<WorldChunk> CreateChunksForLayer(Dictionary<Vector2, ushort> tiles, Dictionary<Vector2, BlockInstance> instances,
-        TileLayer layer)
+    private static List<WorldChunk> CreateChunksForLayer(Dictionary<Vector2, BlockInstance> instances, TileLayer layer)
     {
         var chunks = new List<WorldChunk>();
 
-        if (tiles.Count == 0)
+        if (instances.Count == 0)
         {
             // even if empty send one empty chunk
             chunks.Add(new WorldChunk
@@ -382,8 +379,7 @@ public static class NetworkWorldTransfer
             Difficulty = worldData.Difficulty,
             WorldWidth = worldData.WorldWidth,
             WorldHeight = worldData.WorldHeight,
-            SpawnX = worldData.SpawnX,
-            SpawnY = worldData.SpawnY,
+            Spawn = new Vector2(worldData.SpawnX, worldData.SpawnY),
             SignTexts = worldData.SignTexts
         };
         
@@ -420,7 +416,7 @@ public static class NetworkWorldTransfer
                 NetworkMessageQueue.QueueMessage(hostConnection, MessageType.WorldTransferComplete, $"Completed world transfer for client. Received {chunk.ChunkIndex+1}/{_expectedChunks}");
 
                 // send joined chat message (this client -> host)
-                var playerName = PlayerNWorldManager.Instance.GetSelectedPlayerName();
+                var playerName = PlayerManager.Instance.PlayerState?.Name;
                 NetworkManager.Instance?.SyncChatMessage($"&e{playerName} joined", "");
             }
                 

@@ -4,6 +4,7 @@ using Blastia.Main.Entities.Common;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
 using Blastia.Main.Networking;
+using Blastia.Main.Persistence;
 using Blastia.Main.Sounds;
 using Blastia.Main.UI;
 using Blastia.Main.UI.Menus.InGame;
@@ -154,12 +155,12 @@ public class Player : HumanLikeEntity
 
 	private void Respawn()
 	{
-		if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
+		if (WorldManager.Instance.WorldState == null) return;
 
 		ImmunityTimer = 3f; // 3 seconds of immunity after respawn
 		VisualFlickerTimer = 3f;
 		Life = MaxLife;
-		Position = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint();
+		Position = WorldManager.Instance.WorldState.Spawn;
 	}
 	
 	private bool ShouldBlockInput()
@@ -353,7 +354,7 @@ public class Player : HumanLikeEntity
 		if (BlastiaGame.IsHoveredOnAnyUi) return;
 
 		var selectedItem = PlayerInventory.GetItemAt(SelectedHotbarSlot);
-		var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
+		var currentWorld = WorldManager.Instance.WorldState;
 		if (currentWorld == null) return;
 		
 		if (BlastiaGame.HasClickedRight)
@@ -615,7 +616,7 @@ public class Player : HumanLikeEntity
 	private void UpdateSignHoverText()
 	{
 		// sign hover tooltip
-		var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+		var worldState = WorldManager.Instance.WorldState;
 		if (worldState != null && Camera != null)
 		{
 			var pos = GetCoordsForBlockPlacement();

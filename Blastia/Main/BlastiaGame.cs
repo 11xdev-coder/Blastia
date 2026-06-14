@@ -713,7 +713,7 @@ public class BlastiaGame : Game
             }
 
             // first ground
-            _myPlayer?.Camera?.RenderGroundTiles(SpriteBatch, WorldManager.Instance.SelectedWorldState);
+            _myPlayer?.Camera?.RenderGroundTiles(SpriteBatch, WorldManager.Instance.WorldState);
             if (World is { DrawCollisionGrid: true }) _myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
 
             // then entities

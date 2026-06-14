@@ -2,6 +2,7 @@
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.Persistence;
 using Blastia.Main.Physics;
 using Blastia.Main.Sounds;
 using Microsoft.Xna.Framework;
@@ -44,7 +45,7 @@ public abstract class LiquidBlock : Block
         FlowUpdateInterval = flowUpdateInterval;
         BucketItemId = bucketItemId;
 
-        _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld ?? new WorldState();
+        _currentWorldState = WorldManager.Instance.WorldState ?? new WorldState();
     }
 
     public override Rectangle GetRuleTileSourceRectangle(bool emptyTop, bool emptyBottom, bool emptyRight, bool emptyLeft)
@@ -68,8 +69,8 @@ public abstract class LiquidBlock : Block
 
         if (ForceUpdate || _flowTimer >= FlowUpdateInterval)
         {
-            if (PlayerNWorldManager.Instance.SelectedWorld == null) return;
-            _currentWorldState = PlayerNWorldManager.Instance.SelectedWorld;
+            if (WorldManager.Instance.WorldState == null) return;
+            _currentWorldState = WorldManager.Instance.WorldState;
 
             var blockX = (int) position.X;
             var blockY = (int) position.Y;
@@ -278,7 +279,7 @@ public abstract class LiquidBlock : Block
     {
         var liquid = CreateNewInstance();
         liquid.FlowLevel = targetFlowLevel;
-        _currentWorldState.SetTile(x, y, new BlockInstance(liquid, 0), GetLayer());
+        _currentWorldState.SetTile(new Vector2(x, y), new BlockInstance(liquid, 0), GetLayer());
     }
     
     public abstract LiquidBlock CreateNewInstance();

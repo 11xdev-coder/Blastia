@@ -3,6 +3,7 @@ using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
+using Blastia.Main.Persistence;
 using Blastia.Main.Sounds;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -191,7 +192,7 @@ public class BlockInstance
 	/// <param name="player"></param>
 	public void DoBreaking(Vector2 position, Player? player)
 	{
-		var selectedWorld = PlayerNWorldManager.Instance.SelectedWorld;
+		var selectedWorld = WorldManager.Instance.WorldState;
 		if (selectedWorld == null) return;
 		
 		var deltaTime = (float) BlastiaGame.GameTime.ElapsedGameTime.TotalSeconds;

@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Persistence;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.GameState;
 
@@ -22,7 +24,7 @@ public class WorldGenContext
     }
     
     public void SetTile(int x, int y, ushort id, TileLayer layer) => WorldState.SetTile(x, y, id, layer);
-    public void SetSpawn(int x, int y) => WorldState.SetSpawnPoint(x, y);
+    public void SetSpawn(int x, int y) => WorldState.Spawn = new Vector2(x, y);
 }
 
 public interface IWorldGenPass 

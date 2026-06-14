@@ -2,6 +2,7 @@
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Items;
+using Blastia.Main.Persistence;
 using Blastia.Main.Sounds;
 using Blastia.Main.UI.Menus.InGame;
 using Microsoft.Xna.Framework;
@@ -39,7 +40,7 @@ public class SignBlock : Block
     public override void OnBreak(World? world, Vector2 position, Player? player)
     {
         base.OnBreak(world, position, player);
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState == null) return;
         
         // clear text
@@ -51,7 +52,7 @@ public class SignBlock : Block
         base.Draw(spriteBatch, destRectangle, sourceRectangle, worldPosition);
         
         // draw overlay depending on text
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState == null) return;
     
         worldState.SignTexts.TryGetValue(worldPosition, out var text);

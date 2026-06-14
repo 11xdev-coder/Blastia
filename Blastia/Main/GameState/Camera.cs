@@ -1,6 +1,7 @@
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
+using Blastia.Main.Persistence;
 using Blastia.Main.Physics;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;

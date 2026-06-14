@@ -4,19 +4,18 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using Blastia.Main.Blocks;
 using Blastia.Main.Blocks.Common;
+using Blastia.Main.Persistence;
 using Microsoft.Xna.Framework;
 
 namespace Blastia.Main.Utilities;
 
 public static class Saving
 {
+    // TODO: refactor further
     /// <summary>
-    /// Writes <c>Dictionary&lt;Vector2, ushort&gt;</c> to a binary writer
+    /// Writes <c>Dictionary&lt;Vector2, BlockInstance&gt;</c> to a binary writer
     /// </summary>
-    /// <param name="dict"></param>
-    /// <param name="writer"></param>
-    /// <param name="debugLogs"></param>
-    public static void WriteTileDictionary(Dictionary<Vector2, ushort> dict, BinaryWriter writer, bool debugLogs = false)
+    public static void WriteBlockDictionary(Dictionary<Vector2, BlockInstance> dict, BinaryWriter writer, bool debugLogs = false)
     {
         if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, ushort> with {dict.Count} items");
                         
@@ -24,24 +23,24 @@ public static class Saving
         foreach (var keyValuePair in dict)
         {
             Vector2 vector = keyValuePair.Key;
-            ushort id = keyValuePair.Value;
+            BlockInstance inst = keyValuePair.Value;
                             
             if (debugLogs)
             {
                 Console.WriteLine(vector == default
                     ? "Couldn't write Vector2"
-                    : $"Writing Dictionary<Vector2, ushort> entry: Position({vector.X}, {vector.Y}), ID: {id}");
+                    : $"Writing Dictionary<Vector2, BlockInstance> entry: Position({vector.X}, {vector.Y}), BlockInst ID: {inst.Id}");
             }
                             
             writer.Write(vector.X);
             writer.Write(vector.Y);
-            writer.Write(id);
+            WriteObject(writer, inst);
         }
     }
 
-    public static Dictionary<Vector2, ushort> ReadTileDictionary(BinaryReader reader, bool debugLogs = false)
+    public static Dictionary<Vector2, BlockInstance> ReadBlockDictionary(BinaryReader reader, bool debugLogs = false)
     {
-        var tileDictionary = new Dictionary<Vector2, ushort>();
+        var tileDictionary = new Dictionary<Vector2, BlockInstance>();
         var count = reader.ReadInt32();
         if (debugLogs) Console.WriteLine($"Reading dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
             
@@ -49,7 +48,7 @@ public static class Saving
         {
             var x = reader.ReadSingle();
             var y = reader.ReadSingle();
-            var id = reader.ReadUInt16();
+            BlockInstance inst = (BlockInstance) ReadObject(reader, typeof(BlockInstance));
                 
             if (float.IsInfinity(x) || float.IsNaN(x) ||
                 float.IsInfinity(y) || float.IsNaN(y))
@@ -58,18 +57,82 @@ public static class Saving
                 continue;
             }
                 
-            if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), ID: {id}");
-            tileDictionary.Add(new Vector2(x, y), id);
+            if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), BlockInst ID: {inst.Id}");
+            tileDictionary.Add(new Vector2(x, y), inst);
         }
             
         if (debugLogs) Console.WriteLine($"Successfully read {tileDictionary.Count} entries");
         return tileDictionary;
     }
     
+    public static void WriteStringDictionary(Dictionary<Vector2, string> dict, BinaryWriter writer, bool debugLogs = false) 
+    {
+        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, string> with {dict.Count} items");
+
+        writer.Write(dict.Count);
+        foreach (var keyValuePair in dict)
+        {
+            var vector = keyValuePair.Key;
+            var str = keyValuePair.Value;
+
+            if (debugLogs)
+            {
+                Console.WriteLine(vector == default
+                    ? "Couldn't write Vector2"
+                    : $"Writing Dictionary<Vector2, string> entry: Position({vector.X}, {vector.Y}), String: {str}");
+            }
+
+            writer.Write(vector.X);
+            writer.Write(vector.Y);
+            writer.Write(str);
+        }
+
+        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {writer.BaseStream.Position}");
+    }
+    
+    public static Dictionary<Vector2, string> ReadStringDictionary(BinaryReader reader, bool debugLogs = false) 
+    {
+        var dict = new Dictionary<Vector2, string>();
+        var count = reader.ReadInt32();
+        if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
+        
+        for (int i = 0; i < count; i++)
+        {
+            var x = reader.ReadSingle();
+            var y = reader.ReadSingle();
+            var str = reader.ReadString();
+            
+            if (float.IsInfinity(x) || float.IsNaN(x) ||
+                float.IsInfinity(y) || float.IsNaN(y))
+            {
+                if (debugLogs) Console.WriteLine($"Skipping invalid string entry {i}: ({x}, {y})");
+                continue;
+            }
+            
+            if (string.IsNullOrEmpty(str))
+            {
+                if (debugLogs) Console.WriteLine("String is null or empty, skipping");
+                continue;
+            }
+            
+            if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), string: {str}");
+            dict.Add(new Vector2(x, y), str);
+        }
+        
+        if (debugLogs) Console.WriteLine($"Successfully read {dict.Count} entries");
+        return dict;
+    }
+    
     public static void WriteObject(BinaryWriter writer, object value) 
     {
         switch (value)
         {
+            case Dictionary<Vector2, BlockInstance> blockDict:
+                WriteBlockDictionary(blockDict, writer);
+                break;
+            case Dictionary<Vector2, string> stringDict:
+                WriteStringDictionary(stringDict, writer);
+                break;
             case Vector2 vectorValue:
                 // write X and Y
                 writer.Write(vectorValue.X);
@@ -109,6 +172,13 @@ public static class Saving
             case ulong ulongValue:
                 writer.Write(ulongValue);
                 break;
+            case BlockInstance inst:
+                writer.Write(inst.Id);
+                if (inst.Block is LiquidBlock liquid)
+                {
+                    writer.Write(liquid.FlowLevel);
+                }
+                break;
         }
     }
     
@@ -146,66 +216,7 @@ public static class Saving
                     Console.WriteLine($"Property type: {property.PropertyType.FullName}");
                 }
 
-                switch (value)
-                {
-                    case Dictionary<Vector2, ushort> tileDictionary:
-                        WriteTileDictionary(tileDictionary, writer, debugLogs);
-                        break;
-                    case Dictionary<Vector2, BlockInstance> blockInstanceDictionary:
-                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, BlockInstance> with {blockInstanceDictionary.Count} items");
-
-                        writer.Write(blockInstanceDictionary.Count);
-                        foreach (var keyValuePair in blockInstanceDictionary)
-                        {
-                            var vector = keyValuePair.Key;
-                            var block = keyValuePair.Value;
-
-                            if (debugLogs)
-                            {
-                                Console.WriteLine(vector == default
-                                    ? "Couldn't write Vector2"
-                                    : $"Writing Dictionary<Vector2, BlockInstance> entry: Position({vector.X}, {vector.Y}), Block ID: {block.Id}");
-                            }
-
-                            writer.Write(vector.X);
-                            writer.Write(vector.Y);
-                            // write blocks ID, reconstruct later from StuffRegistry
-                            writer.Write(block.Id);
-                            if (keyValuePair.Value.Block is LiquidBlock liquid)
-                            {
-                                writer.Write(liquid.FlowLevel);
-                            }
-                        }
-
-                        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
-                        break;
-                    case Dictionary<Vector2, string> stringDictionary:
-                        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, string> with {stringDictionary.Count} items");
-
-                        writer.Write(stringDictionary.Count);
-                        foreach (var keyValuePair in stringDictionary)
-                        {
-                            var vector = keyValuePair.Key;
-                            var str = keyValuePair.Value;
-
-                            if (debugLogs)
-                            {
-                                Console.WriteLine(vector == default
-                                    ? "Couldn't write Vector2"
-                                    : $"Writing Dictionary<Vector2, string> entry: Position({vector.X}, {vector.Y}), String: {str}");
-                            }
-
-                            writer.Write(vector.X);
-                            writer.Write(vector.Y);
-                            writer.Write(str);
-                        }
-
-                        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {fs.Position}");
-                        break;
-                    default:
-                        WriteObject(writer, value);
-                        break;
-                }    
+                WriteObject(writer, value);   
             }
         }
     }
@@ -261,6 +272,16 @@ public static class Saving
     
     public static object ReadObject(BinaryReader reader, Type type) 
     {
+        if (type == typeof(Dictionary<Vector2, BlockInstance>))
+        {
+            return ReadBlockDictionary(reader);
+        }
+        
+        if (type == typeof(Dictionary<Vector2, string>))
+        {
+            return ReadStringDictionary(reader);
+        }
+        
         if (type == typeof(Vector2))
         {
             float x = reader.ReadSingle();
@@ -290,6 +311,21 @@ public static class Saving
             return Enum.ToObject(type, enumValue);
         }
         
+        if (type == typeof(BlockInstance)) 
+        {
+            ushort id = reader.ReadUInt16();
+            Block? block = StuffRegistry.GetBlock(id) ?? throw new Exception($"Error reading BlockInstance. Block with ID: {id} not found.");
+            
+            if (block is LiquidBlock liquid) 
+            {
+                var liquidClone = liquid.CreateNewInstance();
+                liquidClone.FlowLevel = reader.ReadInt32();
+                block = liquidClone;
+            }
+            
+            return new BlockInstance(block, 0);
+        }
+        
         switch (Type.GetTypeCode(type))
         {
             case TypeCode.Byte: return reader.ReadByte();
@@ -308,89 +344,6 @@ public static class Saving
     private static object ReadValue(BinaryReader reader, Type type, bool debugLogs = false)
     {
         if (debugLogs) Console.WriteLine($"Reading type: {type.FullName}");
-
-        if (type == typeof(Dictionary<Vector2, ushort>))
-        {
-            return ReadTileDictionary(reader, debugLogs);
-        }
-        
-        if (type == typeof(Dictionary<Vector2, BlockInstance>))
-        {
-            var blockDictionary = new Dictionary<Vector2, BlockInstance>();
-            var count = reader.ReadInt32();
-            if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
-
-            for (int i = 0; i < count; i++)
-            {
-                var x = reader.ReadSingle();
-                var y = reader.ReadSingle();
-                var blockId = reader.ReadUInt16();
-
-                if (float.IsInfinity(x) || float.IsNaN(x) ||
-                    float.IsInfinity(y) || float.IsNaN(y))
-                {
-                    if (debugLogs) Console.WriteLine($"Skipping invalid block entry {i}: Position({x}, {y})");
-                    continue;
-                }
-                
-                var blockTemplate = StuffRegistry.GetBlock(blockId);
-                if (blockTemplate == null)
-                {
-                    if (debugLogs) Console.WriteLine($"Block ID: {blockId} not found in registry");
-                    continue;
-                }
-
-                Block instance;
-                if (blockTemplate is LiquidBlock liquid)
-                {
-                    var clone = liquid.CreateNewInstance();
-                    clone.FlowLevel = reader.ReadInt32();
-                    instance = clone;
-                }
-                else
-                    instance = blockTemplate;
-                
-                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), block ID: {blockId}, block name: {instance.Name}");
-                blockDictionary.Add(new Vector2(x, y), new BlockInstance(instance, 0));
-            }
-            
-            if (debugLogs) Console.WriteLine($"Successfully read {blockDictionary.Count} entries");
-            return blockDictionary;
-        }
-        
-        if (type == typeof(Dictionary<Vector2, string>))
-        {
-            var stringDictionary = new Dictionary<Vector2, string>();
-            var count = reader.ReadInt32();
-            if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
-            
-            for (int i = 0; i < count; i++)
-            {
-                var x = reader.ReadSingle();
-                var y = reader.ReadSingle();
-                var str = reader.ReadString();
-                
-                if (float.IsInfinity(x) || float.IsNaN(x) ||
-                    float.IsInfinity(y) || float.IsNaN(y))
-                {
-                    if (debugLogs) Console.WriteLine($"Skipping invalid string entry {i}: ({x}, {y})");
-                    continue;
-                }
-                
-                if (string.IsNullOrEmpty(str))
-                {
-                    if (debugLogs) Console.WriteLine("String is null or empty, skipping");
-                    continue;
-                }
-                
-                if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), string: {str}");
-                stringDictionary.Add(new Vector2(x, y), str);
-            }
-            
-            if (debugLogs) Console.WriteLine($"Successfully read {stringDictionary.Count} entries");
-            return stringDictionary;
-        }
-
         return ReadObject(reader, type);
     }
     

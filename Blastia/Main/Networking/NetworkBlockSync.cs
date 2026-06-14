@@ -3,6 +3,7 @@ using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.Persistence;
 using Microsoft.Xna.Framework;
 using Steamworks;
 
@@ -49,7 +50,7 @@ public static class NetworkBlockSync
     
     public static void HandleBlockChanged(string updateBase64, HSteamNetConnection senderConnection) 
     {
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState == null || NetworkManager.Instance == null) return;
 
         NetworkSync.HandleNetworkMessage<NetworkBlockChangeMessage>(updateBase64, MessageType.BlockChanged,
@@ -95,7 +96,7 @@ public static class NetworkBlockSync
     
     public static void HandleBlockUpdated(string updateBase64, HSteamNetConnection senderConnection) 
     {
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         var world = _worldFactory?.Invoke();
         if (worldState == null || NetworkManager.Instance == null || world == null) return;
 
@@ -118,7 +119,7 @@ public static class NetworkBlockSync
     
     public static void HandleSignEdited(string editBase64, HSteamNetConnection senderConnection) 
     {
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState == null || NetworkManager.Instance == null) return;
 
         NetworkSync.HandleNetworkMessage<NetworkSignEditedMessage>(editBase64, MessageType.SignEditedAt,

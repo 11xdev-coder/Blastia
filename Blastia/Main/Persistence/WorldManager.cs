@@ -204,7 +204,7 @@ public class WorldManager : Singleton<WorldManager>
 {
     public static string WorldsSaveFolder = Path.Combine(Paths.GetSaveGameDirectory(), "Worlds");
     public static string Extension = ".blsw";
-    public WorldState? SelectedWorldState;
+    public WorldState? WorldState;
     
     public void NewWorld(string worldName, BigInteger seed, WorldDifficulty difficulty, 
 			int worldWidth, int worldHeight) 
@@ -235,7 +235,7 @@ public class WorldManager : Singleton<WorldManager>
 	/// <param name="host">If true, will tell <c>NetworkManager</c> to host the game</param>
 	public void SelectWorld(WorldState worldState, bool host)
 	{
-		SelectedWorldState = worldState;
+		WorldState = worldState;
 		// BlastiaGame.RequestWorldInitialization();
 		
 		// // hide join game menu whenever in a world
@@ -248,5 +248,5 @@ public class WorldManager : Singleton<WorldManager>
 		// }
 	}
 
-	public void UnselectWorld() => SelectedWorldState = null;
+	public void UnselectWorld() => WorldState = null;
 }

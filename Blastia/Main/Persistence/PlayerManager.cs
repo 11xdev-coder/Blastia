@@ -14,7 +14,7 @@ public class PlayerManager : Singleton<PlayerManager>
 {
     public static string PlayersSaveFolder = Path.Combine(Paths.GetSaveGameDirectory(), "Players");
     public static string Extension = ".blst";
-    public PlayerState? SelectedPlayerState;
+    public PlayerState? PlayerState;
     
 	public void NewPlayer(string playerName) 
 	{
@@ -32,10 +32,10 @@ public class PlayerManager : Singleton<PlayerManager>
 	/// </summary>
 	public void SelectPlayer(PlayerState playerState)
 	{
-		SelectedPlayerState = playerState;
+		PlayerState = playerState;
 
 			// switchToMenu(BlastiaGame.GetMenu<JoinGameMenu>());
 	}
 	
-	public void UnselectPlayer() => SelectedPlayerState = null;
+	public void UnselectPlayer() => PlayerState = null;
 }

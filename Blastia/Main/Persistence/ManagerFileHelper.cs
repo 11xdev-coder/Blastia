@@ -1,3 +1,4 @@
+using Blastia.Main.Persistence;
 using Blastia.Main.Utilities;
 
 
@@ -47,8 +48,9 @@ public static class ManagerFileHelper
             if (file.EndsWith(extension))
             {
                 // load new instance
-                // TODO: make it lightweight
-                var loadedState = Saving.Load<T>(file);
+                var loadedState = Saving.LoadLightweight<T>(file);
+                if (loadedState is State state)
+                    state.FilePath = file;
                 items.Add(loadedState);
             }
         }
