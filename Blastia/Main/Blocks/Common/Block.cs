@@ -167,6 +167,7 @@ public abstract class Block
 /// </summary>
 public class BlockInstance
 {
+	public override string ToString() => Convert.ToString(Block.Id);
 	public Block Block;
 	public float Damage;
 	private readonly BlockBreakingAnimation _breakingAnimation;

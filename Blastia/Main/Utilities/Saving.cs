@@ -11,275 +11,158 @@ namespace Blastia.Main.Utilities;
 
 public static class Saving
 {
-    // TODO: refactor further
+    public static bool EnableLogs = true;
+    public static bool EnableSpamLogs = false;
+    
+    private static Dictionary<Type, Action<BinaryWriter, object>> _primitiveWriters = new()
+    {
+        { typeof(byte),   (w, v) => w.Write((byte) v) },
+        { typeof(ushort), (w, v) => w.Write((ushort) v) },
+        { typeof(int),    (w, v) => w.Write((int) v) },
+        { typeof(float),  (w, v) => w.Write((float) v) },
+        { typeof(double), (w, v) => w.Write((double) v) },
+        { typeof(bool),   (w, v) => w.Write((bool) v) },
+        { typeof(string), (w, v) => w.Write((string) v) },
+        { typeof(ulong),  (w, v) => w.Write((ulong) v) },
+    };
+    
+    private static Dictionary<Type, Func<BinaryReader, object>> _primitiveReaders = new() 
+    {
+        { typeof(byte),   r => r.ReadByte() },
+        { typeof(ushort), r => r.ReadUInt16() },
+        { typeof(int),    r => r.ReadInt32() },
+        { typeof(float),  r => r.ReadSingle() },
+        { typeof(double), r => r.ReadDouble() },
+        { typeof(bool),   r => r.ReadBoolean() },
+        { typeof(string), r => r.ReadString() },
+        { typeof(ulong),  r => r.ReadUInt64() },
+    };
+    
     /// <summary>
-    /// Writes <c>Dictionary&lt;Vector2, BlockInstance&gt;</c> to a binary writer
+    /// Writes Dictionary&lt;Vector2, T&gt;
     /// </summary>
-    public static void WriteBlockDictionary(Dictionary<Vector2, BlockInstance> dict, BinaryWriter writer, bool debugLogs = false)
+    public static void WriteVector2Dictionary<T>(Dictionary<Vector2, T> dict, BinaryWriter writer) 
     {
-        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, ushort> with {dict.Count} items");
-                        
+        if (EnableLogs) 
+            Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}> with {dict.Count} items");
+            
         writer.Write(dict.Count);
-        foreach (var keyValuePair in dict)
+        foreach (var kvp in dict) 
         {
-            Vector2 vector = keyValuePair.Key;
-            BlockInstance inst = keyValuePair.Value;
-                            
-            if (debugLogs)
+            Vector2 vector = kvp.Key;
+            if (float.NaN == vector.X || float.NaN == vector.Y || float.IsInfinity(vector.X) || float.IsInfinity(vector.Y))
             {
-                Console.WriteLine(vector == default
-                    ? "Couldn't write Vector2"
-                    : $"Writing Dictionary<Vector2, BlockInstance> entry: Position({vector.X}, {vector.Y}), BlockInst ID: {inst.Id}");
+                if (EnableLogs)
+                    Console.WriteLine($"Found invalid Vector2 values, skipping.");
+                    
+                continue;
             }
-                            
+            
+            T value = kvp.Value;
+            if (value == null) 
+            {
+                if (EnableLogs)
+                    Console.WriteLine($"Value is null while writing, skipping.");
+                continue;
+            }
+            
+            if (EnableSpamLogs) 
+                Console.WriteLine($"Writing Dictionary<Vector2, {typeof(T).Name}> entry at {vector}. Value: {value}");
+            
             writer.Write(vector.X);
             writer.Write(vector.Y);
-            WriteObject(writer, inst);
+            WriteObject(writer, value);
         }
     }
+    
+    public static void WriteVector2BlockInstDictionary(Dictionary<Vector2, BlockInstance> dict, BinaryWriter writer) => WriteVector2Dictionary(dict, writer);
+    public static void WriteVector2StringDictionary(Dictionary<Vector2, string> dict, BinaryWriter writer) => WriteVector2Dictionary(dict, writer);
 
-    public static Dictionary<Vector2, BlockInstance> ReadBlockDictionary(BinaryReader reader, bool debugLogs = false)
+    public static Dictionary<Vector2, T> ReadVector2Dictionary<T>(BinaryReader reader)
     {
-        var tileDictionary = new Dictionary<Vector2, BlockInstance>();
-        var count = reader.ReadInt32();
-        if (debugLogs) Console.WriteLine($"Reading dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
+        var resultDict = new Dictionary<Vector2, T>();
+        int count = reader.ReadInt32();
+        
+        if (EnableLogs) 
+            Console.WriteLine($"Reading dictionary of type <Vector2, {typeof(T).Name} with {count} entries from FileStream position: {reader.BaseStream.Position}");
             
         for (int i = 0; i < count; i++)
         {
-            var x = reader.ReadSingle();
-            var y = reader.ReadSingle();
-            BlockInstance inst = (BlockInstance) ReadObject(reader, typeof(BlockInstance));
-                
-            if (float.IsInfinity(x) || float.IsNaN(x) ||
-                float.IsInfinity(y) || float.IsNaN(y))
+            float x = reader.ReadSingle();
+            float y = reader.ReadSingle();
+            if (float.IsInfinity(x) || float.IsNaN(x) || float.IsInfinity(y) || float.IsNaN(y))
             {
-                if (debugLogs) Console.WriteLine($"Skipping invalid tile entry {i}: ({x}, {y})");
+                if (EnableLogs)
+                    Console.WriteLine($"Found invalid Vector2 values, skipping.");
                 continue;
             }
+            
+            T value = (T) ReadObject(reader, typeof(T));
+            if (value == null)
+            {
+                if (EnableLogs)
+                    Console.WriteLine($"Value is null while reading, skipping.");
+                continue;
+            }
+            
+            Vector2 vector = new Vector2(x, y);
+            if (EnableSpamLogs) 
+                Console.WriteLine($"Successfully read entry {i} of type Dictionary<Vector2, {typeof(T).Name}>: (Vector: {vector}, Value: {value})");
                 
-            if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), BlockInst ID: {inst.Id}");
-            tileDictionary.Add(new Vector2(x, y), inst);
+            resultDict.Add(vector, value);
         }
             
-        if (debugLogs) Console.WriteLine($"Successfully read {tileDictionary.Count} entries");
-        return tileDictionary;
+        return resultDict;
     }
     
-    public static void WriteStringDictionary(Dictionary<Vector2, string> dict, BinaryWriter writer, bool debugLogs = false) 
-    {
-        if (debugLogs) Console.WriteLine($"Writing Dictionary<Vector2, string> with {dict.Count} items");
-
-        writer.Write(dict.Count);
-        foreach (var keyValuePair in dict)
-        {
-            var vector = keyValuePair.Key;
-            var str = keyValuePair.Value;
-
-            if (debugLogs)
-            {
-                Console.WriteLine(vector == default
-                    ? "Couldn't write Vector2"
-                    : $"Writing Dictionary<Vector2, string> entry: Position({vector.X}, {vector.Y}), String: {str}");
-            }
-
-            writer.Write(vector.X);
-            writer.Write(vector.Y);
-            writer.Write(str);
-        }
-
-        if (debugLogs) Console.WriteLine($"Finished writing Dictionary at FileStream position: {writer.BaseStream.Position}");
-    }
-    
-    public static Dictionary<Vector2, string> ReadStringDictionary(BinaryReader reader, bool debugLogs = false) 
-    {
-        var dict = new Dictionary<Vector2, string>();
-        var count = reader.ReadInt32();
-        if (debugLogs) Console.WriteLine($"Reading block dictionary with {count} entries from FileStream position: {reader.BaseStream.Position}");
-        
-        for (int i = 0; i < count; i++)
-        {
-            var x = reader.ReadSingle();
-            var y = reader.ReadSingle();
-            var str = reader.ReadString();
-            
-            if (float.IsInfinity(x) || float.IsNaN(x) ||
-                float.IsInfinity(y) || float.IsNaN(y))
-            {
-                if (debugLogs) Console.WriteLine($"Skipping invalid string entry {i}: ({x}, {y})");
-                continue;
-            }
-            
-            if (string.IsNullOrEmpty(str))
-            {
-                if (debugLogs) Console.WriteLine("String is null or empty, skipping");
-                continue;
-            }
-            
-            if (debugLogs) Console.WriteLine($"Read entry {i}: Position({x}, {y}), string: {str}");
-            dict.Add(new Vector2(x, y), str);
-        }
-        
-        if (debugLogs) Console.WriteLine($"Successfully read {dict.Count} entries");
-        return dict;
-    }
+    public static Dictionary<Vector2, BlockInstance> ReadVector2BlockInstDictionary(BinaryReader reader) => ReadVector2Dictionary<BlockInstance>(reader);
+    public static Dictionary<Vector2, string> ReadVector2StringDictionary(BinaryReader reader) => ReadVector2Dictionary<string>(reader);
     
     public static void WriteObject(BinaryWriter writer, object value) 
     {
+        var type = value.GetType();
+        
+        if (_primitiveWriters.TryGetValue(type, out var writeAction)) 
+        {
+            writeAction(writer, value);
+            return;
+        }
+        
+        // handle special cases
         switch (value)
         {
-            case Dictionary<Vector2, BlockInstance> blockDict:
-                WriteBlockDictionary(blockDict, writer);
-                break;
-            case Dictionary<Vector2, string> stringDict:
-                WriteStringDictionary(stringDict, writer);
-                break;
-            case Vector2 vectorValue:
-                // write X and Y
-                writer.Write(vectorValue.X);
-                writer.Write(vectorValue.Y);
-                break;
-            case ushort[] ushortArrayValue:
-                writer.Write(ushortArrayValue.Length);
-                foreach (var item in ushortArrayValue)
-                {
-                    writer.Write(item);
-                }
-                break;
-            case Enum enumValue:
-                writer.Write(Convert.ToInt32(enumValue));
-                break;
-            case byte byteValue:
-                writer.Write(byteValue);
-                break;
-            case ushort ushortValue:
-                writer.Write(ushortValue);
-                break;
-            case int intValue:
-                writer.Write(intValue);
-                break;
-            case float floatValue:
-                writer.Write(floatValue);
-                break;
-            case double doubleValue:
-                writer.Write(doubleValue);
-                break;
-            case bool boolValue:
-                writer.Write(boolValue);
-                break;
-            case string stringValue:
-                writer.Write(stringValue);
-                break;
-            case ulong ulongValue:
-                writer.Write(ulongValue);
+            case Enum e:
+                writer.Write(Convert.ToInt32(e));
                 break;
             case BlockInstance inst:
                 writer.Write(inst.Id);
                 if (inst.Block is LiquidBlock liquid)
-                {
                     writer.Write(liquid.FlowLevel);
-                }
+                break;
+            case Dictionary<Vector2, BlockInstance> d:
+                WriteVector2BlockInstDictionary(d, writer);
+                break;
+            case Dictionary<Vector2, string> d:
+                WriteVector2StringDictionary(d, writer);
+                break;
+            // fallback call for dictionaries, slower than known types
+            case IDictionary dict when type.IsGenericType // if the type is dictionary
+            && type.GetGenericTypeDefinition() == typeof(Dictionary<,>) // check if it is a Dictionary<,> with 2 type parameters
+            && type.GetGenericArguments()[0] == typeof(Vector2): // [0] - key, [1] - value. check if key is Vector2
+                var valueType = type.GetGenericArguments()[1]; // get the value type
+                
+                // find the method by name and creates a generic version like WriteVector2Dictionary<valueType>
+                var method = typeof(Saving).GetMethod(nameof(WriteVector2Dictionary))!.MakeGenericMethod(valueType);
+                method.Invoke(null, [dict, writer]);
                 break;
         }
     }
     
-    /// <summary>
-    /// Writes to a file at filePath state's class data. Supports: <c> Dictionary&lt;Vector2, ushort&gt;</c>,
-    /// <c> Vector2</c>, <c> ushort[]</c>, <c> enum values</c>, <c> byte</c>, <c> ushort</c>,
-    /// <c> int</c>, <c> float</c>, <c> double</c>, <c> bool</c>, <c> string</c>
-    /// </summary>
-    /// <param name="filePath"></param>
-    /// <param name="state">Serializable state class</param>
-    /// <param name="debugLogs">If <c>true</c> prints debugging logs in the console</param>
-    /// <typeparam name="T"></typeparam>
-    public static void Save<T>(string filePath, T state, bool debugLogs = false)
-    {
-        if (state == null) return;
-
-        using FileStream fs = File.Open(filePath, FileMode.Create);
-        using (BinaryWriter writer = new BinaryWriter(fs))
-        {
-            PropertyInfo[] properties = typeof(T).GetProperties()
-                .OrderBy(p => p.MetadataToken)
-                .ToArray();
-
-            foreach (PropertyInfo property in properties)
-            {
-                if (property.GetCustomAttribute<NoSaveAttribute>() != null)
-                    continue;
-                    
-                object? value = property.GetValue(state);
-                if (value == null) continue;
-
-                if (debugLogs)
-                {
-                    Console.WriteLine($"\nInspecting property {property.Name}");
-                    Console.WriteLine($"Property type: {property.PropertyType.FullName}");
-                }
-
-                WriteObject(writer, value);   
-            }
-        }
-    }
-
-    /// <summary>
-    /// Loads state class data (must be empty constructor) from a file and returns state with loaded parameters
-    /// </summary>
-    /// <param name="filePath"></param>
-    /// <param name="debugLogs">If <c>true</c> prints debugging logs in the console</param>
-    /// <param name="readCondition">If Func returns true, then it continues to read properties. Otherwise <strong>breaks</strong> and stops reading</param>
-    /// <typeparam name="T">Serializable state class with empty constructor</typeparam>
-    /// <returns>State class with loaded parameters from the file. Returns empty if file doesn't exist</returns>
-    private static T LoadWithCondition<T>(string filePath, Func<PropertyInfo, bool> readCondition, bool debugLogs = false) where T : new()
-    {
-        T state = new T();
-        
-        using FileStream fs = File.Open(filePath, FileMode.Open);
-        using (BinaryReader reader = new BinaryReader(fs))
-        {
-            PropertyInfo[] properties = typeof(T).GetProperties()
-                .OrderBy(p => p.MetadataToken)
-                .ToArray();
-                
-            foreach (PropertyInfo property in properties)
-            {
-                if (!readCondition(property)) break;
-                
-                try
-                {
-                    Type propertyType = property.PropertyType;
-                    object value = ReadValue(reader, propertyType, debugLogs);
-                    property.SetValue(state, value);
-                }
-                catch (EndOfStreamException)
-                {
-                    // legacy save without this property -> stop reading further properties
-                    break;
-                }
-            }
-        }
-
-        return state;
-    }
-    
-    /// <summary>
-    /// <inheritdoc cref="LoadWithCondition"/>
-    /// </summary>
-    public static T Load<T>(string filePath, bool debugLogs = false) where T : new() => LoadWithCondition<T>(filePath, (p) => true, debugLogs);
-    /// <summary>
-    /// Loads only essential properties (marked with <c>EssentialAttribute</c>). For proper load these properties must be listed first in a class declaration
-    /// </summary>
-    public static T LoadLightweight<T>(string filePath, bool debugLogs = false) where T : new() => LoadWithCondition<T>(filePath, (p) => p.GetCustomAttribute<EssentialPropertyAttribute>() != null, debugLogs);
-    
     public static object ReadObject(BinaryReader reader, Type type) 
     {
-        if (type == typeof(Dictionary<Vector2, BlockInstance>))
+        if (_primitiveReaders.TryGetValue(type, out var readerFunc)) 
         {
-            return ReadBlockDictionary(reader);
-        }
-        
-        if (type == typeof(Dictionary<Vector2, string>))
-        {
-            return ReadStringDictionary(reader);
+            return readerFunc(reader);
         }
         
         if (type == typeof(Vector2))
@@ -299,7 +182,7 @@ public static class Saving
                         
             for (int i = 0; i < length; i++)
             {
-                array.SetValue(ReadValue(reader, elementType), i);
+                array.SetValue(ReadObject(reader, elementType), i);
             }
 
             return array;
@@ -326,26 +209,102 @@ public static class Saving
             return new BlockInstance(block, 0);
         }
         
-        switch (Type.GetTypeCode(type))
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>) 
+        && type.GetGenericArguments()[0] == typeof(Vector2)) 
         {
-            case TypeCode.Byte: return reader.ReadByte();
-            case TypeCode.UInt16: return reader.ReadUInt16();
-            case TypeCode.Int32: return reader.ReadInt32();
-            case TypeCode.Single: return reader.ReadSingle();
-            case TypeCode.Double: return reader.ReadDouble();
-            case TypeCode.Boolean: return reader.ReadBoolean();
-            case TypeCode.String: return reader.ReadString();
-            case TypeCode.UInt64: return reader.ReadUInt64();
+            Type valueType = type.GetGenericArguments()[1];
+            var method = typeof(Saving).GetMethod(nameof(ReadVector2Dictionary))!.MakeGenericMethod(valueType);
+            return method.Invoke(null, [reader])!;
         }
 
         throw new ArgumentException($"Unsupported type: {type.Name} (Full name: {type.FullName})");
     }
-
-    private static object ReadValue(BinaryReader reader, Type type, bool debugLogs = false)
+    
+    /// <summary>
+    /// Writes to a file at filePath state's class data. Supports: <c> Dictionary&lt;Vector2, ushort&gt;</c>,
+    /// <c> Vector2</c>, <c> ushort[]</c>, <c> enum values</c>, <c> byte</c>, <c> ushort</c>,
+    /// <c> int</c>, <c> float</c>, <c> double</c>, <c> bool</c>, <c> string</c>
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="state">Serializable state class</param>
+    /// <typeparam name="T"></typeparam>
+    public static void Save<T>(string filePath, T state)
     {
-        if (debugLogs) Console.WriteLine($"Reading type: {type.FullName}");
-        return ReadObject(reader, type);
+        if (state == null) return;
+
+        using FileStream fs = File.Open(filePath, FileMode.Create);
+        using (BinaryWriter writer = new BinaryWriter(fs))
+        {
+            PropertyInfo[] properties = typeof(T).GetProperties()
+                .OrderBy(p => p.MetadataToken)
+                .ToArray();
+
+            foreach (PropertyInfo property in properties)
+            {
+                if (property.GetCustomAttribute<NoSaveAttribute>() != null)
+                    continue;
+                    
+                object? value = property.GetValue(state);
+                if (value == null) continue;
+
+                if (EnableSpamLogs)
+                {
+                    Console.WriteLine($"\nInspecting property {property.Name}");
+                    Console.WriteLine($"Property type: {property.PropertyType.FullName}");
+                }
+
+                WriteObject(writer, value);   
+            }
+        }
     }
+
+    /// <summary>
+    /// Loads state class data (must be empty constructor) from a file and returns state with loaded parameters
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="readCondition">If Func returns true, then it continues to read properties. Otherwise <strong>breaks</strong> and stops reading</param>
+    /// <typeparam name="T">Serializable state class with empty constructor</typeparam>
+    /// <returns>State class with loaded parameters from the file. Returns empty if file doesn't exist</returns>
+    private static T LoadWithCondition<T>(string filePath, Func<PropertyInfo, bool> readCondition) where T : new()
+    {
+        T state = new T();
+        
+        using FileStream fs = File.Open(filePath, FileMode.Open);
+        using (BinaryReader reader = new BinaryReader(fs))
+        {
+            PropertyInfo[] properties = typeof(T).GetProperties()
+                .OrderBy(p => p.MetadataToken)
+                .ToArray();
+                
+            foreach (PropertyInfo property in properties)
+            {
+                if (!readCondition(property)) break;
+                
+                try
+                {
+                    Type propertyType = property.PropertyType;
+                    object value = ReadObject(reader, propertyType);
+                    property.SetValue(state, value);
+                }
+                catch (EndOfStreamException)
+                {
+                    // legacy save without this property -> stop reading further properties
+                    break;
+                }
+            }
+        }
+
+        return state;
+    }
+    
+    /// <summary>
+    /// <inheritdoc cref="LoadWithCondition"/>
+    /// </summary>
+    public static T Load<T>(string filePath) where T : new() => LoadWithCondition<T>(filePath, (p) => true);
+    /// <summary>
+    /// Loads only essential properties (marked with <c>EssentialAttribute</c>). For proper load these properties must be listed first in a class declaration
+    /// </summary>
+    public static T LoadLightweight<T>(string filePath) where T : new() => LoadWithCondition<T>(filePath, (p) => p.GetCustomAttribute<EssentialPropertyAttribute>() != null);
     
     /// <summary>
     /// Gets a type code for custom serialization

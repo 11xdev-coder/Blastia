@@ -1,4 +1,5 @@
 using System.Numerics;
+using Blastia.Main.Persistence;
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.UI.Warnings;
 using Blastia.Main.Utilities;
@@ -317,9 +318,9 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		string name = _name.StringBuilder.ToString();
 		BigInteger seed = BigInteger.Parse(_seed.StringBuilder.ToString());
 
-		if (!PlayerNWorldManager.Instance.WorldExists(name))
+		if (!WorldManager.Instance.WorldExists(name))
 		{
-			PlayerNWorldManager.Instance.NewWorld(name, seed, difficulty, width, height);	
+			WorldManager.Instance.NewWorld(name, seed, difficulty, width, height);	
 			SwitchToMenu(BlastiaGame.GetMenu<WorldGenerationStatusMenu>());
 		}
 		else
