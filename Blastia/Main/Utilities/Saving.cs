@@ -225,35 +225,45 @@ public static class Saving
     /// <c> Vector2</c>, <c> ushort[]</c>, <c> enum values</c>, <c> byte</c>, <c> ushort</c>,
     /// <c> int</c>, <c> float</c>, <c> double</c>, <c> bool</c>, <c> string</c>
     /// </summary>
-    /// <param name="filePath"></param>
-    /// <param name="state">Serializable state class</param>
-    /// <typeparam name="T"></typeparam>
     public static void Save<T>(string filePath, T state)
     {
+        // the idea is to save properties with a temp buffer to measure its length
+        // write its length so we can correctly skip over the property
+        
         if (state == null) return;
 
         using FileStream fs = File.Open(filePath, FileMode.Create);
         using (BinaryWriter writer = new BinaryWriter(fs))
         {
-            PropertyInfo[] properties = typeof(T).GetProperties()
-                .OrderBy(p => p.MetadataToken)
-                .ToArray();
-
+            PropertyInfo[] properties = state.GetType().GetProperties().ToArray();
+            
             foreach (PropertyInfo property in properties)
             {
+                // skip with NoSave tag
                 if (property.GetCustomAttribute<NoSaveAttribute>() != null)
                     continue;
-                    
+                
                 object? value = property.GetValue(state);
-                if (value == null) continue;
-
-                if (EnableSpamLogs)
+                bool present = value != null;
+                
+                // empty buffer
+                byte[] buffer = Array.Empty<byte>();
+                if (present) 
                 {
-                    Console.WriteLine($"\nInspecting property {property.Name}");
-                    Console.WriteLine($"Property type: {property.PropertyType.FullName}");
+                    using MemoryStream tempMS = new MemoryStream();
+                    using (BinaryWriter tempWriter = new BinaryWriter(tempMS)) 
+                    {
+                        WriteObject(tempWriter, value!);
+                        tempWriter.Flush(); // writer may keep some bytes so flush them all out
+                        buffer = tempMS.ToArray();
+                    }                    
                 }
-
-                WriteObject(writer, value);   
+                
+                // name, present byte, value length and value
+                writer.Write(property.Name);
+                writer.Write(present);
+                writer.Write(buffer.Length);
+                writer.Write(buffer);
             }
         }
     }
@@ -262,35 +272,48 @@ public static class Saving
     /// Loads state class data (must be empty constructor) from a file and returns state with loaded parameters
     /// </summary>
     /// <param name="filePath"></param>
-    /// <param name="readCondition">If Func returns true, then it continues to read properties. Otherwise <strong>breaks</strong> and stops reading</param>
+    /// <param name="readCondition">If true - read the property, otherwise skips over it</param>
     /// <typeparam name="T">Serializable state class with empty constructor</typeparam>
-    /// <returns>State class with loaded parameters from the file. Returns empty if file doesn't exist</returns>
+    /// <returns>State class with loaded parameters from the file. Throws <c>FileNotFoundException</c> if file is missing. </returns>
     private static T LoadWithCondition<T>(string filePath, Func<PropertyInfo, bool> readCondition) where T : new()
     {
+        // here we can just skip over if the property doesnt satisfy read condition
+        // dont care about order
+        
         T state = new T();
+        
+        // create a dictionary: property name - property info
+        // fixes multiple properties with the same name -> GroupBy gathers into groups from a list
+        // e.g given [Prop1, Prop2, Prop3, Prop2] returns = {Prop1 -> [Prop1], Prop2 -> [Prop2, Prop2], Prop3 -> [Prop3]}
+        // ToDictionary(Key, Value) -> as key we pass group's key (g.Key) and value = first value of the group
+        // so we get = Prop1: Prop1, Prop2: Prop2, Prop3: Prop3 (fixed duplicate names!)
+        Dictionary<string, PropertyInfo> map = typeof(T).GetProperties().GroupBy(p => p.Name).ToDictionary(g => g.Key, g => g.First());
         
         using FileStream fs = File.Open(filePath, FileMode.Open);
         using (BinaryReader reader = new BinaryReader(fs))
         {
-            PropertyInfo[] properties = typeof(T).GetProperties()
-                .OrderBy(p => p.MetadataToken)
-                .ToArray();
-                
-            foreach (PropertyInfo property in properties)
+            while (fs.Position < fs.Length) 
             {
-                if (!readCondition(property)) break;
+                string propertyName = reader.ReadString();
+                bool present = reader.ReadBoolean();
+                int length = reader.ReadInt32();
                 
-                try
+                long dataStart = fs.Position;
+                
+                PropertyInfo? info = null;
+                bool shouldLoad = present &&
+                                    map.TryGetValue(propertyName, out info) && // if we have a property with this name in T class
+                                    info.GetCustomAttribute<NoSaveAttribute>() == null && // no 'NoSave' tag
+                                    readCondition(info); // we want this property
+                                    
+                if (shouldLoad && info != null) 
                 {
-                    Type propertyType = property.PropertyType;
-                    object value = ReadObject(reader, propertyType);
-                    property.SetValue(state, value);
+                    object value = ReadObject(reader, info.PropertyType);
+                    info.SetValue(state, value);
                 }
-                catch (EndOfStreamException)
-                {
-                    // legacy save without this property -> stop reading further properties
-                    break;
-                }
+                
+                // move relative to the beginning (pos before read + length = pos after read)
+                fs.Seek(dataStart + length, SeekOrigin.Begin);
             }
         }
 
