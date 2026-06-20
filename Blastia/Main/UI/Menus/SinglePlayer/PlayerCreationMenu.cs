@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Blastia.Main.Persistence;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
@@ -33,10 +34,10 @@ public class PlayerCreationMenu(SpriteFont font, bool isActive = false) : Creati
 		if (NameInput?.Text == null) return;
 		string playerName = NameInput.StringBuilder.ToString();
 
-		if (!PlayerNWorldManager.Instance.PlayerExists(playerName))
+		if (!PlayerManager.Instance.PlayerExists(playerName))
 		{
 			// create player if doesnt exist
-			PlayerNWorldManager.Instance.NewPlayer(NameInput.StringBuilder.ToString());
+			PlayerManager.Instance.NewPlayer(NameInput.StringBuilder.ToString());
 			
 			Back(); // go back
 		}

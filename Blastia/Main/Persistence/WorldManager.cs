@@ -156,7 +156,7 @@ public class WorldState : State
 	/// <param name="checkDistance">Distance to check for tile below</param>
 	/// <param name="layer"></param>
 	/// <returns>Tuple containing tile ID and coordinates, returns <c>(BlockId.Air, 0, 0)</c> if none found</returns>
-	private (BlockInstance? inst, int x, int y) GetFirstTileBelowWithCoords(float entityLeftX, float entityBottomY,
+	public (BlockInstance? inst, int x, int y) GetFirstTileBelowWithCoords(float entityLeftX, float entityBottomY,
 		float entityWidthPixels, float checkDistance, TileLayer layer)
 	{
 		var checkWorldY = (int) (entityBottomY + checkDistance);

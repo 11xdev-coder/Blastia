@@ -3,6 +3,7 @@ using Blastia.Main.Entities;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.Persistence;
 using Microsoft.Xna.Framework;
 using NAudio.MediaFoundation;
 using Steamworks;
@@ -38,18 +39,18 @@ public static class NetworkEntitySync
     /// <param name="clientConnection"></param>
     public static void OnClientJoined(CSteamID clientId, HSteamNetConnection clientConnection)
     {
-        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || PlayerNWorldManager.Instance.SelectedWorld == null
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.IsHost || WorldManager.Instance.WorldState == null
         || _worldFactory == null || _addToPlayersListMethod == null || _playersFactory == null || _myPlayerFactory == null || _entitiesFactory == null) return;
 
         var clientName = SteamFriends.GetFriendPersonaName(clientId);
 
         // Create a not locally controlled player for the client
-        var clientPlayer = new Player(PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint(), _worldFactory(), Entity.PlayerScale, false)
+        var clientPlayer = new Player(WorldManager.Instance.WorldState.Spawn, _worldFactory(), Entity.PlayerScale, false)
         {
             SteamId = clientId,
             LocallyControlled = false,
             Name = clientName,
-            NetworkPosition = PlayerNWorldManager.Instance.SelectedWorld.GetSpawnPoint()
+            NetworkPosition = WorldManager.Instance.WorldState.Spawn
         };
 
         _addToPlayersListMethod(clientPlayer);

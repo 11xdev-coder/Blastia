@@ -175,8 +175,6 @@ public class BlastiaGame : Game
         // load audio manager
         AudioManager.Instance.Initialize();
         AudioManager.Instance.LoadStateFromFile<AudioManagerState>();
-        // load player manager
-        PlayerNWorldManager.Instance.Initialize();
         Console.WriteLine($"Save game directory: {Paths.GetSaveGameDirectory()}");
 
         ExitRequestEvent += OnExitRequested;
@@ -382,7 +380,7 @@ public class BlastiaGame : Game
                         if (KeyboardHelper.IsKeyJustPressed(Keys.G)) World.DrawRulerLine();
                     }
 
-                    var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+                    var worldState = WorldManager.Instance.WorldState;
                     if (worldState != null)
                     {
                         // then add tiles and update tiles
@@ -572,7 +570,7 @@ public class BlastiaGame : Game
     /// <returns></returns>
     private (ushort blockId, int flowLevel) CaptureBlockState(BlockInstance inst, Vector2 position)
     {
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
 
         // get the actual block ID from the world (this detects if block was created/destroyed during update)
         var actualBlockId = worldState?.GetTile((int)position.X, (int)position.Y, inst.Block.GetLayer()) ?? 0;
@@ -704,7 +702,7 @@ public class BlastiaGame : Game
         GraphicsDevice.Clear(Color.CornflowerBlue);
         BeginSpriteBatch(SpriteBatch);
 
-        if (IsWorldInitialized && PlayerNWorldManager.Instance.SelectedWorld != null)
+        if (IsWorldInitialized && WorldManager.Instance.WorldState != null)
         {
             // reset camera to only what this player sees
             if (_myPlayer?.Camera != null && _myCachedTiles != null)
@@ -714,7 +712,7 @@ public class BlastiaGame : Game
 
             // first ground
             _myPlayer?.Camera?.RenderGroundTiles(SpriteBatch, WorldManager.Instance.WorldState);
-            if (World is { DrawCollisionGrid: true }) _myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
+            if (World is { DrawCollisionGrid: true }) _myPlayer?.Camera?.RenderSpatialGrid(SpriteBatch, WorldManager.Instance.WorldState);
 
             // then entities
             _myPlayer?.Camera?.RenderEntity(SpriteBatch, _myPlayer);
@@ -729,7 +727,7 @@ public class BlastiaGame : Game
             }
 
             // then liquids and furniture
-            _myPlayer?.Camera?.RenderFurnitureThenLiquids(SpriteBatch, PlayerNWorldManager.Instance.SelectedWorld);
+            _myPlayer?.Camera?.RenderFurnitureThenLiquids(SpriteBatch, WorldManager.Instance.WorldState);
 
             // after updating and drawing each entity one time, remove ones that are scheduled
             foreach (var entityToRemove in _entitiesToRemove)
@@ -803,12 +801,12 @@ public class BlastiaGame : Game
     public static void RequestWorldInitialization() => RequestWorldInitializationEvent?.Invoke();
     private void InitializeWorld()
     {
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState == null) return;
 
         World = new World(worldState, _entities.AsReadOnly(), _players.AsReadOnly());
         //worldState.SetSpawnPoint(1600, 468);
-        _myPlayer = new Player(worldState.GetSpawnPoint(), World, Entity.PlayerScale, true);
+        _myPlayer = new Player(worldState.Spawn, World, Entity.PlayerScale, true);
         World.SetPlayer(_myPlayer);
 
         foreach (var menu in _menus)
@@ -874,10 +872,10 @@ public class BlastiaGame : Game
     private void UnloadWorld()
     {
         // save world state before unloading
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState != null)
         {
-            var savePath = Path.Combine(PlayerNWorldManager.Instance.WorldsSaveFolder, worldState.Name + ".bmwld");
+            var savePath = Path.Combine(WorldManager.WorldsSaveFolder, worldState.Name + WorldManager.Extension);
             Saving.Save(savePath, worldState);
         }
 
@@ -892,8 +890,8 @@ public class BlastiaGame : Game
         ConsoleWindow?.UnloadWorldCommands();
 
         // unselect
-        PlayerNWorldManager.Instance.UnselectPlayer();
-        PlayerNWorldManager.Instance.UnselectWorld();
+        PlayerManager.Instance.UnselectPlayer();
+        WorldManager.Instance.UnselectWorld();
 
         IsWorldInitialized = false;
         World?.Unload();

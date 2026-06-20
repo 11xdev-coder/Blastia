@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Networking;
+using Blastia.Main.Persistence;
 using Blastia.Main.UI.Buttons;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -46,7 +47,7 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
 
     private void SaveText()
     {
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (worldState == null || SignPosition == Vector2.Zero || SignText == null) return;
 
         // set world state sign text
@@ -68,7 +69,7 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
         Active = false;
         
         // fallback to original text
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (SignText == null || worldState == null) return;
         
         worldState.SignTexts.TryGetValue(SignPosition, out var originalText);
@@ -79,7 +80,7 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
 
     public void UpdateText()
     {
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (SignText == null || worldState == null) return;
         
         worldState.SignTexts.TryGetValue(SignPosition, out var text);
@@ -90,7 +91,7 @@ public class InGameSignEditMenu(SpriteFont font, bool isActive = false) : Menu(f
     {
         base.Update();
         
-        var worldState = PlayerNWorldManager.Instance.SelectedWorld;
+        var worldState = WorldManager.Instance.WorldState;
         if (_closeButton == null || worldState == null) return;
         worldState.SignTexts.TryGetValue(SignPosition, out var originalText);
         var currentText = SignText?.StringBuilder.ToString();

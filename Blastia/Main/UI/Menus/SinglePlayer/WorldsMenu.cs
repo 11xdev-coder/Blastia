@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Blastia.Main.Persistence;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
@@ -31,10 +32,10 @@ public class WorldsMenu : CollectionMenu
 		SwitchToMenu(BlastiaGame.GetMenu<PlayersMenu>());
 	}
 	
-	protected override IEnumerable<object> LoadItems() => PlayerNWorldManager.Instance.LoadAllWorlds();
+	protected override IEnumerable<object> LoadItems() => WorldManager.Instance.LoadAllWorlds();
 
 	protected override void SelectItem(object worldState)
 	{
-		PlayerNWorldManager.Instance.SelectWorld((WorldState) worldState, Host);
+		WorldManager.Instance.SelectWorld((WorldState) worldState, Host);
 	}	
 }

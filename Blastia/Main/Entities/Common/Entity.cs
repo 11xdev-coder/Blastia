@@ -3,6 +3,7 @@ using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
 using Blastia.Main.Networking;
+using Blastia.Main.Persistence;
 using Blastia.Main.Physics;
 using Blastia.Main.Sounds;
 using Blastia.Main.Utilities;
@@ -330,7 +331,7 @@ public abstract class Entity : Object
     
     private void UpdatePosition()
     {
-        var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
+        var currentWorld = WorldManager.Instance.WorldState;
         var deltaTime = (float) BlastiaGame.GameTimeElapsedSeconds;
         if (currentWorld == null || deltaTime < 0)
         {
@@ -427,10 +428,10 @@ public abstract class Entity : Object
         }
 
         // is on ground check
-        var strictTileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f, TileLayer.Ground);
+        var strictTileBelow = currentWorld.GetFirstTileBelowWithCoords(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 1f, TileLayer.Ground).inst;
         IsGrounded = strictTileBelow != null && strictTileBelow.Block.IsCollidable;
         
-        var tileBelow = currentWorld.GetBlockInstanceBelow(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 3f, TileLayer.Ground);
+        var tileBelow = currentWorld.GetFirstTileBelowWithCoords(entityBounds.Left, entityBounds.Bottom, entityBounds.Width, 3f, TileLayer.Ground).inst;
         CanJump = tileBelow != null && tileBelow.Block.IsCollidable;
         
         var dragCoefficient = IsGrounded
@@ -492,7 +493,7 @@ public abstract class Entity : Object
     {
         if (!ApplyGravity || IsGrounded) return;
          
-        var currentWorld = PlayerNWorldManager.Instance.SelectedWorld;
+        var currentWorld = WorldManager.Instance.WorldState;
         if (currentWorld == null) return;
         
         var worldMass = World.GetMass();

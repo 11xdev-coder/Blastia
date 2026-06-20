@@ -1,4 +1,5 @@
 using System.Reflection.Emit;
+using Blastia.Main.Persistence;
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -34,7 +35,7 @@ public class ChatInputMenu(SpriteFont font, bool isActive = false) : Menu(font, 
         if (KeyboardHelper.IsKeyJustPressed(Keys.Enter)) 
         {
             // send message
-            var selectedPlayerName = PlayerNWorldManager.Instance.GetSelectedPlayerName();
+            var selectedPlayerName = PlayerManager.Instance.PlayerState.Name;
             BlastiaGame.GetMenu<ChatMessagesMenu>()?.AddMessage(selectedPlayerName, ChatInput?.StringBuilder.ToString());
             
             // turn chat off

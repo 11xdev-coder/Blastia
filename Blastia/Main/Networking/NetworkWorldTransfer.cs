@@ -19,7 +19,7 @@ public class WorldChunk
     public int ChunkIndex { get; set; }
     public int TotalChunks { get; set; }
     public TileLayer Layer { get; set; }
-    public Dictionary<Vector2, NetworkBlockInstance> Instances { get; set; } = [];
+    public Dictionary<Vector2, NetworkBlockInstance> Blocks { get; set; } = [];
 }
 
 /// <summary>
@@ -121,10 +121,9 @@ public static class NetworkWorldTransfer
             writer.Write(chunk.ChunkIndex);
             writer.Write(chunk.TotalChunks);
             writer.Write((byte) chunk.Layer);
-            Saving.WriteTileDictionary(chunk.Tiles, writer);
             
-            writer.Write(chunk.Instances.Count);
-            foreach (var kvp in chunk.Instances)
+            writer.Write(chunk.Blocks.Count);
+            foreach (var kvp in chunk.Blocks)
             {
                 writer.Write(kvp.Key.X);
                 writer.Write(kvp.Key.Y);
@@ -150,7 +149,6 @@ public static class NetworkWorldTransfer
             chunk.ChunkIndex = reader.ReadInt32();
             chunk.TotalChunks = reader.ReadInt32();
             chunk.Layer = (TileLayer) reader.ReadByte();
-            chunk.Tiles = Saving.ReadTileDictionary(reader);
             
             var instCount = reader.ReadInt32();
             var instDict = new Dictionary<Vector2, NetworkBlockInstance>(instCount);
@@ -162,7 +160,7 @@ public static class NetworkWorldTransfer
                 instDict.Add(vector, inst);
             }
 
-            chunk.Instances = instDict;
+            chunk.Blocks = instDict;
         }
 
         return chunk;
@@ -213,20 +211,18 @@ public static class NetworkWorldTransfer
             Difficulty = worldState.Difficulty,
             WorldWidth = worldState.WorldWidth,
             WorldHeight = worldState.WorldHeight,
-            SpawnX = worldState.Spawn.X,
-            SpawnY = worldState.Spawn.Y,
+            Spawn = worldState.Spawn,
             SignTexts = worldState.SignTexts
         };
         
         var allChunks = new List<WorldChunk>();
         
         // create all chunks for all layers
-        // TODO: Instances is <Vector2, BlockInstance> -> convert to <Vector2, ushort>
-        var groundChunks = CreateChunksForLayer(worldState.GroundTiles, worldState.GroundInstances, TileLayer.Ground);
+        var groundChunks = CreateChunksForLayer(worldState.GroundLayer.Instances, TileLayer.Ground);
         allChunks.AddRange(groundChunks);
-        var liquidChunks = CreateChunksForLayer(worldState.LiquidTiles, worldState.LiquidInstances, TileLayer.Liquid);
+        var liquidChunks = CreateChunksForLayer(worldState.LiquidLayer.Instances, TileLayer.Liquid);
         allChunks.AddRange(liquidChunks);
-        var furnitureChunks = CreateChunksForLayer(worldState.FurnitureTiles, worldState.FurnitureInstances, TileLayer.Furniture);
+        var furnitureChunks = CreateChunksForLayer(worldState.FurnitureLayer.Instances, TileLayer.Furniture);
         allChunks.AddRange(furnitureChunks);
         
         // update data total chunks
@@ -301,8 +297,7 @@ public static class NetworkWorldTransfer
             chunks.Add(new WorldChunk
             {
                 Layer = layer,
-                Tiles = [],
-                Instances = []
+                Blocks = []
             });
             return chunks;
         }
@@ -310,25 +305,20 @@ public static class NetworkWorldTransfer
         var currentChunk = new WorldChunk
         {
             Layer = layer,
-            Tiles = [],
-            Instances = []
+            Blocks = []
         };
         var tilesInCurrentChunk = 0;
 
         Console.WriteLine($"[NetworkWorldTransfer] Creating chunks for layer {layer} with {ConservativeMaxTiles} max tiles per chunk");
         
-        foreach (var kvp in tiles)
+        foreach (var kvp in instances)
         {
             var position = kvp.Key;
-            var tileId = kvp.Value;
-
-            currentChunk.Tiles[position] = tileId;
-            if (instances.TryGetValue(position, out var inst))
-            {
-                var networkInst = new NetworkBlockInstance();
-                networkInst.FromBlockInstance(inst);
-                currentChunk.Instances[position] = networkInst;
-            }
+            var inst = kvp.Value;
+            
+            var networkInst = new NetworkBlockInstance();
+            networkInst.FromBlockInstance(inst);
+            currentChunk.Blocks[position] = networkInst;
 
             tilesInCurrentChunk += 1;
             
@@ -341,8 +331,7 @@ public static class NetworkWorldTransfer
                 currentChunk = new WorldChunk
                 {
                     Layer = layer,
-                    Tiles = [],
-                    Instances = []
+                    Blocks = []
                 };
                 tilesInCurrentChunk = 0;
             }
@@ -379,7 +368,7 @@ public static class NetworkWorldTransfer
             Difficulty = worldData.Difficulty,
             WorldWidth = worldData.WorldWidth,
             WorldHeight = worldData.WorldHeight,
-            Spawn = new Vector2(worldData.SpawnX, worldData.SpawnY),
+            Spawn = worldData.Spawn,
             SignTexts = worldData.SignTexts
         };
         
@@ -437,38 +426,29 @@ public static class NetworkWorldTransfer
                 // apply chunk data to appropriate layer
                 switch (chunk.Layer)
                 {
-                    case TileLayer.Ground:
-                        foreach (var kvp in chunk.Tiles)
-                            _clientWorldStateBuffer.GroundTiles[kvp.Key] = kvp.Value;
-                        
-                        foreach (var kvp in chunk.Instances)
-                            _clientWorldStateBuffer.GroundInstances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
+                    case TileLayer.Ground:                        
+                        foreach (var kvp in chunk.Blocks)
+                            _clientWorldStateBuffer.GroundLayer.Instances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
                         break;
                     case TileLayer.Liquid:
-                        foreach (var kvp in chunk.Tiles)
-                            _clientWorldStateBuffer.LiquidTiles[kvp.Key] = kvp.Value;
-                        
-                        foreach (var kvp in chunk.Instances)
-                            _clientWorldStateBuffer.LiquidInstances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
+                        foreach (var kvp in chunk.Blocks)
+                            _clientWorldStateBuffer.LiquidLayer.Instances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
                         break;
                     case TileLayer.Furniture:
-                        foreach (var kvp in chunk.Tiles)
-                            _clientWorldStateBuffer.FurnitureTiles[kvp.Key] = kvp.Value;
-                        
-                        foreach (var kvp in chunk.Instances)
-                            _clientWorldStateBuffer.FurnitureInstances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
+                        foreach (var kvp in chunk.Blocks)
+                            _clientWorldStateBuffer.FurnitureLayer.Instances[kvp.Key] = kvp.Value.ToBlockInstance() ?? throw new NullReferenceException("[NetworkWorldTransfer] Block instance cannot be null");
                         break;
                 }
             }
         }
         
         Console.WriteLine("[NetworkWorldTransfer] World reconstruction completed");
-        Console.WriteLine($"  - Ground: {_clientWorldStateBuffer.GroundTiles.Count} tiles");
-        Console.WriteLine($"  - Liquid: {_clientWorldStateBuffer.LiquidTiles.Count} tiles");
-        Console.WriteLine($"  - Furniture: {_clientWorldStateBuffer.FurnitureTiles.Count} tiles");
+        Console.WriteLine($"  - Ground: {_clientWorldStateBuffer.GroundLayer.Instances.Count} tiles");
+        Console.WriteLine($"  - Liquid: {_clientWorldStateBuffer.LiquidLayer.Instances.Count} tiles");
+        Console.WriteLine($"  - Furniture: {_clientWorldStateBuffer.FurnitureLayer.Instances.Count} tiles");
         
         // apply
-        PlayerNWorldManager.Instance.SelectWorld(_clientWorldStateBuffer, false);
+        WorldManager.Instance.SelectWorld(_clientWorldStateBuffer, false);
         
         // cleanup
         _clientWorldStateBuffer = null;
