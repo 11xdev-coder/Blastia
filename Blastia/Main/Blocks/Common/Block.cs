@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Blastia.Main.Entities;
 using Blastia.Main.Entities.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
@@ -312,5 +313,35 @@ public class BlockInstance
 
 		var blockDestroySourceRectangle = GetBlockDestroySourceRectangle();
 		spriteBatch.Draw(BlastiaGame.TextureManager.Get("BlockDestroy", "Blocks"), destRectangle, blockDestroySourceRectangle, Color.White);
+	}
+	
+	public void Write(BinaryWriter writer) 
+	{
+	    writer.Write(Id);
+	    
+	    bool isLiquid = Block is LiquidBlock;
+	    writer.Write(isLiquid);
+	    if (isLiquid)
+	    	writer.Write(((LiquidBlock) Block).FlowLevel);
+	}
+	
+	public static BlockInstance Read(BinaryReader reader) 
+	{
+	    ushort id = reader.ReadUInt16();
+	    Block block = StuffRegistry.GetBlock(id) ?? throw new Exception($"Reading BlockInstance: block with ID {id} not found in registry");
+	    
+	    bool isLiquid = reader.ReadBoolean();
+	    
+	    if (isLiquid) 
+	    {
+	        if (block is not LiquidBlock liquid)
+	        	throw new Exception($"Reading BlockInstance: Liquid flag mismatch - read value is true but in registry block is not a liquid");
+	        
+	        var liquidClone = liquid.CreateNewInstance();
+			liquidClone.FlowLevel = reader.ReadInt32();
+			block = liquidClone;
+	    }
+	    
+	    return new BlockInstance(block, 0);
 	}
 }

@@ -801,6 +801,10 @@ public class BlastiaGame : Game
     public static void RequestWorldInitialization() => RequestWorldInitializationEvent?.Invoke();
     private void InitializeWorld()
     {
+		// hide join game menu whenever in a world
+		GetMenu<JoinGameMenu>().SetActive(false);
+		GetMenu<JoinGameMenu>()?.ToggleStatusText(false);
+		
         var worldState = WorldManager.Instance.WorldState;
         if (worldState == null) return;
 

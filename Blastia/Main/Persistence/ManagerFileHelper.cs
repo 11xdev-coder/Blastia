@@ -34,7 +34,7 @@ public static class ManagerFileHelper
 	}
 
 	public static List<T> LoadAll<T>(string pathToSaveFolder, string extension)
-		where T : new()
+		where T : State, new()
 	{
 		if (string.IsNullOrEmpty(pathToSaveFolder))
 		    throw new Exception($"Failed loading all saves: Provided folder path is null or empty.");
@@ -49,8 +49,7 @@ public static class ManagerFileHelper
             {
                 // load new instance
                 var loadedState = Saving.LoadLightweight<T>(file);
-                if (loadedState is State state)
-                    state.FilePath = file;
+                loadedState.FilePath = file;
                 items.Add(loadedState);
             }
         }

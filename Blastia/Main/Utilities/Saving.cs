@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using Blastia.Main.Blocks;
@@ -16,26 +17,28 @@ public static class Saving
     
     private static Dictionary<Type, Action<BinaryWriter, object>> _primitiveWriters = new()
     {
-        { typeof(byte),   (w, v) => w.Write((byte) v) },
-        { typeof(ushort), (w, v) => w.Write((ushort) v) },
-        { typeof(int),    (w, v) => w.Write((int) v) },
-        { typeof(float),  (w, v) => w.Write((float) v) },
-        { typeof(double), (w, v) => w.Write((double) v) },
-        { typeof(bool),   (w, v) => w.Write((bool) v) },
-        { typeof(string), (w, v) => w.Write((string) v) },
-        { typeof(ulong),  (w, v) => w.Write((ulong) v) },
+        { typeof(byte),    (w, v) => w.Write((byte) v) },
+        { typeof(ushort),  (w, v) => w.Write((ushort) v) },
+        { typeof(int),     (w, v) => w.Write((int) v) },
+        { typeof(float),   (w, v) => w.Write((float) v) },
+        { typeof(double),  (w, v) => w.Write((double) v) },
+        { typeof(bool),    (w, v) => w.Write((bool) v) },
+        { typeof(string),  (w, v) => w.Write((string) v) },
+        { typeof(ulong),   (w, v) => w.Write((ulong) v) },
+        { typeof(Vector2), (w, v) => { Vector2 vec = (Vector2) v; w.Write(vec.X); w.Write(vec.Y); }}
     };
     
     private static Dictionary<Type, Func<BinaryReader, object>> _primitiveReaders = new() 
     {
-        { typeof(byte),   r => r.ReadByte() },
-        { typeof(ushort), r => r.ReadUInt16() },
-        { typeof(int),    r => r.ReadInt32() },
-        { typeof(float),  r => r.ReadSingle() },
-        { typeof(double), r => r.ReadDouble() },
-        { typeof(bool),   r => r.ReadBoolean() },
-        { typeof(string), r => r.ReadString() },
-        { typeof(ulong),  r => r.ReadUInt64() },
+        { typeof(byte),    r => r.ReadByte() },
+        { typeof(ushort),  r => r.ReadUInt16() },
+        { typeof(int),     r => r.ReadInt32() },
+        { typeof(float),   r => r.ReadSingle() },
+        { typeof(double),  r => r.ReadDouble() },
+        { typeof(bool),    r => r.ReadBoolean() },
+        { typeof(string),  r => r.ReadString() },
+        { typeof(ulong),   r => r.ReadUInt64() },
+        { typeof(Vector2), r => new Vector2(r.ReadSingle(), r.ReadSingle()) }
     };
     
     /// <summary>
@@ -43,14 +46,12 @@ public static class Saving
     /// </summary>
     public static void WriteVector2Dictionary<T>(Dictionary<Vector2, T> dict, BinaryWriter writer) 
     {
-        if (EnableLogs) 
-            Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}> with {dict.Count} items");
-            
-        writer.Write(dict.Count);
+        // first gather all valid entries 
+        Dictionary<Vector2, T> valid = [];
         foreach (var kvp in dict) 
         {
             Vector2 vector = kvp.Key;
-            if (float.NaN == vector.X || float.NaN == vector.Y || float.IsInfinity(vector.X) || float.IsInfinity(vector.Y))
+            if (float.IsNaN(vector.X) || float.IsNaN(vector.Y) || float.IsInfinity(vector.X) || float.IsInfinity(vector.Y))
             {
                 if (EnableLogs)
                     Console.WriteLine($"Found invalid Vector2 values, skipping.");
@@ -58,20 +59,36 @@ public static class Saving
                 continue;
             }
             
-            T value = kvp.Value;
-            if (value == null) 
+            if (kvp.Value == null) 
             {
                 if (EnableLogs)
                     Console.WriteLine($"Value is null while writing, skipping.");
                 continue;
             }
             
-            if (EnableSpamLogs) 
-                Console.WriteLine($"Writing Dictionary<Vector2, {typeof(T).Name}> entry at {vector}. Value: {value}");
+            valid.Add(vector, kvp.Value);
+        }
+        
+        if (valid.Count == 0) 
+        {
+            if (EnableLogs)
+                Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}>: aborting, 0 items");
+            writer.Write(valid.Count); // still write 0 count elements since read method always reads count
+            return;
+        }
+        
+        if (EnableLogs) 
+            Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}> with {valid.Count} items");
+        
+        // then write all valid entries instead of writing everything
+        writer.Write(valid.Count);
+        foreach (var kvp in valid) 
+        {
+            if (EnableSpamLogs)
+                Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}>: (Vector2: {kvp.Key}, Value: {kvp.Value})");
             
-            writer.Write(vector.X);
-            writer.Write(vector.Y);
-            WriteObject(writer, value);
+            WriteObject(writer, kvp.Key);
+            WriteObject(writer, kvp.Value!);
         }
     }
     
@@ -88,9 +105,8 @@ public static class Saving
             
         for (int i = 0; i < count; i++)
         {
-            float x = reader.ReadSingle();
-            float y = reader.ReadSingle();
-            if (float.IsInfinity(x) || float.IsNaN(x) || float.IsInfinity(y) || float.IsNaN(y))
+            Vector2 vec = (Vector2) ReadObject(reader, typeof(Vector2));
+            if (float.IsInfinity(vec.X) || float.IsNaN(vec.X) || float.IsInfinity(vec.Y) || float.IsNaN(vec.Y))
             {
                 if (EnableLogs)
                     Console.WriteLine($"Found invalid Vector2 values, skipping.");
@@ -105,11 +121,10 @@ public static class Saving
                 continue;
             }
             
-            Vector2 vector = new Vector2(x, y);
             if (EnableSpamLogs) 
-                Console.WriteLine($"Successfully read entry {i} of type Dictionary<Vector2, {typeof(T).Name}>: (Vector: {vector}, Value: {value})");
+                Console.WriteLine($"Successfully read entry {i} of type Dictionary<Vector2, {typeof(T).Name}>: (Vector: {vec}, Value: {value})");
                 
-            resultDict.Add(vector, value);
+            resultDict.Add(vec, value);
         }
             
         return resultDict;
@@ -135,9 +150,10 @@ public static class Saving
                 writer.Write(Convert.ToInt32(e));
                 break;
             case BlockInstance inst:
-                writer.Write(inst.Id);
-                if (inst.Block is LiquidBlock liquid)
-                    writer.Write(liquid.FlowLevel);
+                inst.Write(writer);
+                break;
+            case TileLayerData tld:
+                tld.Write(writer);
                 break;
             case Dictionary<Vector2, BlockInstance> d:
                 WriteVector2BlockInstDictionary(d, writer);
@@ -154,6 +170,9 @@ public static class Saving
                 // find the method by name and creates a generic version like WriteVector2Dictionary<valueType>
                 var method = typeof(Saving).GetMethod(nameof(WriteVector2Dictionary))!.MakeGenericMethod(valueType);
                 method.Invoke(null, [dict, writer]);
+                break;
+            default:
+                Console.WriteLine($"Tried to save unsupported type: {value.GetType().FullName}");
                 break;
         }
     }
@@ -196,17 +215,12 @@ public static class Saving
         
         if (type == typeof(BlockInstance)) 
         {
-            ushort id = reader.ReadUInt16();
-            Block? block = StuffRegistry.GetBlock(id) ?? throw new Exception($"Error reading BlockInstance. Block with ID: {id} not found.");
-            
-            if (block is LiquidBlock liquid) 
-            {
-                var liquidClone = liquid.CreateNewInstance();
-                liquidClone.FlowLevel = reader.ReadInt32();
-                block = liquidClone;
-            }
-            
-            return new BlockInstance(block, 0);
+            return BlockInstance.Read(reader);
+        }
+        
+        if (type == typeof(TileLayerData)) 
+        {
+            return TileLayerData.Read(reader);
         }
         
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>) 
@@ -214,7 +228,16 @@ public static class Saving
         {
             Type valueType = type.GetGenericArguments()[1];
             var method = typeof(Saving).GetMethod(nameof(ReadVector2Dictionary))!.MakeGenericMethod(valueType);
-            return method.Invoke(null, [reader])!;
+            
+            try 
+            {
+                return method.Invoke(null, [reader])!;
+            }
+            catch (Exception e) 
+            {
+                if (e.InnerException != null)
+                    ExceptionDispatchInfo.Capture(e.InnerException).Throw();
+            }
         }
 
         throw new ArgumentException($"Unsupported type: {type.Name} (Full name: {type.FullName})");

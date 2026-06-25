@@ -2,6 +2,7 @@ using System.Numerics;
 using Blastia.Main.Blocks.Common;
 using Blastia.Main.Entities.HumanLikeEntities;
 using Blastia.Main.GameState;
+using Blastia.Main.UI.Menus.Multiplayer;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
@@ -14,6 +15,19 @@ namespace Blastia.Main.Persistence;
 public class TileLayerData 
 {
     public Dictionary<Vector2, BlockInstance> Instances { get; set; } = [];
+    
+    public void Write(BinaryWriter writer) 
+    {
+        Saving.WriteObject(writer, Instances);
+    }
+    
+    public static TileLayerData Read(BinaryReader reader) 
+    {
+        return new TileLayerData 
+        {
+            Instances = (Dictionary<Vector2, BlockInstance>) Saving.ReadObject(reader, typeof(Dictionary<Vector2, BlockInstance>))
+        };
+    }
 }
 
 public enum TileLayer
@@ -236,12 +250,9 @@ public class WorldManager : Singleton<WorldManager>
 	public void SelectWorld(WorldState worldState, bool host)
 	{
 		WorldState = worldState;
-		// BlastiaGame.RequestWorldInitialization();
-		
-		// // hide join game menu whenever in a world
-		// BlastiaGame.GetMenu<JoinGameMenu>().SetActive(false);
-		// BlastiaGame.GetMenu<JoinGameMenu>()?.ToggleStatusText(false);
+		BlastiaGame.RequestWorldInitialization();
 
+		// TODO: Fix hosting later
 		// if (host)
 		// {
 		// 	NetworkManager.Instance?.HostGame();
