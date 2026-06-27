@@ -34,7 +34,7 @@ public class WorldGenerationStatusMenu(SpriteFont font, bool isActive = false) :
         // we switch to this menu after world gen starts, so it has time to reset progress and we can check it
         if (WorldGen.Progress == 1f) 
         {
-            SwitchToMenu(BlastiaGame.GetMenu<WorldsMenu>());
+            SwitchToMenu(BlastiaGame.GetMenu<WorldSelectionMenu>());
         }
     }
 }

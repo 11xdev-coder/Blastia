@@ -41,7 +41,7 @@ public class PlayersMenu : CollectionMenu
 		PlayerManager.Instance.SelectPlayer((PlayerState) playerState);
 		
 		if (!SwitchToJoinMenu)
-			SwitchToMenu(BlastiaGame.GetMenu<WorldsMenu>());
+			SwitchToMenu(BlastiaGame.GetMenu<WorldSelectionMenu>());
 		else
 			SwitchToMenu(BlastiaGame.GetMenu<JoinGameMenu>());
 	}	

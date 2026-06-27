@@ -271,7 +271,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
     
     private void Back() 
     {
-        SwitchToMenu(BlastiaGame.GetMenu<WorldsMenu>());
+        SwitchToMenu(BlastiaGame.GetMenu<WorldSelectionMenu>());
     }
     
     private void RandomizeWorldName() => _name?.SetText(WorldNameGenerator.Generate(20));

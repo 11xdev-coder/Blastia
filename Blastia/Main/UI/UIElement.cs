@@ -190,6 +190,12 @@ public abstract class UIElement
     #endregion
     
     /// <summary>
+    /// Automatically updates and draws these elements + these elements just copy some properties from the base (this) element. For now it is: <c>HAlign</c>, <c>VAlign</c>
+    /// </summary>
+    public List<UIElement> ChildElements = [];
+    // TODO: Rework other ui elements to use this!
+    
+    /// <summary>
     /// Image constructor
     /// </summary>
     /// <param name="position">Left-top bounds corner</param>
@@ -308,6 +314,13 @@ public abstract class UIElement
         _prevIsHovered = IsHovered;
     
         UpdateBounds();
+        
+        foreach (var child in ChildElements) 
+        {
+            child.HAlign = HAlign;
+            child.VAlign = VAlign;
+            child.Update();
+        }
     }
 
     #region Dragging
@@ -510,6 +523,11 @@ public abstract class UIElement
         else
         {
             DrawTexture(spriteBatch);
+        }
+        
+        foreach (var child in ChildElements) 
+        {
+            child.Draw(spriteBatch);
         }
     }
     
