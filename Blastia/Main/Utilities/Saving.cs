@@ -41,97 +41,101 @@ public static class Saving
         { typeof(Vector2), r => new Vector2(r.ReadSingle(), r.ReadSingle()) }
     };
     
+    private static Func<Vector2, bool> _vector2ValidChecker = v => { return !float.IsNaN(v.X) && !float.IsNaN(v.Y) && !float.IsInfinity(v.X) && !float.IsInfinity(v.Y); };
+    private static Func<string, bool> _stringValidChecker = s => !string.IsNullOrEmpty(s);
+    
     /// <summary>
-    /// Writes Dictionary&lt;Vector2, T&gt;
+    /// Writes some &lt;TKey, TValue&gt; dictionary to <c>BinaryWriter</c>
     /// </summary>
-    public static void WriteVector2Dictionary<T>(Dictionary<Vector2, T> dict, BinaryWriter writer) 
+    /// <param name="keyValidationChecker">A function that must return true if we should write the key and it's valid</param>
+    /// <param name="valueValidationChecker">A function that must return true if we should write the value and it's valid (<c>value != null</c> check is already included in the method itself)</param>
+    public static void WriteDictionary<TKey, TValue>(Dictionary<TKey, TValue> dict, BinaryWriter writer, 
+        Func<TKey, bool>? keyValidationChecker = null, Func<TValue, bool>? valueValidationChecker = null) where TKey : notnull
     {
-        // first gather all valid entries 
-        Dictionary<Vector2, T> valid = [];
+        Dictionary<TKey, TValue> valid = [];
         foreach (var kvp in dict) 
         {
-            Vector2 vector = kvp.Key;
-            if (float.IsNaN(vector.X) || float.IsNaN(vector.Y) || float.IsInfinity(vector.X) || float.IsInfinity(vector.Y))
+            if (keyValidationChecker != null && !keyValidationChecker(kvp.Key)) 
             {
-                if (EnableLogs)
-                    Console.WriteLine($"Found invalid Vector2 values, skipping.");
-                    
+                if (EnableLogs) 
+                    Console.WriteLine($"Writing dictionary of type: <{typeof(TKey).Name}, {typeof(TValue).Name}> - key {kvp.Key} wasn't valid by provided validation checker.");
+                
+                // skip invalid elements
                 continue;
             }
             
+            // not optional, mandatory
             if (kvp.Value == null) 
             {
-                if (EnableLogs)
-                    Console.WriteLine($"Value is null while writing, skipping.");
+                if (EnableLogs) 
+                    Console.WriteLine($"Writing dictionary of type: <{typeof(TKey).Name}, {typeof(TValue).Name}> - value is null while writing, skipping.");
                 continue;
             }
             
-            valid.Add(vector, kvp.Value);
+            if (valueValidationChecker != null && !valueValidationChecker(kvp.Value)) 
+            {
+                if (EnableLogs) 
+                    Console.WriteLine($"Writing dictionary of type: <{typeof(TKey).Name}, {typeof(TValue).Name}> - value {kvp.Value} wasn't valid by provided validation checker.");
+                continue;
+            }
+            
+            // add valid elements
+            valid.Add(kvp.Key, kvp.Value);
         }
+        
+        // either way write amount of valid elements, since read method always reads this
+        writer.Write(valid.Count);
         
         if (valid.Count == 0) 
         {
             if (EnableLogs)
-                Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}>: aborting, 0 items");
-            writer.Write(valid.Count); // still write 0 count elements since read method always reads count
+                Console.WriteLine($"Writing dictionary of type: <{typeof(TKey).Name}, {typeof(TValue).Name}> - 0 valid values, aborting.");
             return;
         }
         
-        if (EnableLogs) 
-            Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}> with {valid.Count} items");
-        
-        // then write all valid entries instead of writing everything
-        writer.Write(valid.Count);
+        if (EnableLogs)
+            Console.WriteLine($"Writing dictionary of type: <{typeof(TKey).Name}, {typeof(TValue).Name}> - writing {valid.Count} items.");
+            
         foreach (var kvp in valid) 
         {
             if (EnableSpamLogs)
-                Console.WriteLine($"Writing Vector2 dictionary of type <Vector2, {typeof(T).Name}>: (Vector2: {kvp.Key}, Value: {kvp.Value})");
-            
+                Console.WriteLine($"Writing dictionary of type <{typeof(TKey).Name}, {typeof(TValue).Name}>: (Key: {kvp.Key}, Value: {kvp.Value})");
+                
             WriteObject(writer, kvp.Key);
             WriteObject(writer, kvp.Value!);
         }
     }
     
-    public static void WriteVector2BlockInstDictionary(Dictionary<Vector2, BlockInstance> dict, BinaryWriter writer) => WriteVector2Dictionary(dict, writer);
-    public static void WriteVector2StringDictionary(Dictionary<Vector2, string> dict, BinaryWriter writer) => WriteVector2Dictionary(dict, writer);
+    public static void WriteVector2BlockInstDictionary(Dictionary<Vector2, BlockInstance> dict, BinaryWriter writer) => WriteDictionary(dict, writer, _vector2ValidChecker);
+    public static void WriteVector2StringDictionary(Dictionary<Vector2, string> dict, BinaryWriter writer) => WriteDictionary(dict, writer, _vector2ValidChecker, _stringValidChecker);
 
-    public static Dictionary<Vector2, T> ReadVector2Dictionary<T>(BinaryReader reader)
+    public static Dictionary<TKey, TValue> ReadDictionary<TKey, TValue>(BinaryReader reader) where TKey : notnull
     {
-        var resultDict = new Dictionary<Vector2, T>();
+        // writer doesnt allow invalid elements
+        // reader should be dumb - read everything without checking
+        
+        var resultDict = new Dictionary<TKey, TValue>();
         int count = reader.ReadInt32();
         
-        if (EnableLogs) 
-            Console.WriteLine($"Reading dictionary of type <Vector2, {typeof(T).Name} with {count} entries from FileStream position: {reader.BaseStream.Position}");
+        if (EnableLogs)
+            Console.WriteLine($"Reading dictionary of type <{typeof(TKey).Name}, {typeof(TValue).Name}> with {count} items from FileStream position: {reader.BaseStream.Position}");
             
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++) 
         {
-            Vector2 vec = (Vector2) ReadObject(reader, typeof(Vector2));
-            if (float.IsInfinity(vec.X) || float.IsNaN(vec.X) || float.IsInfinity(vec.Y) || float.IsNaN(vec.Y))
-            {
-                if (EnableLogs)
-                    Console.WriteLine($"Found invalid Vector2 values, skipping.");
-                continue;
-            }
-            
-            T value = (T) ReadObject(reader, typeof(T));
-            if (value == null)
-            {
-                if (EnableLogs)
-                    Console.WriteLine($"Value is null while reading, skipping.");
-                continue;
-            }
+            TKey key = (TKey) ReadObject(reader, typeof(TKey));
+            TValue value = (TValue) ReadObject(reader, typeof(TValue));
             
             if (EnableSpamLogs) 
-                Console.WriteLine($"Successfully read entry {i} of type Dictionary<Vector2, {typeof(T).Name}>: (Vector: {vec}, Value: {value})");
+                Console.WriteLine($"Successfully read entry {i} from dictionary of type <{typeof(TKey).Name}, {typeof(TValue).Name}>: (Key: {key}, Value: {value})");
                 
-            resultDict.Add(vec, value);
+            resultDict.Add(key, value);
         }
-            
+        
         return resultDict;
     }
     
-    public static Dictionary<Vector2, BlockInstance> ReadVector2BlockInstDictionary(BinaryReader reader) => ReadVector2Dictionary<BlockInstance>(reader);
-    public static Dictionary<Vector2, string> ReadVector2StringDictionary(BinaryReader reader) => ReadVector2Dictionary<string>(reader);
+    public static Dictionary<Vector2, BlockInstance> ReadVector2BlockInstDictionary(BinaryReader reader) => ReadDictionary<Vector2, BlockInstance>(reader);
+    public static Dictionary<Vector2, string> ReadVector2StringDictionary(BinaryReader reader) => ReadDictionary<Vector2, string>(reader);
     
     public static void WriteObject(BinaryWriter writer, object value) 
     {
@@ -163,13 +167,14 @@ public static class Saving
                 break;
             // fallback call for dictionaries, slower than known types
             case IDictionary dict when type.IsGenericType // if the type is dictionary
-            && type.GetGenericTypeDefinition() == typeof(Dictionary<,>) // check if it is a Dictionary<,> with 2 type parameters
-            && type.GetGenericArguments()[0] == typeof(Vector2): // [0] - key, [1] - value. check if key is Vector2
-                var valueType = type.GetGenericArguments()[1]; // get the value type
+            && type.GetGenericTypeDefinition() == typeof(Dictionary<,>): // check if it is a Dictionary<,> with 2 type parameters
+                Type[] args = type.GetGenericArguments();
+                Type keyType = args[0]; // get the key type
+                Type valueType = args[1]; // get the value type
                 
-                // find the method by name and creates a generic version like WriteVector2Dictionary<valueType>
-                var method = typeof(Saving).GetMethod(nameof(WriteVector2Dictionary))!.MakeGenericMethod(valueType);
-                method.Invoke(null, [dict, writer]);
+                // find the method by name and creates a generic version like WriteDictionary<keyType, valueType>
+                var method = typeof(Saving).GetMethod(nameof(WriteDictionary))!.MakeGenericMethod(keyType, valueType);
+                method.Invoke(null, [dict, writer, null, null]);
                 break;
             default:
                 Console.WriteLine($"Tried to save unsupported type: {value.GetType().FullName}");
@@ -223,11 +228,12 @@ public static class Saving
             return TileLayerData.Read(reader);
         }
         
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>) 
-        && type.GetGenericArguments()[0] == typeof(Vector2)) 
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>)) 
         {
-            Type valueType = type.GetGenericArguments()[1];
-            var method = typeof(Saving).GetMethod(nameof(ReadVector2Dictionary))!.MakeGenericMethod(valueType);
+            Type[] args = type.GetGenericArguments();
+            Type keyType = args[0];
+            Type valueType = args[1];
+            var method = typeof(Saving).GetMethod(nameof(ReadDictionary))!.MakeGenericMethod(keyType, valueType);
             
             try 
             {
