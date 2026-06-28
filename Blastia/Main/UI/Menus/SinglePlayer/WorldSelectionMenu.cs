@@ -7,15 +7,36 @@ namespace Blastia.Main.UI.Menus.SinglePlayer;
 
 public class SelectionItem : UIElement
 {
+	private const int Width = 700;
+	private const int Height = 150;
+	
 	private readonly WorldState _worldState;
+	
+	private Text? _nameText;
 	
     public SelectionItem(Vector2 position, WorldState worldState, SpriteFont font) : base(position, "", font)
 	{
 		_worldState = worldState;
 		
-		AdvancedBackground bg = new AdvancedBackground(position, 700, 150, Colors.DarkBackground, 1, Colors.DarkBorder);
-		ChildElements.Add(bg);
+		SetBackgroundProperties(() => new Rectangle(Bounds.Left, Bounds.Top, Width, Height), Colors.DarkBackground, 1, Colors.DarkBorder, 0);
+		
+		_nameText = new Text(Vector2.Zero, _worldState.Name, font);
+		ChildElements.Add(_nameText);
 	}
+
+    public override void UpdateBounds()
+    {		
+		// background may be null here so we must update bounds regardless
+		
+		UpdateBoundsBase(Width, Height);
+		UpdateChildrenPositions();
+   }
+    
+    private void UpdateChildrenPositions() 
+    {
+		if (_nameText != null)
+        	_nameText.Position = new Vector2(Bounds.Left, Bounds.Top);
+    }
 }
 
 public class WorldSelectionMenu : Menu
@@ -58,10 +79,10 @@ public class WorldSelectionMenu : Menu
 		};
 		Elements.Add(bg);
 		
-		SelectionItem test = new SelectionItem(Vector2.Zero, new WorldState(), Font) 
+		SelectionItem test = new SelectionItem(Vector2.Zero, _worldStates[0], Font)
 		{
-		    HAlign = 0.5f,
-		    VAlign = 0.98f
+			HAlign = 0.5f,
+			VAlign = 0.5f
 		};
 		Elements.Add(test);
 	}

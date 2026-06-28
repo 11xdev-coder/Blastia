@@ -144,7 +144,6 @@ public class Button : UIElement, IValueStorageUi<bool>
 
     public override void Draw(SpriteBatch spriteBatch)
     {
-        Background?.Draw(spriteBatch);
         base.Draw(spriteBatch);
     }
 

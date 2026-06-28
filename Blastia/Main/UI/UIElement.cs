@@ -190,10 +190,9 @@ public abstract class UIElement
     #endregion
     
     /// <summary>
-    /// Automatically updates and draws these elements + these elements just copy some properties from the base (this) element. For now it is: <c>HAlign</c>, <c>VAlign</c>
+    /// Automatically updates and draws these elements. Please position them relative to Bounds, not absolute position
     /// </summary>
     public List<UIElement> ChildElements = [];
-    // TODO: Rework other ui elements to use this!
     
     /// <summary>
     /// Image constructor
@@ -317,8 +316,6 @@ public abstract class UIElement
         
         foreach (var child in ChildElements) 
         {
-            child.HAlign = HAlign;
-            child.VAlign = VAlign;
             child.Update();
         }
     }
@@ -376,14 +373,14 @@ public abstract class UIElement
     protected float GetVAlign() => VAlign + AlignOffset.Y;
 
     /// <summary>
-    /// Updates the bounding rectangle of the UI element based on its current properties such as position, text size, or texture size.
+    /// Updates this UI element bounds, taking text size (text). Override and call <c>UpdateBoundsBase</c> for custom bounds
     /// </summary>
     public virtual void UpdateBounds()
     {
         if (Font == null) return;
         
         Vector2 textSize = Font.MeasureString(Text);
-        UpdateBoundsBase(textSize.X, textSize.Y);        
+        UpdateBoundsBase(textSize.X, textSize.Y);
     }
 
     /// <summary>
@@ -516,6 +513,8 @@ public abstract class UIElement
     
     public virtual void Draw(SpriteBatch spriteBatch)
     {
+        Background?.Draw(spriteBatch);
+        
         if (!UseTexture)
         {
             DrawText(spriteBatch);
