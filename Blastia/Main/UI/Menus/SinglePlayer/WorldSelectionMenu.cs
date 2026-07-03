@@ -13,6 +13,7 @@ public class SelectionItem : UIElement
 	private readonly WorldState _worldState;
 	
 	private Text? _nameText;
+	private Text? _infoText;
 	
     public SelectionItem(Vector2 position, WorldState worldState, SpriteFont font) : base(position, "", font)
 	{
@@ -22,6 +23,9 @@ public class SelectionItem : UIElement
 		
 		_nameText = new Text(Vector2.Zero, _worldState.Name, font);
 		ChildElements.Add(_nameText);
+		
+		_infoText = new Text(Vector2.Zero, "99h 59m | 99d 23h 59m 59s");
+		ChildElements.Add(_infoText);
 	}
 
     public override void UpdateBounds()
@@ -35,7 +39,10 @@ public class SelectionItem : UIElement
     private void UpdateChildrenPositions() 
     {
 		if (_nameText != null)
-        	_nameText.Position = new Vector2(Bounds.Left, Bounds.Top);
+        	_nameText.Position = new Vector2(Bounds.Left + 150, Bounds.Top);
+        	
+        if (!_infoText != null)
+			_infoText.Position = new Vector2(Bounds.Left + 150, Bounds.TOp + 50);
     }
 }
 
