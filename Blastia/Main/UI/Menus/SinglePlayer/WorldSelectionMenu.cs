@@ -42,8 +42,9 @@ public class SelectionItem : UIElement
 		{
 		    DrawColor = Colors.SelectionItemBorder,
 		    OnStartHovering = () => {},
-		    OnEndHovering = () => {}
+		    OnEndHovering = () => {},
 		};
+		_playButton.OnClick += SelectItem;
 		ChildElements.Add(_playButton);
 	}
 	
@@ -81,11 +82,17 @@ public class SelectionItem : UIElement
     /// <summary>
 	/// Automatically checks element for null and changes its <c>DrawColor</c>. Helper method to save 1 line
 	/// </summary>
-    private void ChangeDrawColor(UIElement e, Color newCol) 
+    private void ChangeDrawColor(UIElement? e, Color newCol) 
     {
         if (e == null) return;
         e.DrawColor = newCol;
     }
+    
+	private void SelectItem()
+	{
+		var fullyLoadedState = Saving.Load<WorldState>(_worldState.FilePath);
+		WorldManager.Instance.SelectWorld(fullyLoadedState, false);
+	}
 }
 
 public class WorldSelectionMenu : Menu
@@ -128,28 +135,59 @@ public class WorldSelectionMenu : Menu
 		};
 		Elements.Add(bg);
 		
-		WorldState testWS = new WorldState() 
+		Viewport viewport = new Viewport(1300, 410);
+		ScrollableArea area = new ScrollableArea(Vector2.Zero, viewport) 
 		{
-		    Name = "MMMMMMMMMMMMMMMMMMMM",
-		    CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+		    HAlign = 0.5f,
+		    VAlign = 0.5f
 		};
-		SelectionItem test = new SelectionItem(Vector2.Zero, testWS, Font)
+		Elements.Add(area);
+		
+		foreach (var state in _worldStates) 
 		{
-			HAlign = 0.5f,
-			VAlign = 0.5f
+		    SelectionItem item = new SelectionItem(Vector2.Zero, state, Font);
+		    area.AddChild(item);
+		}
+		
+		Console.WriteLine(Font.MeasureString("Create"));
+		
+		Console.WriteLine(Font.MeasureString("Delete"));
+		
+		Console.WriteLine(Font.MeasureString("Back"));
+		
+		Vector2 createScale = Font.MeasureString("Create");
+		Vector2 deleteScale = Font.MeasureString("Delete");
+		Vector2 backScale = Font.MeasureString("Back");
+		float spacing = 15f;
+		Button createButton = new Button(new Vector2(-(deleteScale.X + createScale.X) * 0.5f - spacing, 250), "Create", Font, () => SwitchToMenu(BlastiaGame.GetMenu<WorldCreationMenu>())) 
+		{
+		    HAlign = 0.5f,
+		    VAlign = 0.65f
 		};
-		Elements.Add(test);
+		Elements.Add(createButton);
+		
+		Button deleteButton = new Button(new Vector2(0, 250), "Delete", Font, () => {}) 
+		{
+		    HAlign = 0.5f,
+		    VAlign = 0.65f
+		};
+		Elements.Add(deleteButton);
+		
+		Button back = new Button(new Vector2((deleteScale.X + backScale.X) * 0.5f + spacing, 250), "Back", Font, () => SwitchToMenu(BlastiaGame.GetMenu<PlayersMenu>()))
+		{
+		    HAlign = 0.5f,
+		    VAlign = 0.65f
+		};
+		Elements.Add(back);
+		
+		WorldCreationButtonPreset(createButton);
+		WorldCreationButtonPreset(deleteButton);
+		WorldCreationButtonPreset(back);
 	}
 
 	public void ToggleMultiplayer(bool host)
 	{
 		Host = host;
 		Console.WriteLine($"Worlds menu now host: {host}");
-	}
-
-	private void SelectItem(object worldState)
-	{
-		var fullyLoadedState = Saving.Load<WorldState>(((WorldState) worldState).FilePath);
-		WorldManager.Instance.SelectWorld(fullyLoadedState, Host);
 	}	
 }
