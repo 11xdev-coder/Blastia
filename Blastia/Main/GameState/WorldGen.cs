@@ -102,12 +102,22 @@ public class SpawnPointPass : IWorldGenPass
 
 public static class WorldGen
 {
+    // world gen progress
     public volatile static float Progress = 0f;
+    public volatile static bool IsFinished = false; // worldgen + file write is finished
+    public volatile static bool HasError = false;
     
     private static readonly List<IWorldGenPass> Passes = [
         new DirtPass(),
         new SpawnPointPass()
     ];
+    
+    public static void Reset() 
+    {
+        Progress = 0f;
+        IsFinished = false;
+        HasError = false;
+    }
     
     public static void Generate(BigInteger seed, WorldState worldState)
     {

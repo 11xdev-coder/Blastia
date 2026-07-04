@@ -235,8 +235,18 @@ public class WorldManager : Singleton<WorldManager>
 		// run world gen on different thread
 		Task.Run(() => 
 		{
-		    WorldGen.Generate(seed, worldData);		
-			ManagerFileHelper.New(WorldsSaveFolder, worldName, Extension, worldData);
+			try 
+			{
+				WorldGen.Reset();
+		    	WorldGen.Generate(seed, worldData);		
+				ManagerFileHelper.New(WorldsSaveFolder, worldName, Extension, worldData);
+				WorldGen.IsFinished = true;
+			}
+			catch (Exception e) 
+			{
+			    Console.WriteLine($"[WorldGen] World generation failed: {e}");
+			    WorldGen.HasError = true;
+			}
 		});
 	}
 	

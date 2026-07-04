@@ -19,6 +19,7 @@ public class ImageButton : Button
 
     public override void Draw(SpriteBatch spriteBatch)
     {
+        base.Draw(spriteBatch);
         spriteBatch.Draw(Texture, Position, DrawColor);
     }
 }

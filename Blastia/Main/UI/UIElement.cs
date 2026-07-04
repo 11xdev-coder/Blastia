@@ -313,6 +313,7 @@ public abstract class UIElement
         _prevIsHovered = IsHovered;
     
         UpdateBounds();
+        UpdateBackgroundPosition();
         
         foreach (var child in ChildElements) 
         {

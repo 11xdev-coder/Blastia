@@ -101,12 +101,34 @@ public class WorldSelectionMenu : Menu
 	
 	private bool Host { get; set; }
 	private static string TopText = "World Select";
-	private readonly List<WorldState> _worldStates;
+	private List<WorldState> _worldStates;
+	private ScrollableArea? _area;
+	private Text? _amountText;
 
 	public WorldSelectionMenu(SpriteFont font, bool isActive = false) : base(font, isActive, false) 
 	{
 	    _worldStates = WorldManager.Instance.LoadAllWorlds();
 	    AddElements();
+	}
+	
+	protected override void OnMenuActive() 
+	{
+	    _worldStates = WorldManager.Instance.LoadAllWorlds();
+	    
+	    UpdateWorldStateUi();
+	}
+	
+	private void UpdateWorldStateUi() 
+	{
+		_area.ClearChildren();
+		
+	    foreach (var state in _worldStates) 
+		{
+		    SelectionItem item = new SelectionItem(Vector2.Zero, state, Font);
+		    _area.AddChild(item);
+		}
+		
+		_amountText.Text = $"{_worldStates.Count} items";
 	}
 
     protected override void AddElements()
@@ -121,12 +143,12 @@ public class WorldSelectionMenu : Menu
 		
 		string text = $"{_worldStates.Count} items";
 		s = Font.MeasureString(text);
-		Text amountText = new Text(new Vector2(650 - s.X * 0.5f, -300 - s.Y), text, Font) 
+		_amountText = new Text(new Vector2(650 - s.X * 0.5f, -300 - s.Y), text, Font) 
 		{
 		    HAlign = 0.5f,
 		    VAlign = 0.59f
 		};
-		Elements.Add(amountText);
+		Elements.Add(_amountText);
 		
 		AdvancedBackground bg = new AdvancedBackground(Vector2.Zero, 1300, 600, Colors.DarkBackground, 2, Colors.DarkBorder) 
 		{
@@ -135,25 +157,13 @@ public class WorldSelectionMenu : Menu
 		};
 		Elements.Add(bg);
 		
-		Viewport viewport = new Viewport(1300, 410);
-		ScrollableArea area = new ScrollableArea(Vector2.Zero, viewport) 
+		Viewport viewport = new Viewport(1300, 580);
+		_area = new ScrollableArea(Vector2.Zero, viewport, spacing: 10) 
 		{
 		    HAlign = 0.5f,
-		    VAlign = 0.5f
+		    VAlign = 0.65f
 		};
-		Elements.Add(area);
-		
-		foreach (var state in _worldStates) 
-		{
-		    SelectionItem item = new SelectionItem(Vector2.Zero, state, Font);
-		    area.AddChild(item);
-		}
-		
-		Console.WriteLine(Font.MeasureString("Create"));
-		
-		Console.WriteLine(Font.MeasureString("Delete"));
-		
-		Console.WriteLine(Font.MeasureString("Back"));
+		Elements.Add(_area);
 		
 		Vector2 createScale = Font.MeasureString("Create");
 		Vector2 deleteScale = Font.MeasureString("Delete");
