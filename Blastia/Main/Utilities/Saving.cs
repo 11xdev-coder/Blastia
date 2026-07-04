@@ -24,6 +24,7 @@ public static class Saving
         { typeof(double),  (w, v) => w.Write((double) v) },
         { typeof(bool),    (w, v) => w.Write((bool) v) },
         { typeof(string),  (w, v) => w.Write((string) v) },
+        { typeof(long),    (w, v) => w.Write((long) v) },
         { typeof(ulong),   (w, v) => w.Write((ulong) v) },
         { typeof(Vector2), (w, v) => { Vector2 vec = (Vector2) v; w.Write(vec.X); w.Write(vec.Y); }}
     };
@@ -37,6 +38,7 @@ public static class Saving
         { typeof(double),  r => r.ReadDouble() },
         { typeof(bool),    r => r.ReadBoolean() },
         { typeof(string),  r => r.ReadString() },
+        { typeof(long),    r => r.ReadInt64() },
         { typeof(ulong),   r => r.ReadUInt64() },
         { typeof(Vector2), r => new Vector2(r.ReadSingle(), r.ReadSingle()) }
     };

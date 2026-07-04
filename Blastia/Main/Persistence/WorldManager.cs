@@ -226,6 +226,7 @@ public class WorldManager : Singleton<WorldManager>
 		WorldState worldData = new WorldState 
 		{ 
 			Name = worldName, 
+			CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
 			Difficulty = difficulty,
 			WorldWidth = worldWidth,
 			WorldHeight = worldHeight

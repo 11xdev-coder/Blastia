@@ -22,9 +22,11 @@ public class State
     /// </summary>
     [NoSave] public string FilePath { get; set; } = "";
     [EssentialProperty] public string Name { get; set; } = "";
-    [EssentialProperty] public int CreatedAt { get; set; }
-    [EssentialProperty] public int LastPlayed { get; set; }
+    [EssentialProperty] public long CreatedAt { get; set; }
     [EssentialProperty] public int PlayedFor { get; set; }
     
     public override string ToString() => Name;
+    
+    [NoSave] public DateTimeOffset CreatedAtDate => DateTimeOffset.FromUnixTimeSeconds(CreatedAt);
+    [NoSave] public string CreatedAtDisplay => CreatedAtDate.LocalDateTime.ToString("dd.MM.yyyy");
 }

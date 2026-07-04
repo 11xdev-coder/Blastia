@@ -20,7 +20,8 @@ public class PlayerManager : Singleton<PlayerManager>
 	{
 		PlayerState playerData = new() 
 		{
-			Name = playerName
+			Name = playerName,
+			CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
 		};
 		ManagerFileHelper.New(PlayersSaveFolder, playerName, Extension, playerData);
 	}

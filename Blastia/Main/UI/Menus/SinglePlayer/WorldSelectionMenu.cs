@@ -1,4 +1,5 @@
 ﻿using Blastia.Main.Persistence;
+using Blastia.Main.UI.Buttons;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -7,25 +8,43 @@ namespace Blastia.Main.UI.Menus.SinglePlayer;
 
 public class SelectionItem : UIElement
 {
-	private const int Width = 700;
+	private const int Width = 1200;
 	private const int Height = 150;
 	
 	private readonly WorldState _worldState;
 	
 	private Text? _nameText;
-	private Text? _infoText;
+	private Text? _metaText;
+	private Button? _playButton;
 	
     public SelectionItem(Vector2 position, WorldState worldState, SpriteFont font) : base(position, "", font)
 	{
 		_worldState = worldState;
 		
-		SetBackgroundProperties(() => new Rectangle(Bounds.Left, Bounds.Top, Width, Height), Colors.DarkBackground, 1, Colors.DarkBorder, 0);
+		SetBackgroundProperties(() => new Rectangle(Bounds.Left, Bounds.Top, Width, Height), Colors.SelectionItemBg, 2, Colors.SelectionItemBorder, 0);
 		
-		_nameText = new Text(Vector2.Zero, _worldState.Name, font);
+		_nameText = new Text(Vector2.Zero, _worldState.Name, font) 
+		{
+		    DrawColor = Colors.SelectionItemTextDim,
+		    BorderColor = new(0, 0, 0, 0)
+		};
 		ChildElements.Add(_nameText);
 		
-		_infoText = new Text(Vector2.Zero, "99h 59m | 99d 23h 59m 59s");
-		ChildElements.Add(_infoText);
+		_metaText = new Text(Vector2.Zero, $"99h 59m 59s | {worldState.CreatedAtDisplay}", font) 
+		{
+		    Scale = new Vector2(0.7f, 0.7f),
+		    DrawColor = Colors.SelectionItemMetaDim,
+		    BorderColor = new(0, 0, 0, 0)
+		};
+		ChildElements.Add(_metaText);
+		
+		_playButton = new ImageButton(Vector2.Zero, BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("PlayButton", "UI", "WorldSelection"), new Vector2(3f, 3f)), Font, () => {}) 
+		{
+		    DrawColor = Colors.SelectionItemBorder,
+		    OnStartHovering = () => {},
+		    OnEndHovering = () => {}
+		};
+		ChildElements.Add(_playButton);
 	}
 
     public override void UpdateBounds()
@@ -39,10 +58,13 @@ public class SelectionItem : UIElement
     private void UpdateChildrenPositions() 
     {
 		if (_nameText != null)
-        	_nameText.Position = new Vector2(Bounds.Left + 150, Bounds.Top);
+        	_nameText.Position = new Vector2(Bounds.Left + 150, Bounds.Top + 10);
         	
-        if (!_infoText != null)
-			_infoText.Position = new Vector2(Bounds.Left + 150, Bounds.TOp + 50);
+        if (_metaText != null)
+			_metaText.Position = new Vector2(Bounds.Left + 150, Bounds.Top + 50);
+			
+		if (_playButton != null)
+			_playButton.Position = new Vector2(Bounds.Right - _playButton.Bounds.Width - 20, Bounds.Top + Height * 0.5f - _playButton.Bounds.Height * 0.5f);
     }
 }
 
@@ -63,7 +85,7 @@ public class WorldSelectionMenu : Menu
     protected override void AddElements()
 	{
 		Vector2 s = Font.MeasureString(TopText);
-		Text worldSelectText = new Text(new Vector2(-400 + s.X * 0.5f, -300 - s.Y), TopText, Font) 
+		Text worldSelectText = new Text(new Vector2(-650 + s.X * 0.5f, -300 - s.Y), TopText, Font) 
 		{
 		    HAlign = 0.5f,
 		    VAlign = 0.59f
@@ -72,21 +94,26 @@ public class WorldSelectionMenu : Menu
 		
 		string text = $"{_worldStates.Count} items";
 		s = Font.MeasureString(text);
-		Text amountText = new Text(new Vector2(400 - s.X * 0.5f, -300 - s.Y), text, Font) 
+		Text amountText = new Text(new Vector2(650 - s.X * 0.5f, -300 - s.Y), text, Font) 
 		{
 		    HAlign = 0.5f,
 		    VAlign = 0.59f
 		};
 		Elements.Add(amountText);
 		
-		AdvancedBackground bg = new AdvancedBackground(Vector2.Zero, 800, 600, Colors.DarkBackground, 2, Colors.DarkBorder) 
+		AdvancedBackground bg = new AdvancedBackground(Vector2.Zero, 1300, 600, Colors.DarkBackground, 2, Colors.DarkBorder) 
 		{
 		    HAlign = 0.5f,
 		    VAlign = 0.65f
 		};
 		Elements.Add(bg);
 		
-		SelectionItem test = new SelectionItem(Vector2.Zero, _worldStates[0], Font)
+		WorldState testWS = new WorldState() 
+		{
+		    Name = "MMMMMMMMMMMMMMMMMMMM",
+		    CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+		};
+		SelectionItem test = new SelectionItem(Vector2.Zero, testWS, Font)
 		{
 			HAlign = 0.5f,
 			VAlign = 0.5f
