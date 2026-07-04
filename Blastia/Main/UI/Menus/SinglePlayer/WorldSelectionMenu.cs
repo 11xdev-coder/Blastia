@@ -46,6 +46,17 @@ public class SelectionItem : UIElement
 		};
 		ChildElements.Add(_playButton);
 	}
+	
+	public override void Update() 
+	{
+	    base.Update();
+	    
+	    Background?.SetBackgroundColor(IsHovered ? Colors.SelectionItemBgSelected : Colors.SelectionItemBg);
+        Background?.SetOutlineColor(IsHovered ? Colors.DimmedGold : Colors.SelectionItemBorder);
+        ChangeDrawColor(_nameText, IsHovered ? Colors.SelectionItemText : Colors.SelectionItemTextDim);
+        ChangeDrawColor(_metaText, IsHovered ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
+        ChangeDrawColor(_playButton, IsHovered ? Colors.DimmedGold : Colors.SelectionItemBorder);
+	}
 
     public override void UpdateBounds()
     {		
@@ -65,6 +76,15 @@ public class SelectionItem : UIElement
 			
 		if (_playButton != null)
 			_playButton.Position = new Vector2(Bounds.Right - _playButton.Bounds.Width - 20, Bounds.Top + Height * 0.5f - _playButton.Bounds.Height * 0.5f);
+    }
+    
+    /// <summary>
+	/// Automatically checks element for null and changes its <c>DrawColor</c>. Helper method to save 1 line
+	/// </summary>
+    private void ChangeDrawColor(UIElement e, Color newCol) 
+    {
+        if (e == null) return;
+        e.DrawColor = newCol;
     }
 }
 
