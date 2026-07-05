@@ -17,6 +17,8 @@ public class SelectionItem : UIElement
 	private Text? _metaText;
 	private Button? _playButton;
 	
+	public bool IsSelected { get; set; }
+	
     public SelectionItem(Vector2 position, WorldState worldState, SpriteFont font) : base(position, "", font)
 	{
 		_worldState = worldState;
@@ -38,13 +40,13 @@ public class SelectionItem : UIElement
 		};
 		ChildElements.Add(_metaText);
 		
-		_playButton = new ImageButton(Vector2.Zero, BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("PlayButton", "UI", "WorldSelection"), new Vector2(3f, 3f)), Font, () => {}) 
+		_playButton = new ImageButton(Vector2.Zero, BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("PlayButton", "UI", "WorldSelection"), new Vector2(3f, 3f)), font, () => {}) 
 		{
 		    DrawColor = Colors.SelectionItemBorder,
 		    OnStartHovering = () => {},
 		    OnEndHovering = () => {},
 		};
-		_playButton.OnClick += SelectItem;
+		_playButton.OnClick += SelectWorld;
 		ChildElements.Add(_playButton);
 	}
 	
@@ -52,11 +54,11 @@ public class SelectionItem : UIElement
 	{
 	    base.Update();
 	    
-	    Background?.SetBackgroundColor(IsHovered ? Colors.SelectionItemBgSelected : Colors.SelectionItemBg);
-        Background?.SetOutlineColor(IsHovered ? Colors.DimmedGold : Colors.SelectionItemBorder);
-        ChangeDrawColor(_nameText, IsHovered ? Colors.SelectionItemText : Colors.SelectionItemTextDim);
-        ChangeDrawColor(_metaText, IsHovered ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
-        ChangeDrawColor(_playButton, IsHovered ? Colors.DimmedGold : Colors.SelectionItemBorder);
+	    Background?.SetBackgroundColor(IsHovered || IsSelected ? Colors.SelectionItemBgSelected : Colors.SelectionItemBg);
+        Background?.SetOutlineColor(IsHovered || IsSelected ? Colors.DimmedGold : Colors.SelectionItemBorder);
+        ChangeDrawColor(_nameText, IsHovered || IsSelected ? Colors.SelectionItemText : Colors.SelectionItemTextDim);
+        ChangeDrawColor(_metaText, IsHovered || IsSelected ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
+        ChangeDrawColor(_playButton, IsHovered || IsSelected ? Colors.DimmedGold : Colors.SelectionItemBorder);
 	}
 
     public override void UpdateBounds()
@@ -88,7 +90,7 @@ public class SelectionItem : UIElement
         e.DrawColor = newCol;
     }
     
-	private void SelectItem()
+	private void SelectWorld()
 	{
 		var fullyLoadedState = Saving.Load<WorldState>(_worldState.FilePath);
 		WorldManager.Instance.SelectWorld(fullyLoadedState, false);
@@ -120,15 +122,17 @@ public class WorldSelectionMenu : Menu
 	
 	private void UpdateWorldStateUi() 
 	{
-		_area.ClearChildren();
+		_area?.ClearChildren();
 		
 	    foreach (var state in _worldStates) 
 		{
 		    SelectionItem item = new SelectionItem(Vector2.Zero, state, Font);
-		    _area.AddChild(item);
+		    item.OnClick += () => HighlightSelectionItem(item);
+		    _area?.AddChild(item);
 		}
 		
-		_amountText.Text = $"{_worldStates.Count} items";
+		if (_amountText != null)
+			_amountText.Text = $"{_worldStates.Count} items";
 	}
 
     protected override void AddElements()
@@ -193,6 +197,19 @@ public class WorldSelectionMenu : Menu
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(deleteButton);
 		WorldCreationButtonPreset(back);
+	}
+	
+	private void HighlightSelectionItem(SelectionItem item) 
+	{
+	    if (_area == null) return;
+	    
+	    foreach (var ui in _area.Children) 
+	    {
+			if (ui is not SelectionItem selectionItem)
+				continue;
+				
+			selectionItem.IsSelected = selectionItem == item;	        
+	    }
 	}
 
 	public void ToggleMultiplayer(bool host)
