@@ -1,6 +1,7 @@
 ﻿using Blastia.Main.Persistence;
 using Blastia.Main.UI.Buttons;
 using Blastia.Main.Utilities;
+using Blastia.Main.Utilities.ListHandlers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -15,6 +16,8 @@ public class SelectionItem : UIElement
 	
 	private Text? _nameText;
 	private Text? _metaText;
+	private Text? _diffText;
+	private Text? _sizeText;
 	private Button? _playButton;
 	
 	public bool IsSelected { get; set; }
@@ -48,6 +51,47 @@ public class SelectionItem : UIElement
 		};
 		_playButton.OnClick += SelectWorld;
 		ChildElements.Add(_playButton);
+		
+		_diffText = new Text(Vector2.Zero, GetDifficultyDisplayName(worldState.Difficulty), font)
+		{
+			Scale = new Vector2(0.7f, 0.7f),
+			DrawColor = Colors.SelectionItemMetaDim,
+			BorderColor = new(0, 0, 0, 0)
+		};
+		ChildElements.Add(_diffText);
+		
+		_sizeText = new Text(Vector2.Zero, GetSizeDisplayName(worldState.WorldWidth, worldState.WorldHeight), font)
+		{
+			Scale = new Vector2(0.7f, 0.7f),
+			DrawColor = Colors.SelectionItemMetaDim,
+			BorderColor = new(0, 0, 0, 0)
+		};
+		ChildElements.Add(_sizeText);
+	}
+	
+	private string GetDifficultyDisplayName(WorldDifficulty diff) => diff switch 
+	{
+	    WorldDifficulty.Easy => "Peaceful",
+	    WorldDifficulty.Medium => "Unforgiving",
+	    WorldDifficulty.Hard => "No mercy",
+	    _ => "???"
+	};
+	
+	private string GetSizeDisplayName(int width, int height) 
+	{
+		int idx = Array.FindIndex(WorldCreationMenu.SizeValues, s => s.width == width && s.height == height);
+		if (idx < 0) return "error";
+		
+		WorldSize size = (WorldSize) idx;
+		
+	    return size switch 
+		{
+			WorldSize.Small => "Small",
+			WorldSize.Medium => "Medium",
+			WorldSize.Large => "Large",
+			WorldSize.XL => "Enormous",
+			_ => "???"
+		};
 	}
 	
 	public override void Update() 
@@ -58,6 +102,8 @@ public class SelectionItem : UIElement
         Background?.SetOutlineColor(IsHovered || IsSelected ? Colors.DimmedGold : Colors.SelectionItemBorder);
         ChangeDrawColor(_nameText, IsHovered || IsSelected ? Colors.SelectionItemText : Colors.SelectionItemTextDim);
         ChangeDrawColor(_metaText, IsHovered || IsSelected ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
+        ChangeDrawColor(_diffText, IsHovered || IsSelected ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
+        ChangeDrawColor(_sizeText, IsHovered || IsSelected ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
         ChangeDrawColor(_playButton, IsHovered || IsSelected ? Colors.DimmedGold : Colors.SelectionItemBorder);
 	}
 
@@ -76,6 +122,12 @@ public class SelectionItem : UIElement
         	
         if (_metaText != null)
 			_metaText.Position = new Vector2(Bounds.Left + 150, Bounds.Top + 50);
+			
+        if (_diffText != null)
+			_diffText.Position = new Vector2(Bounds.Right - 300, Bounds.Top + 20);
+			
+        if (_sizeText != null)
+			_sizeText.Position = new Vector2(Bounds.Right - 300, Bounds.Top + 50);
 			
 		if (_playButton != null)
 			_playButton.Position = new Vector2(Bounds.Right - _playButton.Bounds.Width - 20, Bounds.Top + Height * 0.5f - _playButton.Bounds.Height * 0.5f);
@@ -208,7 +260,7 @@ public class WorldSelectionMenu : Menu
 			if (ui is not SelectionItem selectionItem)
 				continue;
 				
-			selectionItem.IsSelected = selectionItem == item;	        
+			selectionItem.IsSelected = selectionItem == item;
 	    }
 	}
 

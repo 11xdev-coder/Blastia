@@ -21,7 +21,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	
 	private List<Button> _sizeButtons = [];
 	// sizes in order to match their buttons
-	private static readonly (int width, int height)[] SizeValues = [
+	public static readonly (int width, int height)[] SizeValues = [
 		(4200, 1200),
 		(6400, 1800),
 		(8400, 2400),
@@ -175,15 +175,15 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		var difficultyText = new Text(new Vector2(275, 550), "Difficulty", Font);
 		Elements.Add(difficultyText);
 		
-		var easy = new Button(new Vector2(430, 550), "I am too young to die", Font, () => {});
+		var easy = new Button(new Vector2(430, 550), "Peaceful", Font, () => {});
 		Elements.Add(easy);
 		SetTooltipText(easy, "The standard Blastia experience");
 		
-		var normal = new Button(new Vector2(430, 605), "Hurt me plenty", Font, () => {});
+		var normal = new Button(new Vector2(430, 605), "Unforgiving", Font, () => {});
 		Elements.Add(normal);
 		SetTooltipText(normal, "Greater difficulty with better loot");
 		
-		var hard = new Button(new Vector2(670, 605), "Nightmare", Font, () => {});
+		var hard = new Button(new Vector2(670, 605), "No mercy", Font, () => {});
 		Elements.Add(hard);		
 		SetTooltipText(hard, "For those who'd like a challenge");
 		
