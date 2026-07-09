@@ -220,9 +220,13 @@ public class WorldManager : Singleton<WorldManager>
     public static string Extension = ".blsw";
     public WorldState? WorldState;
     
-    public void NewWorld(string worldName, BigInteger seed, WorldDifficulty difficulty, 
+    public SaveValidationResult NewWorld(string worldName, BigInteger seed, WorldDifficulty difficulty, 
 			int worldWidth, int worldHeight) 
 	{
+		var result = ManagerFileHelper.CanCreate(WorldsSaveFolder, worldName, Extension);
+		if (result != SaveValidationResult.Success)
+			return result;
+		
 		WorldState worldData = new WorldState 
 		{ 
 			Name = worldName, 
@@ -248,6 +252,9 @@ public class WorldManager : Singleton<WorldManager>
 			    WorldGen.HasError = true;
 			}
 		});
+		
+		// means that we started generating the world, not that its already generated
+		return SaveValidationResult.Success;
 	}
 	
 	public bool WorldExists(string worldName) => ManagerFileHelper.Exists(WorldsSaveFolder, worldName, Extension);

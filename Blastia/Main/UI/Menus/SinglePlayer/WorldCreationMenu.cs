@@ -17,7 +17,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	private Input? _seed;
 	private ScrollableArea? _warnings;
 	private Text? _tooltipText;
-	private Text? _existsText;
+	private Text? _errorText;
 	
 	private List<Button> _sizeButtons = [];
 	// sizes in order to match their buttons
@@ -230,13 +230,13 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(back);
 		
-		_existsText = new Text(new Vector2(0, 960), "World with same name already exists", Font) 
+		_errorText = new Text(new Vector2(0, 960), "World with same name already exists", Font) 
 		{
 		    HAlign = 0.5f,
 		    DrawColorGetter = () => BlastiaGame.ErrorColor,
 		    Alpha = 0f
 		};
-		Elements.Add(_existsText);
+		Elements.Add(_errorText);
 		
         // call an extra update for buttons to keep up
         base.Update();
@@ -309,7 +309,7 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 
 	protected void Create()
 	{
-		if (_name == null || _seed == null || string.IsNullOrEmpty(_name.Text) || string.IsNullOrEmpty(_seed.Text) || _existsText == null) return;
+		if (_name == null || _seed == null || string.IsNullOrEmpty(_seed.Text) || _errorText == null) return;
 		
 		(int width, int height) = GetSelectedSize();
 		WorldDifficulty difficulty = GetSelectedDifficulty();
@@ -317,16 +317,24 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		string name = _name.StringBuilder.ToString();
 		BigInteger seed = BigInteger.Parse(_seed.StringBuilder.ToString());
-
-		if (!WorldManager.Instance.WorldExists(name))
+		
+		SaveValidationResult result = WorldManager.Instance.NewWorld(name, seed, difficulty, width, height);
+		if (result == SaveValidationResult.Success) 
 		{
-			WorldManager.Instance.NewWorld(name, seed, difficulty, width, height);	
 			SwitchToMenu(BlastiaGame.GetMenu<WorldGenerationStatusMenu>());
+		    return;
 		}
-		else
+		
+		string message = result switch 
 		{
-			_existsText.Alpha = 1f;
-			_existsText.LerpAlphaToZero = true;
-		}
+		    SaveValidationResult.InvalidName => "Invalid characters in the name",
+		    SaveValidationResult.InvalidPath => "Invalid world path. Please check the folder's name",
+		    SaveValidationResult.AlreadyExists => "World with that name already exists",
+		    _ => "Error while creating the world"
+		};
+		
+		_errorText.Text = message;
+		_errorText.Alpha = 2f;
+		_errorText.LerpAlphaToZero = true;
 	}
 }

@@ -1,22 +1,42 @@
+using System.Text.RegularExpressions;
 using Blastia.Main.Persistence;
 using Blastia.Main.Utilities;
 
+public enum SaveValidationResult
+{
+    InvalidName,
+    InvalidPath,
+    AlreadyExists,
+    Success
+}
 
 /// <summary>
 /// Contains utility/base methods for <c>WorldManager</c> and <c>PlayerManager</c>
 /// </summary>
 public static class ManagerFileHelper 
 {
+    private static string GetFullPath(string folder, string name, string extension) => Path.Combine(folder, name + extension);
+    
+    public static SaveValidationResult CanCreate(string pathToSaveFolder, string name, string extension) 
+    {
+        if (string.IsNullOrEmpty(pathToSaveFolder))
+            return SaveValidationResult.InvalidPath;
+           
+        if (!IsValidName(name))
+            return SaveValidationResult.InvalidName;
+            
+        if (File.Exists(GetFullPath(pathToSaveFolder, name, extension))) 
+            return SaveValidationResult.AlreadyExists;
+            
+        return SaveValidationResult.Success;
+    }
+    
     public static void New(string pathToSaveFolder, string name, string extension, object? data = null)
 	{
-		if (string.IsNullOrEmpty(pathToSaveFolder))
-		    throw new Exception($"Failed creating a save: Provided folder path is null or empty.");
-		    
-        string fullPath = GetFullPath(pathToSaveFolder, name, extension);
-
-        if (File.Exists(fullPath))
-            throw new Exception($"Failed creating a save: Save already exists. Full path: {fullPath}");
-            
+        if (CanCreate(pathToSaveFolder, name, extension) != SaveValidationResult.Success)
+            return;
+        
+        var fullPath = GetFullPath(pathToSaveFolder, name, extension);
         // save data if provided
         if (data != null) 
             Saving.Save(fullPath, data);
@@ -56,13 +76,6 @@ public static class ManagerFileHelper
 
         return items;
 	}
-
-    /// <summary>
-    /// Returns full path including extension of type 'folder/name.extension'
-    /// </summary>
-	public static string GetFullPath(string folder, string name, string extension)
-	{
-		// Players/Name.bmplr or Worlds/Name.bmwld
-		return Path.Combine(folder, name + extension);
-	}
+	
+	public static bool IsValidName(string name) => Regex.IsMatch(name, @"^[a-zA-Z0-9\s_]+$");
 }
