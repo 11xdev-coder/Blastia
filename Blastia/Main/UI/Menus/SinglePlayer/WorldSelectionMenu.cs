@@ -12,7 +12,7 @@ public class SelectionItem : UIElement
 	private const int Width = 1200;
 	private const int Height = 150;
 	
-	private readonly WorldState _worldState;
+	public readonly WorldState WorldState;
 	
 	private Text? _nameText;
 	private Text? _metaText;
@@ -24,11 +24,11 @@ public class SelectionItem : UIElement
 	
     public SelectionItem(Vector2 position, WorldState worldState, SpriteFont font) : base(position, "", font)
 	{
-		_worldState = worldState;
+		WorldState = worldState;
 		
 		SetBackgroundProperties(() => new Rectangle(Bounds.Left, Bounds.Top, Width, Height), Colors.SelectionItemBg, 2, Colors.SelectionItemBorder, 0);
 		
-		_nameText = new Text(Vector2.Zero, _worldState.Name, font) 
+		_nameText = new Text(Vector2.Zero, WorldState.Name, font) 
 		{
 		    DrawColor = Colors.SelectionItemTextDim,
 		    BorderColor = new(0, 0, 0, 0)
@@ -144,7 +144,7 @@ public class SelectionItem : UIElement
     
 	private void SelectWorld()
 	{
-		var fullyLoadedState = Saving.Load<WorldState>(_worldState.FilePath);
+		var fullyLoadedState = Saving.Load<WorldState>(WorldState.FilePath);
 		WorldManager.Instance.SelectWorld(fullyLoadedState, false);
 	}
 }
@@ -158,6 +158,9 @@ public class WorldSelectionMenu : Menu
 	private List<WorldState> _worldStates;
 	private ScrollableArea? _area;
 	private Text? _amountText;
+	private Text? _deleteConfirmation;
+	private Button? _deleteYes;
+	private Button? _deleteNo;
 
 	public WorldSelectionMenu(SpriteFont font, bool isActive = false) : base(font, isActive, false) 
 	{
@@ -232,7 +235,7 @@ public class WorldSelectionMenu : Menu
 		};
 		Elements.Add(createButton);
 		
-		Button deleteButton = new Button(new Vector2(0, 250), "Delete", Font, () => {}) 
+		Button deleteButton = new Button(new Vector2(0, 250), "Delete", Font, ShowDeleteConfirmation) 
 		{
 		    HAlign = 0.5f,
 		    VAlign = 0.65f
@@ -245,6 +248,36 @@ public class WorldSelectionMenu : Menu
 		    VAlign = 0.65f
 		};
 		Elements.Add(back);
+		
+		_deleteConfirmation = new Text(new Vector2(0, 250 + deleteScale.Y + 20), "", Font) 
+		{
+			HAlign = 0.5f,
+			VAlign = 0.65f,
+		    Alpha = 0f
+		};
+		Elements.Add(_deleteConfirmation);
+		
+		_deleteYes = new Button(new Vector2(0, 250 + deleteScale.Y + 20), "Yes", Font, () => {}) 
+		{
+			HAlign = 0.5f,
+			VAlign = 0.65f,
+		    Alpha = 0f,
+		    DrawColor = Color.LimeGreen,
+		    NormalColor = Color.LimeGreen,
+			SelectedColor = Color.LimeGreen
+		};
+		Elements.Add(_deleteYes);
+		
+		_deleteNo = new Button(new Vector2(0, 250 + deleteScale.Y + 20), "No", Font, () => {}) 
+		{
+			HAlign = 0.5f,
+			VAlign = 0.65f,
+		    Alpha = 0f,
+		    DrawColor = Color.DarkRed,
+		    NormalColor = Color.DarkRed,
+			SelectedColor = Color.DarkRed
+		};
+		Elements.Add(_deleteNo);
 		
 		WorldCreationButtonPreset(createButton);
 		WorldCreationButtonPreset(deleteButton);
@@ -261,6 +294,32 @@ public class WorldSelectionMenu : Menu
 				continue;
 				
 			selectionItem.IsSelected = selectionItem == item;
+	    }
+	}
+	
+	private void ShowDeleteConfirmation() 
+	{
+	    if (_area == null || _deleteConfirmation == null || _deleteYes == null || _deleteNo == null) return;
+	    
+	    foreach (var ui in _area.Children) 
+	    {
+	        if (ui is not SelectionItem selectionItem)
+	        	continue;
+	        	
+	        if (!selectionItem.IsSelected) continue;
+	        
+	        string text = $"Delete {selectionItem.WorldState.Name}?";
+	        Vector2 size = Font.MeasureString(text);
+	        _deleteConfirmation.Text = text;
+	        _deleteConfirmation.Position.X = -size.X;
+	        _deleteConfirmation.Alpha = 1f;
+	        
+	        Vector2 yesSize = Font.MeasureString("Yes");
+	        Vector2 noSize = Font.MeasureString("No");
+	        _deleteYes.Position.X = yesSize.X;
+	        _deleteYes.Alpha = 1f;
+	        _deleteNo.Position.X = yesSize.X + noSize.X + 20;
+	        _deleteNo.Alpha = 1f;
 	    }
 	}
 

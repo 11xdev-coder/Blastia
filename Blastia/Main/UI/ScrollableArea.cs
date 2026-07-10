@@ -162,6 +162,8 @@ public class ScrollableArea : UIElement
         // update every child
         foreach (var child in _children)
         {
+            child.ClickClipBounds = new Rectangle(Bounds.X, Bounds.Y, ViewportWidth, ViewportHeight);
+            
             // align
             switch (_alignment) 
             {

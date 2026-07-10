@@ -63,6 +63,12 @@ public abstract class UIElement
     #endregion
 
     public Rectangle Bounds { get; set; }
+    
+    /// <summary>
+    /// Optional clip region for click/hover testing. When set the element responds to click within intersection of Bounds and thic rect.
+    /// Set to the parent's bounds for the element to not be clickable if not in the bounds (for example in <c>ScrollableArea</c>)
+    /// </summary>
+    public Rectangle? ClickClipBounds { get; set; }
 
     #region Hovering events
 
@@ -259,16 +265,29 @@ public abstract class UIElement
         IsFocused = false;
     }
     
+    /// <summary>
+    /// Returns whether a point in UI space at (x,y) is inside the bounds, or <c>ClickClipBounds</c> if set
+    /// </summary>
+    public virtual bool HitTest(int x, int y) 
+    {
+        var rect = ClickClipBounds.HasValue ? Rectangle.Intersect(Bounds, ClickClipBounds.Value) : Bounds;
+        return rect.Contains(x, y);
+    }
+    
     public virtual void Update()
     {
-        Background?.Update();
+        if (Background != null) 
+        {
+            Background.ClickClipBounds = ClickClipBounds;
+            Background.Update();
+        }
         
         int cursorX = (int)BlastiaGame.CursorPosition.X;
         int cursorY = (int)BlastiaGame.CursorPosition.Y;
         bool hasClickedLeft = BlastiaGame.HasClickedLeft;
         bool hasClickedRight = BlastiaGame.HasClickedRight;
         bool isHoldingLeft = BlastiaGame.IsHoldingLeft;
-        IsHovered = Bounds.Contains(cursorX, cursorY);
+        IsHovered = HitTest(cursorX, cursorY);
         
         var isBackgroundHovered = Background?.IsHovered ?? false;
         var isHoveredIncludingBackground = IsHovered || isBackgroundHovered;
