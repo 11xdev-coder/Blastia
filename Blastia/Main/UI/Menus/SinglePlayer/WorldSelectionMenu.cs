@@ -169,14 +169,13 @@ public class WorldSelectionMenu : Menu
 	}
 	
 	protected override void OnMenuActive() 
-	{
-	    _worldStates = WorldManager.Instance.LoadAllWorlds();
-	    
+	{	    
 	    UpdateWorldStateUi();
 	}
 	
 	private void UpdateWorldStateUi() 
 	{
+	    _worldStates = WorldManager.Instance.LoadAllWorlds();
 		_area?.ClearChildren();
 		
 	    foreach (var state in _worldStates) 
@@ -257,7 +256,7 @@ public class WorldSelectionMenu : Menu
 		};
 		Elements.Add(_deleteConfirmation);
 		
-		_deleteYes = new Button(new Vector2(0, 250 + deleteScale.Y + 20), "Yes", Font, () => {}) 
+		_deleteYes = new Button(new Vector2(0, 250 + deleteScale.Y + 20), "Yes", Font, DeleteYes) 
 		{
 			HAlign = 0.5f,
 			VAlign = 0.65f,
@@ -268,7 +267,7 @@ public class WorldSelectionMenu : Menu
 		};
 		Elements.Add(_deleteYes);
 		
-		_deleteNo = new Button(new Vector2(0, 250 + deleteScale.Y + 20), "No", Font, () => {}) 
+		_deleteNo = new Button(new Vector2(0, 250 + deleteScale.Y + 20), "No", Font, DeleteNo) 
 		{
 			HAlign = 0.5f,
 			VAlign = 0.65f,
@@ -297,31 +296,51 @@ public class WorldSelectionMenu : Menu
 	    }
 	}
 	
+	private SelectionItem? GetSelectedItem() => _area?.Children.OfType<SelectionItem>().FirstOrDefault(s => s.IsSelected);
+	
 	private void ShowDeleteConfirmation() 
 	{
-	    if (_area == null || _deleteConfirmation == null || _deleteYes == null || _deleteNo == null) return;
+		var selectedItem = GetSelectedItem();
+	    if (selectedItem == null || _deleteConfirmation == null || _deleteYes == null || _deleteNo == null) return;
 	    
-	    foreach (var ui in _area.Children) 
-	    {
-	        if (ui is not SelectionItem selectionItem)
-	        	continue;
-	        	
-	        if (!selectionItem.IsSelected) continue;
-	        
-	        string text = $"Delete {selectionItem.WorldState.Name}?";
-	        Vector2 size = Font.MeasureString(text);
-	        _deleteConfirmation.Text = text;
-	        _deleteConfirmation.Position.X = -size.X;
-	        _deleteConfirmation.Alpha = 1f;
-	        
-	        Vector2 yesSize = Font.MeasureString("Yes");
-	        Vector2 noSize = Font.MeasureString("No");
-	        _deleteYes.Position.X = yesSize.X;
-	        _deleteYes.Alpha = 1f;
-	        _deleteNo.Position.X = yesSize.X + noSize.X + 20;
-	        _deleteNo.Alpha = 1f;
-	    }
+	    string text = $"Delete {selectedItem.WorldState.Name}?";
+		Vector2 size = Font.MeasureString(text);
+		_deleteConfirmation.Text = text;
+		_deleteConfirmation.Position.X = -size.X;
+		_deleteConfirmation.Alpha = 1f;
+		
+		Vector2 yesSize = Font.MeasureString("Yes");
+		Vector2 noSize = Font.MeasureString("No");
+		_deleteYes.Position.X = yesSize.X;
+		_deleteYes.Alpha = 1f;
+		_deleteNo.Position.X = yesSize.X + noSize.X + 20;
+		_deleteNo.Alpha = 1f;
 	}
+	
+	private void HideDeleteConfirmation() 
+	{
+		if (_deleteConfirmation == null || _deleteYes == null || _deleteNo == null) return;
+		
+	    _deleteConfirmation.Alpha = 0f;
+	    _deleteYes.Alpha = 0f;
+	    _deleteNo.Alpha = 0f;
+	}
+	
+	private void DeleteYes() 
+	{
+	    var selectedItem = GetSelectedItem();
+	    if (selectedItem == null) return;
+	    
+	    HideDeleteConfirmation();
+	    
+	    bool deleted = WorldManager.Instance.DeleteWorld(selectedItem.WorldState.FilePath);
+	    if (deleted)
+	    	UpdateWorldStateUi();
+	    else
+	    	Console.WriteLine("Error while deleting world");
+	}
+	
+	private void DeleteNo() => HideDeleteConfirmation();
 
 	public void ToggleMultiplayer(bool host)
 	{

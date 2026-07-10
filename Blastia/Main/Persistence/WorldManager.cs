@@ -259,6 +259,7 @@ public class WorldManager : Singleton<WorldManager>
 	
 	public bool WorldExists(string worldName) => ManagerFileHelper.Exists(WorldsSaveFolder, worldName, Extension);
 	public List<WorldState> LoadAllWorlds() => ManagerFileHelper.LoadAll<WorldState>(WorldsSaveFolder, Extension);
+	public bool DeleteWorld(string fullPath) => ManagerFileHelper.Delete(fullPath);
 		
 	/// <summary>
 	/// Selects the world state

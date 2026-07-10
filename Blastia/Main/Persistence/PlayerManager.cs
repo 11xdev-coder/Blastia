@@ -27,6 +27,7 @@ public class PlayerManager : Singleton<PlayerManager>
 	}
 	public bool PlayerExists(string playerName) => ManagerFileHelper.Exists(PlayersSaveFolder, playerName, Extension);
 	public List<PlayerState> LoadAllPlayers() => ManagerFileHelper.LoadAll<PlayerState>(PlayersSaveFolder, Extension);
+	public bool DeletePlayer(string fullPath) => ManagerFileHelper.Delete(fullPath);
 
 	/// <summary>
 	/// Selects the player state

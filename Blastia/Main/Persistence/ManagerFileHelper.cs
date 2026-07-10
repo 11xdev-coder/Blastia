@@ -77,5 +77,14 @@ public static class ManagerFileHelper
         return items;
 	}
 	
+	public static bool Delete(string fullPath) 
+	{
+	    if (string.IsNullOrEmpty(fullPath) || !File.Exists(fullPath))
+            return false;
+            
+        File.Delete(fullPath);
+        return true;
+	}
+	
 	public static bool IsValidName(string name) => Regex.IsMatch(name, @"^[a-zA-Z0-9\s_]+$");
 }
