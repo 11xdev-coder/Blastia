@@ -8,35 +8,36 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus;
 
-public abstract class SelectionItem : UIElement
+public abstract class AbstractSelectionItem<T> : UIElement where T : State
 {
 	private const int Width = 1200;
 	private const int Height = 150;
 	
-	public readonly WorldState WorldState;
+	public readonly T State;
 	
 	private Text? _nameText;
 	private Text? _metaText;
-	private Text? _diffText;
-	private Text? _sizeText;
 	private Button? _playButton;
 	
 	public bool IsSelected { get; set; }
 	
-    public SelectionItem(Vector2 position, WorldState worldState, SpriteFont font) : base(position, "", font)
+	/// <summary>
+    /// Adds elements to the item. Add your own constructor to add items
+    /// </summary>
+    public AbstractSelectionItem(Vector2 position, T state, SpriteFont font) : base(position, "", font)
 	{
-		WorldState = worldState;
+		State = state;
 		
 		SetBackgroundProperties(() => new Rectangle(Bounds.Left, Bounds.Top, Width, Height), Colors.SelectionItemBg, 2, Colors.SelectionItemBorder, 0);
 		
-		_nameText = new Text(Vector2.Zero, WorldState.Name, font) 
+		_nameText = new Text(Vector2.Zero, State.Name, font) 
 		{
 		    DrawColor = Colors.SelectionItemTextDim,
 		    BorderColor = new(0, 0, 0, 0)
 		};
 		ChildElements.Add(_nameText);
 		
-		_metaText = new Text(Vector2.Zero, $"99h 59m 59s | {worldState.CreatedAtDisplay}", font) 
+		_metaText = new Text(Vector2.Zero, $"99h 59m 59s | {State.CreatedAtDisplay}", font) 
 		{
 		    Scale = new Vector2(0.7f, 0.7f),
 		    DrawColor = Colors.SelectionItemMetaDim,
@@ -50,50 +51,11 @@ public abstract class SelectionItem : UIElement
 		    OnStartHovering = () => {},
 		    OnEndHovering = () => {},
 		};
-		_playButton.OnClick += SelectWorld;
+		_playButton.OnClick += LoadState;
 		ChildElements.Add(_playButton);
-		
-		_diffText = new Text(Vector2.Zero, GetDifficultyDisplayName(worldState.Difficulty), font)
-		{
-			Scale = new Vector2(0.7f, 0.7f),
-			DrawColor = Colors.SelectionItemMetaDim,
-			BorderColor = new(0, 0, 0, 0)
-		};
-		ChildElements.Add(_diffText);
-		
-		_sizeText = new Text(Vector2.Zero, GetSizeDisplayName(worldState.WorldWidth, worldState.WorldHeight), font)
-		{
-			Scale = new Vector2(0.7f, 0.7f),
-			DrawColor = Colors.SelectionItemMetaDim,
-			BorderColor = new(0, 0, 0, 0)
-		};
-		ChildElements.Add(_sizeText);
 	}
-	
-	private string GetDifficultyDisplayName(WorldDifficulty diff) => diff switch 
-	{
-	    WorldDifficulty.Easy => "Peaceful",
-	    WorldDifficulty.Medium => "Unforgiving",
-	    WorldDifficulty.Hard => "No mercy",
-	    _ => "???"
-	};
-	
-	private string GetSizeDisplayName(int width, int height) 
-	{
-		int idx = Array.FindIndex(WorldCreationMenu.SizeValues, s => s.width == width && s.height == height);
-		if (idx < 0) return "error";
-		
-		WorldSize size = (WorldSize) idx;
-		
-	    return size switch 
-		{
-			WorldSize.Small => "Small",
-			WorldSize.Medium => "Medium",
-			WorldSize.Large => "Large",
-			WorldSize.XL => "Enormous",
-			_ => "???"
-		};
-	}
+    
+	protected abstract void LoadState();
 	
 	public override void Update() 
 	{
@@ -103,8 +65,6 @@ public abstract class SelectionItem : UIElement
         Background?.SetOutlineColor(IsHovered || IsSelected ? Colors.DimmedGold : Colors.SelectionItemBorder);
         ChangeDrawColor(_nameText, IsHovered || IsSelected ? Colors.SelectionItemText : Colors.SelectionItemTextDim);
         ChangeDrawColor(_metaText, IsHovered || IsSelected ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
-        ChangeDrawColor(_diffText, IsHovered || IsSelected ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
-        ChangeDrawColor(_sizeText, IsHovered || IsSelected ? Colors.SelectionItemMeta : Colors.SelectionItemMetaDim);
         ChangeDrawColor(_playButton, IsHovered || IsSelected ? Colors.DimmedGold : Colors.SelectionItemBorder);
 	}
 
@@ -116,19 +76,16 @@ public abstract class SelectionItem : UIElement
 		UpdateChildrenPositions();
    }
     
-    private void UpdateChildrenPositions() 
+    /// <summary>
+    /// Update's children positions every frame. Override to add your own
+    /// </summary>
+    protected virtual void UpdateChildrenPositions() 
     {
 		if (_nameText != null)
         	_nameText.Position = new Vector2(Bounds.Left + 150, Bounds.Top + 10);
         	
         if (_metaText != null)
 			_metaText.Position = new Vector2(Bounds.Left + 150, Bounds.Top + 50);
-			
-        if (_diffText != null)
-			_diffText.Position = new Vector2(Bounds.Right - 300, Bounds.Top + 20);
-			
-        if (_sizeText != null)
-			_sizeText.Position = new Vector2(Bounds.Right - 300, Bounds.Top + 50);
 			
 		if (_playButton != null)
 			_playButton.Position = new Vector2(Bounds.Right - _playButton.Bounds.Width - 20, Bounds.Top + Height * 0.5f - _playButton.Bounds.Height * 0.5f);
@@ -137,20 +94,14 @@ public abstract class SelectionItem : UIElement
     /// <summary>
 	/// Automatically checks element for null and changes its <c>DrawColor</c>. Helper method to save 1 line
 	/// </summary>
-    private void ChangeDrawColor(UIElement? e, Color newCol) 
+    protected void ChangeDrawColor(UIElement? e, Color newCol) 
     {
         if (e == null) return;
         e.DrawColor = newCol;
     }
-    
-	private void SelectWorld()
-	{
-		var fullyLoadedState = Saving.Load<WorldState>(WorldState.FilePath);
-		WorldManager.Instance.SelectWorld(fullyLoadedState, false);
-	}
 }
 
-public abstract class AbstractSelectionMenu<T> : Menu where T : State, new()
+public abstract class AbstractSelectionMenu<T> : Menu where T : State
 {
 	public override ActivationMethod ActivationType => ActivationMethod.HideWhenInGame;
 	
@@ -162,10 +113,15 @@ public abstract class AbstractSelectionMenu<T> : Menu where T : State, new()
 	private Button? _deleteYes;
 	private Button? _deleteNo;
 	
-	protected abstract Menu CreationMenu { get; set; }
-	protected abstract Menu PreviousMenu { get; set; }
+	protected abstract Menu? CreationMenu { get; }
+	protected abstract Menu? PreviousMenu { get; }
 	
 	protected abstract List<T> GetStates();
+	
+	/// <summary>
+    /// Method that creates a child of abstract SelectionItem with provided state
+    /// </summary>
+	protected abstract AbstractSelectionItem<T> CreateSelectionItem(T state);
 
 	public AbstractSelectionMenu(SpriteFont font, bool isActive = false) : base(font, isActive, false) 
 	{
@@ -182,7 +138,7 @@ public abstract class AbstractSelectionMenu<T> : Menu where T : State, new()
 		
 	    foreach (var state in _states) 
 		{
-		    SelectionItem item = new SelectionItem(Vector2.Zero, state, Font);
+		    AbstractSelectionItem<T> item = CreateSelectionItem(state);
 		    item.OnClick += () => HighlightSelectionItem(item);
 		    _area?.AddChild(item);
 		}
@@ -285,27 +241,27 @@ public abstract class AbstractSelectionMenu<T> : Menu where T : State, new()
 		WorldCreationButtonPreset(back);
 	}
 	
-	private void HighlightSelectionItem(SelectionItem item) 
+	private void HighlightSelectionItem(AbstractSelectionItem<T> item) 
 	{
 	    if (_area == null) return;
 	    
 	    foreach (var ui in _area.Children) 
 	    {
-			if (ui is not SelectionItem selectionItem)
+			if (ui is not AbstractSelectionItem<T> selectionItem)
 				continue;
 				
 			selectionItem.IsSelected = selectionItem == item;
 	    }
 	}
 	
-	private SelectionItem? GetSelectedItem() => _area?.Children.OfType<SelectionItem>().FirstOrDefault(s => s.IsSelected);
+	private AbstractSelectionItem<T>? GetSelectedItem() => _area?.Children.OfType<AbstractSelectionItem<T>>().FirstOrDefault(s => s.IsSelected);
 	
 	private void ShowDeleteConfirmation() 
 	{
 		var selectedItem = GetSelectedItem();
 	    if (selectedItem == null || _deleteConfirmation == null || _deleteYes == null || _deleteNo == null) return;
 	    
-	    string text = $"Delete {selectedItem.WorldState.Name}?";
+	    string text = $"Delete {selectedItem.State.Name}?";
 		Vector2 size = Font.MeasureString(text);
 		_deleteConfirmation.Text = text;
 		_deleteConfirmation.Position.X = -size.X;
@@ -328,6 +284,8 @@ public abstract class AbstractSelectionMenu<T> : Menu where T : State, new()
 	    _deleteNo.Alpha = 0f;
 	}
 	
+	protected abstract bool DeleteState(string filePath);
+	
 	private void DeleteYes() 
 	{
 	    var selectedItem = GetSelectedItem();
@@ -335,11 +293,11 @@ public abstract class AbstractSelectionMenu<T> : Menu where T : State, new()
 	    
 	    HideDeleteConfirmation();
 	    
-	    bool deleted = WorldManager.Instance.DeleteWorld(selectedItem.WorldState.FilePath);
+	    bool deleted = DeleteState(selectedItem.State.FilePath);
 	    if (deleted)
 	    	UpdateUi();
 	    else
-	    	Console.WriteLine("Error while deleting world");
+	    	Console.WriteLine("[AbstractSelectionMenu] Error while deleting");
 	}
 	
 	private void DeleteNo() => HideDeleteConfirmation();	
