@@ -41,7 +41,7 @@ public class PlayerSelectionMenu : AbstractSelectionMenu<PlayerState>
 
 	private void SwitchMenuOnSelect() => SwitchToMenu(SwitchToJoinMenu ? BlastiaGame.GetMenu<JoinGameMenu>() : BlastiaGame.GetMenu<WorldSelectionMenu>());
 
-    protected override bool DeleteState(string filePath) => WorldManager.Instance.DeleteWorld(filePath);
+    protected override bool DeleteState(string filePath) => PlayerManager.Instance.DeletePlayer(filePath);
     
     public void ToggleSwitchToJoinMenu(bool switchToJoinMenu)
 	{
