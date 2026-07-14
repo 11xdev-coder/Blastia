@@ -87,7 +87,7 @@ public class WorldSelectionMenu : AbstractSelectionMenu<WorldState>
     private bool Host { get; set; }
 	protected override string TopText => "World Select";
 	protected override Menu? CreationMenu => BlastiaGame.GetMenu<WorldCreationMenu>();
-	protected override Menu? PreviousMenu => BlastiaGame.GetMenu<PlayersMenu>();
+	protected override Menu? PreviousMenu => BlastiaGame.GetMenu<PlayerSelectionMenu>();
 
 	public WorldSelectionMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
     {

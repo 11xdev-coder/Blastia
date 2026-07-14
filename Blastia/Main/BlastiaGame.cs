@@ -275,7 +275,7 @@ public class BlastiaGame : Game
             // menus
             AddMenu(new LogoMenu(MainFont));
             AddMenu(new MainMenu(MainFont));
-            AddMenu(new PlayersMenu(MainFont));
+            AddMenu(new PlayerSelectionMenu(MainFont));
             AddMenu(new WorldSelectionMenu(MainFont));
             AddMenu(new PlayerCreationMenu(MainFont));
             AddMenu(new WorldCreationMenu(MainFont));

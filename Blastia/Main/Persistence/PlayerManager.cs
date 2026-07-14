@@ -35,7 +35,6 @@ public class PlayerManager : Singleton<PlayerManager>
 	public void SelectPlayer(PlayerState playerState)
 	{
 		PlayerState = playerState;
-			// switchToMenu(BlastiaGame.GetMenu<JoinGameMenu>());
 	}
 	
 	public void UnselectPlayer() => PlayerState = null;
