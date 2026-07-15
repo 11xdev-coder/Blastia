@@ -13,7 +13,7 @@ public class WorldNameData
 /// <summary>
 /// Returns a random world name from the list ("worldnames.json")
 /// </summary>
-public static class WorldNameGenerator 
+public static class RandomNameGenerator 
 {
     private static readonly Random _rng = new();
     private static WorldNameData? _data;

@@ -41,7 +41,7 @@ public class WorldSelectionItem: AbstractSelectionItem<WorldState>
 	
 	private string GetSizeDisplayName(int width, int height) 
 	{
-		int idx = Array.FindIndex(WorldCreationMenu.SizeValues, s => s.width == width && s.height == height);
+		int idx = Array.FindIndex(WorldCreationMenu.SizeValues.ToArray(), s => s.width == width && s.height == height);
 		if (idx < 0) return "error";
 		
 		WorldSize size = (WorldSize) idx;

@@ -9,19 +9,16 @@ using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
 
-public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(font, isActive)
+public class WorldCreationMenu : AbstractCreationMenu
 {
 	private Image? _worldPreview;
 	private Image? _worldPreviewBorder;
-	private Input? _name;
 	private Input? _seed;
 	private ScrollableArea? _warnings;
-	private Text? _tooltipText;
-	private Text? _errorText;
 	
 	private List<Button> _sizeButtons = [];
 	// sizes in order to match their buttons
-	public static readonly (int width, int height)[] SizeValues = [
+	public static readonly List<(int width, int height)> SizeValues = [
 		(4200, 1200),
 		(6400, 1800),
 		(8400, 2400),
@@ -29,61 +26,26 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 	];
 	private List<Button> _difficultyButtons = [];
 	// difficulties in order to match their buttons
-	private static readonly WorldDifficulty[] DifficultyValues = [
+	private static readonly List<WorldDifficulty> DifficultyValues = [
 		WorldDifficulty.Easy,
 		WorldDifficulty.Medium,
 		WorldDifficulty.Hard
 	];
 	private List<Button> _modificatorButtons = [];
+
+    protected override Menu? PreviousMenu => BlastiaGame.GetMenu<WorldSelectionMenu>();
+
+    public WorldCreationMenu(SpriteFont font, bool isActive = false) : base(font, isActive)
+    {
+    }
+	private (int width, int height) GetSelectedSize() => GetValueFromSelectedButton(_sizeButtons, SizeValues);
 	
-	private void SetTooltipText(UIElement elem, string text) 
-	{	
-		if (_tooltipText == null) return;
-		
-	    elem.OnStartHovering += () => { _tooltipText.Text = text; };
-	    elem.OnEndHovering += () => { _tooltipText.Text = ""; };
-	}
-	
-	/// <summary>
-	/// Get the first selected button's index from a group
-	/// </summary>
-	private int GetSelectedIndex(List<Button> group) => group.FindIndex(b => b.GetState());
-	private (int width, int height) GetSelectedSize() 
-	{
-	    int idx = GetSelectedIndex(_sizeButtons);
-	    return idx >= 0 ? SizeValues[idx] : SizeValues[1];
-	}
-	
-	private WorldDifficulty GetSelectedDifficulty() 
-	{
-	    int idx = GetSelectedIndex(_difficultyButtons);
-	    return idx >= 0 ? DifficultyValues[idx] : DifficultyValues[1];
-	}
+	private WorldDifficulty GetSelectedDifficulty() => GetValueFromSelectedButton(_difficultyButtons, DifficultyValues);
 	
 	protected override void AddElements()
 	{
-		// --------------- BACKGROUND -----------------------
-		AdvancedBackground bg = new AdvancedBackground(Vector2.Zero, 1400, 600, Colors.DarkBackground, 2, Colors.DarkBorder)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.6f
-		};
-		Elements.Add(bg);
-		
-		AdvancedBackground tooltipBg = new AdvancedBackground(Vector2.Zero, 1300, 90, Colors.DarkBackground, 0) 
-		{
-		    HAlign = 0.5f,
-		    VAlign = 0.8f
-		};
-		Elements.Add(tooltipBg);
-		
-		_tooltipText = new Text(Vector2.Zero, "", Font)
-		{
-			HAlign = 0.5f,
-			VAlign = 0.78f
-		};
-		Elements.Add(_tooltipText);
-		
+		base.AddElements();
+				
 		// --------------- WORLD ICON -----------------------
 		_worldPreview = new Image(Vector2.Zero, BlastiaGame.TextureManager.Get("Preview", "UI", "WorldCreation"), 32, 32, 3, new Vector2(3.5f, 3.5f)) 
 		{
@@ -99,24 +61,11 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		};
 		Elements.Add(_worldPreviewBorder);
 		
-		// --------------- NAME & SEED -----------------------
-		var nameRandButton = new ImageButton(new Vector2(415, 317), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Name", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, RandomizeWorldName);
-		Elements.Add(nameRandButton);
-		SetTooltipText(nameRandButton, "Randomize name");
-		
+		// --------------- NAME & SEED -----------------------		
 		var seedRandButton = new ImageButton(new Vector2(415, 377), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Seed", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, RandomizeSeed);
 		Elements.Add(seedRandButton);
 		SetTooltipText(seedRandButton, "Randomize seed");
-				
-		WorldCreationButtonPreset(nameRandButton);
 		WorldCreationButtonPreset(seedRandButton);
-		
-		_name = new Input(new Vector2(565, 315), Font, true, labelText: "Name", defaultText: "") 
-		{
-		    CharacterLimit = 20	    
-		};
-		_name.SetBackgroundProperties(_name.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
-		Elements.Add(_name);
 		
 		_seed = new Input(new Vector2(552, 375), Font, true, labelText: "Seed", defaultText: "") 
 		{
@@ -214,30 +163,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
 		_modificatorButtons.AddRange([lowGravity, highGravity, eternalWinter]);
 		
-		
-		var createButton = new Button(new Vector2(950, 900), "Create", Font, Create)
-		{
-			Scale = new Vector2(1.2f, 1.2f)
-		};
-		Elements.Add(createButton);
-		
-		var back = new Button(new Vector2(850, 900), "Back", Font, Back)
-		{
-			Scale = new Vector2(1.2f, 1.2f)
-		};
-		Elements.Add(back);
-		
-		WorldCreationButtonPreset(createButton);
-		WorldCreationButtonPreset(back);
-		
-		_errorText = new Text(new Vector2(0, 960), "World with same name already exists", Font) 
-		{
-		    HAlign = 0.5f,
-		    DrawColorGetter = () => BlastiaGame.ErrorColor,
-		    Alpha = 0f
-		};
-		Elements.Add(_errorText);
-		
         // call an extra update for buttons to keep up
         base.Update();
 	}
@@ -245,11 +170,11 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
     protected override void OnMenuActive()
     {
         base.OnMenuActive();
-        RandomizeWorldName();
-        RandomizeSeed();
-        
+        RandomizeSeed();        
         ResetSettings();
     }
+
+    protected override void RandomizeName(Input? name) => name?.SetText(RandomNameGenerator.Generate(name.CharacterLimit));
 	
 	/// <summary>
 	/// Updates list of warnings
@@ -269,12 +194,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 			_warnings.AddChild(new WarningUi(Vector2.Zero, "eternal winter", Font));
 	}
     
-    private void Back() 
-    {
-        SwitchToMenu(BlastiaGame.GetMenu<WorldSelectionMenu>());
-    }
-    
-    private void RandomizeWorldName() => _name?.SetText(WorldNameGenerator.Generate(20));
     
     private void RandomizeSeed() 
     {
@@ -306,14 +225,14 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		
         UpdateModificators();
     }
-
-	protected void Create()
-	{
-		if (_name == null || _seed == null || string.IsNullOrEmpty(_seed.Text) || _errorText == null) return;
+    
+    protected override void Create() 
+    {
+        if (_name == null || _seed == null || string.IsNullOrEmpty(_seed.Text)) return;
 		
 		(int width, int height) = GetSelectedSize();
 		WorldDifficulty difficulty = GetSelectedDifficulty();
-		Console.WriteLine($"[WORLD] Name: {_name.Text}, Seed: {_seed.Text}, World difficulty: {difficulty}, Width: {width}, Height: {height}");
+		Console.WriteLine($"[WorldCreation] Name: {_name.Text}, Seed: {_seed.Text}, World difficulty: {difficulty}, Width: {width}, Height: {height}");
 		
 		string name = _name.StringBuilder.ToString();
 		BigInteger seed = BigInteger.Parse(_seed.StringBuilder.ToString());
@@ -325,16 +244,6 @@ public class WorldCreationMenu(SpriteFont font, bool isActive = false) : Menu(fo
 		    return;
 		}
 		
-		string message = result switch 
-		{
-		    SaveValidationResult.InvalidName => "Invalid characters in the name",
-		    SaveValidationResult.InvalidPath => "Invalid world path. Please check the folder's name",
-		    SaveValidationResult.AlreadyExists => "World with that name already exists",
-		    _ => "Error while creating the world"
-		};
-		
-		_errorText.Text = message;
-		_errorText.Alpha = 2f;
-		_errorText.LerpAlphaToZero = true;
+		ShowErrorMessage(result);
 	}
 }

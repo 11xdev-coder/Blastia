@@ -268,7 +268,7 @@ public class BlastiaGame : Game
             StuffLoader.LoadHumans(GraphicsDevice);
             StuffLoader.LoadItemsFromJson(GraphicsDevice, Paths.ItemsData);
             
-            WorldNameGenerator.Load();
+            RandomNameGenerator.Load();
 
             MainFont = Content.Load<SpriteFont>("Font/Raleway");
 
