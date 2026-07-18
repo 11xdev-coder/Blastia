@@ -176,7 +176,7 @@ public class WorldCreationMenu : AbstractCreationMenu
         ResetSettings();
     }
 
-    protected override void RandomizeName(Input? name) => name?.SetText(RandomNameGenerator.Generate(name.CharacterLimit));
+    protected override void RandomizeName() => _name?.SetText(RandomNameGenerator.Generate(_name.CharacterLimit));
 	
 	/// <summary>
 	/// Updates list of warnings

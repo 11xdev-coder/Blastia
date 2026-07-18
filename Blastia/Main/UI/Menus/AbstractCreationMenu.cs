@@ -67,7 +67,7 @@ public abstract class AbstractCreationMenu(SpriteFont font, bool isActive = fals
 		Elements.Add(_tooltipText);
 		
 		// --------------- NAME & SEED -----------------------
-		var nameRandButton = new ImageButton(new Vector2(415, 317), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Name", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, () => RandomizeName(_name));
+		var nameRandButton = new ImageButton(new Vector2(415, 317), BlastiaGame.TextureManager.Rescale(BlastiaGame.TextureManager.Get("Name", "UI", "WorldCreation"), new Vector2(2f, 2f)), Font, RandomizeName);
 		Elements.Add(nameRandButton);
 		SetTooltipText(nameRandButton, "Randomize name");
 				
@@ -107,7 +107,7 @@ public abstract class AbstractCreationMenu(SpriteFont font, bool isActive = fals
     protected override void OnMenuActive()
     {
         base.OnMenuActive();
-        RandomizeName(_name);
+        RandomizeName();
     }
     
     private void Back() => SwitchToMenu(PreviousMenu);
@@ -115,7 +115,7 @@ public abstract class AbstractCreationMenu(SpriteFont font, bool isActive = fals
     /// <summary>
     /// Method that randomizes name when menu becomes active. Set name text directly
     /// </summary>
-    protected abstract void RandomizeName(Input? name);
+    protected abstract void RandomizeName();
 
     /// <summary>
     /// Method that gathers the settings and creates the save file. If it fails, call <c>ShowErrorMessage</c> and pass the result there

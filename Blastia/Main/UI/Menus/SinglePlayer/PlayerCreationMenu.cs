@@ -12,7 +12,7 @@ public class PlayerCreationMenu : AbstractCreationMenu
         
     }
 
-    protected override void RandomizeName(Input? name)
+    protected override void RandomizeName()
     {
         
     }
