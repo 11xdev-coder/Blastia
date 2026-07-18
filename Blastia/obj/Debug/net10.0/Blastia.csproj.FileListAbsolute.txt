@@ -370,3 +370,4 @@ C:/Users/matve/projects/Blastia/Blastia/obj/Debug/net10.0/Blastia.genruntimeconf
 C:/Users/matve/projects/Blastia/Blastia/obj/Debug/net10.0/ref/Blastia.dll
 C:/Users/matve/projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldSelection/PlayButton.png
 /home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Textures/UI/WorldSelection/PlayButton.png
+/home/matvei/Projects/Blastia/Blastia/bin/Debug/net10.0/Main/Content/Data/playernames.json

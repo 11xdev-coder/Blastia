@@ -1,0 +1,37 @@
+{
+  "NameStarts": [
+    "Ael", "Bran", "Cor", "Dra", "El", "Fen", "Gar", "Hal", "Ith", "Kael",
+    "Lor", "Mor", "Nyx", "Or", "Per", "Quen", "Rav", "Syl", "Thal", "Ul",
+    "Var", "Wyn", "Xan", "Yor", "Zeph", "Ash", "Bel", "Cin", "Dus", "Ember"
+  ],
+  "NameEnds": [
+    "an", "ar", "as", "dor", "eth", "ia", "iel", "in", "ion", "is",
+    "ith", "on", "or", "ra", "ric", "rin", "th", "us", "wyn", "yx",
+    "ley", "mir", "nar", "sen", "vek"
+  ],
+  "Adjectives": [
+    "Ashen", "Bold", "Crimson", "Dread", "Ember", "Fallen", "Gilded", "Hollow",
+    "Iron", "Jagged", "Keen", "Lost", "Molten", "Nimble", "Obsidian", "Pale",
+    "Quiet", "Restless", "Silent", "Twin", "Umbral", "Vagrant", "Wandering",
+    "Wretched", "Young", "Frost", "Grim", "Swift", "Weary", "Bitter"
+  ],
+  "Nouns": [
+    "Blade", "Cinder", "Crow", "Dagger", "Ember", "Fang", "Flame", "Ghost",
+    "Hammer", "Hunter", "Lantern", "Moth", "Nomad", "Oath", "Pilgrim", "Raven",
+    "Reaver", "Sparrow", "Spire", "Stag", "Thorn", "Tide", "Vagabond", "Warden",
+    "Wolf", "Wraith", "Anvil", "Beacon", "Drifter", "Kestrel"
+  ],
+  "Titles": [
+    "the Brave", "the Lost", "the Unbroken", "the Wanderer", "the Quiet",
+    "the Emberborn", "the Twice-Burned", "the Nameless", "the Undying",
+    "the Hollow", "the Sunless", "the Far-Walker", "the Stonebound",
+    "the Ashwalker", "the Kindly", "the Restless", "the Wayward", "the Sharp",
+    "the Deepdelver", "the Last"
+  ],
+  "Epithets": [
+    "Ashfall", "Blackbriar", "Coldwater", "Dawnbreak", "Emberfell", "Fairwind",
+    "Grimhold", "Hollowbrook", "Ironvale", "Longshadow", "Mournfield", "Nightriver",
+    "Oakenshield", "Palewood", "Ravenmoor", "Stormhollow", "Thornwick", "Wintermere",
+    "Duskbarrow", "Farhaven"
+  ]
+}

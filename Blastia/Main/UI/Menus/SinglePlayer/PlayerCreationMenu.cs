@@ -1,4 +1,5 @@
 using Blastia.Main.Persistence;
+using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Menus.SinglePlayer;
@@ -12,10 +13,7 @@ public class PlayerCreationMenu : AbstractCreationMenu
         
     }
 
-    protected override void RandomizeName()
-    {
-        
-    }
+    protected override void RandomizeName() => _name?.SetText(RandomNameGenerator.GeneratePlayerName(_name.CharacterLimit));
 
     protected override void Create()
     {
