@@ -128,9 +128,9 @@ public abstract class AbstractCreationMenu(SpriteFont font, bool isActive = fals
         string message = result switch 
 		{
 		    SaveValidationResult.InvalidName => "Invalid characters in the name",
-		    SaveValidationResult.InvalidPath => "Invalid world path. Please check the folder's name",
-		    SaveValidationResult.AlreadyExists => "World with that name already exists",
-		    _ => "Error while creating the world"
+		    SaveValidationResult.InvalidPath => "Invalid save path. Please check the folder's name",
+		    SaveValidationResult.AlreadyExists => "Save with that name already exists",
+		    _ => "Error while creating save"
 		};
 		
 		_errorText.Text = message;

@@ -128,11 +128,13 @@ public class WorldCreationMenu : AbstractCreationMenu
 		Elements.Add(easy);
 		SetTooltipText(easy, "The standard Blastia experience");
 		
-		var normal = new Button(new Vector2(430, 605), "Unforgiving", Font, () => {});
+		var easyScale = Font.MeasureString("Peaceful");
+		var normalScale = Font.MeasureString("Unforgiving");
+		var normal = new Button(new Vector2(430 + easyScale.X + 16, 550), "Unforgiving", Font, () => {});
 		Elements.Add(normal);
 		SetTooltipText(normal, "Greater difficulty with better loot");
 		
-		var hard = new Button(new Vector2(670, 605), "No mercy", Font, () => {});
+		var hard = new Button(new Vector2(430 + easyScale.X + 16 + normalScale.X + 16, 550), "No mercy", Font, () => {});
 		Elements.Add(hard);		
 		SetTooltipText(hard, "For those who'd like a challenge");
 		

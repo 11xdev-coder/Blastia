@@ -16,14 +16,19 @@ public class PlayerManager : Singleton<PlayerManager>
     public static string Extension = ".blst";
     public PlayerState? PlayerState;
     
-	public void NewPlayer(string playerName) 
+	public SaveValidationResult NewPlayer(string playerName) 
 	{
+		SaveValidationResult result = ManagerFileHelper.CanCreate(PlayersSaveFolder, playerName, Extension);
+		if (result != SaveValidationResult.Success)
+			return result;
+		
 		PlayerState playerData = new() 
 		{
 			Name = playerName,
 			CreatedAt = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
 		};
 		ManagerFileHelper.New(PlayersSaveFolder, playerName, Extension, playerData);
+		return SaveValidationResult.Success;
 	}
 	public bool PlayerExists(string playerName) => ManagerFileHelper.Exists(PlayersSaveFolder, playerName, Extension);
 	public List<PlayerState> LoadAllPlayers() => ManagerFileHelper.LoadAll<PlayerState>(PlayersSaveFolder, Extension);
