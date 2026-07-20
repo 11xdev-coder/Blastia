@@ -1,5 +1,6 @@
 ﻿using System.Reflection.Emit;
 using System.Text;
+using System.Text.RegularExpressions;
 using Assimp;
 using Blastia.Main.Utilities;
 using Microsoft.Xna.Framework;
@@ -54,6 +55,8 @@ public class Input : UIElement
     /// If <c>MoveInsteadOfWrapping</c> is true -> indicates character index from where we start showing text
     /// </summary>
     private int _cachedDisplayStart;
+    
+    public string AllowedCharRegex = "";
 
     private bool _ctrlVPressedLastFrame;
     
@@ -217,6 +220,26 @@ public class Input : UIElement
         {
             _cursorIndex = StringBuilder.Length;
         }
+    }
+    
+    /// <summary>
+    /// Simply removes all unallowed characters that dont match <c>AllowedCharRegex</c> pattern
+    /// </summary>
+    private void RemoveUnallowedCharacters() 
+    {
+        if (string.IsNullOrEmpty(AllowedCharRegex)) return;
+        
+        var originalText = StringBuilder.ToString();
+        var newText = new StringBuilder();
+        foreach (char c in originalText) 
+        {
+            if (!Regex.IsMatch(c.ToString(), AllowedCharRegex)) continue;
+            
+            newText.Append(c);
+        }
+        
+        if (newText.ToString() != originalText)
+            SetText(newText.ToString());
     }
     
     /// <summary>
@@ -424,6 +447,7 @@ public class Input : UIElement
         
         HandleCtrlVPaste();
         HandleInput();
+        RemoveUnallowedCharacters();
         EnforceCharacterLimit();
         SetDefaultTextIfEmpty();
         

@@ -69,7 +69,8 @@ public class WorldCreationMenu : AbstractCreationMenu
 		
 		_seed = new Input(new Vector2(552, 375), Font, true, labelText: "Seed", defaultText: "") 
 		{
-		    CharacterLimit = 20
+		    CharacterLimit = 20,
+		    AllowedCharRegex = @"^[0-9]+$"
 		};
 		_seed.SetBackgroundProperties(_seed.GetBackgroundBounds, Color.Black, 1, Color.Transparent, 5);
 		Elements.Add(_seed);
