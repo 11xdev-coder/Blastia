@@ -7,8 +7,6 @@ public class InGameVideoSettingsMenu(SpriteFont font, bool isActive = false) : M
 {
     protected override void AddElements()
     {
-        AddResolutionHandler(0.2f, 0.2f, OnResolutionClicked);
-        AddFullscreenSwitch(0.2f, 0.24f, OnFullScreenClicked);
     }
 
     private void OnFullScreenClicked()

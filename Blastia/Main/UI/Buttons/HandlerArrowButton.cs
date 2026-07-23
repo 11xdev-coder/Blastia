@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Blastia.Main.UI.Buttons;
 
+// TODO: refactor whatever bullshit thisi s
 /// <summary>
 /// Accepts handler, creates 2 arrows that will go to next/previous item.
 /// <para>T -> ListHandler's class</para>
@@ -15,9 +16,6 @@ public class HandlerArrowButton<T> : Button, IValueStorageUi<ListHandler<T>>
 	
 	public Button? LeftButton;
 	public Button? RightButton;
-
-	private Vector2 _leftArrowPosition;
-	private Vector2 _rightArrowPosition;
 	private float _arrowSpacing;
 	private ListHandler<T>? _handler;
 
@@ -30,11 +28,11 @@ public class HandlerArrowButton<T> : Button, IValueStorageUi<ListHandler<T>>
 		_arrowSpacing = arrowSpacing;
 		_handler = handler;
 
-		LeftButton = new Button(_leftArrowPosition, "<", font, OnLeftArrowClick)
+		LeftButton = new Button(Vector2.Zero, "<", font, OnLeftArrowClick)
 		{
 			AffectedByAlignOffset = false
 		};
-		RightButton = new Button(_rightArrowPosition, ">", font, OnRightArrowClick)
+		RightButton = new Button(Vector2.Zero, ">", font, OnRightArrowClick)
 		{
 			AffectedByAlignOffset = false
 		};
@@ -46,38 +44,24 @@ public class HandlerArrowButton<T> : Button, IValueStorageUi<ListHandler<T>>
 		if (subscribeToEvent != null) subscribeToEvent(UpdateLabel);
 	}
 
+    public override void Update()
+    {
+        base.Update();
+        LeftButton?.Update();
+        RightButton?.Update();
+    }
+
 	public override void UpdateBounds()
 	{
 		base.UpdateBounds();
 		UpdateArrowPositions();
 	}
 
-	/// <summary>
-	/// Adds LeftArrow, this button and RightArrow to the elements list
-	/// </summary>
-	/// <param name="elements"></param>
-	public void AddToElements(List<UIElement> elements)
-	{
-		if (LeftButton != null) elements.Add(LeftButton);
-		elements.Add(this);
-		if (RightButton != null) elements.Add(RightButton);
-	}
-
 	private void UpdateArrowPositions()
 	{
-		_leftArrowPosition = new Vector2(Bounds.Left - _arrowSpacing * 2, Bounds.Center.Y - _leftArrowSizeY / 2);
-		if (LeftButton != null)
-		{
-			LeftButton.Position = _leftArrowPosition;
-			LeftButton.UpdateBounds();
-		}
-		
-		_rightArrowPosition = new Vector2(Bounds.Right + _arrowSpacing, Bounds.Center.Y - _rightArrowSizeX / 2);
-		if (RightButton != null)
-		{
-			RightButton.Position = _rightArrowPosition;
-			RightButton.UpdateBounds();
-		}
+		if (LeftButton == null || RightButton == null) return;
+		LeftButton.Position = new Vector2(Bounds.Left - _arrowSpacing * 2, Bounds.Center.Y - _leftArrowSizeY / 2);		
+		RightButton.Position = new Vector2(Bounds.Right + _arrowSpacing, Bounds.Center.Y - _rightArrowSizeX / 2);
 	}
 
 	private void UpdateButtonText()
@@ -109,4 +93,11 @@ public class HandlerArrowButton<T> : Button, IValueStorageUi<ListHandler<T>>
 	{
 		UpdateButtonText();
 	}
+
+    public override void Draw(SpriteBatch spriteBatch)
+    {
+        base.Draw(spriteBatch);
+        LeftButton?.Draw(spriteBatch);
+        RightButton?.Draw(spriteBatch);
+    }
 }

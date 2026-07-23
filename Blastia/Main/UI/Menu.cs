@@ -167,44 +167,44 @@ public class Menu
     }
 
     // COMMON METHODS
-    private void AddSlider(Vector2 textPosition, Vector2 sliderPosition,
+    private (Text text, Slider slider) AddSlider(Vector2 position,
         float hAlign, float vAlign, string text, Func<float> sliderGetValue,
         Action<float> sliderSetValue, Action<Action> subscribeToEvent)
     {
-        var textUi = new Text(textPosition, text, Font)
+        var textUi = new Text(position, text, Font)
         {
             HAlign = hAlign - 0.13f,
             VAlign = vAlign
         };
-        Elements.Add(textUi);
-        var slider = new Slider(sliderPosition, Font,
+        var slider = new Slider(position, Font,
             sliderGetValue, sliderSetValue, subscribeToEvent, true)
         {
             HAlign = hAlign,
             VAlign = vAlign
         };
-        Elements.Add(slider);
+        
+        return (textUi, slider);
     }
-    protected void AddMasterVolumeSlider(float hAlign, float vAlign) =>
-        AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Master Volume",
+    protected (Text text, Slider slider) AddMasterVolumeSlider(Vector2 pos, float hAlign, float vAlign) =>
+        AddSlider(pos, hAlign, vAlign, "Master Volume",
             () => AudioManager.Instance.MasterVolume,
             f => AudioManager.Instance.MasterVolume = f,
             handler => AudioManager.Instance.MasterVolumeChanged += handler);
-    protected void AddMusicVolumeSlider(float hAlign, float vAlign) =>
-        AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Music Volume",
+    protected (Text text, Slider slider) AddMusicVolumeSlider(Vector2 pos, float hAlign, float vAlign) =>
+        AddSlider(pos, hAlign, vAlign, "Music Volume",
             () => AudioManager.Instance.MusicVolume,
             f => AudioManager.Instance.MusicVolume = f,
             handler => AudioManager.Instance.MusicVolumeChanged += handler);
 
-    protected void AddSoundVolumeSlider(float hAlign, float vAlign) =>
-        AddSlider(Vector2.Zero, Vector2.Zero, hAlign, vAlign, "Sound Volume",
+    protected (Text text, Slider slider) AddSoundVolumeSlider(Vector2 pos, float hAlign, float vAlign) =>
+        AddSlider(pos, hAlign, vAlign, "Sound Volume",
             () => AudioManager.Instance.SoundsVolume,
             f => AudioManager.Instance.SoundsVolume = f,
             handler => AudioManager.Instance.SoundsVolumeChanged += handler);
 
-    protected void AddFullscreenSwitch(float hAlign, float vAlign, Action onClick)
+    protected Button AddFullscreenSwitch(Vector2 pos, float hAlign, float vAlign, Action onClick)
     {
-        var isFullScreenButton = new Button(Vector2.Zero, "Full Screen", Font, onClick)
+        var isFullScreenButton = new Button(pos, "Full Screen", Font, onClick)
         {
             HAlign = hAlign,
             VAlign = vAlign
@@ -213,20 +213,19 @@ public class Menu
             () => VideoManager.Instance.IsFullScreen,
             _ => VideoManager.Instance.ToggleFullscreen(),
             handler => VideoManager.Instance.FullScreenChanged += handler);
-        Elements.Add(isFullScreenButton);
+        return isFullScreenButton;
     }
 
-    protected void AddResolutionHandler(float hAlign, float vAlign, Action onClick)
+    protected HandlerArrowButton<DisplayMode> AddResolutionHandler(Vector2 pos, float hAlign, float vAlign, Action onClick)
     {
-        HandlerArrowButton<DisplayMode> resolutionSwitcher = new HandlerArrowButton<DisplayMode>(Vector2.Zero, "Resolution", Font,
+        HandlerArrowButton<DisplayMode> resolutionSwitcher = new HandlerArrowButton<DisplayMode>(pos, "Resolution", Font,
             onClick, 10, VideoManager.Instance.ResolutionHandler,
             handler => VideoManager.Instance.ResolutionChanged += handler)
         {
             HAlign = hAlign,
             VAlign = vAlign
         };
-        resolutionSwitcher.AddToElements(Elements);
-
+        return resolutionSwitcher;
     }
     protected void WorldCreationBoolButtonPreset(Button button, List<Func<Button>>? buttonGroupGetters = null, bool canDeselectWholeButtonGroup = true)
     {

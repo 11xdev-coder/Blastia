@@ -283,8 +283,6 @@ public class BlastiaGame : Game
             AddMenu(new MultiplayerMenu(MainFont));
             AddMenu(new JoinGameMenu(MainFont));
             AddMenu(new SettingsMenu(MainFont));
-            AddMenu(new AudioSettingsMenu(MainFont));
-            AddMenu(new VideoSettingsMenu(MainFont));
             AddMenu(new RulerMenu(MainFont));
             AddMenu(new InGameSettingsButtonMenu(MainFont));
             AddMenu(new FpsCounterMenu(MainFont));
